@@ -31,6 +31,10 @@ namespace Spatial4n.Core.Distance
 			squared = false;
 		}
 
+		public CartesianDistCalc(bool squared)
+		{
+			this.squared = squared;
+		}
 
 		public override double Distance(Point @from, double toX, double toY)
 		{

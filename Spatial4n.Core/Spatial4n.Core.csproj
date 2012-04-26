@@ -1,0 +1,78 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{777904AC-46EF-466C-9E13-2A52A6735987}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Spatial4n.Core</RootNamespace>
+    <AssemblyName>Spatial4n.Core</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="Microsoft.CSharp" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Context\ParseUtils.cs" />
+    <Compile Include="Context\SpatialContext.cs" />
+    <Compile Include="Context\SpatialContextFactory.cs" />
+    <Compile Include="Distance\AbstractDistanceCalculator.cs" />
+    <Compile Include="Distance\CartesianDistCalc.cs" />
+    <Compile Include="Distance\DistanceCalculator.cs" />
+    <Compile Include="Distance\DistanceUnits.cs" />
+    <Compile Include="Distance\DistanceUtils.cs" />
+    <Compile Include="Distance\GeodesicSphereDistCalc.cs" />
+    <Compile Include="Exceptions\InvalidShapeException.cs" />
+    <Compile Include="Exceptions\InvalidSpatialArgument.cs" />
+    <Compile Include="Exceptions\UnsupportedSpatialOperation.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Query\SpatialOperation.cs" />
+    <Compile Include="Shapes\Circle.cs" />
+    <Compile Include="Shapes\Impl\CircleImpl.cs" />
+    <Compile Include="Shapes\Impl\GeoCircle.cs" />
+    <Compile Include="Shapes\Impl\PointImpl.cs" />
+    <Compile Include="Shapes\Impl\RectangleImpl.cs" />
+    <Compile Include="Shapes\MultiShape.cs" />
+    <Compile Include="Shapes\Point.cs" />
+    <Compile Include="Shapes\Rectangle.cs" />
+    <Compile Include="Shapes\Shape.cs" />
+    <Compile Include="Shapes\SpatialRelation.cs" />
+    <Compile Include="Util\GeohashUtils.cs" />
+    <Compile Include="Util\MathHelper.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Io\" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

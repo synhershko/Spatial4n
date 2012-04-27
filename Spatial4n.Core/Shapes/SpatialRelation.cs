@@ -21,8 +21,8 @@ namespace Spatial4n.Core.Shapes
 	/// The set of spatial relationships.  Naming is consistent with OGC spec conventions as seen in SQL/MM and others.
 	/// No equality case.  If two Shape instances are equal then the result might be CONTAINS or WITHIN, and
 	/// some logic might fail under this edge condition when it's not careful to check.
-	/// Client code must be written to detect this and act accordingly.  In RectangleImpl.relate(), it checks
-	/// for this explicitly, for example.  TestShapes2D.assertRelation() checks too.
+	/// Client code must be written to detect this and act accordingly.  In RectangleImpl.Relate(), it checks
+	/// for this explicitly, for example. TestShapes2D.assertRelation() checks too.
 	/// </summary>
 	public enum SpatialRelation
 	{
@@ -77,6 +77,5 @@ namespace Spatial4n.Core.Shapes
 			}
 			return SpatialRelation.INTERSECTS;
 		}
-
 	}
 }

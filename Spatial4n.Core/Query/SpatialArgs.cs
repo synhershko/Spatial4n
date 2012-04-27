@@ -30,7 +30,7 @@ namespace Spatial4n.Core.Query
 
 		public SpatialOperation Operation { get; set; }
 
-		private Shape shape;
+		private IShape shape;
 		private double distPrecision = DEFAULT_DIST_PRECISION;
 
 		// Useful for 'distance' calculations
@@ -42,7 +42,7 @@ namespace Spatial4n.Core.Query
 			this.Operation = operation;
 		}
 
-		public SpatialArgs(SpatialOperation operation, Shape shape)
+		public SpatialArgs(SpatialOperation operation, IShape shape)
 		{
 			this.Operation = operation;
 			this.shape = shape;
@@ -51,7 +51,6 @@ namespace Spatial4n.Core.Query
 		/**
 		 * Check if the arguments make sense -- throw an exception if not
 		 */
-
 		public void Validate()
 		{
 			if (Operation.IsTargetNeedsArea() && !shape.HasArea())
@@ -91,14 +90,14 @@ namespace Spatial4n.Core.Query
 		 * Considers {@link SpatialOperation#BBoxWithin} in returning the shape.
 		 */
 
-		public Shape GetShape()
+		public IShape GetShape()
 		{
 			if (shape != null && (Operation == SpatialOperation.BBoxWithin || Operation == SpatialOperation.BBoxIntersects))
 				return shape.GetBoundingBox();
 			return shape;
 		}
 
-		public void SetShape(Shape shape)
+		public void SetShape(IShape shape)
 		{
 			this.shape = shape;
 		}

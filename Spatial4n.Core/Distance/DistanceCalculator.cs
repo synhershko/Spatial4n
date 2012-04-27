@@ -20,12 +20,12 @@ using Spatial4n.Core.Shapes;
 
 namespace Spatial4n.Core.Distance
 {
-	public interface DistanceCalculator
+	public interface IDistanceCalculator
 	{
-		double Distance(Point @from, Point to);
-		double Distance(Point @from, double toX, double toY);
+		double Distance(IPoint @from, IPoint to);
+		double Distance(IPoint @from, double toX, double toY);
 
-		Point PointOnBearing(Point @from, double dist, double bearingDEG, SpatialContext ctx);
+		IPoint PointOnBearing(IPoint @from, double dist, double bearingDEG, SpatialContext ctx);
 
 		/// <summary>
 		/// Converts a distance to radians (multiples of the radius). A spherical
@@ -39,9 +39,8 @@ namespace Spatial4n.Core.Distance
 
 		//public Point pointOnBearing(Point from, double angle);
 
-		Rectangle CalcBoxByDistFromPt(Point from, double distance, SpatialContext ctx);
+		IRectangle CalcBoxByDistFromPt(IPoint from, double distance, SpatialContext ctx);
 
-		double CalcBoxByDistFromPtHorizAxis(Point from, double distance, SpatialContext ctx);
-
+		double CalcBoxByDistFromPtHorizAxis(IPoint from, double distance, SpatialContext ctx);
 	}
 }

@@ -20,7 +20,7 @@ namespace Spatial4n.Core.Shapes
 	/// <summary>
 	/// This is basically a circle.
 	/// </summary>
-	public interface Circle : Shape
+	public interface ICircle : IShape
 	{
 		double GetDistance();
 	}

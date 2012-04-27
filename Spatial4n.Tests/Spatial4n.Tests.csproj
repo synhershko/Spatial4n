@@ -50,7 +50,14 @@
     </CodeAnalysisDependentAssemblyPaths>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CustomAssert.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="distance\TestDistances.cs" />
+    <Compile Include="RandomSeed.cs" />
+    <Compile Include="shape\AbstractTestShapes.cs" />
+    <Compile Include="shape\TestShapeGeo.cs" />
+    <Compile Include="shape\TestShapes2D.cs" />
+    <Compile Include="util\TestGeohashUtils.cs" />
   </ItemGroup>
   <ItemGroup>
     <WCFMetadata Include="Service References\" />

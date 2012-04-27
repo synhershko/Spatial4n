@@ -24,7 +24,7 @@ namespace Spatial4n.Core.Query
 {
 	public class SpatialArgsParser
 	{
-		public SpatialArgs parse(String v, SpatialContext ctx)
+		public SpatialArgs Parse(String v, SpatialContext ctx)
 		{
 			int idx = v.IndexOf('(');
 			int edx = v.LastIndexOf(')');

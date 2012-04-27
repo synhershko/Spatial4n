@@ -4,7 +4,7 @@ using Spatial4n.Core.Shapes;
 using Spatial4n.Core.Util;
 using Xunit;
 
-namespace Spatial4n.Tests
+namespace Spatial4n.Tests.util
 {
 	public class TestGeohashUtils
 	{

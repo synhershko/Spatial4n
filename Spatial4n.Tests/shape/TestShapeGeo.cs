@@ -18,7 +18,8 @@ namespace Spatial4n.Tests.shape
             DistanceUnits units = DistanceUnits.KILOMETERS;
             IDistanceCalculator distCalc = new GeodesicSphereDistCalc.Haversine(units.EarthRadius());//default
             //TODO WTF it randomly chooses which implementation to use!!!!!!!!
-            switch (random.Next(3))
+            var item = random.Next(3);
+            switch (item)
             {
                 case 2:
                     //TODO ENABLE WHEN WORKING
@@ -26,6 +27,8 @@ namespace Spatial4n.Tests.shape
                     break;
                 case 1:
                     distCalc = new GeodesicSphereDistCalc.Vincenty(units.EarthRadius());
+                    break;
+                default:
                     break;
             }
             return new SpatialContext(units, distCalc, SpatialContext.GEO_WORLDBOUNDS);

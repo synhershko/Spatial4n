@@ -19,7 +19,7 @@ namespace Spatial4n.Tests.shape
 
         public void BeforeClass()
         {
-            random = new Random(7337);
+            random = new Random(RandomSeed.Seed());
             ctx = GetContext();
         }
 

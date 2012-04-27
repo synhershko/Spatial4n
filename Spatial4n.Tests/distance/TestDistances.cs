@@ -4,11 +4,11 @@ using Spatial4n.Core.Distance;
 using Spatial4n.Core.Shapes;
 using Xunit;
 
-namespace Spatial4n.Tests
+namespace Spatial4n.Tests.distance
 {
 	public class TestDistances
 	{
-		private Random random = new Random(7773);
+		private Random random = new Random(RandomSeed.Seed());
 		private SpatialContext ctx;
 
 		public TestDistances()
@@ -28,7 +28,6 @@ namespace Spatial4n.Tests
 			//Java ones AND they are different from the values reported at the movable-type url above!!!!!
 			//Assert.Equal(11100, dc().Distance(pLL(0, 100), pLL(10, 0)), precision: 0);     // we get 11102.445304151641 instead!!
 			//Assert.Equal(11100, dc().Distance(pLL(0, 100), pLL(10, -160)), precision: 0);  // we get 11102.445304151641 instead!!
-
 
 			Assert.Equal(314.4, dc().Distance(pLL(1, 2), pLL(3, 4)), precision: 1);   //314.4
 			Assert.Equal(7506, dc().Distance(pLL(5, 70), pLL(10, 2)), precision: 0);  //7506
@@ -156,7 +155,7 @@ namespace Spatial4n.Tests
 		}
 
 		[Fact]
-		public void TestDistCalcPointOnBearing_cartesian()
+		public void TestDistCalcPointOnBearing_Cartesian()
 		{
 			ctx = new SpatialContext(DistanceUnits.CARTESIAN);
 			var EPS = 10e-6; //tighter epsilon (aka delta)
@@ -167,7 +166,7 @@ namespace Spatial4n.Tests
 		}
 
 		[Fact]
-		public void TestDistCalcPointOnBearing_geo()
+		public void TestDistCalcPointOnBearing_Geo()
 		{
 			//The haversine formula has a higher error if the points are near antipodal. We adjust EPS tolerance for this case.
 			//TODO Eventually we should add the Vincenty formula for improved accuracy, or try some other cleverness.
@@ -237,7 +236,7 @@ namespace Spatial4n.Tests
 				//Assert.Equal(/* "input "+pair[0],*/ pair[1], ctx.NormY(pair[0]), precision: 0);
 				CustomAssert.EqualWithDelta(/* "input "+pair[0],*/ pair[1], ctx.NormY(pair[0]), Double.Epsilon);
 			}
-			Random random = new Random(7337);
+			Random random = new Random(RandomSeed.Seed());
 			for (int i = -1000; i < 1000; i += random.Next(10) * 10)
 			{
 				double d = ctx.NormY(i);
@@ -265,7 +264,7 @@ namespace Spatial4n.Tests
 				//Assert.Equal( /*"input "+pair[0],*/ pair[1], ctx.NormX(pair[0]), 0);
 				CustomAssert.EqualWithDelta( /*"input "+pair[0],*/ pair[1], ctx.NormX(pair[0]), Double.Epsilon);
 			}
-			Random random = new Random(7337);
+			Random random = new Random(RandomSeed.Seed());
 			for (int i = -1000; i < 1000; i += random.Next(10) * 10)
 			{
 				double d = ctx.NormX(i);

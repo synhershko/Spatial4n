@@ -26,7 +26,7 @@ namespace Spatial4n.Core.Shapes.Impl
 	/// it is world coordinates that cross the date line using degrees.
 	/// Immutable & threadsafe.
 	/// </summary>
-	public class RectangleImpl : Rectangle
+	public class RectangleImpl : IRectangle
 	{
 		private readonly double minX;
 		private readonly double maxX;
@@ -44,7 +44,7 @@ namespace Spatial4n.Core.Shapes.Impl
 			//assert minY <= maxY;
 		}
 
-		public RectangleImpl(Rectangle r)
+		public RectangleImpl(IRectangle r)
 		{
 			minX = r.GetMinX();
 			maxX = r.GetMaxX();
@@ -52,20 +52,20 @@ namespace Spatial4n.Core.Shapes.Impl
 			maxY = r.GetMaxY();
 		}
 
-		public SpatialRelation Relate(Shape other, SpatialContext ctx)
+		public SpatialRelation Relate(IShape other, SpatialContext ctx)
 		{
-			if (other is Point)
+			if (other is IPoint)
 			{
-				return Relate((Point)other, ctx);
+				return Relate((IPoint)other, ctx);
 			}
-			if (other is Rectangle)
+			if (other is IRectangle)
 			{
-				return Relate((Rectangle)other, ctx);
+				return Relate((IRectangle)other, ctx);
 			}
 			return other.Relate(this, ctx).Transpose();
 		}
 
-		public SpatialRelation Relate(Point point, SpatialContext ctx)
+		public SpatialRelation Relate(IPoint point, SpatialContext ctx)
 		{
 			if (point.GetY() > GetMaxY() || point.GetY() < GetMinY() ||
 				(GetCrossesDateLine() ?
@@ -75,7 +75,7 @@ namespace Spatial4n.Core.Shapes.Impl
 			return SpatialRelation.CONTAINS;
 		}
 
-		public SpatialRelation relate(Rectangle rect, SpatialContext ctx)
+		public SpatialRelation relate(IRectangle rect, SpatialContext ctx)
 		{
 			SpatialRelation yIntersect = Relate_yRange(rect.GetMinY(), rect.GetMaxY(), ctx);
 			if (yIntersect == SpatialRelation.DISJOINT)
@@ -97,7 +97,7 @@ namespace Spatial4n.Core.Shapes.Impl
 			return SpatialRelation.INTERSECTS;
 		}
 
-		public Rectangle GetBoundingBox()
+		public IRectangle GetBoundingBox()
 		{
 			return this;
 		}
@@ -107,7 +107,7 @@ namespace Spatial4n.Core.Shapes.Impl
 			return maxX != minX && maxY != minY;
 		}
 
-		public Point GetCenter()
+		public IPoint GetCenter()
 		{
 			double y = GetHeight() / 2 + minY;
 			double x = GetWidth() / 2 + minX;

@@ -22,76 +22,78 @@ using Spatial4n.Core.Context;
 
 namespace Spatial4n.Core.Shapes
 {
-	public class MultiShape : Shape
-	{
-		  private readonly Collection<Shape> geoms;
-	private readonly Rectangle bbox;
+    public class MultiShape : IShape
+    {
+        private readonly Collection<IShape> geoms;
+        private readonly IRectangle bbox;
 
-  public MultiShape(Collection<Shape> geoms, SpatialContext ctx) {
-    this.geoms = geoms;
-    double minX = Double.MaxValue;
-	double minY = Double.MaxValue;
-	double maxX = Double.MaxValue;
-	double maxY = Double.MaxValue;
-    foreach (var geom in geoms) {
-      Rectangle r = geom.GetBoundingBox();
-      minX = Math.Min(minX,r.GetMinX());
-      minY = Math.Min(minY,r.GetMinY());
-      maxX = Math.Max(maxX,r.GetMaxX());
-      maxY = Math.Max(maxY,r.GetMaxY());
+        public MultiShape(Collection<IShape> geoms, SpatialContext ctx)
+        {
+            this.geoms = geoms;
+            double minX = Double.MaxValue;
+            double minY = Double.MaxValue;
+            double maxX = Double.MaxValue;
+            double maxY = Double.MaxValue;
+            foreach (var geom in geoms)
+            {
+                IRectangle r = geom.GetBoundingBox();
+                minX = Math.Min(minX, r.GetMinX());
+                minY = Math.Min(minY, r.GetMinY());
+                maxX = Math.Max(maxX, r.GetMaxX());
+                maxY = Math.Max(maxY, r.GetMaxY());
+            }
+            this.bbox = ctx.MakeRect(minX, maxX, minY, maxY);
+        }
+
+        public SpatialRelation Relate(IShape other, SpatialContext ctx)
+        {
+            bool allOutside = true;
+            bool allContains = true;
+            foreach (var geom in geoms)
+            {
+                SpatialRelation sect = geom.Relate(other, ctx);
+                if (sect != SpatialRelation.DISJOINT)
+                    allOutside = false;
+                if (sect != SpatialRelation.CONTAINS)
+                    allContains = false;
+                if (!allContains && !allOutside)
+                    return SpatialRelation.INTERSECTS; //short circuit
+            }
+            if (allOutside)
+                return SpatialRelation.DISJOINT;
+            if (allContains)
+                return SpatialRelation.CONTAINS;
+            return SpatialRelation.INTERSECTS;
+        }
+
+        public IRectangle GetBoundingBox()
+        {
+            return bbox;
+        }
+
+        public bool HasArea()
+        {
+            return geoms.Any(geom => geom.HasArea());
+        }
+
+        public IPoint GetCenter()
+        {
+            return bbox.GetCenter();
+        }
+
+        public override bool Equals(object o)
+        {
+            if (this == o) return true;
+            
+            var that = o as MultiShape;
+            if (that == null || (geoms != null ? !geoms.Equals(that.geoms) : that.geoms != null)) return false;
+
+            return true;
+        }
+
+        public override int GetHashCode()
+        {
+            return geoms != null ? geoms.GetHashCode() : 0;
+        }
     }
-    this.bbox = ctx.MakeRect(minX, maxX, minY, maxY);
-  }
-
-  public SpatialRelation Relate(Shape other, SpatialContext ctx)
-  {
-  	bool allOutside = true;
-  	bool allContains = true;
-  	foreach (var geom in geoms)
-  	{
-  		SpatialRelation sect = geom.Relate(other, ctx);
-  		if (sect != SpatialRelation.DISJOINT)
-  			allOutside = false;
-  		if (sect != SpatialRelation.CONTAINS)
-  			allContains = false;
-  		if (!allContains && !allOutside)
-  			return SpatialRelation.INTERSECTS; //short circuit
-  	}
-  	if (allOutside)
-  		return SpatialRelation.DISJOINT;
-  	if (allContains)
-  		return SpatialRelation.CONTAINS;
-  	return SpatialRelation.INTERSECTS;
-  }
-
-		public Rectangle GetBoundingBox()
-		{
-			return bbox;
-		}
-
-		public bool HasArea()
-		{
-			return geoms.Any(geom => geom.HasArea());
-		}
-
-		public Point GetCenter()
-		{
-			return bbox.GetCenter();
-		}
-
-		public override bool Equals(object o)
-		{
-			if (this == o) return true;
-			
-			var that = o as MultiShape;
-			if (that == null || (geoms != null ? !geoms.Equals(that.geoms) : that.geoms != null)) return false;
-
-			return true;
-		}
-
-		public override int GetHashCode()
-		{
-			return geoms != null ? geoms.GetHashCode() : 0;
-		}
-	}
 }

@@ -135,21 +135,21 @@ namespace Spatial4n.Core.Util
 
 
 		/**
-   * Decodes the given geohash into a latitude and longitude
-   *
-   * @param geohash Geohash to deocde
-   * @return Array with the latitude at index 0, and longitude at index 1
-   */
-		public static Point Decode(String geohash, SpatialContext ctx)
+		 * Decodes the given geohash into a latitude and longitude
+		 *
+		 * @param geohash Geohash to deocde
+		 * @return Array with the latitude at index 0, and longitude at index 1
+		 */
+		public static IPoint Decode(String geohash, SpatialContext ctx)
 		{
-			Rectangle rect = DecodeBoundary(geohash, ctx);
+			IRectangle rect = DecodeBoundary(geohash, ctx);
 			double latitude = (rect.GetMinY() + rect.GetMaxY()) / 2D;
 			double longitude = (rect.GetMinX() + rect.GetMaxX()) / 2D;
 			return ctx.MakePoint(longitude, latitude);
 		}
 
 		/** Returns min-max lat, min-max lon. */
-		public static Rectangle DecodeBoundary(String geohash, SpatialContext ctx)
+		public static IRectangle DecodeBoundary(String geohash, SpatialContext ctx)
 		{
 			double minY = -90, maxY = 90, minX = -180, maxX = 180;
 			bool isEven = true;
@@ -160,7 +160,7 @@ namespace Spatial4n.Core.Util
 				if (c >= 'A' && c <= 'Z')
 					c = Convert.ToChar(c - Convert.ToChar('A' - 'a'));
 
-				int cd = BASE_32_IDX[c - BASE_32[0]];//TODO check successful?
+				int cd = BASE_32_IDX[c - BASE_32[0]]; //TODO check successful?
 
 				foreach (var mask in BITS)
 				{
@@ -188,7 +188,6 @@ namespace Spatial4n.Core.Util
 					}
 					isEven = !isEven;
 				}
-
 			}
 			return ctx.MakeRect(minX, maxX, minY, maxY);
 		}

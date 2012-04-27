@@ -77,6 +77,5 @@ namespace Spatial4n.Core.Shapes
 			}
 			return SpatialRelation.INTERSECTS;
 		}
-
 	}
 }

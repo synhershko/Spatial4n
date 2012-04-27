@@ -20,7 +20,7 @@ using Spatial4n.Core.Context;
 
 namespace Spatial4n.Core.Shapes.Impl
 {
-	public class PointImpl : Point
+	public class PointImpl : IPoint
 	{
 		private readonly double x;
 		private readonly double y;
@@ -31,14 +31,14 @@ namespace Spatial4n.Core.Shapes.Impl
 			this.y = y;
 		}
 
-		public SpatialRelation Relate(Shape other, SpatialContext ctx)
+		public SpatialRelation Relate(IShape other, SpatialContext ctx)
 		{
-			if (other is Point)
+			if (other is IPoint)
 				return this.Equals(other) ? SpatialRelation.INTERSECTS : SpatialRelation.DISJOINT;
 			return other.Relate(this, ctx).Transpose();
 		}
 
-		public Rectangle GetBoundingBox()
+		public IRectangle GetBoundingBox()
 		{
 			return new RectangleImpl(x, x, y, y);
 		}
@@ -48,7 +48,7 @@ namespace Spatial4n.Core.Shapes.Impl
 			return false;
 		}
 
-		public Point GetCenter()
+		public IPoint GetCenter()
 		{
 			return this;
 		}

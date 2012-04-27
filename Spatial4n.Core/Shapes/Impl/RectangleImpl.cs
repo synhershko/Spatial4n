@@ -75,7 +75,7 @@ namespace Spatial4n.Core.Shapes.Impl
 			return SpatialRelation.CONTAINS;
 		}
 
-		public SpatialRelation relate(IRectangle rect, SpatialContext ctx)
+		public SpatialRelation Relate(IRectangle rect, SpatialContext ctx)
 		{
 			SpatialRelation yIntersect = Relate_yRange(rect.GetMinY(), rect.GetMaxY(), ctx);
 			if (yIntersect == SpatialRelation.DISJOINT)

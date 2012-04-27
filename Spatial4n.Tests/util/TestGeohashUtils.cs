@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using Spatial4n.Core.Context;
 using Spatial4n.Core.Shapes;
 using Spatial4n.Core.Util;
@@ -84,8 +81,8 @@ namespace Spatial4n.Tests
 		public void TestHashLenToWidth()
 		{
 			double[] box = GeohashUtils.LookupDegreesSizeForHashLen(3);
-			CustomAssert.EqualWithDelta(1.40625, box[0], 0.0001);
-			CustomAssert.EqualWithDelta(1.40625, box[1], 0.0001);
+			Assert.Equal(1.40625, box[0], precision: 5);
+			Assert.Equal(1.40625, box[1], precision: 5);
 		}
 	}
 }

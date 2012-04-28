@@ -31,8 +31,8 @@ namespace Spatial4n.Core.Context
         protected Dictionary<String, String> args;
 
         protected DistanceUnits units;
-        protected IDistanceCalculator calculator;
-        protected IRectangle worldBounds;
+        protected DistanceCalculator calculator;
+        protected Rectangle worldBounds;
 
         /// <summary>
         /// The factory class is lookuped up via "spatialContextFactory" in args
@@ -113,7 +113,7 @@ namespace Spatial4n.Core.Context
 
             //kinda ugly we do this just to read a rectangle.  TODO refactor
             var simpleCtx = new SpatialContext(units, calculator, null);
-            worldBounds = (IRectangle)simpleCtx.ReadShape(worldBoundsStr);
+            worldBounds = (Rectangle)simpleCtx.ReadShape(worldBoundsStr);
         }
 
         /** Subclasses should simply construct the instance from the initialized configuration. */

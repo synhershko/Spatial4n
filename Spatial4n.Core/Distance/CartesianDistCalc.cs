@@ -36,7 +36,7 @@ namespace Spatial4n.Core.Distance
 			this.squared = squared;
 		}
 
-		public override double Distance(IPoint @from, double toX, double toY)
+		public override double Distance(Point @from, double toX, double toY)
 		{
 			double result = 0;
 
@@ -52,7 +52,7 @@ namespace Spatial4n.Core.Distance
 			return Math.Sqrt(result);
 		}
 
-		public override IPoint PointOnBearing(IPoint @from, double dist, double bearingDEG, SpatialContext ctx)
+		public override Point PointOnBearing(Point @from, double dist, double bearingDEG, SpatialContext ctx)
 		{
 			if (dist == 0)
 				return from;
@@ -72,12 +72,12 @@ namespace Spatial4n.Core.Distance
 			throw new InvalidOperationException("no geo!");
 		}
 
-		public override IRectangle CalcBoxByDistFromPt(IPoint @from, double distance, SpatialContext ctx)
+		public override Rectangle CalcBoxByDistFromPt(Point @from, double distance, SpatialContext ctx)
 		{
 			return ctx.MakeRect(from.GetX() - distance, from.GetX() + distance, from.GetY() - distance, from.GetY() + distance);
 		}
 
-		public override double CalcBoxByDistFromPtHorizAxis(IPoint @from, double distance, SpatialContext ctx)
+		public override double CalcBoxByDistFromPtHorizAxis(Point @from, double distance, SpatialContext ctx)
 		{
 			return from.GetY();
 		}

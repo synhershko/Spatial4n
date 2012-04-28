@@ -19,7 +19,7 @@ using Spatial4n.Core.Context;
 
 namespace Spatial4n.Core.Shapes
 {
-	public interface IShape
+	public interface Shape
 	{
 		/// <summary>
 		/// Describe the relationship between the two objects.  For example
@@ -33,13 +33,13 @@ namespace Spatial4n.Core.Shapes
 		/// <param name="other"></param>
 		/// <param name="ctx"></param>
 		/// <returns></returns>
-		SpatialRelation Relate(IShape other, SpatialContext ctx);
+		SpatialRelation Relate(Shape other, SpatialContext ctx);
 
 		/// <summary>
 		/// Get the bounding box for this Shape
 		/// </summary>
 		/// <returns></returns>
-		IRectangle GetBoundingBox();
+		Rectangle GetBoundingBox();
 
 		/// <summary>
 		/// 
@@ -47,6 +47,6 @@ namespace Spatial4n.Core.Shapes
 		/// <returns>true if the shape has area.  This will be false for points and lines</returns>
 		bool HasArea();
 
-		IPoint GetCenter();
+		Point GetCenter();
 	}
 }

@@ -20,9 +20,9 @@ using Spatial4n.Core.Shapes;
 
 namespace Spatial4n.Core.Distance
 {
-	public abstract class AbstractDistanceCalculator : IDistanceCalculator
+	public abstract class AbstractDistanceCalculator : DistanceCalculator
 	{
-		public double Distance(IPoint @from, IPoint to)
+		public double Distance(Point @from, Point to)
 		{
 			return Distance(from, to.GetX(), to.GetY());
 		}
@@ -32,11 +32,11 @@ namespace Spatial4n.Core.Distance
 			return GetType().Name;
 		}
 
-		public abstract double Distance(IPoint @from, double toX, double toY);
-		public abstract IPoint PointOnBearing(IPoint @from, double dist, double bearingDEG, SpatialContext ctx);
+		public abstract double Distance(Point @from, double toX, double toY);
+		public abstract Point PointOnBearing(Point @from, double dist, double bearingDEG, SpatialContext ctx);
 		public abstract double DistanceToDegrees(double distance);
 		public abstract double DegreesToDistance(double degrees);
-		public abstract IRectangle CalcBoxByDistFromPt(IPoint @from, double distance, SpatialContext ctx);
-		public abstract double CalcBoxByDistFromPtHorizAxis(IPoint @from, double distance, SpatialContext ctx);
+		public abstract Rectangle CalcBoxByDistFromPt(Point @from, double distance, SpatialContext ctx);
+		public abstract double CalcBoxByDistFromPtHorizAxis(Point @from, double distance, SpatialContext ctx);
 	}
 }

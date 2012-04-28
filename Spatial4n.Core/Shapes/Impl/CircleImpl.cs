@@ -26,20 +26,20 @@ namespace Spatial4n.Core.Shapes.Impl
 	/// should work for both cartesian 2D and geodetic sphere surfaces.
 	/// Threadsafe & immutable.
 	/// </summary>
-	public class CircleImpl : ICircle
+	public class CircleImpl : Circle
 	{
-		protected readonly IPoint point;
+		protected readonly Point point;
 		protected readonly double distance;
 
 		protected readonly SpatialContext ctx;
 
 		/* below is calculated & cached: */
 
-		protected readonly IRectangle enclosingBox;
+		protected readonly Rectangle enclosingBox;
 
 		//we don't have a line shape so we use a rectangle for these axis
 
-		public CircleImpl(IPoint p, double dist, SpatialContext ctx)
+		public CircleImpl(Point p, double dist, SpatialContext ctx)
 		{
 			//We assume any normalization / validation of params already occurred (including bounding dist)
 			this.point = p;
@@ -48,7 +48,7 @@ namespace Spatial4n.Core.Shapes.Impl
 			this.enclosingBox = ctx.GetDistCalc().CalcBoxByDistFromPt(point, distance, ctx);
 		}
 
-		public SpatialRelation Relate(IShape other, SpatialContext ctx)
+		public SpatialRelation Relate(Shape other, SpatialContext ctx)
 		{
 			//assert this.ctx == ctx;
 			//This shortcut was problematic in testing due to distinctions of CONTAINS/WITHIN for no-area shapes (lines, points).
@@ -56,28 +56,28 @@ namespace Spatial4n.Core.Shapes.Impl
 			//      return point.relate(other,ctx).intersects() ? SpatialRelation.WITHIN : SpatialRelation.DISJOINT;
 			//    }
 
-			if (other is IPoint)
+			if (other is Point)
 			{
-				return Relate((IPoint)other, ctx);
+				return Relate((Point)other, ctx);
 			}
-			if (other is IRectangle)
+			if (other is Rectangle)
 			{
-				return Relate((IRectangle)other, ctx);
+				return Relate((Rectangle)other, ctx);
 			}
-			if (other is ICircle)
+			if (other is Circle)
 			{
-				return Relate((ICircle)other, ctx);
+				return Relate((Circle)other, ctx);
 			}
 			return other.Relate(this, ctx).Transpose();
 
 		}
 
-		public SpatialRelation Relate(IPoint point, SpatialContext ctx)
+		public SpatialRelation Relate(Point point, SpatialContext ctx)
 		{
 			return Contains(point.GetX(), point.GetY()) ? SpatialRelation.CONTAINS : SpatialRelation.DISJOINT;
 		}
 
-		public SpatialRelation Relate(IRectangle r, SpatialContext ctx)
+		public SpatialRelation Relate(Rectangle r, SpatialContext ctx)
 		{
 			//Note: Surprisingly complicated!
 
@@ -93,7 +93,7 @@ namespace Spatial4n.Core.Shapes.Impl
 			return RelateRectanglePhase2(r, bboxSect, ctx);
 		}
 
-		protected virtual SpatialRelation RelateRectanglePhase2(IRectangle r, SpatialRelation bboxSect, SpatialContext ctx)
+		protected virtual SpatialRelation RelateRectanglePhase2(Rectangle r, SpatialRelation bboxSect, SpatialContext ctx)
 		{
 			/*
 			 !! DOES NOT WORK WITH GEO CROSSING DATELINE OR WORLD-WRAP.
@@ -176,7 +176,7 @@ namespace Spatial4n.Core.Shapes.Impl
 			return point.GetX();
 		}
 
-		public SpatialRelation Relate(ICircle circle, SpatialContext ctx)
+		public SpatialRelation Relate(Circle circle, SpatialContext ctx)
 		{
 			double crossDist = ctx.GetDistCalc().Distance(point, circle.GetCenter());
 			double aDist = distance, bDist = circle.GetDistance();
@@ -191,7 +191,7 @@ namespace Spatial4n.Core.Shapes.Impl
 		}
 
 
-		public IRectangle GetBoundingBox()
+		public Rectangle GetBoundingBox()
 		{
 			return enclosingBox;
 		}
@@ -201,7 +201,7 @@ namespace Spatial4n.Core.Shapes.Impl
 			return distance > 0;
 		}
 
-		public IPoint GetCenter()
+		public Point GetCenter()
 		{
 			return point;
 		}

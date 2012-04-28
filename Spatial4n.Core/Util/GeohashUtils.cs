@@ -140,16 +140,16 @@ namespace Spatial4n.Core.Util
 		 * @param geohash Geohash to deocde
 		 * @return Array with the latitude at index 0, and longitude at index 1
 		 */
-		public static IPoint Decode(String geohash, SpatialContext ctx)
+		public static Point Decode(String geohash, SpatialContext ctx)
 		{
-			IRectangle rect = DecodeBoundary(geohash, ctx);
+			Rectangle rect = DecodeBoundary(geohash, ctx);
 			double latitude = (rect.GetMinY() + rect.GetMaxY()) / 2D;
 			double longitude = (rect.GetMinX() + rect.GetMaxX()) / 2D;
 			return ctx.MakePoint(longitude, latitude);
 		}
 
 		/** Returns min-max lat, min-max lon. */
-		public static IRectangle DecodeBoundary(String geohash, SpatialContext ctx)
+		public static Rectangle DecodeBoundary(String geohash, SpatialContext ctx)
 		{
 			double minY = -90, maxY = 90, minX = -180, maxX = 180;
 			bool isEven = true;

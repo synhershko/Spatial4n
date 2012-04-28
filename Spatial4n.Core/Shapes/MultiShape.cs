@@ -22,12 +22,12 @@ using Spatial4n.Core.Context;
 
 namespace Spatial4n.Core.Shapes
 {
-    public class MultiShape : IShape
+    public class MultiShape : Shape
     {
-        private readonly Collection<IShape> geoms;
-        private readonly IRectangle bbox;
+        private readonly Collection<Shape> geoms;
+        private readonly Rectangle bbox;
 
-        public MultiShape(Collection<IShape> geoms, SpatialContext ctx)
+        public MultiShape(Collection<Shape> geoms, SpatialContext ctx)
         {
             this.geoms = geoms;
             double minX = Double.MaxValue;
@@ -36,7 +36,7 @@ namespace Spatial4n.Core.Shapes
             double maxY = Double.MaxValue;
             foreach (var geom in geoms)
             {
-                IRectangle r = geom.GetBoundingBox();
+                Rectangle r = geom.GetBoundingBox();
                 minX = Math.Min(minX, r.GetMinX());
                 minY = Math.Min(minY, r.GetMinY());
                 maxX = Math.Max(maxX, r.GetMaxX());
@@ -45,7 +45,7 @@ namespace Spatial4n.Core.Shapes
             this.bbox = ctx.MakeRect(minX, maxX, minY, maxY);
         }
 
-        public SpatialRelation Relate(IShape other, SpatialContext ctx)
+        public SpatialRelation Relate(Shape other, SpatialContext ctx)
         {
             bool allOutside = true;
             bool allContains = true;
@@ -66,7 +66,7 @@ namespace Spatial4n.Core.Shapes
             return SpatialRelation.INTERSECTS;
         }
 
-        public IRectangle GetBoundingBox()
+        public Rectangle GetBoundingBox()
         {
             return bbox;
         }
@@ -76,7 +76,7 @@ namespace Spatial4n.Core.Shapes
             return geoms.Any(geom => geom.HasArea());
         }
 
-        public IPoint GetCenter()
+        public Point GetCenter()
         {
             return bbox.GetCenter();
         }

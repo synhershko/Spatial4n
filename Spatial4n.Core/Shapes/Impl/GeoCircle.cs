@@ -27,7 +27,7 @@ namespace Spatial4n.Core.Shapes.Impl
 		private readonly GeoCircle inverseCircle;//when distance reaches > 1/2 way around the world, cache the inverse.
 		private readonly double horizAxisY;//see getYAxis
 
-		public GeoCircle(IPoint p, double dist, SpatialContext ctx)
+		public GeoCircle(Point p, double dist, SpatialContext ctx)
 			: base(p, dist, ctx)
 		{
 			Debug.Assert(ctx.IsGeo());
@@ -42,7 +42,7 @@ namespace Spatial4n.Core.Shapes.Impl
 				if (backDistDEG >= 0)
 				{
 					double backDistance = ctx.GetDistCalc().DegreesToDistance(backDistDEG);
-					IPoint backPoint = ctx.MakePoint(GetCenter().GetX() + 180, GetCenter().GetY() + 180);
+					Point backPoint = ctx.MakePoint(GetCenter().GetX() + 180, GetCenter().GetY() + 180);
 					inverseCircle = new GeoCircle(backPoint, backDistance, ctx);
 				}
 				else
@@ -82,7 +82,7 @@ namespace Spatial4n.Core.Shapes.Impl
 		/// <param name="bboxSect">INTERSECTS or CONTAINS from enclosingBox's intersection</param>
 		/// <param name="ctx"></param>
 		/// <returns>DISJOINT, CONTAINS, or INTERSECTS (not WITHIN)</returns>
-		protected override SpatialRelation RelateRectanglePhase2(IRectangle r, SpatialRelation bboxSect, SpatialContext ctx)
+		protected override SpatialRelation RelateRectanglePhase2(Rectangle r, SpatialRelation bboxSect, SpatialContext ctx)
 		{
 			//Rectangle wraps around the world longitudinally creating a solid band; there are no corners to test intersection
 			if (r.GetWidth() == 360)
@@ -145,7 +145,7 @@ namespace Spatial4n.Core.Shapes.Impl
 
 		}
 
-		private SpatialRelation RelateRectangleCircleWrapsPole(IRectangle r, SpatialContext ctx)
+		private SpatialRelation RelateRectangleCircleWrapsPole(Rectangle r, SpatialContext ctx)
 		{
 			//This method handles the case where the circle wraps ONE pole, but not both.  For both,
 			// there is the inverseCircle case handled before now.  The only exception is for the case where
@@ -209,7 +209,7 @@ namespace Spatial4n.Core.Shapes.Impl
 		}
 
 		/** Returns either 0 for none, 1 for some, or 4 for all. */
-		private int NumCornersIntersect(IRectangle r)
+		private int NumCornersIntersect(Rectangle r)
 		{
 			//We play some logic games to avoid calling contains() which can be expensive.
 			// for partial, we exit early with 1 and ignore bool.

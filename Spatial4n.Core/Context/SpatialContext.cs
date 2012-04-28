@@ -33,8 +33,8 @@ namespace Spatial4n.Core.Context
 	{
 		//These are non-null
 		private DistanceUnits units;
-		private IDistanceCalculator calculator;
-		private IRectangle worldBounds;
+		private DistanceCalculator calculator;
+		private Rectangle worldBounds;
 
 		public static readonly RectangleImpl GEO_WORLDBOUNDS = new RectangleImpl(-180, 180, -90, 90);
 		public static readonly RectangleImpl MAX_WORLDBOUNDS;
@@ -55,7 +55,7 @@ namespace Spatial4n.Core.Context
 		/// <param name="units">Required; and establishes geo vs cartesian.</param>
 		/// <param name="calculator">Optional; defaults to Haversine or cartesian depending on units.</param>
 		/// <param name="worldBounds">Optional; defaults to GEO_WORLDBOUNDS or MAX_WORLDBOUNDS depending on units.</param> 
-		public SpatialContext(DistanceUnits units, IDistanceCalculator calculator, IRectangle worldBounds)
+		public SpatialContext(DistanceUnits units, DistanceCalculator calculator, Rectangle worldBounds)
 		{
 			Init(units, calculator, worldBounds);
 		}
@@ -65,7 +65,7 @@ namespace Spatial4n.Core.Context
 			Init(units, null, null);
 		}
 
-		protected void Init(DistanceUnits units, IDistanceCalculator calculator, IRectangle worldBounds)
+		protected void Init(DistanceUnits units, DistanceCalculator calculator, Rectangle worldBounds)
 		{
 			if (units == null)
 				throw new ArgumentException("units can't be null", "units");
@@ -75,7 +75,7 @@ namespace Spatial4n.Core.Context
 			if (calculator == null)
 			{
 				calculator = IsGeo()
-					? (IDistanceCalculator)new GeodesicSphereDistCalc.Haversine(units.EarthRadius())
+					? (DistanceCalculator)new GeodesicSphereDistCalc.Haversine(units.EarthRadius())
 					: new CartesianDistCalc();
 			}
 			this.calculator = calculator;
@@ -103,12 +103,12 @@ namespace Spatial4n.Core.Context
 			return units;
 		}
 
-		public IDistanceCalculator GetDistCalc()
+		public DistanceCalculator GetDistCalc()
 		{
 			return calculator;
 		}
 
-		public IRectangle GetWorldBounds()
+		public Rectangle GetWorldBounds()
 		{
 			return worldBounds;
 		}
@@ -156,9 +156,9 @@ namespace Spatial4n.Core.Context
 		 *   http://en.wikipedia.org/wiki/Well-known_text
 		 *
 		 */
-		public IShape ReadShape(String value)
+		public Shape ReadShape(String value)
 		{
-			IShape s = ReadStandardShape(value);
+			Shape s = ReadStandardShape(value);
 			if (s == null)
 			{
 				throw new InvalidShapeException("Unable to read: " + value);
@@ -166,16 +166,16 @@ namespace Spatial4n.Core.Context
 			return s;
 		}
 
-		public String ToString(IShape shape)
+		public String ToString(Shape shape)
 		{
-			var point = shape as IPoint;
+			var point = shape as Point;
 			if (point != null)
 			{
 				return point.GetX().ToString("F6", CultureInfo.CreateSpecificCulture("en-US")) + " " +
 					   point.GetY().ToString("F6", CultureInfo.CreateSpecificCulture("en-US"));
 			}
 
-			var rect = shape as IRectangle;
+			var rect = shape as Rectangle;
 			if (rect != null)
 			{
 				return rect.GetMinX().ToString("F6", CultureInfo.CreateSpecificCulture("en-US")) + " " +
@@ -187,19 +187,19 @@ namespace Spatial4n.Core.Context
 		}
 
 		/** Construct a point. The parameters will be normalized. */
-		public IPoint MakePoint(double x, double y)
+		public Point MakePoint(double x, double y)
 		{
 			return new PointImpl(NormX(x), NormY(y));
 		}
 
-		public IPoint ReadLatCommaLonPoint(String value)
+		public Point ReadLatCommaLonPoint(String value)
 		{
 			double[] latLon = ParseUtils.ParseLatitudeLongitude(value);
 			return MakePoint(latLon[1], latLon[0]);
 		}
 
 		/** Construct a rectangle. The parameters will be normalized. */
-		public IRectangle MakeRect(double minX, double maxX, double minY, double maxY)
+		public Rectangle MakeRect(double minX, double maxX, double minY, double maxY)
 		{
 			//--Normalize parameters
 			if (IsGeo())
@@ -263,7 +263,7 @@ namespace Spatial4n.Core.Context
 
 
 		/** Construct a circle. The parameters will be normalized. */
-		public ICircle MakeCircle(double x, double y, double distance)
+		public Circle MakeCircle(double x, double y, double distance)
 		{
 			return MakeCircle(MakePoint(x, y), distance);
 		}
@@ -272,7 +272,7 @@ namespace Spatial4n.Core.Context
 		 * @param point
 		 * @param distance The units of "distance" should be the same as {@link #getUnits()}.
 		 */
-		public ICircle MakeCircle(IPoint point, double distance)
+		public Circle MakeCircle(Point point, double distance)
 		{
 			if (distance < 0)
 				throw new InvalidShapeException("distance must be >= 0; got " + distance);
@@ -283,7 +283,7 @@ namespace Spatial4n.Core.Context
 		}
 
 
-		protected IShape ReadStandardShape(String str)
+		protected Shape ReadStandardShape(String str)
 		{
 			if (str.Length < 1)
 			{
@@ -303,7 +303,7 @@ namespace Spatial4n.Core.Context
 
 						st = body.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
 						String token = st[tokenPos++];
-						IPoint pt;
+						Point pt;
 						if (token.IndexOf(',') != -1)
 						{
 							pt = ReadLatCommaLonPoint(token);

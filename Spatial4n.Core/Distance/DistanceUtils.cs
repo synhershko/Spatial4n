@@ -259,7 +259,7 @@ namespace Spatial4n.Core.Distance
 			return (off <= 180 ? off : 360 - off) - 90;
 		}
 
-		public static IRectangle CalcBoxByDistFromPtDEG(double lat, double lon, double distance, SpatialContext ctx)
+		public static Rectangle CalcBoxByDistFromPtDEG(double lat, double lon, double distance, SpatialContext ctx)
 		{
 			//See http://janmatuschek.de/LatitudeLongitudeBoundingCoordinates Section 3.1, 3.2 and 3.3
 

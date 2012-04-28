@@ -54,13 +54,15 @@ namespace Spatial4n.Core.Shapes.Impl
 
 		public SpatialRelation Relate(Shape other, SpatialContext ctx)
 		{
-			if (other is Point)
+			var point = other as Point;
+			if (point != null)
 			{
-				return Relate((Point)other, ctx);
+				return Relate(point, ctx);
 			}
-			if (other is Rectangle)
+			var rectangle = other as Rectangle;
+			if (rectangle != null)
 			{
-				return Relate((Rectangle)other, ctx);
+				return Relate(rectangle, ctx);
 			}
 			return other.Relate(this, ctx).Transpose();
 		}

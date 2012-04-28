@@ -119,10 +119,7 @@ namespace Spatial4n.Core.Context
 			{
 				return DistanceUtils.NormLonDEG(x);
 			}
-			else
-			{
-				return x;
-			}
+			return x;
 		}
 
 		public double NormY(double y)

@@ -56,17 +56,20 @@ namespace Spatial4n.Core.Shapes.Impl
 			//      return point.relate(other,ctx).intersects() ? SpatialRelation.WITHIN : SpatialRelation.DISJOINT;
 			//    }
 
-			if (other is Point)
+			var other1 = other as Point;
+			if (other1 != null)
 			{
-				return Relate((Point)other, ctx);
+				return Relate(other1, ctx);
 			}
-			if (other is Rectangle)
+			var rectangle = other as Rectangle;
+			if (rectangle != null)
 			{
-				return Relate((Rectangle)other, ctx);
+				return Relate(rectangle, ctx);
 			}
-			if (other is Circle)
+			var circle = other as Circle;
+			if (circle != null)
 			{
-				return Relate((Circle)other, ctx);
+				return Relate(circle, ctx);
 			}
 			return other.Relate(this, ctx).Transpose();
 
@@ -85,7 +88,7 @@ namespace Spatial4n.Core.Shapes.Impl
 			SpatialRelation bboxSect = enclosingBox.Relate(r, ctx);
 			if (bboxSect == SpatialRelation.DISJOINT || bboxSect == SpatialRelation.WITHIN)
 				return bboxSect;
-			else if (bboxSect == SpatialRelation.CONTAINS && enclosingBox.Equals(r))//nasty identity edge-case
+			if (bboxSect == SpatialRelation.CONTAINS && enclosingBox.Equals(r))//nasty identity edge-case
 				return SpatialRelation.WITHIN;
 			//bboxSect is INTERSECTS or CONTAINS
 			//The result can be DISJOINT, CONTAINS, or INTERSECTS (not WITHIN)

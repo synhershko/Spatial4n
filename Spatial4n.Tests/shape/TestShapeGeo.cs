@@ -16,7 +16,7 @@ namespace Spatial4n.Tests.shape
         protected override SpatialContext GetContext()
         {
             DistanceUnits units = DistanceUnits.KILOMETERS;
-            IDistanceCalculator distCalc = new GeodesicSphereDistCalc.Haversine(units.EarthRadius());//default
+            DistanceCalculator distCalc = new GeodesicSphereDistCalc.Haversine(units.EarthRadius());//default
             //TODO WTF it randomly chooses which implementation to use!!!!!!!!
             var item = random.Next(3);
             switch (item)

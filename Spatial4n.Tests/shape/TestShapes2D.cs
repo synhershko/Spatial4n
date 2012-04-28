@@ -21,17 +21,17 @@ namespace Spatial4n.Tests.shape
 		[Fact]
 		public void TestSimplePoint()
 		{
-			IPoint pt = ctx.MakePoint(0, 0);
+			Point pt = ctx.MakePoint(0, 0);
 			String msg = pt.ToString();
 
 			//test equals & hashcode
-			IPoint pt2 = ctx.MakePoint(0, 0);
+			Point pt2 = ctx.MakePoint(0, 0);
 			Assert.Equal(/*msg,*/ pt, pt2);
 			Assert.Equal(/*msg,*/ pt.GetHashCode(), pt2.GetHashCode());
 
 			Assert.False(pt.HasArea(), msg);
 			Assert.Equal(/*msg,*/ pt.GetCenter(), pt);
-			IRectangle bbox = pt.GetBoundingBox();
+			Rectangle bbox = pt.GetBoundingBox();
 			Assert.False(bbox.HasArea(), msg);
 			Assert.Equal(/*msg,*/ pt, bbox.GetCenter());
 

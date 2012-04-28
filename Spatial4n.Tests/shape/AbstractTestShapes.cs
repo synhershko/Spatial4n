@@ -23,7 +23,7 @@ namespace Spatial4n.Tests.shape
             ctx = GetContext();
         }
 
-        protected void AssertRelation(String msg, SpatialRelation expected, IShape a, IShape b)
+        protected void AssertRelation(String msg, SpatialRelation expected, Shape a, Shape b)
         {
             msg = a + " intersect " + b; //use different msg
             AssertIntersect(msg, expected, a, b);
@@ -31,7 +31,7 @@ namespace Spatial4n.Tests.shape
             AssertIntersect("(transposed) " + msg, expected.Transpose(), b, a);
         }
 
-        private void AssertIntersect(String msg, SpatialRelation expected, IShape a, IShape b)
+        private void AssertIntersect(String msg, SpatialRelation expected, Shape a, Shape b)
         {
             SpatialRelation sect = a.Relate(b, ctx);
             if (sect == expected)
@@ -46,8 +46,8 @@ namespace Spatial4n.Tests.shape
                     Assert.True(!a.HasArea(), msg);
                     Assert.True(!b.HasArea(), msg);
 
-                    IRectangle aBBox = a.GetBoundingBox();
-                    IRectangle bBBox = b.GetBoundingBox();
+                    Rectangle aBBox = a.GetBoundingBox();
+                    Rectangle bBBox = b.GetBoundingBox();
                     if (aBBox.GetHeight() == 0 && bBBox.GetHeight() == 0
                         && (aBBox.GetMaxY() == 90 && bBBox.GetMaxY() == 90
                             || aBBox.GetMinY() == -90 && bBBox.GetMinY() == -90))
@@ -76,9 +76,9 @@ namespace Spatial4n.Tests.shape
 
         protected void TestRectangle(double minX, double width, double minY, double height)
         {
-            IRectangle r = ctx.MakeRect(minX, minX + width, minY, minY + height);
+            Rectangle r = ctx.MakeRect(minX, minX + width, minY, minY + height);
             //test equals & hashcode of duplicate
-            IRectangle r2 = ctx.MakeRect(minX, minX + width, minY, minY + height);
+            Rectangle r2 = ctx.MakeRect(minX, minX + width, minY, minY + height);
             Assert.Equal(r, r2);
             Assert.Equal(r.GetHashCode(), r2.GetHashCode());
 
@@ -89,12 +89,12 @@ namespace Spatial4n.Tests.shape
 
             AssertEqualsRatio(msg, height, r.GetHeight());
             AssertEqualsRatio(msg, width, r.GetWidth());
-            IPoint center = r.GetCenter();
+            Point center = r.GetCenter();
             msg += " ctr:" + center;
             //System.out.println(msg);
             AssertRelation(msg, SpatialRelation.CONTAINS, r, center);
 
-            IDistanceCalculator dc = ctx.GetDistCalc();
+            DistanceCalculator dc = ctx.GetDistCalc();
             double dUR = dc.Distance(center, r.GetMaxX(), r.GetMaxY());
             double dLR = dc.Distance(center, r.GetMaxX(), r.GetMinY());
             double dUL = dc.Distance(center, r.GetMinX(), r.GetMaxY());
@@ -117,14 +117,14 @@ namespace Spatial4n.Tests.shape
             {
                 for (double right = left; right - left <= 360; right += INCR)
                 {
-                    IRectangle r = ctx.MakeRect(left, right, -Y, Y);
+                    Rectangle r = ctx.MakeRect(left, right, -Y, Y);
 
                     //test contains (which also tests within)
                     for (double left2 = left; left2 <= right; left2 += INCR)
                     {
                         for (double right2 = left2; right2 <= right; right2 += INCR)
                         {
-                            IRectangle r2 = ctx.MakeRect(left2, right2, -Y, Y);
+                            Rectangle r2 = ctx.MakeRect(left2, right2, -Y, Y);
                             AssertRelation(null, SpatialRelation.CONTAINS, r, r2);
                         }
                     }
@@ -136,7 +136,7 @@ namespace Spatial4n.Tests.shape
                     {
                         for (double right2 = left2; right2 - left < 360; right2 += INCR)
                         {
-                            IRectangle r2 = ctx.MakeRect(left2, right2, -Y, Y);
+                            Rectangle r2 = ctx.MakeRect(left2, right2, -Y, Y);
                             AssertRelation(null, SpatialRelation.DISJOINT, r, r2);
 
                             //test point disjoint
@@ -148,7 +148,7 @@ namespace Spatial4n.Tests.shape
                     {
                         for (double right2 = right + INCR; right2 - left < 360; right2 += INCR)
                         {
-                            IRectangle r2 = ctx.MakeRect(left2, right2, -Y, Y);
+                            Rectangle r2 = ctx.MakeRect(left2, right2, -Y, Y);
                             AssertRelation(null, SpatialRelation.INTERSECTS, r, r2);
                         }
                     }
@@ -158,14 +158,14 @@ namespace Spatial4n.Tests.shape
 
         protected void TestCircle(double x, double y, double dist)
         {
-            ICircle c = ctx.MakeCircle(x, y, dist);
+            Circle c = ctx.MakeCircle(x, y, dist);
             String msg = c.ToString();
-            ICircle c2 = ctx.MakeCircle(ctx.MakePoint(x, y), dist);
+            Circle c2 = ctx.MakeCircle(ctx.MakePoint(x, y), dist);
             Assert.Equal(c, c2);
             Assert.Equal(c.GetHashCode(), c2.GetHashCode());
 
             Assert.Equal( /*msg,*/ dist > 0, c.HasArea());
-            IRectangle bbox = c.GetBoundingBox();
+            Rectangle bbox = c.GetBoundingBox();
             Assert.Equal( /*msg,*/ dist > 0, bbox.GetArea() > 0);
             if (!ctx.IsGeo())
             {
@@ -190,7 +190,7 @@ namespace Spatial4n.Tests.shape
                 double cY = RandRange(-90, 90);
                 double cR = RandRange(0, 180);
                 double cR_dist = ctx.GetDistCalc().Distance(ctx.MakePoint(0, 0), 0, cR);
-                ICircle c = ctx.MakeCircle(cX, cY, cR_dist);
+                Circle c = ctx.MakeCircle(cX, cY, cR_dist);
 
                 double rX = RandRange(-180, 179);
                 double rW = RandRange(0, 360);
@@ -198,11 +198,11 @@ namespace Spatial4n.Tests.shape
                 double rY2 = RandRange(-90, 90);
                 double rYmin = Math.Min(rY1, rY2);
                 double rYmax = Math.Max(rY1, rY2);
-                IRectangle r = ctx.MakeRect(rX, rX + rW, rYmin, rYmax);
+                Rectangle r = ctx.MakeRect(rX, rX + rW, rYmin, rYmax);
 
                 SpatialRelation ic = c.Relate(r, ctx);
 
-                IPoint p;
+                Point p;
                 switch (ic)
                 {
                     case SpatialRelation.CONTAINS:
@@ -247,20 +247,20 @@ namespace Spatial4n.Tests.shape
             return result;
         }
 
-        private IPoint RandomPointWithin(Random random, ICircle c, SpatialContext ctx)
+        private Point RandomPointWithin(Random random, Circle c, SpatialContext ctx)
         {
             double d = c.GetDistance()*random.NextDouble();
             double angleDEG = 360*random.NextDouble();
-            IPoint p = ctx.GetDistCalc().PointOnBearing(c.GetCenter(), d, angleDEG, ctx);
+            Point p = ctx.GetDistCalc().PointOnBearing(c.GetCenter(), d, angleDEG, ctx);
             Assert.Equal(SpatialRelation.CONTAINS, c.Relate(p, ctx));
             return p;
         }
 
-        private IPoint RandomPointWithin(Random random, IRectangle r, SpatialContext ctx)
+        private Point RandomPointWithin(Random random, Rectangle r, SpatialContext ctx)
         {
             double x = r.GetMinX() + random.NextDouble()*r.GetWidth();
             double y = r.GetMinY() + random.NextDouble()*r.GetHeight();
-            IPoint p = ctx.MakePoint(x, y);
+            Point p = ctx.MakePoint(x, y);
             Assert.Equal(SpatialRelation.CONTAINS, r.Relate(p, ctx));
             return p;
         }

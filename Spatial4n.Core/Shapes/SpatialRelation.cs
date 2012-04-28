@@ -47,7 +47,7 @@ namespace Spatial4n.Core.Shapes
 
 		/// <summary>
 		/// If you were to call aShape.relate(bShape) and aShape.relate(cShape), you could call
-		/// this to merge the intersect results as if bShape & cShape were combined into {@link MultiShape}.
+		/// this to merge the intersect results as if bShape & cShape were combined into {@link MultShape}.
 		/// </summary>
 		/// <param name="this"></param>
 		/// <param name="other"></param>

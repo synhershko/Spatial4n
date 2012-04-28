@@ -16,8 +16,8 @@ namespace Spatial4n.Tests.distance
 			ctx = new SpatialContext(DistanceUnits.KILOMETERS);
 		}
 
-		private IDistanceCalculator dc() { return ctx.GetDistCalc(); }
-		private IPoint pLL(double lat, double lon) { return ctx.MakePoint(lon, lat); }
+		private DistanceCalculator dc() { return ctx.GetDistCalc(); }
+		private Point pLL(double lat, double lon) { return ctx.MakePoint(lon, lat); }
 
 		[Fact]
 		public void testSomeDistances()
@@ -50,11 +50,11 @@ namespace Spatial4n.Tests.distance
 			//first test regression
 			{
 				double d = 6894.1;
-				IPoint pCtr = pLL(-20, 84);
-				IPoint pTgt = pLL(-42, 15);
+				Point pCtr = pLL(-20, 84);
+				Point pTgt = pLL(-42, 15);
 				Assert.True(dc().Distance(pCtr, pTgt) < d);
 				//since the pairwise distance is less than d, a bounding box from ctr with d should contain pTgt.
-				IRectangle r = dc().CalcBoxByDistFromPt(pCtr, d, ctx);
+				Rectangle r = dc().CalcBoxByDistFromPt(pCtr, d, ctx);
 				Assert.Equal(SpatialRelation.CONTAINS, r.Relate(pTgt, ctx));
 				CheckBoundingBox(pCtr, d);
 			}
@@ -78,19 +78,19 @@ namespace Spatial4n.Tests.distance
 			{
 				double lat = -90 + random.NextDouble() * 180;
 				double lon = -180 + random.NextDouble() * 360;
-				IPoint ctr = ctx.MakePoint(lon, lat);
+				Point ctr = ctx.MakePoint(lon, lat);
 				double dist = MAXDIST * random.NextDouble();
 				CheckBoundingBox(ctr, dist);
 			}
 		}
 
-		private void CheckBoundingBox(IPoint ctr, double dist)
+		private void CheckBoundingBox(Point ctr, double dist)
 		{
 			String msg = "ctr: " + ctr + " dist: " + dist;
 
 			var EPS = 10e-4;//delta when doing double assertions. Geo eps is not that small.
 
-			IRectangle r = dc().CalcBoxByDistFromPt(ctr, dist, ctx);
+			Rectangle r = dc().CalcBoxByDistFromPt(ctr, dist, ctx);
 			double horizAxisLat = dc().CalcBoxByDistFromPtHorizAxis(ctr, dist, ctx);
 			if (!Double.IsNaN(horizAxisLat))
 				Assert.True(r.Relate_yRange(horizAxisLat, horizAxisLat, ctx).Intersects());
@@ -104,7 +104,7 @@ namespace Spatial4n.Tests.distance
 			}
 			else
 			{
-				IPoint tPt = FindClosestPointOnVertToPoint(r.GetMinX(), r.GetMinY(), r.GetMaxY(), ctr);
+				Point tPt = FindClosestPointOnVertToPoint(r.GetMinX(), r.GetMinY(), r.GetMaxY(), ctr);
 				double calcDist = dc().Distance(ctr, tPt);
 				CustomAssert.EqualWithDelta(/*msg,*/ dist, calcDist, EPS);
 				CustomAssert.EqualWithDelta(/*msg,*/ tPt.GetY(), horizAxisLat, EPS);
@@ -123,7 +123,7 @@ namespace Spatial4n.Tests.distance
 				CustomAssert.EqualWithDelta(/*msg,*/ dist, botDist, EPS);
 		}
 
-		private IPoint FindClosestPointOnVertToPoint(double lon, double lowLat, double highLat, IPoint ctr)
+		private Point FindClosestPointOnVertToPoint(double lon, double lowLat, double highLat, Point ctr)
 		{
 			//A binary search algorithm to find the point along the vertical lon between lowLat & highLat that is closest
 			// to ctr, and returns the distance.
@@ -195,10 +195,10 @@ namespace Spatial4n.Tests.distance
 		{
 			for (int angDEG = 0; angDEG < 360; angDEG += random.Next(20) + 1)
 			{
-				IPoint c = ctx.MakePoint(random.Next(360), -90 + random.Next(181));
+				Point c = ctx.MakePoint(random.Next(360), -90 + random.Next(181));
 
 				//0 distance means same point
-				IPoint p2 = dc().PointOnBearing(c, 0, angDEG, ctx);
+				Point p2 = dc().PointOnBearing(c, 0, angDEG, ctx);
 				Assert.Equal(c, p2);
 
 				p2 = dc().PointOnBearing(c, dist, angDEG, ctx);

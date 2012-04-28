@@ -17,7 +17,7 @@
 
 namespace Spatial4n.Core.Shapes
 {
-	public interface Point : Shape
+	public interface IPoint : IShape
 	{
 		double GetX();
 		double GetY();

@@ -19,7 +19,7 @@ using Spatial4n.Core.Context;
 
 namespace Spatial4n.Core.Shapes
 {
-	public interface Rectangle :Shape
+	public interface IRectangle :IShape
 	{
 		double GetWidth();
 		double GetHeight();

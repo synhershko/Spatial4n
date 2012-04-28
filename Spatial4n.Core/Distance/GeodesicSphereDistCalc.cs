@@ -35,13 +35,13 @@ namespace Spatial4n.Core.Distance
 			this.radius = radius;
 		}
 
-		public override double Distance(Point @from, double toX, double toY)
+		public override double Distance(IPoint @from, double toX, double toY)
 		{
 			return DistanceLatLonRAD(DistanceUtils.ToRadians(from.GetY()), DistanceUtils.ToRadians(from.GetX()),
 				DistanceUtils.ToRadians(toY), DistanceUtils.ToRadians(toX)) * radius;
 		}
 
-		public override Point PointOnBearing(Point @from, double dist, double bearingDEG, SpatialContext ctx)
+		public override IPoint PointOnBearing(IPoint @from, double dist, double bearingDEG, SpatialContext ctx)
 		{
 			//TODO avoid unnecessary double[] intermediate object
 			if (dist == 0)
@@ -65,7 +65,7 @@ namespace Spatial4n.Core.Distance
 
 		}
 
-		public override Rectangle CalcBoxByDistFromPt(Point @from, double distance, SpatialContext ctx)
+		public override IRectangle CalcBoxByDistFromPt(IPoint @from, double distance, SpatialContext ctx)
 		{
 			Debug.Assert(radius == ctx.GetUnits().EarthRadius());
 			if (distance == 0)
@@ -73,7 +73,7 @@ namespace Spatial4n.Core.Distance
 			return DistanceUtils.CalcBoxByDistFromPtDEG(from.GetY(), from.GetX(), distance, ctx);
 		}
 
-		public override double CalcBoxByDistFromPtHorizAxis(Point @from, double distance, SpatialContext ctx)
+		public override double CalcBoxByDistFromPtHorizAxis(IPoint @from, double distance, SpatialContext ctx)
 		{
 			return DistanceUtils.CalcBoxByDistFromPtHorizAxisDEG(from.GetY(), from.GetX(), distance, radius);
 		}

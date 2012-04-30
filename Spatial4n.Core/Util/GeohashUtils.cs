@@ -34,7 +34,7 @@ namespace Spatial4n.Core.Util
 
 		private static readonly int[] BASE_32_IDX; //sparse array of indexes from '0' to 'z'
 
-		private const int MAX_PRECISION = 24;
+		public const int MAX_PRECISION = 24;
 		//DWS: I forget what level results in needless more precision but it's about this
 
 		private static readonly int[] BITS = { 16, 8, 4, 2, 1 };

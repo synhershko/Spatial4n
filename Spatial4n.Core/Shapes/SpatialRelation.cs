@@ -26,6 +26,7 @@ namespace Spatial4n.Core.Shapes
 	/// </summary>
 	public enum SpatialRelation
 	{
+		NULL_VALUE,
 		WITHIN,
 		CONTAINS,
 		DISJOINT,

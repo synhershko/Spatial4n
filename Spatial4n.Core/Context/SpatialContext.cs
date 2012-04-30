@@ -296,7 +296,10 @@ namespace Spatial4n.Core.Context
 					int idx = str.LastIndexOf(')');
 					if (idx > 0)
 					{
-						var body = str.Substring("Circle(".Length, idx);
+						//Substring in .NET is (startPosn, length), But in Java it's (startPosn, endPosn)
+						//see http://docs.oracle.com/javase/1.4.2/docs/api/java/lang/String.html#substring(int, int)
+						var body = str.Substring("Circle(".Length, 
+												(idx - "Circle(".Length));
 
 						st = body.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
 						String token = st[tokenPos++];

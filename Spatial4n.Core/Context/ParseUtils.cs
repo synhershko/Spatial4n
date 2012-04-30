@@ -59,7 +59,9 @@ namespace Spatial4n.Core.Context
 					{
 						break;
 					}
-					_out[i] = externalVal.Substring(start, end);
+					//Substring in .NET is (startPosn, length), But in Java it's (startPosn, endPosn)
+					//see http://docs.oracle.com/javase/1.4.2/docs/api/java/lang/String.html#substring(int, int)
+					_out[i] = externalVal.Substring(start, (end - start));
 					start = idx + 1;
 					end = externalVal.IndexOf(',', start);
 					idx = end;
@@ -111,7 +113,9 @@ namespace Spatial4n.Core.Context
 					{
 						break;
 					}
-					@out[i] = Double.Parse(externalVal.Substring(start, end));
+					//Substring in .NET is (startPosn, length), But in Java it's (startPosn, endPosn)
+					//see http://docs.oracle.com/javase/1.4.2/docs/api/java/lang/String.html#substring(int, int)
+					@out[i] = Double.Parse(externalVal.Substring(start, (end - start)));
 					start = idx + 1;
 					end = externalVal.IndexOf(',', start);
 					idx = end;

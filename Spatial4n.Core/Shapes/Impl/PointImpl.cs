@@ -81,9 +81,9 @@ namespace Spatial4n.Core.Shapes.Impl
 		public override int GetHashCode()
 		{
 			long temp = x != +0.0d ? BitConverter.DoubleToInt64Bits(x) : 0L;
-			int result = (int) (temp ^ ((uint)temp >> 32));
+			int result = (int)(temp ^ ((uint)temp >> 32));
 			temp = y != +0.0d ? BitConverter.DoubleToInt64Bits(y) : 0L;
-			result = 31*result + (int) (temp ^ ((uint)temp >> 32));
+			result = 31 * result + (int)(temp ^ ((uint)temp >> 32));
 			return result;
 		}
 	}

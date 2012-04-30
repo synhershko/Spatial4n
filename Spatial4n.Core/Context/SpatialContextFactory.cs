@@ -28,11 +28,10 @@ namespace Spatial4n.Core.Context
     /// </summary>
     public class SpatialContextFactory
     {
-        protected Dictionary<String, String> args;
-
-        protected DistanceUnits units;
-        protected DistanceCalculator calculator;
-        protected Rectangle worldBounds;
+        protected Dictionary<String, String> Args;
+        protected DistanceUnits Units;
+        protected DistanceCalculator Calculator;
+        protected Rectangle WorldBounds;
 
         /// <summary>
         /// The factory class is lookuped up via "spatialContextFactory" in args
@@ -44,22 +43,33 @@ namespace Spatial4n.Core.Context
         public static SpatialContext MakeSpatialContext(Dictionary<String, String> args)
         {
             SpatialContextFactory instance;
-            String cname = null;
+            String cname;
+            //if (!Configuration.GetValue("SpatialContextFactory", out cname) || cname == null)
             if (!args.TryGetValue("spatialContextFactory", out cname) || cname == null)
-                //if (!Configuration.GetValue("SpatialContextFactory", out cname) || cname == null)
+            {
                 instance = new SpatialContextFactory();
+                instance.Init(args);
+                return instance.NewSpatialContext();
+            }
             else
             {
                 Type t = Type.GetType(cname);
-                instance = (SpatialContextFactory) Activator.CreateInstance(t);
+                instance = (SpatialContextFactory)Activator.CreateInstance(t);
+                
+                //See if the specified type has subclassed the "NewSpatialContext" method and if so call it to do the setup
+                var subClassedMethod = t.GetMethod("NewSpatialContext", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.DeclaredOnly);
+                if (subClassedMethod != null)
+                    return (SpatialContext)subClassedMethod.Invoke(instance, new object[] { });
+
+                //Otherwise fallback to the default behaviour
+                instance.Init(args);
+                return instance.NewSpatialContext();
             }
-            instance.Init(args);
-            return instance.NewSpatialContext();
         }
 
         protected void Init(Dictionary<String, String> args)
         {
-            this.args = args;
+            Args = args;
             InitUnits();
             InitCalculator();
             InitWorldBounds();
@@ -68,36 +78,36 @@ namespace Spatial4n.Core.Context
         protected void InitUnits()
         {
             String unitsStr;
-            if (!args.TryGetValue("units", out unitsStr) || unitsStr == null)
-                units = DistanceUnits.KILOMETERS;
+            if (!Args.TryGetValue("units", out unitsStr) || unitsStr == null)
+                Units = DistanceUnits.KILOMETERS;
             else
-                units = DistanceUnits.FindDistanceUnit(unitsStr);
+                Units = DistanceUnits.FindDistanceUnit(unitsStr);
         }
 
         protected void InitCalculator()
         {
             String calcStr;
-            if (!args.TryGetValue("distCalculator", out calcStr) || calcStr == null)
+            if (!Args.TryGetValue("distCalculator", out calcStr) || calcStr == null)
                 return;
             if (calcStr.Equals("haversine", StringComparison.InvariantCultureIgnoreCase))
             {
-                calculator = new GeodesicSphereDistCalc.Haversine(units.EarthRadius());
+                Calculator = new GeodesicSphereDistCalc.Haversine(Units.EarthRadius());
             }
             else if (calcStr.Equals("lawOfCosines", StringComparison.InvariantCultureIgnoreCase))
             {
-                calculator = new GeodesicSphereDistCalc.LawOfCosines(units.EarthRadius());
+                Calculator = new GeodesicSphereDistCalc.LawOfCosines(Units.EarthRadius());
             }
             else if (calcStr.Equals("vincentySphere", StringComparison.InvariantCultureIgnoreCase))
             {
-                calculator = new GeodesicSphereDistCalc.Vincenty(units.EarthRadius());
+                Calculator = new GeodesicSphereDistCalc.Vincenty(Units.EarthRadius());
             }
             else if (calcStr.Equals("cartesian", StringComparison.InvariantCultureIgnoreCase))
             {
-                calculator = new CartesianDistCalc();
+                Calculator = new CartesianDistCalc();
             }
             else if (calcStr.Equals("cartesian^2", StringComparison.InvariantCultureIgnoreCase))
             {
-                calculator = new CartesianDistCalc(true);
+                Calculator = new CartesianDistCalc(true);
             }
             else
             {
@@ -108,18 +118,18 @@ namespace Spatial4n.Core.Context
         protected void InitWorldBounds()
         {
             String worldBoundsStr;
-            if (!args.TryGetValue("worldBounds", out worldBoundsStr) || worldBoundsStr == null)
+            if (!Args.TryGetValue("worldBounds", out worldBoundsStr) || worldBoundsStr == null)
                 return;
 
             //kinda ugly we do this just to read a rectangle.  TODO refactor
-            var simpleCtx = new SpatialContext(units, calculator, null);
-            worldBounds = (Rectangle)simpleCtx.ReadShape(worldBoundsStr);
+            var simpleCtx = new SpatialContext(Units, Calculator, null);
+            WorldBounds = (Rectangle)simpleCtx.ReadShape(worldBoundsStr);
         }
 
         /** Subclasses should simply construct the instance from the initialized configuration. */
         protected SpatialContext NewSpatialContext()
         {
-            return new SpatialContext(units, calculator, worldBounds);
+            return new SpatialContext(Units, Calculator, WorldBounds);
         }
     }
 }

@@ -36,7 +36,9 @@ namespace Spatial4n.Core.Query
 
 			SpatialOperation op = SpatialOperation.Get(v.Substring(0, idx).Trim());
 
-			String body = v.Substring(idx + 1, edx).Trim();
+			//Substring in .NET is (startPosn, length), But in Java it's (startPosn, endPosn)
+			//see http://docs.oracle.com/javase/1.4.2/docs/api/java/lang/String.html#substring(int, int)
+			String body = v.Substring(idx + 1, edx - (idx + 1)).Trim();
 			if (body.Length < 1)
 			{
 				throw new InvalidSpatialArgument("missing body : " + v);

@@ -24,10 +24,8 @@ namespace Spatial4n.Tests.distance
 		{
 			//See to verify: from http://www.movable-type.co.uk/scripts/latlong.html
 
-			//TODO work out why these tests fail, the calculated values are different from the original 
-			//Java ones AND they are different from the values reported at the movable-type url above!!!!!
-			//Assert.Equal(11100, dc().Distance(pLL(0, 100), pLL(10, 0)), precision: 0);     // we get 11102.445304151641 instead!!
-			//Assert.Equal(11100, dc().Distance(pLL(0, 100), pLL(10, -160)), precision: 0);  // we get 11102.445304151641 instead!!
+			CustomAssert.EqualWithDelta(11100, dc().Distance(pLL(0, 100), pLL(10, 0)), 3.0);     // we get 11102.445304151641
+			CustomAssert.EqualWithDelta(11100, dc().Distance(pLL(0, 100), pLL(10, -160)), 3.0);  // we get 11102.445304151641
 
 			Assert.Equal(314.4, dc().Distance(pLL(1, 2), pLL(3, 4)), precision: 1);   //314.4
 			Assert.Equal(7506, dc().Distance(pLL(5, 70), pLL(10, 2)), precision: 0);  //7506

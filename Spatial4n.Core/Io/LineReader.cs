@@ -67,40 +67,39 @@ namespace Spatial4n.Core.Io
 			{
 				current = ParseLine(nextLine);
 				count++;
+				nextLine = null;
 			}
 
-			if (!reader.EndOfStream)
+			try
 			{
-				try
+				while (!reader.EndOfStream)
 				{
-					while (!reader.EndOfStream)
+					nextLine = reader.ReadLine();
+					lineNumber++;
+					if (nextLine == null)
 					{
-						nextLine = reader.ReadLine();
-						lineNumber++;
-						if (nextLine == null)
+						Debug.Assert(reader.EndOfStream);
+						break;
+					}
+					else if (nextLine.StartsWith("#"))
+					{
+						ReadComment(nextLine);
+					}
+					else
+					{
+						nextLine = nextLine.Trim();
+						if (nextLine.Length > 0)
 						{
-							Debug.Assert(reader.EndOfStream);
 							break;
-						}
-						else if (nextLine.StartsWith("#"))
-						{
-							ReadComment(nextLine);
-						}
-						else
-						{
-							nextLine = nextLine.Trim();
-							if (nextLine.Length > 0)
-							{
-								break;
-							}
 						}
 					}
 				}
-				catch (IOException ioe)
-				{
-					throw new Exception("IOException thrown while reading/closing reader", ioe);
-				}
 			}
+			catch (IOException ioe)
+			{
+				throw new Exception("IOException thrown while reading/closing reader", ioe);
+			}
+
 			return true;
 		}
 

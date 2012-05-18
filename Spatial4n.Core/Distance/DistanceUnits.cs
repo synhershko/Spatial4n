@@ -37,13 +37,12 @@ namespace Spatial4n.Core.Distance
 
 		private readonly double earthRadius;
 
-		/**
- * Creates a new DistanceUnit that represents the given unit
- *
- * @param units Distance unit in String form
- * @param earthRadius Radius of the Earth in the specific distance unit
- * @param earthCircumfence Circumference of the Earth in the specific distance unit
- */
+		/// <summary>
+		/// Creates a new DistanceUnit that represents the given unit
+		/// </summary>
+		/// <param name="units">Distance unit in String form</param>
+		/// <param name="earthRadius">Radius of the Earth in the specific distance unit</param>
+		/// <param name="earthCircumfence">Circumference of the Earth in the specific distance unit</param>
 		DistanceUnits(String units, double earthRadius, double earthCircumfence)
 		{
 			this.units = units;
@@ -51,13 +50,12 @@ namespace Spatial4n.Core.Distance
 			this.earthRadius = earthRadius;
 		}
 
-		/**
- * Returns the DistanceUnit which represents the given unit
- *
- * @param unit Unit whose DistanceUnit should be found
- * @return DistanceUnit representing the unit
- * @throws IllegalArgumentException if no DistanceUnit which represents the given unit is found
- */
+		/// <summary>
+		/// Returns the DistanceUnit which represents the given unit
+		/// </summary>
+		/// <param name="unit">Unit whose DistanceUnit should be found</param>
+		/// <returns>DistanceUnit representing the unit</returns>
+		/// <throws>IllegalArgumentException if no DistanceUnit which represents the given unit is found</throws>
 		public static DistanceUnits FindDistanceUnit(String unit)
 		{
 			if (MILES.GetUnits().Equals(unit, StringComparison.InvariantCultureIgnoreCase) || unit.Equals("mi", StringComparison.InvariantCultureIgnoreCase))
@@ -75,13 +73,12 @@ namespace Spatial4n.Core.Distance
 			throw new ArgumentException("Unknown distance unit " + unit, "unit");
 		}
 
-		/**
-		 * Converts the given distance in given DistanceUnit, to a distance in the unit represented by {@code this}
-		 *
-		 * @param distance Distance to convert
-		 * @param from Unit to convert the distance from
-		 * @return Given distance converted to the distance in the given unit
-		 */
+		/// <summary>
+		/// Converts the given distance in given DistanceUnit, to a distance in the unit represented by {@code this}
+		/// </summary>
+		/// <param name="distance">Distance to convert</param>
+		/// <param name="from">Unit to convert the distance from</param>
+		/// <returns>Given distance converted to the distance in the given unit</returns>
 		public double Convert(double distance, DistanceUnits from)
 		{
 			if (from == this)
@@ -95,31 +92,28 @@ namespace Spatial4n.Core.Distance
 			return (this == MILES) ? distance * DistanceUtils.KM_TO_MILES : distance * DistanceUtils.MILES_TO_KM;
 		}
 
-		/**
-		 * Returns the string representation of the distance unit
-		 *
-		 * @return String representation of the distance unit
-		 */
+		/// <summary>
+		/// Returns the string representation of the distance unit
+		/// </summary>
+		/// <returns>String representation of the distance unit</returns>
 		public String GetUnits()
 		{
 			return units;
 		}
 
-		/**
-		 * Returns the <a href="http://en.wikipedia.org/wiki/Earth_radius">average earth radius</a>
-		 *
-		 * @return the average earth radius
-		 */
+		/// <summary>
+		/// Returns the <a href="http://en.wikipedia.org/wiki/Earth_radius">average earth radius</a>
+		/// </summary>
+		/// <returns>the average earth radius</returns>
 		public double EarthRadius()
 		{
 			return earthRadius;
 		}
 
-		/**
-		 * Returns the <a href="http://www.lyberty.com/encyc/articles/earth.html">circumference of the Earth</a>
-		 *
-		 * @return  the circumference of the Earth
-		 */
+		/// <summary>
+		/// Returns the <a href="http://www.lyberty.com/encyc/articles/earth.html">circumference of the Earth</a>
+		/// </summary>
+		/// <returns>the circumference of the Earth</returns>
 		public double EarthCircumference()
 		{
 			return earthCircumference;

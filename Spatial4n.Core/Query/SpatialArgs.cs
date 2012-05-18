@@ -48,9 +48,9 @@ namespace Spatial4n.Core.Query
 			this.shape = shape;
 		}
 
-		/**
-		 * Check if the arguments make sense -- throw an exception if not
-		 */
+		/// <summary>
+		/// Check if the arguments make sense -- throw an exception if not
+		/// </summary>
 		public void Validate()
 		{
 			if (Operation.IsTargetNeedsArea() && !shape.HasArea())
@@ -86,10 +86,10 @@ namespace Spatial4n.Core.Query
 		// Getters & Setters
 		//------------------------------------------------
 
-		/**
-		 * Considers {@link SpatialOperation#BBoxWithin} in returning the shape.
-		 */
-
+		/// <summary>
+		/// Considers {@link SpatialOperation#BBoxWithin} in returning the shape.
+		/// </summary>
+		/// <returns></returns>
 		public Shape GetShape()
 		{
 			if (shape != null && (Operation == SpatialOperation.BBoxWithin || Operation == SpatialOperation.BBoxIntersects))
@@ -102,14 +102,14 @@ namespace Spatial4n.Core.Query
 			this.shape = shape;
 		}
 
-		/**
-		 * The fraction of the distance from the center of the query shape to its nearest edge that is considered acceptable
-		 * error. The algorithm for computing the distance to the nearest edge is actually a little different. It normalizes
-		 * the shape to a square given it's bounding box area:
-		 * <pre>sqrt(shape.bbox.area)/2</pre>
-		 * And the error distance is beyond the shape such that the shape is a minimum shape.
-		 */
-
+		/// <summary>
+		/// The fraction of the distance from the center of the query shape to its nearest edge that is considered acceptable
+		/// error. The algorithm for computing the distance to the nearest edge is actually a little different. It normalizes
+		/// the shape to a square given it's bounding box area:
+		/// <pre>sqrt(shape.bbox.area)/2</pre>
+		/// And the error distance is beyond the shape such that the shape is a minimum shape.
+		/// </summary>
+		/// <returns></returns>
 		public Double GetDistPrecision()
 		{
 			return distPrecision;

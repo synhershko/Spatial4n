@@ -258,17 +258,24 @@ namespace Spatial4n.Core.Context
 			return w;
 		}
 
-
-		/** Construct a circle. The parameters will be normalized. */
+		/// <summary>
+		/// Construct a circle. The parameters will be normalized.
+		/// </summary>
+		/// <param name="x"></param>
+		/// <param name="y"></param>
+		/// <param name="distance"></param>
+		/// <returns></returns>
 		public Circle MakeCircle(double x, double y, double distance)
 		{
 			return MakeCircle(MakePoint(x, y), distance);
 		}
 
-		/**
-		 * @param point
-		 * @param distance The units of "distance" should be the same as {@link #getUnits()}.
-		 */
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="point"></param>
+		/// <param name="distance">The units of "distance" should be the same as {@link #GetUnits()}.</param>
+		/// <returns></returns>
 		public Circle MakeCircle(Point point, double distance)
 		{
 			if (distance < 0)

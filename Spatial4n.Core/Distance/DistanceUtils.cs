@@ -237,9 +237,11 @@ namespace Spatial4n.Core.Distance
 		  }
 		}
 
-		/**
-		 * Puts in range -180 <= lon_deg < +180.
-		 */
+		/// <summary>
+		/// Puts in range -180 <= lon_deg < +180.
+		/// </summary>
+		/// <param name="lon_deg"></param>
+		/// <returns></returns>
 		public static double NormLonDEG(double lon_deg)
 		{
 			if (lon_deg >= -180 && lon_deg < 180)

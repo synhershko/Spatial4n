@@ -72,7 +72,7 @@ namespace Spatial4n.Core.Query
 			{
 				str.Append(" max=").Append(Max);
 			}
-			str.Append(" distPrec=").Append(String.Format("%.2f%%", distPrecision/100d)); // TODO
+			str.Append(" distPrec=").AppendFormat("{0:0.00}%", distPrecision / 100d);
 			str.Append(')');
 			return str.ToString();
 		}

@@ -252,11 +252,11 @@ namespace Spatial4n.Core.Shapes.Impl
 		{
 			//I'm deliberately making this look basic and not fully detailed with class name & misc fields.
 			//Add distance in degrees, which is easier to recognize, and earth radius agnostic.
-			String dStr = String.Format("%.1f", distance);
+			String dStr = String.Format("{0:0.00}", distance);
 			if (ctx.IsGeo())
 			{
 				double distDEG = ctx.GetDistCalc().DistanceToDegrees(distance);
-				dStr += String.Format("=%.1f\u00B0", distDEG);//TODO
+				dStr += String.Format("={0:0.0}\u00B0", distDEG);
 			}
 			return "Circle(" + point + ",d=" + dStr + ')';
 		}

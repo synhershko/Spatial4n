@@ -24,7 +24,7 @@ namespace Spatial4n.Core.Io.Samples
 {
 	public class SampleDataWriter
 	{
-		protected readonly TextWriter _out;
+		protected readonly TextWriter @out;
 		protected readonly SpatialContext ctx;
 		protected readonly bool bbox;
 		protected readonly int maxLength;
@@ -35,16 +35,16 @@ namespace Spatial4n.Core.Io.Samples
 			this.bbox = bbox;
 			this.maxLength = maxLength;
 
-			_out = new StringWriter(/*new FileStream(filePath, FileMode.Create)*/);
+			@out = new StringWriter(/*new FileStream(filePath, FileMode.Create)*/);
 
-			_out.Write("#id");
-			_out.Write('\t');
-			_out.Write("name");
-			_out.Write('\t');
-			_out.Write("shape");
-			_out.Write('\t');
-			_out.WriteLine();
-			_out.Flush();
+			@out.Write("#id");
+			@out.Write('\t');
+			@out.Write("name");
+			@out.Write('\t');
+			@out.Write("shape");
+			@out.Write('\t');
+			@out.WriteLine();
+			@out.Flush();
 		}
 
 		//protected String ToString(String name, Shape shape)
@@ -84,19 +84,19 @@ namespace Spatial4n.Core.Io.Samples
 		public void Write(String id, String name, Shape shape)
 		{
 			String geo = string.Empty;//ToString(name, bbox ? shape.GetBoundingBox() : shape);
-			_out.Write(id);
-			_out.Write('\t');
-			_out.Write(name);
-			_out.Write('\t');
-			_out.Write(geo);
-			_out.Write('\t');
-			_out.WriteLine();
-			_out.Flush();
+			@out.Write(id);
+			@out.Write('\t');
+			@out.Write(name);
+			@out.Write('\t');
+			@out.Write(geo);
+			@out.Write('\t');
+			@out.WriteLine();
+			@out.Flush();
 		}
 
 		public void Close()
 		{
-			_out.Close();
+			@out.Close();
 		}
 	}
 }

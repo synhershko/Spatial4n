@@ -37,42 +37,37 @@ namespace Spatial4n.Core.Distance
 		public static readonly double KM_TO_MILES = 0.621371192;
 		public static readonly double MILES_TO_KM = 1 / KM_TO_MILES;//1.609
 
-		/**
-		 * The International Union of Geodesy and Geophysics says the Earth's mean radius in KM is:
-		 *
-		 * [1] http://en.wikipedia.org/wiki/Earth_radius
-		 */
+		/// <summary>
+		/// The International Union of Geodesy and Geophysics says the Earth's mean radius in KM is:
+		///
+		/// [1] http://en.wikipedia.org/wiki/Earth_radius
+		/// </summary>
 		public static readonly double EARTH_MEAN_RADIUS_KM = 6371.0087714;
 		public static readonly double EARTH_EQUATORIAL_RADIUS_KM = 6378.1370;
 
 		public static readonly double EARTH_MEAN_RADIUS_MI = EARTH_MEAN_RADIUS_KM * KM_TO_MILES;
 		public static readonly double EARTH_EQUATORIAL_RADIUS_MI = EARTH_EQUATORIAL_RADIUS_KM * KM_TO_MILES;
 
-		/**
-		 * Calculate the p-norm (i.e. length) between two vectors
-		 *
-		 * @param vec1  The first vector
-		 * @param vec2  The second vector
-		 * @param power The power (2 for cartesian distance, 1 for manhattan, etc.)
-		 * @return The length.
-		 *         <p/>
-		 *         See http://en.wikipedia.org/wiki/Lp_space
-		 * @see #vectorDistance(double[], double[], double, double)
-		 */
+		/// <summary>
+		/// Calculate the p-norm (i.e. length) between two vectors
+		/// </summary>
+		/// <param name="vec1">The first vector</param>
+		/// <param name="vec2">The second vector</param>
+		/// <param name="power">The power (2 for cartesian distance, 1 for manhattan, etc.)</param>
+		/// <returns>The length. See http://en.wikipedia.org/wiki/Lp_space </returns>
 		public static double VectorDistance(double[] vec1, double[] vec2, double power)
 		{
 			return VectorDistance(vec1, vec2, power, 1.0 / power);
 		}
 
-		/**
- * Calculate the p-norm (i.e. length) between two vectors
- *
- * @param vec1         The first vector
- * @param vec2         The second vector
- * @param power        The power (2 for cartesian distance, 1 for manhattan, etc.)
- * @param oneOverPower If you've precalculated oneOverPower and cached it, use this method to save one division operation over {@link #vectorDistance(double[], double[], double)}.
- * @return The length.
- */
+		/// <summary>
+		/// Calculate the p-norm (i.e. length) between two vectors
+		/// </summary>
+		/// <param name="vec1">The first vector</param>
+		/// <param name="vec2">The second vector</param>
+		/// <param name="power">The power (2 for cartesian distance, 1 for manhattan, etc.)</param>
+		/// <param name="oneOverPower">If you've precalculated oneOverPower and cached it, use this method to save one division operation over {@link #vectorDistance(double[], double[], double)}.</param>
+		/// <returns>The length.</returns>
 		public static double VectorDistance(double[] vec1, double[] vec2, double power, double oneOverPower)
 		{
 			double result = 0;
@@ -190,9 +185,10 @@ namespace Spatial4n.Core.Distance
 			return result;
 		}
 
-		/**
-		 * @param latLng The lat/lon, in radians. lat in position 0, lon in position 1
-		 */
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="latLng">The lat/lon, in radians. lat in position 0, lon in position 1</param>
 		public static void NormLatRAD(double[] latLng)
 		{
 
@@ -223,12 +219,11 @@ namespace Spatial4n.Core.Distance
 
 		}
 
-		/**
-		 * Returns a normalized Lng rectangle shape for the bounding box
-		 *
-		 * @param latLng The lat/lon, in radians, lat in position 0, lon in position 1
-		 */
-		//@Deprecated
+
+		/// <summary>
+		/// Returns a normalized Lng rectangle shape for the bounding box
+		/// </summary>
+		/// <param name="latLng">The lat/lon, in radians, lat in position 0, lon in position 1</param>
 		public static void NormLngRAD(double[] latLng) {
 		  if (latLng[1] > DEG_180_AS_RADS) {
 		    latLng[1] = -1.0 * (DEG_180_AS_RADS - (latLng[1] - DEG_180_AS_RADS));
@@ -250,9 +245,11 @@ namespace Spatial4n.Core.Distance
 			return off < 0 ? 180 + off : -180 + off;
 		}
 
-		/**
-		 * Puts in range -90 <= lat_deg <= 90.
-		 */
+		/// <summary>
+		/// Puts in range -90 &lt;= lat_deg &lt;= 90.
+		/// </summary>
+		/// <param name="lat_deg"></param>
+		/// <returns></returns>
 		public static double NormLatDEG(double lat_deg)
 		{
 			if (lat_deg >= -90 && lat_deg <= 90)
@@ -448,19 +445,24 @@ namespace Spatial4n.Core.Distance
 			return Math.Atan2(Math.Sqrt(a * a + b * b), c);
 		}
 
-		/**
-		 * Converts a distance in the units of the radius to degrees (360 degrees are in a circle). A spherical
-		 * earth model is assumed.
-		 */
+		/// <summary>
+		/// Converts a distance in the units of the radius to degrees (360 degrees are in a circle). A spherical
+		/// earth model is assumed.
+		/// </summary>
+		/// <param name="dist"></param>
+		/// <param name="radius"></param>
+		/// <returns></returns>
 		public static double Dist2Degrees(double dist, double radius)
 		{
 			return MathHelper.ToDegrees(Dist2Radians(dist, radius));
 		}
 
-		/**
-		 * Converts a distance in the units of the radius to radians (multiples of the radius). A spherical
-		 * earth model is assumed.
-		 */
+		/// <summary>
+		/// Converts a distance in the units of the radius to radians (multiples of the radius). A spherical earth model is assumed.
+		/// </summary>
+		/// <param name="dist"></param>
+		/// <param name="radius"></param>
+		/// <returns></returns>
 		public static double Dist2Radians(double dist, double radius)
 		{
 			return dist / radius;
@@ -471,9 +473,11 @@ namespace Spatial4n.Core.Distance
 			return radians * radius;
 		}
 
-		/**
-		 * About 3x faster Math.toRadians().  See CompareRadiansSnippit
-		 */
+		/// <summary>
+		/// About 3x faster Math.toRadians().  See CompareRadiansSnippit
+		/// </summary>
+		/// <param name="deg"></param>
+		/// <returns></returns>
 		public static double ToRadians(double deg)
 		{
 			return deg * DEGREES_TO_RADIANS;

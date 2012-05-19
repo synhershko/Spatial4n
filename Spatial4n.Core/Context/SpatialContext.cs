@@ -131,28 +131,30 @@ namespace Spatial4n.Core.Context
 			return y;
 		}
 
-		/**
-		 * Is this a geospatial context (true) or simply 2d spatial (false)
-		 */
+		/// <summary>
+		/// Is this a geospatial context (true) or simply 2d spatial (false)
+		/// </summary>
+		/// <returns></returns>
 		public bool IsGeo()
 		{
 			return GetUnits().IsGeo();
 		}
 
-		/**
-		 * Read a shape from a given string (ie, X Y, XMin XMax... WKT)
-		 *
-		 * (1) Point: X Y
-		 *   1.23 4.56
-		 *
-		 * (2) BOX: XMin YMin XMax YMax
-		 *   1.23 4.56 7.87 4.56
-		 *
-		 * (3) WKT
-		 *   POLYGON( ... )
-		 *   http://en.wikipedia.org/wiki/Well-known_text
-		 *
-		 */
+		/// <summary>
+		/// Read a shape from a given string (ie, X Y, XMin XMax... WKT)
+		/// 
+		///  (1) Point: X Y
+		///    1.23 4.56
+		/// 
+		///  (2) BOX: XMin YMin XMax YMax
+		///   1.23 4.56 7.87 4.56
+		/// 
+		///  (3) WKT
+		///    POLYGON( ... )
+		///    http://en.wikipedia.org/wiki/Well-known_text
+		/// </summary>
+		/// <param name="value"></param>
+		/// <returns></returns>
 		public Shape ReadShape(String value)
 		{
 			Shape s = ReadStandardShape(value);
@@ -183,7 +185,12 @@ namespace Spatial4n.Core.Context
 			return shape.ToString();
 		}
 
-		/** Construct a point. The parameters will be normalized. */
+		/// <summary>
+		/// Construct a point. The parameters will be normalized.
+		/// </summary>
+		/// <param name="x"></param>
+		/// <param name="y"></param>
+		/// <returns></returns>
 		public Point MakePoint(double x, double y)
 		{
 			return new PointImpl(NormX(x), NormY(y));
@@ -195,7 +202,14 @@ namespace Spatial4n.Core.Context
 			return MakePoint(latLon[1], latLon[0]);
 		}
 
-		/** Construct a rectangle. The parameters will be normalized. */
+		/// <summary>
+		/// Construct a rectangle. The parameters will be normalized.
+		/// </summary>
+		/// <param name="minX"></param>
+		/// <param name="maxX"></param>
+		/// <param name="minY"></param>
+		/// <param name="maxY"></param>
+		/// <returns></returns>
 		public Rectangle MakeRect(double minX, double maxX, double minY, double maxY)
 		{
 			//--Normalize parameters

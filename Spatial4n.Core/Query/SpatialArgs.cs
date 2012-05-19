@@ -25,7 +25,6 @@ namespace Spatial4n.Core.Query
 {
 	public class SpatialArgs
 	{
-
 		public static double DEFAULT_DIST_PRECISION = 0.025d;
 
 		public SpatialOperation Operation { get; set; }

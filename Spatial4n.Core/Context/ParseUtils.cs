@@ -16,6 +16,7 @@
  */
 
 using System;
+using System.Globalization;
 using Spatial4n.Core.Exceptions;
 
 namespace Spatial4n.Core.Context
@@ -97,7 +98,7 @@ namespace Spatial4n.Core.Context
 			if (idx == -1 && dimension == 1 && externalVal.Length > 0)
 			{
 				//we have a single point, dimension better be 1
-				@out[0] = Double.Parse(externalVal.Trim());
+				@out[0] = Double.Parse(externalVal.Trim(), CultureInfo.InvariantCulture);
 				i = 1;
 			}
 			else if (idx > 0)
@@ -115,7 +116,7 @@ namespace Spatial4n.Core.Context
 					}
 					//Substring in .NET is (startPosn, length), But in Java it's (startPosn, endPosn)
 					//see http://docs.oracle.com/javase/1.4.2/docs/api/java/lang/String.html#substring(int, int)
-					@out[i] = Double.Parse(externalVal.Substring(start, (end - start)));
+					@out[i] = Double.Parse(externalVal.Substring(start, (end - start)), CultureInfo.InvariantCulture);
 					start = idx + 1;
 					end = externalVal.IndexOf(',', start);
 					idx = end;

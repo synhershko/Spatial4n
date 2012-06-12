@@ -331,8 +331,8 @@ namespace Spatial4n.Core.Context
 						}
 						else
 						{
-							double x = Double.Parse(token);
-							double y = Double.Parse(st[tokenPos++]);
+							double x = Double.Parse(token, CultureInfo.InvariantCulture);
+							double y = Double.Parse(st[tokenPos++], CultureInfo.InvariantCulture);
 							pt = MakePoint(x, y);
 						}
 
@@ -344,7 +344,8 @@ namespace Spatial4n.Core.Context
 							String k = arg.Substring(0, idx);
 							if (k.Equals("d") || k.Equals("distance"))
 							{
-								if (!Double.TryParse(arg.Substring(idx + 1), out d)) throw new InvalidShapeException("Missing Distance: " + str);
+								if (!Double.TryParse(arg.Substring(idx + 1), out d))
+									throw new InvalidShapeException("Missing Distance: " + str);
 							}
 							else
 							{
@@ -369,12 +370,12 @@ namespace Spatial4n.Core.Context
 			if (str.IndexOf(',') != -1)
 				return ReadLatCommaLonPoint(str);
 			st = str.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
-			double p0 = Double.Parse(st[tokenPos++]);
-			double p1 = Double.Parse(st[tokenPos++]);
+			double p0 = Double.Parse(st[tokenPos++], CultureInfo.InvariantCulture);
+			double p1 = Double.Parse(st[tokenPos++], CultureInfo.InvariantCulture);
 			if (st.Length > tokenPos)
 			{
-				double p2 = Double.Parse(st[tokenPos++]);
-				double p3 = Double.Parse(st[tokenPos++]);
+				double p2 = Double.Parse(st[tokenPos++], CultureInfo.InvariantCulture);
+				double p3 = Double.Parse(st[tokenPos++], CultureInfo.InvariantCulture);
 				if (st.Length > tokenPos)
 					throw new InvalidShapeException("Only 4 numbers supported (rect) but found more: " + str);
 				return MakeRect(p0, p2, p1, p3);

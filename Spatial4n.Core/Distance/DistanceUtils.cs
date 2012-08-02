@@ -31,8 +31,9 @@ namespace Spatial4n.Core.Distance
 		public static readonly double DEG_180_AS_RADS = Math.PI;
 		public static readonly double DEG_225_AS_RADS = 5 * DEG_45_AS_RADS;
 		public static readonly double DEG_270_AS_RADS = 3 * DEG_90_AS_RADS;
-		public static readonly double DEGREES_TO_RADIANS = Math.PI / 180.0;
-
+		
+		public static readonly double DEGREES_TO_RADIANS =  Math.PI / 180.0;
+		public static readonly double RADIANS_TO_DEGREES =  1 / DEGREES_TO_RADIANS;
 
 		public static readonly double KM_TO_MILES = 0.621371192;
 		public static readonly double MILES_TO_KM = 1 / KM_TO_MILES;//1.609
@@ -189,6 +190,7 @@ namespace Spatial4n.Core.Distance
 		/// 
 		/// </summary>
 		/// <param name="latLng">The lat/lon, in radians. lat in position 0, lon in position 1</param>
+		[Obsolete]
 		public static void NormLatRAD(double[] latLng)
 		{
 
@@ -233,16 +235,21 @@ namespace Spatial4n.Core.Distance
 		}
 
 		/// <summary>
-		/// Puts in range -180 <= lon_deg < +180.
+		/// Puts in range -180 <= lon_deg <= +180.
 		/// </summary>
 		/// <param name="lon_deg"></param>
 		/// <returns></returns>
 		public static double NormLonDEG(double lon_deg)
 		{
-			if (lon_deg >= -180 && lon_deg < 180)
-				return lon_deg;//common case, and avoids slight double precision shifting
-			double off = (lon_deg + 180) % 360;
-			return off < 0 ? 180 + off : -180 + off;
+			if (lon_deg >= -180 && lon_deg <= 180)
+				return lon_deg; //common case, and avoids slight double precision shifting
+			double off = (lon_deg + 180)%360;
+			if (off < 0)
+				return 180 + off;
+			else if (off == 0 && lon_deg > 0)
+				return 180;
+			else
+				return -180 + off;
 		}
 
 		/// <summary>
@@ -263,11 +270,10 @@ namespace Spatial4n.Core.Distance
 			//See http://janmatuschek.de/LatitudeLongitudeBoundingCoordinates Section 3.1, 3.2 and 3.3
 
 			double radius = ctx.GetUnits().EarthRadius();
-			double dist_rad = distance / radius;
-			double dist_deg = MathHelper.ToDegrees(dist_rad);
+			double dist_deg = Dist2Degrees(distance, radius);
 
 			if (dist_deg == 0)
-				return ctx.MakeRect(lon, lon, lat, lat);
+				return ctx.MakeRect(lon, lon, lat, lat);//essentially a point
 
 			if (dist_deg >= 180)//distance is >= opposite side of the globe
 				return ctx.GetWorldBounds();
@@ -295,7 +301,7 @@ namespace Spatial4n.Core.Distance
 			else
 			{
 				//--calc longitude bounds
-				double lon_delta_deg = CalcBoxByDistFromPtVertAxisOffsetDEG(lat, lon, distance, radius);
+				double lon_delta_deg = CalcBoxByDistFromPt_deltaLonDEG(lat, lon, distance, radius);
 
 				double lonW_deg = lon - lon_delta_deg;
 				double lonE_deg = lon + lon_delta_deg;
@@ -304,31 +310,56 @@ namespace Spatial4n.Core.Distance
 			}
 		}
 
-		public static double CalcBoxByDistFromPtVertAxisOffsetDEG(double lat, double lon, double distance, double radius)
+
+		/// <summary>
+		/// The delta longitude of a point-distance. In other words, half the width of
+		/// the bounding box of a circle.
+		/// <p/>
+		/// <code>distance</code> and <code>radius</code> should be in the same units.
+		/// </summary>
+		/// <param name="lat"></param>
+		/// <param name="lon"></param>
+		/// <param name="distance"></param>
+		/// <param name="radius"></param>
+		/// <returns></returns>
+		public static double CalcBoxByDistFromPt_deltaLonDEG(double lat, double lon, double distance, double radius)
 		{
 			//http://gis.stackexchange.com/questions/19221/find-tangent-point-on-circle-furthest-east-or-west
 			if (distance == 0)
 				return 0;
 			double lat_rad = ToRadians(lat);
-			double dist_rad = distance / radius;
+			double dist_rad = Dist2Radians(distance, radius);
 			double result_rad = Math.Asin(Math.Sin(dist_rad) / Math.Cos(lat_rad));
 
 			if (!Double.IsNaN(result_rad))
-				return MathHelper.ToDegrees(result_rad);
+				return ToDegrees(result_rad);
 			return 90;
 		}
 
-		public static double CalcBoxByDistFromPtHorizAxisDEG(double lat, double lon, double distance, double radius)
+		/// <summary>
+		/// The latitude of the horizontal axis (e.g. left-right line)
+		/// of a circle.  The horizontal axis of a circle passes through its furthest
+		/// left-most and right-most edges. On a 2D plane, this result is always
+		/// <code>from.getY()</code> but, perhaps surprisingly, on a sphere it is going
+		/// to be slightly different.
+		/// <p/>
+		/// <code>distance</code> and <code>radius</code> should be in the same units.
+		/// </summary>
+		/// <param name="lat"></param>
+		/// <param name="lon"></param>
+		/// <param name="distance"></param>
+		/// <param name="radius"></param>
+		/// <returns></returns>
+		public static double CalcBoxByDistFromPt_latHorizAxisDEG(double lat, double lon, double distance, double radius)
 		{
 			//http://gis.stackexchange.com/questions/19221/find-tangent-point-on-circle-furthest-east-or-west
 			if (distance == 0)
 				return lat;
 			double lat_rad = ToRadians(lat);
-			double dist_rad = distance / radius;
+			double dist_rad = Dist2Radians(distance, radius);
 			double result_rad = Math.Asin(Math.Sin(lat_rad) / Math.Cos(dist_rad));
 			if (!Double.IsNaN(result_rad))
-				return MathHelper.ToDegrees(result_rad);
-			//TODO should we use use ctx.getBoundaryNudgeDegrees() offsets here or let caller?
+				return ToDegrees(result_rad);
 			if (lat > 0)
 				return 90;
 			if (lat < 0)
@@ -446,19 +477,20 @@ namespace Spatial4n.Core.Distance
 		}
 
 		/// <summary>
-		/// Converts a distance in the units of the radius to degrees (360 degrees are in a circle). A spherical
-		/// earth model is assumed.
+		/// Converts a distance in the units of the radius to degrees (360 degrees are
+		/// in a circle). A spherical earth model is assumed.
 		/// </summary>
 		/// <param name="dist"></param>
 		/// <param name="radius"></param>
 		/// <returns></returns>
 		public static double Dist2Degrees(double dist, double radius)
 		{
-			return MathHelper.ToDegrees(Dist2Radians(dist, radius));
+			return ToDegrees(Dist2Radians(dist, radius));
 		}
 
 		/// <summary>
-		/// Converts a distance in the units of the radius to radians (multiples of the radius). A spherical earth model is assumed.
+		/// Converts a distance in the units of <code>radius</code> (e.g. kilometers)
+		/// to radians (multiples of the radius). A spherical earth model is assumed.
 		/// </summary>
 		/// <param name="dist"></param>
 		/// <param name="radius"></param>
@@ -474,13 +506,25 @@ namespace Spatial4n.Core.Distance
 		}
 
 		/// <summary>
-		/// About 3x faster Math.toRadians().  See CompareRadiansSnippit
+		/// Same as {@link Math#toRadians(double)} but 3x faster (multiply vs. divide).
+		/// See CompareRadiansSnippet.java in tests.
 		/// </summary>
-		/// <param name="deg"></param>
+		/// <param name="degrees"></param>
 		/// <returns></returns>
-		public static double ToRadians(double deg)
+		public static double ToRadians(double degrees)
 		{
-			return deg * DEGREES_TO_RADIANS;
+			return degrees * DEGREES_TO_RADIANS;
+		}
+
+		/// <summary>
+		/// Same as {@link Math#toDegrees(double)} but 3x faster (multiply vs. divide).
+		/// See CompareRadiansSnippet.java in tests.
+		/// </summary>
+		/// <param name="radians"></param>
+		/// <returns></returns>
+		public static double ToDegrees(double radians)
+		{
+			return radians*RADIANS_TO_DEGREES;
 		}
 	}
 }

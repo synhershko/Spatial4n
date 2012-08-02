@@ -22,25 +22,77 @@ namespace Spatial4n.Core.Distance
 {
 	public interface DistanceCalculator
 	{
+		/// <summary>
+		/// The distance between <code>from</code> and <code>to</code>.
+		/// </summary>
+		/// <param name="from"></param>
+		/// <param name="to"></param>
+		/// <returns></returns>
 		double Distance(Point @from, Point to);
-		double Distance(Point @from, double toX, double toY);
-
-		Point PointOnBearing(Point @from, double dist, double bearingDEG, SpatialContext ctx);
 
 		/// <summary>
-		/// Converts a distance to radians (multiples of the radius). A spherical
-		/// earth model is assumed for geospatial, and non-geospatial is the identity function.
+		/// The distance between <code>from</code> and <code>Point(toX,toY)</code>.
+		/// </summary>
+		/// <param name="from"></param>
+		/// <param name="toX"></param>
+		/// <param name="toY"></param>
+		/// <returns></returns>
+		double Distance(Point @from, double toX, double toY);
+
+		/// <summary>
+		/// Calculates where a destination point is given an origin (<code>from</code>)
+		/// distance, and bearing (given in degrees -- 0-360).
+		/// </summary>
+		/// <param name="from"></param>
+		/// <param name="distance"></param>
+		/// <param name="bearingDEG"></param>
+		/// <param name="ctx"></param>
+		/// <returns></returns>
+		Point PointOnBearing(Point from, double distance, double bearingDEG, SpatialContext ctx);
+
+		/// <summary>
+		/// Converts a distance (in units of the sphere's radius, e.g. km) to degrees
+		/// (0-360). A spherical earth model is assumed for geospatial.  This is not
+		/// implemented for non-geospatial.
 		/// </summary>
 		/// <param name="distance"></param>
 		/// <returns></returns>
 		double DistanceToDegrees(double distance);
 
+		/// <summary>
+		/// Converts distance-degrees (0-360, e.g. as a length around the sphere) to
+		/// distance (in units of the sphere's radius, e.g. km). This is the opposite
+		/// of {@link #distanceToDegrees(double)}.
+		/// </summary>
+		/// <param name="degrees"></param>
+		/// <returns></returns>
 		double DegreesToDistance(double degrees);
 
-		//public Point pointOnBearing(Point from, double angle);
-
+		/// <summary>
+		/// Calculates the bounding box of a circle, as specified by its center point
+		/// and distance.
+		/// </summary>
+		/// <param name="from"></param>
+		/// <param name="distance"></param>
+		/// <param name="ctx"></param>
+		/// <returns></returns>
 		Rectangle CalcBoxByDistFromPt(Point from, double distance, SpatialContext ctx);
 
-		double CalcBoxByDistFromPtHorizAxis(Point from, double distance, SpatialContext ctx);
+		/// <summary>
+		/// The <code>Y</code> coordinate of the horizontal axis (e.g. left-right line)
+		/// of a circle.  The horizontal axis of a circle passes through its furthest
+		/// left-most and right-most edges. On a 2D plane, this result is always
+		/// <code>from.getY()</code> but, perhaps surprisingly, on a sphere it is going
+		/// to be slightly different.
+		/// </summary>
+		/// <param name="from"></param>
+		/// <param name="distance"></param>
+		/// <param name="ctx"></param>
+		/// <returns></returns>
+		double CalcBoxByDistFromPt_yHorizAxisDEG(Point from, double distance, SpatialContext ctx);
+
+		double Area(Rectangle rect);
+
+		double Area(Circle circle);
 	}
 }

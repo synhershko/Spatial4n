@@ -8,7 +8,7 @@ namespace Spatial4n.Tests.distance
 {
 	public class TestDistances
 	{
-		private Random random = new Random(RandomSeed.Seed());
+		private readonly Random random = new Random(RandomSeed.Seed());
 		private SpatialContext ctx;
 
 		public TestDistances()
@@ -57,7 +57,7 @@ namespace Spatial4n.Tests.distance
 				CheckBoundingBox(pCtr, d);
 			}
 
-			Assert.Equal(-45, dc().CalcBoxByDistFromPtHorizAxis(ctx.MakePoint(-180, -45), 0, ctx), 0);
+			Assert.Equal(-45, dc().CalcBoxByDistFromPt_yHorizAxisDEG(ctx.MakePoint(-180, -45), 0, ctx), 0);
 
 			double MAXDIST = ctx.GetUnits().EarthCircumference() / 2;
 			CheckBoundingBox(ctx.MakePoint(0, 0), MAXDIST);
@@ -89,9 +89,9 @@ namespace Spatial4n.Tests.distance
 			var EPS = 10e-4;//delta when doing double assertions. Geo eps is not that small.
 
 			Rectangle r = dc().CalcBoxByDistFromPt(ctr, dist, ctx);
-			double horizAxisLat = dc().CalcBoxByDistFromPtHorizAxis(ctr, dist, ctx);
+			double horizAxisLat = dc().CalcBoxByDistFromPt_yHorizAxisDEG(ctr, dist, ctx);
 			if (!Double.IsNaN(horizAxisLat))
-				Assert.True(r.Relate_yRange(horizAxisLat, horizAxisLat, ctx).Intersects());
+				Assert.True(r.RelateYRange(horizAxisLat, horizAxisLat, ctx).Intersects());
 
 			//horizontal
 			if (r.GetWidth() >= 180)
@@ -245,17 +245,18 @@ namespace Spatial4n.Tests.distance
 		[Fact]
 		public void TestNormLon()
 		{
-			double[][] lons = new double[][]
+			var lons = new double[][]
 			{
 				new double[] {1.23, 1.23}, //1.23 might become 1.2299999 after some math and we want to ensure that doesn't happen
 				new double[] {-180, -180},
-				new double[] {180, -180}, 
+				new double[] {180, +180}, 
 				new double[] {0, 0}, 
 				new double[] {-190, 170},
+				new double[] {181,-179},
 				new double[] {-180 - 360, -180}, 
 				new double[] {-180 - 720, -180}, 
-				new double[] {180 + 360, -180},
-				new double[] {180 + 720, -180}
+				new double[] {180 + 360, +180},
+				new double[] {180 + 720, +180}
 			};
 			foreach (var pair in lons)
 			{

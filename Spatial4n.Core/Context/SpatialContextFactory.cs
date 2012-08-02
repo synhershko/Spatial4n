@@ -33,7 +33,11 @@ namespace Spatial4n.Core.Context
         protected DistanceCalculator Calculator;
         protected Rectangle WorldBounds;
 
-        /// <summary>
+		protected SpatialContextFactory()
+		{
+		}
+
+    	/// <summary>
         /// The factory class is lookuped up via "spatialContextFactory" in args
         /// then falling back to a Java system property (with initial caps). If neither are specified
         /// then {@link SimpleSpatialContextFactory} is chosen.

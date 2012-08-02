@@ -50,8 +50,7 @@ namespace Spatial4n.Core.Distance
 				DistanceUtils.ToRadians(from.GetY()), DistanceUtils.ToRadians(from.GetX()),
 				DistanceUtils.Dist2Radians(dist, ctx.GetUnits().EarthRadius()),
 				DistanceUtils.ToRadians(bearingDEG), null);
-			return ctx.MakePoint(MathHelper.ToDegrees(latLon[1]), MathHelper.ToDegrees(latLon[0]));
-
+			return ctx.MakePoint(DistanceUtils.ToDegrees(latLon[1]), DistanceUtils.ToDegrees(latLon[0]));
 		}
 
 		public override double DistanceToDegrees(double distance)
@@ -73,9 +72,26 @@ namespace Spatial4n.Core.Distance
 			return DistanceUtils.CalcBoxByDistFromPtDEG(from.GetY(), from.GetX(), distance, ctx);
 		}
 
-		public override double CalcBoxByDistFromPtHorizAxis(Point @from, double distance, SpatialContext ctx)
+		public override double CalcBoxByDistFromPt_yHorizAxisDEG(Point from, double distance, SpatialContext ctx)
 		{
-			return DistanceUtils.CalcBoxByDistFromPtHorizAxisDEG(from.GetY(), from.GetX(), distance, radius);
+			return DistanceUtils.CalcBoxByDistFromPt_latHorizAxisDEG(from.GetY(), from.GetX(), distance, radius);
+		}
+
+		public override double Area(Rectangle rect)
+		{
+			//From http://mathforum.org/library/drmath/view/63767.html
+			double lat1 = DistanceUtils.ToRadians(rect.GetMinY());
+			double lat2 = DistanceUtils.ToRadians(rect.GetMaxY());
+			return Math.PI / 180 * radius * radius *
+					Math.Abs(Math.Sin(lat1) - Math.Sin(lat2)) *
+					rect.GetWidth();
+		}
+
+		public override double Area(Circle circle)
+		{
+			//formula is a simplified case of area(rect).
+			double lat = DistanceUtils.ToRadians(90 - DistanceToDegrees(circle.GetRadius()));
+			return 2 * Math.PI * radius * radius * (1 - Math.Sin(lat));
 		}
 
 		public override bool Equals(object o)

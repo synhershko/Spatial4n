@@ -54,12 +54,12 @@
     <Compile Include="Distance\DistanceUtils.cs" />
     <Compile Include="Distance\GeodesicSphereDistCalc.cs" />
     <Compile Include="Exceptions\InvalidShapeException.cs" />
-    <Compile Include="Exceptions\InvalidSpatialArgument.cs" />
     <Compile Include="Exceptions\UnsupportedSpatialOperation.cs" />
     <Compile Include="Io\LineReader.cs" />
     <Compile Include="Io\Samples\SampleData.cs" />
     <Compile Include="Io\Samples\SampleDataReader.cs" />
     <Compile Include="Io\Samples\SampleDataWriter.cs" />
+    <Compile Include="Io\ShapeReadWriter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Query\SpatialArgs.cs" />
     <Compile Include="Query\SpatialArgsParser.cs" />

@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Reflection;
 using Spatial4n.Core.Context;
 using Spatial4n.Core.Distance;
 using Spatial4n.Core.Shapes;
+using Spatial4n.Core.Shapes.Impl;
 using Xunit;
 
 namespace Spatial4n.Tests.shape
@@ -79,6 +81,46 @@ namespace Spatial4n.Tests.shape
 				ctx.MakeCircle(107, -81, 147).Relate(ctx.MakeRect(92, 121, -89, 74), ctx));
 
 			TestCircleIntersect();
+		}
+
+		public static void CheckShapesImplementEquals(Type[] classes)
+		{
+			foreach (var clazz in classes)
+			{
+				try
+				{
+					//getDeclaredMethod( "equals", Object.class );
+					var method = clazz.GetMethod("Equals", new[] { typeof(Object) });
+				}
+				catch (Exception)
+				{
+					//We want the equivalent of Assert.Fail(msg)
+					Assert.True(false, "Shape needs to define 'equals' : " + clazz.Name);
+				}
+				try
+				{
+					//clazz.getDeclaredMethod( "hashCode" );
+					var method = clazz.GetMethod("GetHashCode", BindingFlags.Public | BindingFlags.Instance);
+				}
+				catch (Exception)
+				{
+					//We want the equivalent of Assert.Fail(msg)
+					Assert.True(false, "Shape needs to define 'hashCode' : " + clazz.Name);
+				}
+			}
+		}
+
+		[Fact]
+		public void TestImplementsEqualsAndHash()
+		{
+			TestShapes2D.CheckShapesImplementEquals(new[]
+                                    {
+                                        typeof(PointImpl),
+                                        typeof(CircleImpl),
+										//GeoCircle.class  no: its fields are caches, not part of its identity
+                                        typeof(RectangleImpl),
+                                        typeof(MultiShape),
+                                    });
 		}
 	}
 }

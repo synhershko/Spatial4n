@@ -18,10 +18,17 @@
 namespace Spatial4n.Core.Shapes
 {
 	/// <summary>
-	/// This is basically a circle.
+	/// A circle, also known as a point-radius since that is what it is comprised of.
 	/// </summary>
 	public interface Circle : Shape
 	{
-		double GetDistance();
+		/// <summary>
+		/// The distance from the point's center to its edge, measured in
+		/// {@link com.spatial4j.core.distance.DistanceUnits}.
+		/// </summary>
+		/// <returns></returns>
+		double GetRadius();
+
+		//TODO strange that this isn't in degrees, like everything else?
 	}
 }

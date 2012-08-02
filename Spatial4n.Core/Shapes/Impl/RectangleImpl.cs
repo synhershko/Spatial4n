@@ -22,9 +22,9 @@ using Spatial4n.Core.Distance;
 namespace Spatial4n.Core.Shapes.Impl
 {
 	/// <summary>
-	/// A simple Rectangle implementation that also supports a longitudinal wrap-around. When minX > maxX, this will assume
-	/// it is world coordinates that cross the date line using degrees.
-	/// Immutable & threadsafe.
+	/// A simple Rectangle implementation that also supports a longitudinal
+	/// wrap-around. When minX > maxX, this will assume it is world coordinates that
+	/// cross the date line using degrees. Immutable & threadsafe.
 	/// </summary>
 	public class RectangleImpl : Rectangle
 	{
@@ -42,6 +42,14 @@ namespace Spatial4n.Core.Shapes.Impl
 			this.minY = minY;
 			this.maxY = maxY;
 			//assert minY <= maxY;
+		}
+
+		public RectangleImpl(Point lowerLeft, Point upperRight)
+		{
+			this.minX = lowerLeft.GetX();
+			this.maxX = upperRight.GetX();
+			this.minY = lowerLeft.GetY();
+			this.maxY = upperRight.GetY();
 		}
 
 		public RectangleImpl(Rectangle r)
@@ -79,11 +87,11 @@ namespace Spatial4n.Core.Shapes.Impl
 
 		public SpatialRelation Relate(Rectangle rect, SpatialContext ctx)
 		{
-			SpatialRelation yIntersect = Relate_yRange(rect.GetMinY(), rect.GetMaxY(), ctx);
+			SpatialRelation yIntersect = RelateYRange(rect.GetMinY(), rect.GetMaxY(), ctx);
 			if (yIntersect == SpatialRelation.DISJOINT)
 				return SpatialRelation.DISJOINT;
 
-			SpatialRelation xIntersect = Relate_xRange(rect.GetMinX(), rect.GetMaxX(), ctx);
+			SpatialRelation xIntersect = RelateXRange(rect.GetMinX(), rect.GetMaxX(), ctx);
 			if (xIntersect == SpatialRelation.DISJOINT)
 				return SpatialRelation.DISJOINT;
 
@@ -114,7 +122,7 @@ namespace Spatial4n.Core.Shapes.Impl
 			double y = GetHeight() / 2 + minY;
 			double x = GetWidth() / 2 + minX;
 			if (minX > maxX)//WGS84
-				x = DistanceUtils.NormLonDEG(x);
+				x = DistanceUtils.NormLonDEG(x); //in case falls outside the standard range
 			return new PointImpl(x, y);
 		}
 
@@ -155,9 +163,16 @@ namespace Spatial4n.Core.Shapes.Impl
 			return maxY;
 		}
 
-		public double GetArea()
+		public double GetArea(SpatialContext ctx)
 		{
-			return GetWidth() * GetHeight();
+			if (ctx == null)
+			{
+				return GetWidth()*GetHeight();
+			}
+			else
+			{
+				return ctx.GetDistCalc().Area(this);
+			}
 		}
 
 		public bool GetCrossesDateLine()
@@ -165,26 +180,32 @@ namespace Spatial4n.Core.Shapes.Impl
 			return (minX > maxX);
 		}
 
-		public SpatialRelation Relate_yRange(double ext_minY, double ext_maxY, SpatialContext ctx)
+		private static SpatialRelation Relate_Range(double int_min, double int_max, double ext_min, double ext_max)
 		{
-			if (ext_minY > maxY || ext_maxY < minY)
+			if (ext_min > int_max || ext_max < int_min)
 			{
 				return SpatialRelation.DISJOINT;
 			}
 
-			if (ext_minY >= minY && ext_maxY <= maxY)
+			if (ext_min >= int_min && ext_max <= int_max)
 			{
 				return SpatialRelation.CONTAINS;
 			}
 
-			if (ext_minY <= minY && ext_maxY >= maxY)
+			if (ext_min <= int_min && ext_max >= int_max)
 			{
 				return SpatialRelation.WITHIN;
 			}
+
 			return SpatialRelation.INTERSECTS;
 		}
 
-		public SpatialRelation Relate_xRange(double ext_minX, double ext_maxX, SpatialContext ctx)
+		public SpatialRelation RelateYRange(double ext_minY, double ext_maxY, SpatialContext ctx)
+		{
+			return Relate_Range(minY, maxY, ext_minY, ext_maxY);
+		}
+
+		public SpatialRelation RelateXRange(double ext_minX, double ext_maxX, SpatialContext ctx)
 		{
 			//For ext & this we have local minX and maxX variable pairs. We rotate them so that minX <= maxX
 			double minX = this.minX;
@@ -226,21 +247,7 @@ namespace Spatial4n.Core.Shapes.Impl
 				}
 			}
 
-			if (ext_minX > maxX || ext_maxX < minX)
-			{
-				return SpatialRelation.DISJOINT;
-			}
-
-			if (ext_minX >= minX && ext_maxX <= maxX)
-			{
-				return SpatialRelation.CONTAINS;
-			}
-
-			if (ext_minX <= minX && ext_maxX >= maxX)
-			{
-				return SpatialRelation.WITHIN;
-			}
-			return SpatialRelation.INTERSECTS;
+			return Relate_Range(minX, maxX, ext_minX, ext_maxX);
 		}
 
 		public override string ToString()
@@ -248,26 +255,48 @@ namespace Spatial4n.Core.Shapes.Impl
 			return "Rect(minX=" + minX + ",maxX=" + maxX + ",minY=" + minY + ",maxY=" + maxY + ")";
 		}
 
-		public override bool Equals(object o)
+		public override bool Equals(object obj)
 		{
-			if (this == o) return true;
+			return Equals(this, obj);
+		}
+
+		/// <summary>
+		/// All {@link Rectangle} implementations should use this definition of {@link Object#equals(Object)}.
+		/// </summary>
+		/// <param name="thiz"></param>
+		/// <param name="o"></param>
+		/// <returns></returns>
+		public static bool Equals(Rectangle thiz, Object o)
+		{
+			if (thiz == null)
+				throw new ArgumentNullException("thiz");
+
+			if (thiz == o) return true;
 
 			var rectangle = o as RectangleImpl;
 			if (rectangle == null) return false;
 
-			return maxX.Equals(rectangle.maxX) && minX.Equals(rectangle.minX) &&
-			       maxY.Equals(rectangle.maxY) && minY.Equals(rectangle.minY);
+			return thiz.GetMaxX().Equals(rectangle.maxX) && thiz.GetMinX().Equals(rectangle.minX) &&
+			       thiz.GetMaxY().Equals(rectangle.maxY) && thiz.GetMinY().Equals(rectangle.minY);
 		}
 
 		public override int GetHashCode()
 		{
-			long temp = minX != +0.0d ? BitConverter.DoubleToInt64Bits(minX) : 0L;
+			return GetHashCode(this);
+		}
+
+		public static int GetHashCode(Rectangle thiz)
+		{
+			if (thiz == null)
+				throw new ArgumentNullException("thiz");
+
+			long temp = thiz.GetMinX() != +0.0d ? BitConverter.DoubleToInt64Bits(thiz.GetMinX()) : 0L;
 			int result = (int)(temp ^ ((uint)temp >> 32));
-			temp = maxX != +0.0d ? BitConverter.DoubleToInt64Bits(maxX) : 0L;
+			temp = thiz.GetMaxX() != +0.0d ? BitConverter.DoubleToInt64Bits(thiz.GetMaxX()) : 0L;
 			result = 31 * result + (int)(temp ^ ((uint)temp >> 32));
-			temp = minY != +0.0d ? BitConverter.DoubleToInt64Bits(minY) : 0L;
+			temp = thiz.GetMinY() != +0.0d ? BitConverter.DoubleToInt64Bits(thiz.GetMinY()) : 0L;
 			result = 31 * result + (int)(temp ^ ((uint)temp >> 32));
-			temp = maxY != +0.0d ? BitConverter.DoubleToInt64Bits(maxY) : 0L;
+			temp = thiz.GetMaxY() != +0.0d ? BitConverter.DoubleToInt64Bits(thiz.GetMaxY()) : 0L;
 			result = 31*result + (int) (temp ^ ((uint)temp >> 32));
 			return result;
 		}

@@ -38,7 +38,7 @@ namespace Spatial4n.Tests.shape
                 return;
             if (expected == SpatialRelation.WITHIN || expected == SpatialRelation.CONTAINS)
             {
-                if (a.GetType().Equals(b.GetType())) // they are the same shape type
+                if (a.GetType() == b.GetType()) // they are the same shape type
                     Assert.Equal(/*msg,*/ a, b);
                 else
                 {
@@ -85,7 +85,7 @@ namespace Spatial4n.Tests.shape
             String msg = r.ToString();
 
             Assert.Equal( /*msg,*/ width != 0 && height != 0, r.HasArea());
-            Assert.Equal( /*msg,*/ width != 0 && height != 0, r.GetArea() > 0);
+            Assert.Equal( /*msg,*/ width != 0 && height != 0, r.GetArea(ctx) > 0);
 
             AssertEqualsRatio(msg, height, r.GetHeight());
             AssertEqualsRatio(msg, width, r.GetWidth());
@@ -166,7 +166,7 @@ namespace Spatial4n.Tests.shape
 
             Assert.Equal( /*msg,*/ dist > 0, c.HasArea());
             Rectangle bbox = c.GetBoundingBox();
-            Assert.Equal( /*msg,*/ dist > 0, bbox.GetArea() > 0);
+            Assert.Equal( /*msg,*/ dist > 0, bbox.GetArea(ctx) > 0);
             if (!ctx.IsGeo())
             {
                 //if not geo then units of dist == units of x,y
@@ -182,7 +182,7 @@ namespace Spatial4n.Tests.shape
             //Now do some randomized tests:
             int i_C = 0, i_I = 0, i_W = 0, i_O = 0; //counters for the different intersection cases
             int laps = 0;
-            int MINLAPSPERCASE = 20;
+        	int MINLAPSPERCASE = 20;// *(int)multiplier();
             while (i_C < MINLAPSPERCASE || i_I < MINLAPSPERCASE || i_W < MINLAPSPERCASE || i_O < MINLAPSPERCASE)
             {
                 laps++;
@@ -249,7 +249,7 @@ namespace Spatial4n.Tests.shape
 
         private Point RandomPointWithin(Random random, Circle c, SpatialContext ctx)
         {
-            double d = c.GetDistance()*random.NextDouble();
+            double d = c.GetRadius()*random.NextDouble();
             double angleDEG = 360*random.NextDouble();
             Point p = ctx.GetDistCalc().PointOnBearing(c.GetCenter(), d, angleDEG, ctx);
             Assert.Equal(SpatialRelation.CONTAINS, c.Relate(p, ctx));

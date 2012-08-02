@@ -27,13 +27,23 @@ namespace Spatial4n.Core.Shapes
         private readonly Collection<Shape> geoms;
         private readonly Rectangle bbox;
 
+		/// <summary>
+		/// WARNING: geoms is copied by reference.
+		/// </summary>
+		/// <param name="geoms"></param>
+		/// <param name="ctx"></param>
         public MultiShape(Collection<Shape> geoms, SpatialContext ctx)
         {
+			if (!geoms.Any())
+		      throw new ArgumentException("must be given at least 1 shape", "geoms");
+
             this.geoms = geoms;
-            double minX = Double.MaxValue;
-            double minY = Double.MaxValue;
-            double maxX = Double.MaxValue;
-            double maxY = Double.MaxValue;
+
+			//compute and cache bbox
+            double minX = Double.PositiveInfinity;
+            double minY = Double.PositiveInfinity;
+            double maxX = Double.NegativeInfinity;
+            double maxY = Double.NegativeInfinity;
             foreach (var geom in geoms)
             {
                 Rectangle r = geom.GetBoundingBox();
@@ -81,7 +91,12 @@ namespace Spatial4n.Core.Shapes
             return bbox.GetCenter();
         }
 
-        public override bool Equals(object o)
+		public double GetArea(SpatialContext ctx)
+		{
+			return geoms.Sum(geom => geom.GetArea(ctx));
+		}
+
+    	public override bool Equals(object o)
         {
             if (this == o) return true;
             

@@ -21,6 +21,17 @@ using Spatial4n.Core.Context;
 using Spatial4n.Core.Exceptions;
 using Spatial4n.Core.Shapes;
 
+namespace Spatial4n.Core.Exceptions
+{
+	public class InvalidSpatialArgument : ArgumentException
+	{
+		public InvalidSpatialArgument(String reason)
+			: base(reason)
+		{
+		}
+	}
+}
+
 namespace Spatial4n.Core.Query
 {
 	public class SpatialArgs

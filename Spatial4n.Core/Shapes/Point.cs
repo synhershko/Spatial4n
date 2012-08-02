@@ -17,9 +17,21 @@
 
 namespace Spatial4n.Core.Shapes
 {
+	/// <summary>
+	/// A Point with X & Y coordinates.
+	/// </summary>
 	public interface Point : Shape
 	{
+		/// <summary>
+		/// The X coordinate, or Longitude in geospatial contexts.
+		/// </summary>
+		/// <returns></returns>
 		double GetX();
+
+		/// <summary>
+		/// The Y coordinate, or Latitude in geospatial contexts.
+		/// </summary>
+		/// <returns></returns>
 		double GetY();
 	}
 }

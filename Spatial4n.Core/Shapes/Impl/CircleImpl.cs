@@ -23,13 +23,13 @@ namespace Spatial4n.Core.Shapes.Impl
 	/// <summary>
 	/// A circle, also known as a point-radius, based on a
 	/// {@link com.spatial4j.core.distance.DistanceCalculator} which does all the work. This implementation
-	/// should work for both cartesian 2D and geodetic sphere surfaces.
+	/// implementation should work for both cartesian 2D and geodetic sphere surfaces.
 	/// Threadsafe & immutable.
 	/// </summary>
 	public class CircleImpl : Circle
 	{
 		protected readonly Point point;
-		protected readonly double distance;
+		protected readonly double distRadius;
 
 		protected readonly SpatialContext ctx;
 
@@ -43,9 +43,9 @@ namespace Spatial4n.Core.Shapes.Impl
 		{
 			//We assume any normalization / validation of params already occurred (including bounding dist)
 			this.point = p;
-			this.distance = dist;
+			this.distRadius = dist;
 			this.ctx = ctx;
-			this.enclosingBox = ctx.GetDistCalc().CalcBoxByDistFromPt(point, distance, ctx);
+			this.enclosingBox = ctx.GetDistCalc().CalcBoxByDistFromPt(point, distRadius, ctx);
 		}
 
 		public SpatialRelation Relate(Shape other, SpatialContext ctx)
@@ -88,7 +88,7 @@ namespace Spatial4n.Core.Shapes.Impl
 			SpatialRelation bboxSect = enclosingBox.Relate(r, ctx);
 			if (bboxSect == SpatialRelation.DISJOINT || bboxSect == SpatialRelation.WITHIN)
 				return bboxSect;
-			if (bboxSect == SpatialRelation.CONTAINS && enclosingBox.Equals(r))//nasty identity edge-case
+			if (bboxSect == SpatialRelation.CONTAINS && enclosingBox.Equals(r)) //nasty identity edge-case
 				return SpatialRelation.WITHIN;
 			//bboxSect is INTERSECTS or CONTAINS
 			//The result can be DISJOINT, CONTAINS, or INTERSECTS (not WITHIN)
@@ -166,14 +166,19 @@ namespace Spatial4n.Core.Shapes.Impl
 			return SpatialRelation.INTERSECTS;
 		}
 
-		/**
-		 * The y axis horizontal of maximal left-right extent of the circle.
-		 */
+		/// <summary>
+		/// The <code>Y</code> coordinate of where the circle axis intersect.
+		/// </summary>
+		/// <returns></returns>
 		protected virtual double GetYAxis()
 		{
 			return point.GetY();
 		}
 
+		/// <summary>
+		/// The <code>X</code> coordinate of where the circle axis intersect.
+		/// </summary>
+		/// <returns></returns>
 		protected virtual double GetXAxis()
 		{
 			return point.GetX();
@@ -182,7 +187,7 @@ namespace Spatial4n.Core.Shapes.Impl
 		public SpatialRelation Relate(Circle circle, SpatialContext ctx)
 		{
 			double crossDist = ctx.GetDistCalc().Distance(point, circle.GetCenter());
-			double aDist = distance, bDist = circle.GetDistance();
+			double aDist = distRadius, bDist = circle.GetRadius();
 			if (crossDist > aDist + bDist)
 				return SpatialRelation.DISJOINT;
 			if (crossDist < aDist && crossDist + bDist <= aDist)
@@ -201,7 +206,7 @@ namespace Spatial4n.Core.Shapes.Impl
 
 		public bool HasArea()
 		{
-			return distance > 0;
+			return distRadius > 0;
 		}
 
 		public Point GetCenter()
@@ -209,39 +214,72 @@ namespace Spatial4n.Core.Shapes.Impl
 			return point;
 		}
 
-		public double GetDistance()
+		public double GetRadius()
 		{
-			return distance;
+			return distRadius;
+		}
+
+		public double GetArea(SpatialContext ctx)
+		{
+			if (ctx == null)
+			{
+				return Math.PI*distRadius*distRadius;
+			}
+			else
+			{
+				return ctx.GetDistCalc().Area(this);
+			}
 		}
 
 		public bool Contains(double x, double y)
 		{
-			return ctx.GetDistCalc().Distance(point, x, y) <= distance;
+			return ctx.GetDistCalc().Distance(point, x, y) <= distRadius;
 		}
 
 		public override string ToString()
 		{
-			return "Circle(" + point + ",d=" + distance + ')';
+			return "Circle(" + point + ",d=" + distRadius + ')';
 		}
 
-		public override bool Equals(object o)
+		public override bool Equals(object obj)
 		{
+			return Equals(this, obj);
+		}
+
+		public static bool Equals(Circle thiz, Object o)
+		{
+			if (thiz == null)
+				throw new ArgumentNullException("thiz");
+
 			var circle = o as CircleImpl;
 			if (circle == null) return false;
 
-			if (point != null ? !point.Equals(circle.point) : circle.point != null) return false;
-			if (!distance.Equals(circle.distance)) return false;
-			if (ctx != null ? !ctx.Equals(circle.ctx) : circle.ctx != null) return false;
+			if (!thiz.GetCenter().Equals(circle.GetCenter())) return false;
+			if (!circle.GetRadius().Equals(thiz.GetRadius())) return false;
 
 			return true;
 		}
 
 		public override int GetHashCode()
 		{
-			int result = point != null ? point.GetHashCode() : 0;
-			long temp = distance != +0.0d ? BitConverter.DoubleToInt64Bits(distance) : 0L;
-			result = 31*result + (int) (temp ^ ((uint)temp >> 32));
-			result = 31*result + (ctx != null ? ctx.GetHashCode() : 0);
+			return GetHashCode(this);
+		}
+
+		/// <summary>
+		/// All {@link Circle} implementations should use this definition of {@link Object#hashCode()}.
+		/// </summary>
+		/// <param name="thiz"></param>
+		/// <returns></returns>
+		public static int GetHashCode(Circle thiz)
+		{
+			if (thiz == null)
+				throw new ArgumentNullException("thiz");
+
+			int result = thiz.GetCenter().GetHashCode();
+			long temp = Math.Abs(thiz.GetRadius() - +0.0d) > Double.Epsilon
+			            	? BitConverter.DoubleToInt64Bits(thiz.GetRadius())
+			            	: 0L;
+			result = 31*result + (int) (temp ^ ((uint) temp >> 32));
 			return result;
 		}
 	}

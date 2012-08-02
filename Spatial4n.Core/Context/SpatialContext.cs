@@ -20,22 +20,25 @@ using System.Diagnostics;
 using System.Globalization;
 using Spatial4n.Core.Distance;
 using Spatial4n.Core.Exceptions;
+using Spatial4n.Core.Io;
 using Spatial4n.Core.Shapes;
 using Spatial4n.Core.Shapes.Impl;
 
 namespace Spatial4n.Core.Context
 {
 	/// <summary>
-	/// This holds things like distance units, distance calculator, and world bounds.
-	/// Threadsafe & immutable.
+	/// This is a facade to most of Spatial4j, holding things like {@link
+	/// DistanceUnits}, {@link DistanceCalculator}, and the coordinate world
+	/// boundaries, and acting as a factory for the {@link Shape}s.
+	/// <p/>
+	/// A SpatialContext has public constructors, but note the convenience
+	/// instance {@link #GEO_KM}.  Also, if you wish to construct one based on
+	/// configuration information then consider using {@link SpatialContextFactory}.
+	/// <p/>
+	/// Thread-safe & immutable.
 	/// </summary>
 	public class SpatialContext
 	{
-		//These are non-null
-		private DistanceUnits units;
-		private DistanceCalculator calculator;
-		private Rectangle worldBounds;
-
 		public static readonly RectangleImpl GEO_WORLDBOUNDS = new RectangleImpl(-180, 180, -90, 90);
 		public static readonly RectangleImpl MAX_WORLDBOUNDS;
 
@@ -45,7 +48,35 @@ namespace Spatial4n.Core.Context
 			MAX_WORLDBOUNDS = new RectangleImpl(-v, v, -v, v);
 		}
 
+		/// <summary>
+		/// A popular default SpatialContext implementation based on kilometer distance.
+		/// </summary>
 		public static readonly SpatialContext GEO_KM = new SpatialContext(DistanceUnits.KILOMETERS);
+		//note: any static convenience instances must be declared after the world bounds
+
+		//These are non-null
+		private DistanceUnits units;
+		private DistanceCalculator calculator;
+		private Rectangle worldBounds;
+
+		private ShapeReadWriter<SpatialContext> shapeReadWriter;
+
+		protected ShapeReadWriter<SpatialContext> MakeShapeReadWriter()
+		{
+			return new ShapeReadWriter<SpatialContext>(this);
+		}
+
+		[Obsolete]
+		public Shape ReadShape(String value)
+		{
+			return shapeReadWriter.ReadShape(value);
+		}
+
+		[Obsolete]
+		public String ToString(Shape shape)
+		{
+			return shapeReadWriter.WriteShape(shape);
+		}
 
 		protected double? maxCircleDistance;//only for geo
 
@@ -95,6 +126,8 @@ namespace Spatial4n.Core.Context
 			worldBounds = MakeRect(worldBounds.GetMinX(), worldBounds.GetMaxX(), worldBounds.GetMinY(), worldBounds.GetMaxY());
 			this.worldBounds = worldBounds;
 
+			shapeReadWriter = MakeShapeReadWriter();
+
 			this.maxCircleDistance = IsGeo() ? calculator.DegreesToDistance(180) : (double?)null;
 		}
 
@@ -113,6 +146,11 @@ namespace Spatial4n.Core.Context
 			return worldBounds;
 		}
 
+		/// <summary>
+		/// If {@link #isGeo()} then calls {@link DistanceUtils#normLonDEG(double)}.
+		/// </summary>
+		/// <param name="x"></param>
+		/// <returns></returns>
 		public double NormX(double x)
 		{
 			if (IsGeo())
@@ -122,6 +160,11 @@ namespace Spatial4n.Core.Context
 			return x;
 		}
 
+		/// <summary>
+		/// If {@link #isGeo()} then calls {@link DistanceUtils#normLatDEG(double)}
+		/// </summary>
+		/// <param name="y"></param>
+		/// <returns></returns>
 		public double NormY(double y)
 		{
 			if (IsGeo())
@@ -132,57 +175,12 @@ namespace Spatial4n.Core.Context
 		}
 
 		/// <summary>
-		/// Is this a geospatial context (true) or simply 2d spatial (false)
+		/// Is this a geospatial context (true) or simply 2d spatial (false).
 		/// </summary>
 		/// <returns></returns>
 		public bool IsGeo()
 		{
 			return GetUnits().IsGeo();
-		}
-
-		/// <summary>
-		/// Read a shape from a given string (ie, X Y, XMin XMax... WKT)
-		/// 
-		///  (1) Point: X Y
-		///    1.23 4.56
-		/// 
-		///  (2) BOX: XMin YMin XMax YMax
-		///   1.23 4.56 7.87 4.56
-		/// 
-		///  (3) WKT
-		///    POLYGON( ... )
-		///    http://en.wikipedia.org/wiki/Well-known_text
-		/// </summary>
-		/// <param name="value"></param>
-		/// <returns></returns>
-		public Shape ReadShape(String value)
-		{
-			Shape s = ReadStandardShape(value);
-			if (s == null)
-			{
-				throw new InvalidShapeException("Unable to read: " + value);
-			}
-			return s;
-		}
-
-		public String ToString(Shape shape)
-		{
-			var point = shape as Point;
-			if (point != null)
-			{
-				return point.GetX().ToString("F6", CultureInfo.CreateSpecificCulture("en-US")) + " " +
-					   point.GetY().ToString("F6", CultureInfo.CreateSpecificCulture("en-US"));
-			}
-
-			var rect = shape as Rectangle;
-			if (rect != null)
-			{
-				return rect.GetMinX().ToString("F6", CultureInfo.CreateSpecificCulture("en-US")) + " " +
-					   rect.GetMinY().ToString("F6", CultureInfo.CreateSpecificCulture("en-US")) + " " +
-					   rect.GetMaxX().ToString("F6", CultureInfo.CreateSpecificCulture("en-US")) + " " +
-					   rect.GetMaxY().ToString("F6", CultureInfo.CreateSpecificCulture("en-US"));
-			}
-			return shape.ToString();
 		}
 
 		/// <summary>
@@ -196,10 +194,16 @@ namespace Spatial4n.Core.Context
 			return new PointImpl(NormX(x), NormY(y));
 		}
 
-		public Point ReadLatCommaLonPoint(String value)
+		/// <summary>
+		/// Construct a rectangle. The parameters will be normalized.
+		/// </summary>
+		/// <param name="lowerLeft"></param>
+		/// <param name="upperRight"></param>
+		/// <returns></returns>
+		public Rectangle MakeRect(Point lowerLeft, Point upperRight)
 		{
-			double[] latLon = ParseUtils.ParseLatitudeLongitude(value);
-			return MakePoint(latLon[1], latLon[0]);
+			return MakeRect(lowerLeft.GetX(), upperRight.GetX(),
+			                lowerLeft.GetY(), upperRight.GetY());
 		}
 
 		/// <summary>
@@ -228,13 +232,28 @@ namespace Spatial4n.Core.Context
 					minX = NormX(minX);
 					maxX = NormX(maxX);
 					Debug.Assert(Math.Abs(delta - CalcWidth(minX, maxX)) < 0.0001);//recompute delta; should be the same
+
+					//If an edge coincides with the dateline then don't make this rect cross it
+					if (delta > 0)
+					{
+						if (minX == 180)
+						{
+							minX = -180;
+							maxX = -180 + delta;
+						}
+						else if (maxX == -180)
+						{
+							maxX = 180;
+							minX = 180 - delta;
+						}
+					}
 				}
 				if (minY > maxY)
 				{
-					throw new ArgumentException("maxY must be >= minY");
+					throw new ArgumentException("maxY must be >= minY: " + minY + " to " + maxY, "maxY");
 				}
 				if (minY < -90 || minY > 90 || maxY < -90 || maxY > 90)
-					throw new ArgumentException("minY or maxY is outside of -90 to 90 bounds. What did you mean?");
+					throw new ArgumentException("minY or maxY is outside of -90 to 90 bounds. What did you mean?: "+minY+" to "+maxY);
 				//        debatable what to do in this situation.
 				//        if (minY < -90) {
 				//          minX = -180;
@@ -300,96 +319,16 @@ namespace Spatial4n.Core.Context
 			return new CircleImpl(point, distance, this);
 		}
 
-
-		protected Shape ReadStandardShape(String str)
-		{
-			if (str.Length < 1)
-			{
-				throw new InvalidShapeException(str);
-			}
-
-			string[] st;
-			var tokenPos = 0;
-			if (Char.IsLetter(str[0]))
-			{
-				if (str.StartsWith("Circle("))
-				{
-					int idx = str.LastIndexOf(')');
-					if (idx > 0)
-					{
-						//Substring in .NET is (startPosn, length), But in Java it's (startPosn, endPosn)
-						//see http://docs.oracle.com/javase/1.4.2/docs/api/java/lang/String.html#substring(int, int)
-						var body = str.Substring("Circle(".Length, 
-												(idx - "Circle(".Length));
-
-						st = body.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
-						String token = st[tokenPos++];
-						Point pt;
-						if (token.IndexOf(',') != -1)
-						{
-							pt = ReadLatCommaLonPoint(token);
-						}
-						else
-						{
-							double x = Double.Parse(token, CultureInfo.InvariantCulture);
-							double y = Double.Parse(st[tokenPos++], CultureInfo.InvariantCulture);
-							pt = MakePoint(x, y);
-						}
-
-						double d;
-						String arg = st[tokenPos++];
-						idx = arg.IndexOf('=');
-						if (idx > 0)
-						{
-							String k = arg.Substring(0, idx);
-							if (k.Equals("d") || k.Equals("distance"))
-							{
-								if (!Double.TryParse(arg.Substring(idx + 1), out d))
-									throw new InvalidShapeException("Missing Distance: " + str);
-							}
-							else
-							{
-								throw new InvalidShapeException("unknown arg: " + k + " :: " + str);
-							}
-						}
-						else
-						{
-							if (!Double.TryParse(arg, out d)) throw new InvalidShapeException("Missing Distance: " + str);
-						}
-						if (st.Length > tokenPos)
-						{
-							throw new InvalidShapeException("Extra arguments: " + st[tokenPos] + " :: " + str);
-						}
-						//NOTE: we are assuming the units of 'd' is the same as that of the spatial context.
-						return MakeCircle(pt, d);
-					}
-				}
-				return null;
-			}
-
-			if (str.IndexOf(',') != -1)
-				return ReadLatCommaLonPoint(str);
-			st = str.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
-			double p0 = Double.Parse(st[tokenPos++], CultureInfo.InvariantCulture);
-			double p1 = Double.Parse(st[tokenPos++], CultureInfo.InvariantCulture);
-			if (st.Length > tokenPos)
-			{
-				double p2 = Double.Parse(st[tokenPos++], CultureInfo.InvariantCulture);
-				double p3 = Double.Parse(st[tokenPos++], CultureInfo.InvariantCulture);
-				if (st.Length > tokenPos)
-					throw new InvalidShapeException("Only 4 numbers supported (rect) but found more: " + str);
-				return MakeRect(p0, p2, p1, p3);
-			}
-			return MakePoint(p0, p1);
-		}
-
 		public override String ToString()
 		{
+			if (this.Equals(GEO_KM))
+				return GEO_KM.GetType().Name + ".GEO_KM";
+
 			return GetType().Name + "{" +
-				"units=" + units +
-				", calculator=" + calculator +
-				", worldBounds=" + worldBounds +
-				'}';
+			       "units=" + units +
+			       ", calculator=" + calculator +
+			       ", worldBounds=" + worldBounds +
+			       '}';
 		}
 	}
 }

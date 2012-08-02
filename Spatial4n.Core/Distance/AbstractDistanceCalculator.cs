@@ -37,6 +37,8 @@ namespace Spatial4n.Core.Distance
 		public abstract double DistanceToDegrees(double distance);
 		public abstract double DegreesToDistance(double degrees);
 		public abstract Rectangle CalcBoxByDistFromPt(Point @from, double distance, SpatialContext ctx);
-		public abstract double CalcBoxByDistFromPtHorizAxis(Point @from, double distance, SpatialContext ctx);
+		public abstract double CalcBoxByDistFromPt_yHorizAxisDEG(Point @from, double distance, SpatialContext ctx);
+		public abstract double Area(Rectangle rect);
+		public abstract double Area(Circle circle);
 	}
 }

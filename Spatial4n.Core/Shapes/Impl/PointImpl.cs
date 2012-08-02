@@ -20,6 +20,9 @@ using Spatial4n.Core.Context;
 
 namespace Spatial4n.Core.Shapes.Impl
 {
+	/// <summary>
+	/// A basic 2D implementation of a Point.
+	/// </summary>
 	public class PointImpl : Point
 	{
 		private readonly double x;
@@ -63,6 +66,11 @@ namespace Spatial4n.Core.Shapes.Impl
 			return y;
 		}
 
+		public double GetArea(SpatialContext ctx)
+		{
+			return 0;
+		}
+
 		public override string ToString()
 		{
 			return "Pt(x=" + x + ",y=" + y + ")";
@@ -70,19 +78,46 @@ namespace Spatial4n.Core.Shapes.Impl
 
 		public override bool Equals(object o)
 		{
-			if (this == o) return true;
+			return Equals(this, o);
+		}
+
+		/// <summary>
+		/// All {@link Point} implementations should use this definition of {@link Object#equals(Object)}.
+		/// </summary>
+		/// <param name="thiz"></param>
+		/// <param name="o"></param>
+		/// <returns></returns>
+		public static bool Equals(Point thiz, Object o)
+		{
+			if (thiz == null)
+				throw new ArgumentNullException("thiz");
+
+			if (thiz == o) return true;
 			
 			var point = o as PointImpl;
 			if (point == null) return false;
 
-			return x.Equals(point.x) && y.Equals(point.y);
+			return thiz.GetX().Equals(point.x) && thiz.GetY().Equals(point.y);
 		}
 
 		public override int GetHashCode()
 		{
-			long temp = x != +0.0d ? BitConverter.DoubleToInt64Bits(x) : 0L;
+			return GetHashCode(this);
+		}
+
+		/// <summary>
+		/// All {@link Point} implementations should use this definition of {@link Object#hashCode()}.
+		/// </summary>
+		/// <param name="thiz"></param>
+		/// <returns></returns>
+		public static int GetHashCode(Point thiz)
+		{
+			if (thiz == null)
+				throw new ArgumentNullException("thiz");
+
+			long temp = thiz.GetX() != +0.0d ? BitConverter.DoubleToInt64Bits(thiz.GetX()) : 0L;
 			int result = (int)(temp ^ ((uint)temp >> 32));
-			temp = y != +0.0d ? BitConverter.DoubleToInt64Bits(y) : 0L;
+			temp = thiz.GetY() != +0.0d ? BitConverter.DoubleToInt64Bits(thiz.GetY()) : 0L;
 			result = 31 * result + (int)(temp ^ ((uint)temp >> 32));
 			return result;
 		}

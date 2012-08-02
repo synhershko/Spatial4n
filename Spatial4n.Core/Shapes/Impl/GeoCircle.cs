@@ -21,6 +21,9 @@ using Spatial4n.Core.Context;
 
 namespace Spatial4n.Core.Shapes.Impl
 {
+	/// <summary>
+	/// A circle as it exists on the surface of a sphere.
+	/// </summary>
 	public class GeoCircle : CircleImpl
 	{
 		private readonly double distDEG;// [0 TO 180]
@@ -33,10 +36,11 @@ namespace Spatial4n.Core.Shapes.Impl
 			Debug.Assert(ctx.IsGeo());
 
 			//In the direction of latitude (N,S), distance is the same number of degrees.
-			distDEG = ctx.GetDistCalc().DistanceToDegrees(distance);
+			distDEG = ctx.GetDistCalc().DistanceToDegrees(distRadius);
 
 			if (distDEG > 90)
 			{
+				//--spans more than half the globe
 				Debug.Assert(enclosingBox.GetWidth() == 360);
 				double backDistDEG = 180 - distDEG;
 				if (backDistDEG >= 0)
@@ -52,7 +56,7 @@ namespace Spatial4n.Core.Shapes.Impl
 			else
 			{
 				inverseCircle = null;
-				double _horizAxisY = ctx.GetDistCalc().CalcBoxByDistFromPtHorizAxis(GetCenter(), distance, ctx);
+				double _horizAxisY = ctx.GetDistCalc().CalcBoxByDistFromPt_yHorizAxisDEG(GetCenter(), dist, ctx);
 				//some rare numeric conditioning cases can cause this to be barely beyond the box
 				if (_horizAxisY > enclosingBox.GetMaxY())
 				{
@@ -112,7 +116,7 @@ namespace Spatial4n.Core.Shapes.Impl
 			if (cornersIntersect == 4)
 			{
 				//ensure r's x axis is within c's.  If it doesn't, r sneaks around the globe to touch the other side (intersect).
-				SpatialRelation xIntersect = r.Relate_xRange(enclosingBox.GetMinX(), enclosingBox.GetMaxX(), ctx);
+				SpatialRelation xIntersect = r.RelateXRange(enclosingBox.GetMinX(), enclosingBox.GetMaxX(), ctx);
 				if (xIntersect == SpatialRelation.WITHIN)
 					return SpatialRelation.CONTAINS;
 				return SpatialRelation.INTERSECTS;
@@ -126,18 +130,18 @@ namespace Spatial4n.Core.Shapes.Impl
 			// intersection.
 
 			/* x axis intersects  */
-			if (r.Relate_yRange(GetYAxis(), GetYAxis(), ctx).Intersects() // at y vertical
-				  && r.Relate_xRange(enclosingBox.GetMinX(), enclosingBox.GetMaxX(), ctx).Intersects())
+			if (r.RelateYRange(GetYAxis(), GetYAxis(), ctx).Intersects() // at y vertical
+				  && r.RelateXRange(enclosingBox.GetMinX(), enclosingBox.GetMaxX(), ctx).Intersects())
 				return SpatialRelation.INTERSECTS;
 
 			/* y axis intersects */
-			if (r.Relate_xRange(GetXAxis(), GetXAxis(), ctx).Intersects())
+			if (r.RelateXRange(GetXAxis(), GetXAxis(), ctx).Intersects())
 			{ // at x horizontal
 				double yTop = GetCenter().GetY() + distDEG;
 				Debug.Assert(yTop <= 90);
 				double yBot = GetCenter().GetY() - distDEG;
 				Debug.Assert(yBot >= -90);
-				if (r.Relate_yRange(yBot, yTop, ctx).Intersects())//back bottom
+				if (r.RelateYRange(yBot, yTop, ctx).Intersects())//back bottom
 					return SpatialRelation.INTERSECTS;
 			}
 
@@ -191,7 +195,7 @@ namespace Spatial4n.Core.Shapes.Impl
 			if (cornersIntersect == 4)
 			{//all
 				double backX = ctx.NormX(GetCenter().GetX() + 180);
-				if (r.Relate_xRange(backX, backX, ctx).Intersects())
+				if (r.RelateXRange(backX, backX, ctx).Intersects())
 					return SpatialRelation.INTERSECTS;
 				else
 					return SpatialRelation.CONTAINS;
@@ -199,7 +203,7 @@ namespace Spatial4n.Core.Shapes.Impl
 			else if (cornersIntersect == 0)
 			{//none
 				double frontX = GetCenter().GetX();
-				if (r.Relate_xRange(frontX, frontX, ctx).Intersects())
+				if (r.RelateXRange(frontX, frontX, ctx).Intersects())
 					return SpatialRelation.INTERSECTS;
 				else
 					return SpatialRelation.DISJOINT;
@@ -252,10 +256,10 @@ namespace Spatial4n.Core.Shapes.Impl
 		{
 			//I'm deliberately making this look basic and not fully detailed with class name & misc fields.
 			//Add distance in degrees, which is easier to recognize, and earth radius agnostic.
-			String dStr = String.Format("{0:0.00}", distance);
+			String dStr = String.Format("{0:0.00}", distRadius);
 			if (ctx.IsGeo())
 			{
-				double distDEG = ctx.GetDistCalc().DistanceToDegrees(distance);
+				double distDEG = ctx.GetDistCalc().DistanceToDegrees(distRadius);
 				dStr += String.Format("={0:0.0}\u00B0", distDEG);
 			}
 			return "Circle(" + point + ",d=" + dStr + ')';

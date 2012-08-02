@@ -29,13 +29,14 @@ namespace Spatial4n.Core.Shapes
 		double GetMaxX();
 		double GetMaxY();
 
-		/** If {@link #hasArea()} then this returns the area, otherwise it returns 0. */
-		double GetArea();
-		/** Only meaningful for geospatial contexts. */
+		/// <summary>
+		/// Only meaningful for geospatial contexts.
+		/// </summary>
+		/// <returns></returns>
 		bool GetCrossesDateLine();
 
 		/* There is no axis line shape, and this is more efficient then creating a flat Rectangle for intersect(). */
-		SpatialRelation Relate_yRange(double minY, double maxY, SpatialContext ctx);
-		SpatialRelation Relate_xRange(double minX, double maxX, SpatialContext ctx);
+		SpatialRelation RelateYRange(double minY, double maxY, SpatialContext ctx);
+		SpatialRelation RelateXRange(double minX, double maxX, SpatialContext ctx);
 	}
 }

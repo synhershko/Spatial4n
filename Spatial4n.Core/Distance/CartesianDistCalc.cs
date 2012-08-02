@@ -22,6 +22,9 @@ using Spatial4n.Core.Util;
 
 namespace Spatial4n.Core.Distance
 {
+	/// <summary>
+	/// Calculates based on Euclidean / Cartesian 2d plane.
+	/// </summary>
 	public class CartesianDistCalc : AbstractDistanceCalculator
 	{
 		private readonly bool squared;
@@ -56,7 +59,7 @@ namespace Spatial4n.Core.Distance
 		{
 			if (dist == 0)
 				return from;
-			double bearingRAD = MathHelper.ToDegrees(bearingDEG);
+			double bearingRAD = DistanceUtils.ToRadians(bearingDEG);
 			double x = Math.Sin(bearingRAD) * dist;
 			double y = Math.Cos(bearingRAD) * dist;
 			return ctx.MakePoint(from.GetX() + x, from.GetY() + y);
@@ -77,9 +80,19 @@ namespace Spatial4n.Core.Distance
 			return ctx.MakeRect(from.GetX() - distance, from.GetX() + distance, from.GetY() - distance, from.GetY() + distance);
 		}
 
-		public override double CalcBoxByDistFromPtHorizAxis(Point @from, double distance, SpatialContext ctx)
+		public override double CalcBoxByDistFromPt_yHorizAxisDEG(Point @from, double distance, SpatialContext ctx)
 		{
 			return from.GetY();
+		}
+
+		public override double Area(Rectangle rect)
+		{
+			return rect.GetArea(null);
+		}
+
+		public override double Area(Circle circle)
+		{
+			return circle.GetArea(null);
 		}
 
 		public override bool Equals(object o)

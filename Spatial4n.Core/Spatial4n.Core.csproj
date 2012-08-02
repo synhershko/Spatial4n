@@ -44,7 +44,6 @@
     <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Context\ParseUtils.cs" />
     <Compile Include="Context\SpatialContext.cs" />
     <Compile Include="Context\SpatialContextFactory.cs" />
     <Compile Include="Distance\AbstractDistanceCalculator.cs" />
@@ -56,6 +55,7 @@
     <Compile Include="Exceptions\InvalidShapeException.cs" />
     <Compile Include="Exceptions\UnsupportedSpatialOperation.cs" />
     <Compile Include="Io\LineReader.cs" />
+    <Compile Include="Io\ParseUtils.cs" />
     <Compile Include="Io\Samples\SampleData.cs" />
     <Compile Include="Io\Samples\SampleDataReader.cs" />
     <Compile Include="Io\Samples\SampleDataWriter.cs" />
@@ -75,7 +75,6 @@
     <Compile Include="Shapes\Shape.cs" />
     <Compile Include="Shapes\SpatialRelation.cs" />
     <Compile Include="Util\GeohashUtils.cs" />
-    <Compile Include="Util\MathHelper.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Spatial4n.snk" />

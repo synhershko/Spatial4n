@@ -59,11 +59,11 @@ namespace Spatial4n.Core.Context
 		private DistanceCalculator calculator;
 		private Rectangle worldBounds;
 
-		private ShapeReadWriter<SpatialContext> shapeReadWriter;
+		private ShapeReadWriter shapeReadWriter;
 
-		protected ShapeReadWriter<SpatialContext> MakeShapeReadWriter()
+		protected virtual ShapeReadWriter MakeShapeReadWriter()
 		{
-			return new ShapeReadWriter<SpatialContext>(this);
+			return new ShapeReadWriter(this);
 		}
 
 		[Obsolete]
@@ -189,7 +189,7 @@ namespace Spatial4n.Core.Context
 		/// <param name="x"></param>
 		/// <param name="y"></param>
 		/// <returns></returns>
-		public Point MakePoint(double x, double y)
+		public virtual Point MakePoint(double x, double y)
 		{
 			return new PointImpl(NormX(x), NormY(y));
 		}

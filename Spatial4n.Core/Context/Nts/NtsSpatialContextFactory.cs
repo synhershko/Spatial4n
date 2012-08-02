@@ -15,15 +15,13 @@
  * limitations under the License.
  */
 
-using System;
-
-namespace Spatial4n.Core.Util
+namespace Spatial4n.Core.Context.Nts
 {
-	public static class MathHelper
+	public class NtsSpatialContextFactory : SpatialContextFactory
 	{
-		public static double ToDegrees(double radians)
+		protected override SpatialContext NewSpatialContext()
 		{
-			return radians * (180.0 / Math.PI);
+			return new NtsSpatialContext(null, Units, Calculator, WorldBounds);
 		}
 	}
 }

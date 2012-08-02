@@ -54,7 +54,9 @@
     <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Context\ParseUtils.cs" />
+    <Compile Include="Context\Nts\NtsSpatialContextFactory.cs" />
+    <Compile Include="Context\Nts\NtsSpatialContext.cs" />
+    <Compile Include="Io\ParseUtils.cs" />
     <Compile Include="Context\SpatialContext.cs" />
     <Compile Include="Context\SpatialContextFactory.cs" />
     <Compile Include="Distance\AbstractDistanceCalculator.cs" />
@@ -66,6 +68,7 @@
     <Compile Include="Exceptions\InvalidShapeException.cs" />
     <Compile Include="Exceptions\UnsupportedSpatialOperation.cs" />
     <Compile Include="Io\LineReader.cs" />
+    <Compile Include="Io\NtsShapeReadWriter.cs" />
     <Compile Include="Io\Samples\SampleData.cs" />
     <Compile Include="Io\Samples\SampleDataReader.cs" />
     <Compile Include="Io\Samples\SampleDataWriter.cs" />
@@ -80,20 +83,19 @@
     <Compile Include="Shapes\Impl\PointImpl.cs" />
     <Compile Include="Shapes\Impl\RectangleImpl.cs" />
     <Compile Include="Shapes\MultiShape.cs" />
+    <Compile Include="Shapes\Nts\NtsGeometry.cs" />
+    <Compile Include="Shapes\Nts\NtsPoint.cs" />
     <Compile Include="Shapes\Point.cs" />
     <Compile Include="Shapes\Rectangle.cs" />
     <Compile Include="Shapes\Shape.cs" />
     <Compile Include="Shapes\SpatialRelation.cs" />
     <Compile Include="Util\GeohashUtils.cs" />
-    <Compile Include="Util\MathHelper.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
     <None Include="Spatial4n.snk" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Context\Nts\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\nuget.targets" />
   <!--<Import Project="$(SolutionDir)\.nuget\nuget.targets" />-->

@@ -19,9 +19,15 @@ using System;
 
 namespace Spatial4n.Core.Exceptions
 {
+	[Serializable]
 	public class InvalidShapeException : Exception
 	{
 		public InvalidShapeException(string reason) : base(reason)
+		{
+		}
+
+		public InvalidShapeException(string reason, Exception exception)
+			: base(reason, exception)
 		{
 		}
 	}

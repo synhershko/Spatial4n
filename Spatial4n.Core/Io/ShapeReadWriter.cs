@@ -23,13 +23,13 @@ using Spatial4n.Core.Shapes;
 
 namespace Spatial4n.Core.Io
 {
-	public class ShapeReadWriter<TCtx> where TCtx : SpatialContext
+	public class ShapeReadWriter
 	{
-		protected TCtx Ctx;
+		protected SpatialContext Ctx;
 
 		public ShapeReadWriter(SpatialContext ctx)
 		{
-			Ctx = (TCtx)ctx;
+			Ctx = ctx;
 		}
 
 		/// <summary>
@@ -54,7 +54,7 @@ namespace Spatial4n.Core.Io
 		/// </summary>
 		/// <param name="value"></param>
 		/// <returns></returns>
-		public Shape ReadShape(string value)
+		public virtual Shape ReadShape(string value)
 		{
 			Shape s = ReadStandardShape(value);
 			if (s == null)
@@ -69,7 +69,7 @@ namespace Spatial4n.Core.Io
 		/// </summary>
 		/// <param name="shape"></param>
 		/// <returns></returns>
-		public String WriteShape(Shape shape)
+		public virtual String WriteShape(Shape shape)
 		{
 			// TODO: Support Java's NumberFormat behavior
 

@@ -131,7 +131,7 @@ namespace Spatial4n.Core.Context
         }
 
         /** Subclasses should simply construct the instance from the initialized configuration. */
-        protected SpatialContext NewSpatialContext()
+        protected virtual SpatialContext NewSpatialContext()
         {
             return new SpatialContext(Units, Calculator, WorldBounds);
         }

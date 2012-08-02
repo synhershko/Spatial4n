@@ -67,15 +67,14 @@
     <WCFMetadata Include="Service References\" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Spatial4n.Core\Spatial4n.Core.csproj">
-      <Project>{777904AC-46EF-466C-9E13-2A52A6735987}</Project>
-      <Name>Spatial4n.Core</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <ProjectReference Include="..\Spatial4n.Core\Spatial4n.Core.NTS.csproj">
+      <Project>{DDCB0537-C471-4ACD-B48B-56EB1711EB4A}</Project>
+      <Name>Spatial4n.Core.NTS</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\nuget.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -77,10 +77,33 @@ namespace Spatial4n.Core.Shapes.Impl
 
 		public SpatialRelation Relate(Point point, SpatialContext ctx)
 		{
-			if (point.GetY() > GetMaxY() || point.GetY() < GetMinY() ||
-				(GetCrossesDateLine() ?
-					(point.GetX() < minX && point.GetX() > maxX)
-					: (point.GetX() < minX || point.GetX() > maxX)))
+			if (point.GetY() > GetMaxY() || point.GetY() < GetMinY())
+				return SpatialRelation.DISJOINT;
+			//  all the below logic is rather unfortunate but some dateline cases demand it
+			double minX = this.minX;
+			double maxX = this.maxX;
+			double pX = point.GetX();
+			if (ctx.IsGeo())
+			{
+				//unwrap dateline and normalize +180 to become -180
+				double rawWidth = maxX - minX;
+				if (rawWidth < 0)
+				{
+					maxX = minX + (rawWidth + 360);
+				}
+				//shift to potentially overlap
+				if (pX < minX)
+				{
+					pX += 360;
+				}
+				else if (pX > maxX)
+				{
+					pX -= 360;
+				} else {
+					return SpatialRelation.CONTAINS; //short-circuit
+				}
+			}
+			if (pX < minX || pX > maxX)
 				return SpatialRelation.DISJOINT;
 			return SpatialRelation.CONTAINS;
 		}
@@ -212,29 +235,24 @@ namespace Spatial4n.Core.Shapes.Impl
 			double maxX = this.maxX;
 			if (ctx.IsGeo())
 			{
-				//the 360 check is an edge-case for complete world-wrap
-				double ext_width = ext_maxX - ext_minX;
-				if (ext_width < 0)//this logic unfortunately duplicates getWidth()
-					ext_width += 360;
-
-				if (ext_width < 360)
+				//unwrap dateline, plus do world-wrap short circuit
+				double rawWidth = maxX - minX;
+				if (rawWidth == 360)
+					return SpatialRelation.CONTAINS;
+				if (rawWidth < 0)
 				{
-					ext_maxX = ext_minX + ext_width;
-				}
-				else
-				{
-					ext_maxX = 180 + 360;
+					maxX = minX + (rawWidth + 360);
 				}
 
-				if (GetWidth() < 360)
+				double ext_rawWidth = ext_maxX - ext_minX;
+				if (ext_rawWidth == 360)
+					return SpatialRelation.WITHIN;
+				if (ext_rawWidth < 0)
 				{
-					maxX = minX + GetWidth();
-				}
-				else
-				{
-					maxX = 180 + 360;
+					ext_maxX = ext_minX + (ext_rawWidth + 360);
 				}
 
+				//shift to potentially overlap
 				if (maxX < ext_minX)
 				{
 					minX += 360;

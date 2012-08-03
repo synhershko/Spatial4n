@@ -91,6 +91,8 @@ namespace Spatial4n.Tests.shape
             //    assertEquals("dist != xy space", INTERSECTS, c.relate(r, ctx));//once failed here
             //}
 
+			Assert.Equal(/*"nudge back circle", */ SpatialRelation.CONTAINS, ctx.MakeCircle(-150, -90, DegToDist(122)).Relate(ctx.MakeRect(0, -132, 32, 32), ctx));
+
             Assert.Equal(/* "wrong estimate", */ SpatialRelation.DISJOINT, ctx.MakeCircle(-166, 59, 5226.2).Relate(ctx.MakeRect(36, 66, 23, 23), ctx));
 
             Assert.Equal(/*"bad CONTAINS (dateline)",*/ SpatialRelation.INTERSECTS, 

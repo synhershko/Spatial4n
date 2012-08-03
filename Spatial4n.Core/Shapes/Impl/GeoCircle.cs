@@ -46,6 +46,8 @@ namespace Spatial4n.Core.Shapes.Impl
 				if (backDistDEG >= 0)
 				{
 					double backDistance = ctx.GetDistCalc().DegreesToDistance(backDistDEG);
+					//shrink inverseCircle as small as possible to avoid accidental overlap
+					backDistance -= Ulp(backDistance);
 					Point backPoint = ctx.MakePoint(GetCenter().GetX() + 180, GetCenter().GetY() + 180);
 					inverseCircle = new GeoCircle(backPoint, backDistance, ctx);
 				}
@@ -251,7 +253,6 @@ namespace Spatial4n.Core.Shapes.Impl
 			return b ? 4 : 0;
 		}
 
-
 		public override string ToString()
 		{
 			//I'm deliberately making this look basic and not fully detailed with class name & misc fields.
@@ -265,5 +266,17 @@ namespace Spatial4n.Core.Shapes.Impl
 			return "Circle(" + point + ",d=" + dStr + ')';
 		}
 
+		private static double Ulp(double value)
+		{
+			if (Double.IsNaN(value)) return Double.NaN;
+			if (Double.IsInfinity(value)) return Double.PositiveInfinity;
+			if (value == +0.0d || value == -0.0d) return Double.MinValue;
+			if (value == Double.MaxValue) return Math.Pow(2, 971);
+
+
+			long bits = BitConverter.DoubleToInt64Bits(value);
+			double nextValue = BitConverter.Int64BitsToDouble(bits + 1);
+			return nextValue - value;
+		}
 	}
 }

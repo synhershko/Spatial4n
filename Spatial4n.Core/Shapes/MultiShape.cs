@@ -16,7 +16,7 @@
  */
 
 using System;
-using System.Collections.ObjectModel;
+using System.Collections.Generic;
 using System.Linq;
 using Spatial4n.Core.Context;
 
@@ -24,7 +24,7 @@ namespace Spatial4n.Core.Shapes
 {
     public class MultiShape : Shape
     {
-        private readonly Collection<Shape> geoms;
+		private readonly IEnumerable<Shape> geoms;
         private readonly Rectangle bbox;
 
 		/// <summary>
@@ -32,7 +32,7 @@ namespace Spatial4n.Core.Shapes
 		/// </summary>
 		/// <param name="geoms"></param>
 		/// <param name="ctx"></param>
-        public MultiShape(Collection<Shape> geoms, SpatialContext ctx)
+        public MultiShape(IEnumerable<Shape> geoms, SpatialContext ctx)
         {
 			if (!geoms.Any())
 		      throw new ArgumentException("must be given at least 1 shape", "geoms");

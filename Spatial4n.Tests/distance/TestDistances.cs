@@ -9,12 +9,10 @@ namespace Spatial4n.Tests.distance
 	public class TestDistances
 	{
 		private readonly Random random = new Random(RandomSeed.Seed());
-		private SpatialContext ctx;
 
-		public TestDistances()
-		{
-			ctx = new SpatialContext(DistanceUnits.KILOMETERS);
-		}
+		//NOTE!  These are sometimes modified by tests.
+		private SpatialContext ctx = new SpatialContext(DistanceUnits.KILOMETERS);
+		private const double EPS = 10e-4; //delta when doing double assertions. Geo eps is not that small.;
 
 		private DistanceCalculator dc() { return ctx.GetDistCalc(); }
 		private Point pLL(double lat, double lon) { return ctx.MakePoint(lon, lat); }
@@ -23,6 +21,11 @@ namespace Spatial4n.Tests.distance
 		public void testSomeDistances()
 		{
 			//See to verify: from http://www.movable-type.co.uk/scripts/latlong.html
+			Point ctr = pLL(0, 100);
+			CustomAssert.EqualWithDelta(11100, dc().Distance(ctr, pLL(10, 0)), 3);
+			CustomAssert.EqualWithDelta(11100, dc().Distance(ctr, pLL(10, -160)), 3);
+
+			CustomAssert.EqualWithDelta(314.40338, dc().Distance(pLL(1, 2), pLL(3, 4)), EPS);
 
 			CustomAssert.EqualWithDelta(11100, dc().Distance(pLL(0, 100), pLL(10, 0)), 3.0);     // we get 11102.445304151641
 			CustomAssert.EqualWithDelta(11100, dc().Distance(pLL(0, 100), pLL(10, -160)), 3.0);  // we get 11102.445304151641
@@ -38,7 +41,6 @@ namespace Spatial4n.Tests.distance
 			Assert.Equal(67.10, dc().Distance(pLL(6.4, 7.9), pLL(5.8, 7.965)), precision: 2);
 			Assert.Equal(67.10, dc().Distance(pLL(6.4, 7.9), pLL(7.0, 7.965)), precision: 2);
 
-			var EPS = 10e-4;//delta when doing double assertions. Geo eps is not that small.
 			CustomAssert.EqualWithDelta(314.40338, dc().Distance(pLL(1, 2), pLL(3, 4)), EPS);  //calculated value 314.40338388409333
 		}
 
@@ -54,22 +56,22 @@ namespace Spatial4n.Tests.distance
 				//since the pairwise distance is less than d, a bounding box from ctr with d should contain pTgt.
 				Rectangle r = dc().CalcBoxByDistFromPt(pCtr, d, ctx);
 				Assert.Equal(SpatialRelation.CONTAINS, r.Relate(pTgt, ctx));
-				CheckBoundingBox(pCtr, d);
+				CheckBBox(pCtr, d);
 			}
 
 			Assert.Equal(-45, dc().CalcBoxByDistFromPt_yHorizAxisDEG(ctx.MakePoint(-180, -45), 0, ctx), 0);
 
 			double MAXDIST = ctx.GetUnits().EarthCircumference() / 2;
-			CheckBoundingBox(ctx.MakePoint(0, 0), MAXDIST);
-			CheckBoundingBox(ctx.MakePoint(0, 0), MAXDIST * 0.999999);
-			CheckBoundingBox(ctx.MakePoint(0, 0), 0);
-			CheckBoundingBox(ctx.MakePoint(0, 0), 0.000001);
-			CheckBoundingBox(ctx.MakePoint(0, 90), 0.000001);
-			CheckBoundingBox(ctx.MakePoint(-32.7, -5.42), 9829);
-			CheckBoundingBox(ctx.MakePoint(0, 90 - 20), ctx.GetDistCalc().DegreesToDistance(20));
+			CheckBBox(ctx.MakePoint(0, 0), MAXDIST);
+			CheckBBox(ctx.MakePoint(0, 0), MAXDIST * 0.999999);
+			CheckBBox(ctx.MakePoint(0, 0), 0);
+			CheckBBox(ctx.MakePoint(0, 0), 0.000001);
+			CheckBBox(ctx.MakePoint(0, 90), 0.000001);
+			CheckBBox(ctx.MakePoint(-32.7, -5.42), 9829);
+			CheckBBox(ctx.MakePoint(0, 90 - 20), ctx.GetDistCalc().DegreesToDistance(20));
 			{
 				double d = 0.010;//10m
-				CheckBoundingBox(ctx.MakePoint(0, 90 - ctx.GetDistCalc().DistanceToDegrees(d + 0.001)), d);
+				CheckBBox(ctx.MakePoint(0, 90 - ctx.GetDistCalc().DistanceToDegrees(d + 0.001)), d);
 			}
 
 			for (int T = 0; T < 100; T++)
@@ -78,15 +80,13 @@ namespace Spatial4n.Tests.distance
 				double lon = -180 + random.NextDouble() * 360;
 				Point ctr = ctx.MakePoint(lon, lat);
 				double dist = MAXDIST * random.NextDouble();
-				CheckBoundingBox(ctr, dist);
+				CheckBBox(ctr, dist);
 			}
 		}
 
-		private void CheckBoundingBox(Point ctr, double dist)
+		private void CheckBBox(Point ctr, double dist)
 		{
 			String msg = "ctr: " + ctr + " dist: " + dist;
-
-			var EPS = 10e-4;//delta when doing double assertions. Geo eps is not that small.
 
 			Rectangle r = dc().CalcBoxByDistFromPt(ctr, dist, ctx);
 			double horizAxisLat = dc().CalcBoxByDistFromPt_yHorizAxisDEG(ctr, dist, ctx);
@@ -191,9 +191,9 @@ namespace Spatial4n.Tests.distance
 
 		private void TestDistCalcPointOnBearing(double dist, double EPS)
 		{
-			for (int angDEG = 0; angDEG < 360; angDEG += random.Next(20) + 1)
+			for (int angDEG = 0; angDEG < 360; angDEG += random.Next(1,20))
 			{
-				Point c = ctx.MakePoint(random.Next(360), -90 + random.Next(181));
+				Point c = ctx.MakePoint(random.Next(359),random.Next(-90,90));
 
 				//0 distance means same point
 				Point p2 = dc().PointOnBearing(c, 0, angDEG, ctx);
@@ -205,7 +205,7 @@ namespace Spatial4n.Tests.distance
 			}
 		}
 
-		private void AssertEqualsRatio(double expected, double actual, double EPS)
+		private static void AssertEqualsRatio(double expected, double actual, double EPS)
 		{
 			double delta = Math.Abs(actual - expected);
 			double baseValue = Math.Min(actual, expected);
@@ -234,8 +234,8 @@ namespace Spatial4n.Tests.distance
 				//Assert.Equal(/* "input "+pair[0],*/ pair[1], ctx.NormY(pair[0]), precision: 0);
 				CustomAssert.EqualWithDelta(/* "input "+pair[0],*/ pair[1], ctx.NormY(pair[0]), Double.Epsilon);
 			}
-			Random random = new Random(RandomSeed.Seed());
-			for (int i = -1000; i < 1000; i += random.Next(10) * 10)
+			var random = new Random(RandomSeed.Seed());
+			for (int i = -1000; i < 1000; i += random.Next(9) * 10)
 			{
 				double d = ctx.NormY(i);
 				Assert.True(/*i + " " + d,*/ d >= -90 && d <= 90);
@@ -263,11 +263,12 @@ namespace Spatial4n.Tests.distance
 				//Assert.Equal( /*"input "+pair[0],*/ pair[1], ctx.NormX(pair[0]), 0);
 				CustomAssert.EqualWithDelta( /*"input "+pair[0],*/ pair[1], ctx.NormX(pair[0]), Double.Epsilon);
 			}
-			Random random = new Random(RandomSeed.Seed());
-			for (int i = -1000; i < 1000; i += random.Next(10) * 10)
+
+			var random = new Random(RandomSeed.Seed());
+			for (int i = -1000; i < 1000; i += random.Next(9) * 10)
 			{
 				double d = ctx.NormX(i);
-				Assert.True(d >= -180 && d < 180, i + " " + d);
+				Assert.True(d >= -180 && d <= 180, i + " " + d);
 			}
 		}
 
@@ -285,6 +286,35 @@ namespace Spatial4n.Tests.distance
 			CustomAssert.EqualWithDelta(
 				DistanceUtils.PointOnBearingRAD(0, 0, DistanceUtils.Dist2Radians(dist, radius), DistanceUtils.DEG_90_AS_RADS, null)[1],
 				DistanceUtils.Dist2Radians(dist, radius), 10e-5);
+		}
+
+		[Fact]
+		public void testArea()
+		{
+			//surface of a sphere is 4 * pi * r^2
+			double earthArea = 4 * Math.PI * ctx.GetUnits().EarthRadius() * ctx.GetUnits().EarthRadius();
+
+			var random = new Random(RandomSeed.Seed());
+			Circle c = ctx.MakeCircle(random.Next(-180, 180), random.Next(-90, 90),
+					ctx.GetDistCalc().DegreesToDistance(180));//180 means whole earth
+			CustomAssert.EqualWithDelta(earthArea, c.GetArea(ctx), 1.0);
+
+			//now check half earth
+			Circle cHalf = ctx.MakeCircle(c.GetCenter(), ctx.GetDistCalc().DegreesToDistance(90));
+			CustomAssert.EqualWithDelta(earthArea / 2, cHalf.GetArea(ctx), 1.0);
+
+			//picked out of the blue
+			Circle c2 = ctx.MakeCircle(c.GetCenter(), ctx.GetDistCalc().DegreesToDistance(30));
+			CustomAssert.EqualWithDelta(3.416E7, c2.GetArea(ctx), 3.416E7 * 0.01);
+
+			//circle with same radius at +20 lat with one at -20 lat should have same area as well as bbox with same area
+			Circle c3 = ctx.MakeCircle(c.GetCenter().GetX(), 20, ctx.GetDistCalc().DegreesToDistance(30));
+			CustomAssert.EqualWithDelta(c2.GetArea(ctx), c3.GetArea(ctx), 0.01);
+			Circle c3Opposite = ctx.MakeCircle(c.GetCenter().GetX(), -20, ctx.GetDistCalc().DegreesToDistance(30));
+			CustomAssert.EqualWithDelta(c3.GetArea(ctx), c3Opposite.GetArea(ctx), 0.01);
+			CustomAssert.EqualWithDelta(c3.GetBoundingBox().GetArea(ctx), c3Opposite.GetBoundingBox().GetArea(ctx), 0.01);
+
+			CustomAssert.EqualWithDelta(earthArea, ctx.GetWorldBounds().GetArea(ctx), 1.0);
 		}
 	}
 }

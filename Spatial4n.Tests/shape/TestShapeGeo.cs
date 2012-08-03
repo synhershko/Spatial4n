@@ -1,42 +1,49 @@
 ﻿using System;
+using System.Collections.Generic;
 using Spatial4n.Core.Context;
+using Spatial4n.Core.Context.Nts;
 using Spatial4n.Core.Distance;
 using Spatial4n.Core.Shapes;
 using Xunit;
+using Xunit.Extensions;
 
 namespace Spatial4n.Tests.shape
 {
     public class TestShapesGeo : AbstractTestShapes
     {
-        public TestShapesGeo()
-        {
-            BeforeClass();
-        }
+		public static IEnumerable<object[]> Contexts
+		{
+			get
+			{
+				DistanceUnits units = DistanceUnits.KILOMETERS;
 
-        protected override SpatialContext GetContext()
-        {
-            DistanceUnits units = DistanceUnits.KILOMETERS;
-            DistanceCalculator distCalc = new GeodesicSphereDistCalc.Haversine(units.EarthRadius());//default
-            //TODO WTF it randomly chooses which implementation to use!!!!!!!!
-            var item = random.Next(3);
-            switch (item)
-            {
-                case 2:
-                    //TODO ENABLE WHEN WORKING
-                    //distCalc = new GeodesicSphereDistCalc.LawOfCosines(units.earthRadius());
-                    break;
-                case 1:
-                    distCalc = new GeodesicSphereDistCalc.Vincenty(units.EarthRadius());
-                    break;
-                default:
-                    break;
-            }
-            return new SpatialContext(units, distCalc, SpatialContext.GEO_WORLDBOUNDS);
-        }
+				DistanceCalculator distCalcH = new GeodesicSphereDistCalc.Haversine(units.EarthRadius());//default
+				DistanceCalculator distCalcV = new GeodesicSphereDistCalc.Vincenty(units.EarthRadius());//default
 
-        [Fact]
-        public void TestGeoRectangle()
-        {
+				yield return new object[] { new SpatialContext(units, distCalcH, SpatialContext.GEO_WORLDBOUNDS) };
+				yield return new object[] { new SpatialContext(units, distCalcV, SpatialContext.GEO_WORLDBOUNDS) };
+				yield return new object[] { NtsSpatialContext.GEO_KM };
+			}
+		}
+
+    	public TestShapesGeo()
+    	{
+    	}
+
+		public TestShapesGeo(SpatialContext ctx) : base(ctx)
+    	{
+    	}
+
+		[Theory]
+		[PropertyData("Contexts")]
+		public void TestGeoRectangle(SpatialContext ctx)
+		{
+			base.ctx = ctx;
+
+			//test 180 becomes -180 for non-zero width rectangle
+			Assert.Equal(ctx.MakeRect(-180, -170, 0, 0), ctx.MakeRect(180, -170, 0, 0));
+			Assert.Equal(ctx.MakeRect(170, 180, 0, 0), ctx.MakeRect(170, -180, 0, 0));
+
             double[] lons = new double[] { 0, 45, 160, 180, -45, -175, -180 }; //minX
             foreach (double lon in lons)
             {
@@ -54,9 +61,12 @@ namespace Spatial4n.Tests.shape
             TestRectIntersect();
         }
 
-        [Fact]
-        public void TestGeoCircle()
-        {
+		[Theory]
+		[PropertyData("Contexts")]
+        public void TestGeoCircle(SpatialContext ctx)
+		{
+			base.ctx = ctx;
+
             //--Start with some static tests that once failed:
 
             //Bug: numeric edge at pole, fails to init

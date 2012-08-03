@@ -9,7 +9,9 @@ namespace Spatial4n.Tests.context
 {
     public class SpatialContextFactoryTest
     {
-        private SpatialContext Call(params String [] argsStr) 
+		public static String PROP = "SpatialContextFactory";
+
+        private static SpatialContext Call(params String [] argsStr) 
         {			
             var args = new Dictionary<String,String>();
             for (int i = 0; i < argsStr.Length; i += 2)
@@ -61,7 +63,7 @@ namespace Spatial4n.Tests.context
 
         public class DSCF : SpatialContextFactory 
         {
-            new protected SpatialContext NewSpatialContext()
+            override protected SpatialContext NewSpatialContext()
             {
                 return new SpatialContext(DistanceUnits.CARTESIAN);
             }

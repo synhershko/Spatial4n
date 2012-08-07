@@ -137,7 +137,7 @@ namespace Spatial4n.Tests.shape
 			// * crosses the dateline
 			// * has coordinates needing normalization (longitude +180.000xxx)
 			// * some geometries might(?) not be "valid" (requires union to overcome)
-			String wktStr = readFirstLineFromRsrc("/russia.wkt.txt");
+			String wktStr = readFirstLineFromRsrc("russia.wkt.txt");
 
 			NtsGeometry jtsGeom = (NtsGeometry) ctx.ReadShape(wktStr);
 
@@ -152,9 +152,9 @@ namespace Spatial4n.Tests.shape
 		public void testFiji()
 		{
 			//Fiji is a group of islands crossing the dateline.
-			String wktStr = readFirstLineFromRsrc("/fiji.wkt.txt");
+			String wktStr = readFirstLineFromRsrc("fiji.wkt.txt");
 
-			NtsGeometry jtsGeom = (NtsGeometry) ctx.ReadShape(wktStr);
+			var jtsGeom = (NtsGeometry) ctx.ReadShape(wktStr);
 
 			AssertRelation(null, SpatialRelation.CONTAINS, jtsGeom,
 			               ctx.MakePoint(-179.99, -16.9));
@@ -162,9 +162,12 @@ namespace Spatial4n.Tests.shape
 			               ctx.MakePoint(+179.99, -16.9));
 		}
 
-		private String readFirstLineFromRsrc(String wktRsrcPath)
+		private static String readFirstLineFromRsrc(String wktRsrcPath)
 		{
-			using (var stream = File.OpenText(wktRsrcPath))
+			var projectPath = AppDomain.CurrentDomain.BaseDirectory.Substring(0,
+				AppDomain.CurrentDomain.BaseDirectory.LastIndexOf("Spatial4n.Tests", StringComparison.InvariantCultureIgnoreCase));
+			var fullPath = Path.Combine(projectPath, "Spatial4n.Tests", "resources", wktRsrcPath);
+			using (var stream = File.OpenText(fullPath))
 			{
 				return stream.ReadLine();
 			}

@@ -94,10 +94,10 @@ namespace Spatial4n.Core.Shapes.Impl
 
 			if (thiz == o) return true;
 			
-			var point = o as PointImpl;
+			var point = o as Point;
 			if (point == null) return false;
 
-			return thiz.GetX().Equals(point.x) && thiz.GetY().Equals(point.y);
+			return thiz.GetX().Equals(point.GetX()) && thiz.GetY().Equals(point.GetY());
 		}
 
 		public override int GetHashCode()

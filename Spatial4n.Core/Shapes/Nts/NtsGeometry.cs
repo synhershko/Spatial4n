@@ -43,7 +43,7 @@ namespace Spatial4n.Core.Shapes.Nts
 		public NtsGeometry(IGeometry geom, NtsSpatialContext ctx, bool dateline180Check)
 		{
 			//GeometryCollection isn't supported in relate()
-			if (geom is GeometryCollection)
+			if (geom.GetType() == typeof(GeometryCollection))
 				throw new ArgumentException("NtsGeometry does not support GeometryCollection but does support its subclasses.");
 
 			//NOTE: All this logic is fairly expensive. There are some short-circuit checks though.

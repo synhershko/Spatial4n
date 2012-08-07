@@ -251,7 +251,9 @@ namespace Spatial4n.Core.Shapes.Impl
 			if (thiz == null)
 				throw new ArgumentNullException("thiz");
 
-			var circle = o as CircleImpl;
+			if (thiz == o) return true;
+
+			var circle = o as Circle;
 			if (circle == null) return false;
 
 			if (!thiz.GetCenter().Equals(circle.GetCenter())) return false;

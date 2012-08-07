@@ -291,11 +291,11 @@ namespace Spatial4n.Core.Shapes.Impl
 
 			if (thiz == o) return true;
 
-			var rectangle = o as RectangleImpl;
+			var rectangle = o as Rectangle;
 			if (rectangle == null) return false;
 
-			return thiz.GetMaxX().Equals(rectangle.maxX) && thiz.GetMinX().Equals(rectangle.minX) &&
-			       thiz.GetMaxY().Equals(rectangle.maxY) && thiz.GetMinY().Equals(rectangle.minY);
+			return thiz.GetMaxX().Equals(rectangle.GetMaxX()) && thiz.GetMinX().Equals(rectangle.GetMinX()) &&
+			       thiz.GetMaxY().Equals(rectangle.GetMaxY()) && thiz.GetMinY().Equals(rectangle.GetMinY());
 		}
 
 		public override int GetHashCode()

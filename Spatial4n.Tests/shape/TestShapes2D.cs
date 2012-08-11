@@ -41,9 +41,10 @@ namespace Spatial4n.Tests.shape
 			Assert.Equal(/*msg,*/ pt.GetCenter(), pt);
 			Rectangle bbox = pt.GetBoundingBox();
 			Assert.False(bbox.HasArea(), msg);
+			
 			var center = bbox.GetCenter();
-			Assert.True(PointImpl.Equals(pt, center));
-			Assert.Equal(/*msg,*/ pt, center);
+			Assert.True(pt.Equals(center));
+			//Assert.Equal(/*msg,*/ pt, center);
 
 			AssertRelation(msg, SpatialRelation.CONTAINS, pt, pt2);
 			AssertRelation(msg, SpatialRelation.DISJOINT, pt, ctx.MakePoint(0, 1));

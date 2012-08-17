@@ -16,6 +16,7 @@
  */
 
 using System;
+using System.Diagnostics;
 using Spatial4n.Core.Context;
 
 namespace Spatial4n.Core.Shapes.Impl
@@ -50,7 +51,8 @@ namespace Spatial4n.Core.Shapes.Impl
 
 		public SpatialRelation Relate(Shape other, SpatialContext ctx)
 		{
-			//assert this.ctx == ctx;
+			Debug.Assert(this.ctx == ctx);
+
 			//This shortcut was problematic in testing due to distinctions of CONTAINS/WITHIN for no-area shapes (lines, points).
 			//    if (distance == 0) {
 			//      return point.relate(other,ctx).intersects() ? SpatialRelation.WITHIN : SpatialRelation.DISJOINT;

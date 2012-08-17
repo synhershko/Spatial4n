@@ -26,14 +26,12 @@ namespace Spatial4n.Core.Distance
 	public class DistanceUnits
 	{
 		//TODO do we need circumference?
-		public static DistanceUnits KILOMETERS = new DistanceUnits("km", DistanceUtils.EARTH_MEAN_RADIUS_KM, 40076);
-		public static DistanceUnits MILES = new DistanceUnits("miles", DistanceUtils.EARTH_MEAN_RADIUS_MI, 24902);
-		public static DistanceUnits RADIANS = new DistanceUnits("radians", 1, Math.PI * 2);//experimental
-		public static DistanceUnits CARTESIAN = new DistanceUnits("u", -1, -1);
+		public static DistanceUnits KILOMETERS = new DistanceUnits("km", DistanceUtils.EARTH_MEAN_RADIUS_KM);
+		public static DistanceUnits MILES = new DistanceUnits("miles", DistanceUtils.EARTH_MEAN_RADIUS_MI);
+		public static DistanceUnits RADIANS = new DistanceUnits("radians", 1);//experimental
+		public static DistanceUnits CARTESIAN = new DistanceUnits("u", -1);
 
 		private readonly String units;
-
-		private readonly double earthCircumference;
 
 		private readonly double earthRadius;
 
@@ -42,11 +40,9 @@ namespace Spatial4n.Core.Distance
 		/// </summary>
 		/// <param name="units">Distance unit in String form</param>
 		/// <param name="earthRadius">Radius of the Earth in the specific distance unit</param>
-		/// <param name="earthCircumfence">Circumference of the Earth in the specific distance unit</param>
-		DistanceUnits(String units, double earthRadius, double earthCircumfence)
+		DistanceUnits(String units, double earthRadius)
 		{
 			this.units = units;
-			this.earthCircumference = earthCircumfence;
 			this.earthRadius = earthRadius;
 		}
 
@@ -110,19 +106,9 @@ namespace Spatial4n.Core.Distance
 			return earthRadius;
 		}
 
-		/// <summary>
-		/// Returns the <a href="http://www.lyberty.com/encyc/articles/earth.html">circumference of the Earth</a>
-		/// </summary>
-		/// <returns>the circumference of the Earth</returns>
-		public double EarthCircumference()
-		{
-			return earthCircumference;
-		}
-
 		public bool IsGeo()
 		{
 			return earthRadius > 0;
 		}
-
 	}
 }

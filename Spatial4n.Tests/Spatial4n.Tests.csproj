@@ -67,7 +67,7 @@
     <Compile Include="RepeatTestAttribute.cs" />
     <Compile Include="shape\AbstractTestShapes.cs" />
     <Compile Include="shape\NtsPolygonTest.cs" />
-    <Compile Include="shape\TestShapeGeo.cs" />
+    <Compile Include="shape\TestShapesGeo.cs" />
     <Compile Include="shape\TestShapes2D.cs" />
     <Compile Include="util\TestGeohashUtils.cs" />
   </ItemGroup>

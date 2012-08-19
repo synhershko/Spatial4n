@@ -43,7 +43,7 @@ namespace Spatial4n.Core.Shapes.Impl
 				//--spans more than half the globe
 				Debug.Assert(enclosingBox.GetWidth() == 360);
 				double backDistDEG = 180 - distDEG;
-				if (backDistDEG >= 0)
+				if (backDistDEG > 0)
 				{
 					double backDistance = ctx.GetDistCalc().DegreesToDistance(backDistDEG);
 					//shrink inverseCircle as small as possible to avoid accidental overlap
@@ -164,7 +164,7 @@ namespace Spatial4n.Core.Shapes.Impl
 			if (yTop > 90)
 			{
 				double yTopOverlap = yTop - 90;
-				Debug.Assert(yTopOverlap <= 90);
+				Debug.Assert(yTopOverlap <= 90, "yTopOverlap: " + yTopOverlap);
 				if (r.GetMinY() >= 90 - yTopOverlap)
 					return SpatialRelation.CONTAINS;
 			}

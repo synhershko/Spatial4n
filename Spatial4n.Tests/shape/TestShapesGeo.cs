@@ -40,6 +40,14 @@ namespace Spatial4n.Tests.shape
 		{
 			base.ctx = ctx;
 
+			//First test some relateXRange
+			//    opposite +/- 180
+			Assert.Equal(SpatialRelation.INTERSECTS, ctx.MakeRect(170, 180, 0, 0).RelateXRange(-180, -170, ctx));
+			Assert.Equal(SpatialRelation.INTERSECTS, ctx.MakeRect(-90, -45, 0, 0).RelateXRange(-45, -135, ctx));
+			Assert.Equal(SpatialRelation.CONTAINS, ctx.GetWorldBounds().RelateXRange(-90, -135, ctx));
+			//point on edge at dateline using opposite +/- 180
+			Assert.Equal(SpatialRelation.CONTAINS, ctx.MakeRect(170, 180, 0, 0).Relate(ctx.MakePoint(-180, 0), ctx));
+
 			//test 180 becomes -180 for non-zero width rectangle
 			Assert.Equal(ctx.MakeRect(-180, -170, 0, 0), ctx.MakeRect(180, -170, 0, 0));
 			Assert.Equal(ctx.MakeRect(170, 180, 0, 0), ctx.MakeRect(170, -180, 0, 0));

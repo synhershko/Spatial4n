@@ -488,6 +488,11 @@ namespace Spatial4n.Core.Distance
 			return ToDegrees(Dist2Radians(dist, radius));
 		}
 
+		public static double Degrees2Dist(double degrees, double radius)
+		{
+			return Radians2Dist(ToRadians(degrees), radius);
+		}
+
 		/// <summary>
 		/// Converts a distance in the units of <code>radius</code> (e.g. kilometers)
 		/// to radians (multiples of the radius). A spherical earth model is assumed.

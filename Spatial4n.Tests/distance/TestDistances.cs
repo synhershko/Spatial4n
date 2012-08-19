@@ -61,7 +61,7 @@ namespace Spatial4n.Tests.distance
 
 			Assert.Equal(-45, dc().CalcBoxByDistFromPt_yHorizAxisDEG(ctx.MakePoint(-180, -45), 0, ctx), 0);
 
-			double MAXDIST = ctx.GetUnits().EarthCircumference() / 2;
+			double MAXDIST = degToKm(180);
 			CheckBBox(ctx.MakePoint(0, 0), MAXDIST);
 			CheckBBox(ctx.MakePoint(0, 0), MAXDIST * 0.999999);
 			CheckBBox(ctx.MakePoint(0, 0), 0);
@@ -180,11 +180,11 @@ namespace Spatial4n.Tests.distance
 			//    assertEqualsRatio(dist, calcDist);
 			//}
 
-			double maxDist = ctx.GetUnits().EarthCircumference() / 2;
+			double maxDistKm = degToKm(180);
 			for (int i = 0; i < 1000; i++)
 			{
-				int dist = random.Next((int)maxDist);
-				var EPS = (dist < maxDist * 0.75 ? 10e-6 : 10e-3);
+				int dist = random.Next((int)maxDistKm);
+				var EPS = (dist < maxDistKm * 0.75 ? 10e-6 : 10e-3);
 				TestDistCalcPointOnBearing(dist, EPS);
 			}
 		}
@@ -315,6 +315,16 @@ namespace Spatial4n.Tests.distance
 			CustomAssert.EqualWithDelta(c3.GetBoundingBox().GetArea(ctx), c3Opposite.GetBoundingBox().GetArea(ctx), 0.01);
 
 			CustomAssert.EqualWithDelta(earthArea, ctx.GetWorldBounds().GetArea(ctx), 1.0);
+		}
+
+		private static double degToKm(double deg)
+		{
+			return DistanceUtils.Degrees2Dist(deg, DistanceUtils.EARTH_MEAN_RADIUS_KM);
+		}
+
+		private static double kmToDeg(double km)
+		{
+			return DistanceUtils.Dist2Degrees(km, DistanceUtils.EARTH_MEAN_RADIUS_KM);
 		}
 	}
 }

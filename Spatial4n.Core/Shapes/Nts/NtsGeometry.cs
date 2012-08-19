@@ -59,7 +59,7 @@ namespace Spatial4n.Core.Shapes.Nts
 				//Cuts an unwrapped geometry back into overlaid pages in the standard geo bounds.
 				geom = CutUnwrappedGeomInto360(geom);//returns same or new geom
 				Debug.Assert(geom.EnvelopeInternal.Width <= 360);
-				Debug.Assert(!(geom is GeometryCollection)); //double check
+				Debug.Assert(geom.GetType() != typeof(GeometryCollection)); //double check
 
 				//note: this bbox may be sub-optimal. If geom is a collection of things near the dateline on both sides then
 				// the bbox will needlessly span most or all of the globe longitudinally.

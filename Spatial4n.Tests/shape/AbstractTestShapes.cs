@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Spatial4n.Core.Context;
 using Spatial4n.Core.Context.Nts;
 using Spatial4n.Core.Distance;
@@ -287,7 +288,7 @@ namespace Spatial4n.Tests.shape
 			{
 				shapes.Add(RandomRectangle(20));
 			}
-			var multiShape = new MultiShape(shapes, ctx);
+			var multiShape = new MultiShape(shapes.Cast<Shape>(), ctx);
 
 			//test multiShape.getBoundingBox();
 			Rectangle msBbox = multiShape.GetBoundingBox();

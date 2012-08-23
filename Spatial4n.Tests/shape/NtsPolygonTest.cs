@@ -166,7 +166,11 @@ namespace Spatial4n.Tests.shape
 		{
 			var projectPath = AppDomain.CurrentDomain.BaseDirectory.Substring(0,
 				AppDomain.CurrentDomain.BaseDirectory.LastIndexOf("Spatial4n.Tests", StringComparison.InvariantCultureIgnoreCase));
-			var fullPath = Path.Combine(projectPath, "Spatial4n.Tests", "resources", wktRsrcPath);
+
+			var fullPath = Path.Combine(projectPath, "Spatial4n.Tests");
+			fullPath = Path.Combine(fullPath, "resources");
+			fullPath = Path.Combine(fullPath, wktRsrcPath);
+
 			using (var stream = File.OpenText(fullPath))
 			{
 				return stream.ReadLine();

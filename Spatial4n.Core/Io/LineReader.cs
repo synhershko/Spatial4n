@@ -60,7 +60,11 @@ namespace Spatial4n.Core.Io
 		{
 			current = default(T);
 
+#if NET35
+			if (string.IsNullOrEmpty((nextLine ?? "").Trim()) && reader.EndOfStream)
+#else
 			if (string.IsNullOrWhiteSpace(nextLine) && reader.EndOfStream)
+#endif
 			{
 				nextLine = null;
 				return false;

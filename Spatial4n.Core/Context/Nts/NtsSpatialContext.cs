@@ -37,14 +37,13 @@ namespace Spatial4n.Core.Context.Nts
 	/// </summary>
 	public class NtsSpatialContext : SpatialContext
 	{
-		public new static NtsSpatialContext GEO_KM = new NtsSpatialContext(DistanceUnits.KILOMETERS);
+		public new static NtsSpatialContext GEO_KM = new NtsSpatialContext(true);
 
 		private readonly GeometryFactory geometryFactory;
 
-		public NtsSpatialContext(DistanceUnits units)
-			: base(units, null, null)
+		public NtsSpatialContext(bool geo)
+			: this(null, geo, null, null)
 		{
-			geometryFactory = new GeometryFactory();
 		}
 
 		/**
@@ -52,8 +51,8 @@ namespace Spatial4n.Core.Context.Nts
 		 *
 		 * @param geometryFactory optional
 		 */
-		public NtsSpatialContext(GeometryFactory geometryFactory, DistanceUnits units, DistanceCalculator calculator, Rectangle worldBounds)
-			: base(units, calculator, worldBounds)
+		public NtsSpatialContext(GeometryFactory geometryFactory, bool geo, DistanceCalculator calculator, Rectangle worldBounds)
+			: base(geo, calculator, worldBounds)
 		{
 			this.geometryFactory = geometryFactory ?? new GeometryFactory();
 		}

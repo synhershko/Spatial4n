@@ -21,7 +21,7 @@ namespace Spatial4n.Core.Context.Nts
 	{
 		protected override SpatialContext NewSpatialContext()
 		{
-			return new NtsSpatialContext(null, Units, Calculator, WorldBounds);
+			return new NtsSpatialContext(null, geo, Calculator, WorldBounds);
 		}
 	}
 }

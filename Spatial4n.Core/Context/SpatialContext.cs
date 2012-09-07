@@ -49,17 +49,17 @@ namespace Spatial4n.Core.Context
 		}
 
 		/// <summary>
-		/// A popular default SpatialContext implementation based on kilometer distance.
+		/// A popular default SpatialContext implementation for geospatial.
 		/// </summary>
-		public static readonly SpatialContext GEO_KM = new SpatialContext(DistanceUnits.KILOMETERS);
+		public static readonly SpatialContext GEO = new SpatialContext(true);
 		//note: any static convenience instances must be declared after the world bounds
 
 		//These are non-null
-		private DistanceUnits units;
-		private DistanceCalculator calculator;
-		private Rectangle worldBounds;
+		private readonly bool geo;
+		private readonly DistanceCalculator calculator;
+		private readonly Rectangle worldBounds;
 
-		private ShapeReadWriter shapeReadWriter;
+		private readonly ShapeReadWriter shapeReadWriter;
 
 		protected virtual ShapeReadWriter MakeShapeReadWriter()
 		{
@@ -78,35 +78,20 @@ namespace Spatial4n.Core.Context
 			return shapeReadWriter.WriteShape(shape);
 		}
 
-		protected double? maxCircleDistance;//only for geo
-
 		/// <summary>
 		/// 
 		/// </summary>
-		/// <param name="units">Required; and establishes geo vs cartesian.</param>
+		/// <param name="geo">Establishes geo vs cartesian / Euclidean.</param>
 		/// <param name="calculator">Optional; defaults to Haversine or cartesian depending on units.</param>
 		/// <param name="worldBounds">Optional; defaults to GEO_WORLDBOUNDS or MAX_WORLDBOUNDS depending on units.</param> 
-		public SpatialContext(DistanceUnits units, DistanceCalculator calculator, Rectangle worldBounds)
+		public SpatialContext(bool geo, DistanceCalculator calculator, Rectangle worldBounds)
 		{
-			Init(units, calculator, worldBounds);
-		}
-
-		public SpatialContext(DistanceUnits units)
-		{
-			Init(units, null, null);
-		}
-
-		protected void Init(DistanceUnits units, DistanceCalculator calculator, Rectangle worldBounds)
-		{
-			if (units == null)
-				throw new ArgumentException("units can't be null", "units");
-
-			this.units = units;
+			this.geo = geo;
 
 			if (calculator == null)
 			{
 				calculator = IsGeo()
-					? (DistanceCalculator)new GeodesicSphereDistCalc.Haversine(units.EarthRadius())
+					? (DistanceCalculator)new GeodesicSphereDistCalc.Haversine()
 					: new CartesianDistCalc();
 			}
 			this.calculator = calculator;
@@ -127,13 +112,11 @@ namespace Spatial4n.Core.Context
 			this.worldBounds = worldBounds;
 
 			shapeReadWriter = MakeShapeReadWriter();
-
-			this.maxCircleDistance = IsGeo() ? calculator.DegreesToDistance(180) : (double?)null;
 		}
 
-		public DistanceUnits GetUnits()
+		public SpatialContext(bool geo)
+			: this(geo, null, null)
 		{
-			return units;
 		}
 
 		public DistanceCalculator GetDistCalc()
@@ -180,7 +163,7 @@ namespace Spatial4n.Core.Context
 		/// <returns></returns>
 		public bool IsGeo()
 		{
-			return GetUnits().IsGeo();
+			return geo;
 		}
 
 		/// <summary>
@@ -314,18 +297,18 @@ namespace Spatial4n.Core.Context
 			if (distance < 0)
 				throw new InvalidShapeException("distance must be >= 0; got " + distance);
 			if (IsGeo())
-				return new GeoCircle(point, Math.Min(distance, maxCircleDistance ?? 0), this);
+				return new GeoCircle(point, Math.Min(distance, 180), this);
 
 			return new CircleImpl(point, distance, this);
 		}
 
 		public override String ToString()
 		{
-			if (this.Equals(GEO_KM))
-				return GEO_KM.GetType().Name + ".GEO_KM";
+			if (this.Equals(GEO))
+				return GEO.GetType().Name + ".GEO";
 
 			return GetType().Name + "{" +
-			       "units=" + units +
+			       "geo=" + geo +
 			       ", calculator=" + calculator +
 			       ", worldBounds=" + worldBounds +
 			       '}';

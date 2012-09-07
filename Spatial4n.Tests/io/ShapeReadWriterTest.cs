@@ -14,7 +14,7 @@ namespace Spatial4n.Tests.io
 		{
 			get
 			{
-				yield return new object[] { SpatialContext.GEO_KM };
+				yield return new object[] { SpatialContext.GEO };
 				yield return new object[] { NtsSpatialContext.GEO_KM };
 			}
 		}

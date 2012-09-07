@@ -265,22 +265,19 @@ namespace Spatial4n.Core.Distance
 			return (off <= 180 ? off : 360 - off) - 90;
 		}
 
-		public static Rectangle CalcBoxByDistFromPtDEG(double lat, double lon, double distance, SpatialContext ctx)
+		public static Rectangle CalcBoxByDistFromPtDEG(double lat, double lon, double distDEG, SpatialContext ctx)
 		{
 			//See http://janmatuschek.de/LatitudeLongitudeBoundingCoordinates Section 3.1, 3.2 and 3.3
 
-			double radius = ctx.GetUnits().EarthRadius();
-			double dist_deg = Dist2Degrees(distance, radius);
-
-			if (dist_deg == 0)
+			if (distDEG == 0)
 				return ctx.MakeRect(lon, lon, lat, lat);//essentially a point
 
-			if (dist_deg >= 180)//distance is >= opposite side of the globe
+			if (distDEG >= 180)//distance is >= opposite side of the globe
 				return ctx.GetWorldBounds();
 
 			//--calc latitude bounds
-			double latN_deg = lat + dist_deg;
-			double latS_deg = lat - dist_deg;
+			double latN_deg = lat + distDEG;
+			double latS_deg = lat - distDEG;
 
 			if (latN_deg >= 90 || latS_deg <= -90)
 			{//touches either pole
@@ -301,7 +298,7 @@ namespace Spatial4n.Core.Distance
 			else
 			{
 				//--calc longitude bounds
-				double lon_delta_deg = CalcBoxByDistFromPt_deltaLonDEG(lat, lon, distance, radius);
+				double lon_delta_deg = CalcBoxByDistFromPt_deltaLonDEG(lat, lon, distDEG);
 
 				double lonW_deg = lon - lon_delta_deg;
 				double lonE_deg = lon + lon_delta_deg;
@@ -314,21 +311,19 @@ namespace Spatial4n.Core.Distance
 		/// <summary>
 		/// The delta longitude of a point-distance. In other words, half the width of
 		/// the bounding box of a circle.
-		/// <p/>
-		/// <code>distance</code> and <code>radius</code> should be in the same units.
 		/// </summary>
 		/// <param name="lat"></param>
 		/// <param name="lon"></param>
 		/// <param name="distance"></param>
 		/// <param name="radius"></param>
 		/// <returns></returns>
-		public static double CalcBoxByDistFromPt_deltaLonDEG(double lat, double lon, double distance, double radius)
+		public static double CalcBoxByDistFromPt_deltaLonDEG(double lat, double lon, double distDEG)
 		{
 			//http://gis.stackexchange.com/questions/19221/find-tangent-point-on-circle-furthest-east-or-west
-			if (distance == 0)
+			if (distDEG == 0)
 				return 0;
 			double lat_rad = ToRadians(lat);
-			double dist_rad = Dist2Radians(distance, radius);
+			double dist_rad = ToRadians(distDEG);
 			double result_rad = Math.Asin(Math.Sin(dist_rad) / Math.Cos(lat_rad));
 
 			if (!Double.IsNaN(result_rad))
@@ -342,21 +337,18 @@ namespace Spatial4n.Core.Distance
 		/// left-most and right-most edges. On a 2D plane, this result is always
 		/// <code>from.getY()</code> but, perhaps surprisingly, on a sphere it is going
 		/// to be slightly different.
-		/// <p/>
-		/// <code>distance</code> and <code>radius</code> should be in the same units.
 		/// </summary>
 		/// <param name="lat"></param>
 		/// <param name="lon"></param>
 		/// <param name="distance"></param>
-		/// <param name="radius"></param>
 		/// <returns></returns>
-		public static double CalcBoxByDistFromPt_latHorizAxisDEG(double lat, double lon, double distance, double radius)
+		public static double CalcBoxByDistFromPt_latHorizAxisDEG(double lat, double lon, double distDEG)
 		{
 			//http://gis.stackexchange.com/questions/19221/find-tangent-point-on-circle-furthest-east-or-west
-			if (distance == 0)
+			if (distDEG == 0)
 				return lat;
 			double lat_rad = ToRadians(lat);
-			double dist_rad = Dist2Radians(distance, radius);
+			double dist_rad = ToRadians(distDEG);
 			double result_rad = Math.Asin(Math.Sin(lat_rad) / Math.Cos(dist_rad));
 			if (!Double.IsNaN(result_rad))
 				return ToDegrees(result_rad);

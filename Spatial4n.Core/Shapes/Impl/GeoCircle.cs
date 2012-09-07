@@ -18,6 +18,7 @@
 using System;
 using System.Diagnostics;
 using Spatial4n.Core.Context;
+using Spatial4n.Core.Distance;
 
 namespace Spatial4n.Core.Shapes.Impl
 {
@@ -26,30 +27,26 @@ namespace Spatial4n.Core.Shapes.Impl
 	/// </summary>
 	public class GeoCircle : CircleImpl
 	{
-		private readonly double distDEG;// [0 TO 180]
 		private readonly GeoCircle inverseCircle;//when distance reaches > 1/2 way around the world, cache the inverse.
 		private readonly double horizAxisY;//see getYAxis
 
-		public GeoCircle(Point p, double dist, SpatialContext ctx)
-			: base(p, dist, ctx)
+		public GeoCircle(Point p, double radiusDEG, SpatialContext ctx)
+			: base(p, radiusDEG, ctx)
 		{
 			Debug.Assert(ctx.IsGeo());
 
-			//In the direction of latitude (N,S), distance is the same number of degrees.
-			distDEG = ctx.GetDistCalc().DistanceToDegrees(distRadius);
-
-			if (distDEG > 90)
+			if (radiusDEG > 90)
 			{
 				//--spans more than half the globe
 				Debug.Assert(enclosingBox.GetWidth() == 360);
-				double backDistDEG = 180 - distDEG;
+				double backDistDEG = 180 - radiusDEG;
 				if (backDistDEG > 0)
 				{
-					double backDistance = ctx.GetDistCalc().DegreesToDistance(backDistDEG);
+					double backRadius = 180 - radiusDEG;
 					//shrink inverseCircle as small as possible to avoid accidental overlap
-					backDistance -= Ulp(backDistance);
+					backRadius -= Ulp(backRadius);
 					Point backPoint = ctx.MakePoint(GetCenter().GetX() + 180, GetCenter().GetY() + 180);
-					inverseCircle = new GeoCircle(backPoint, backDistance, ctx);
+					inverseCircle = new GeoCircle(backPoint, backRadius, ctx);
 				}
 				else
 					inverseCircle = null;//whole globe
@@ -58,7 +55,7 @@ namespace Spatial4n.Core.Shapes.Impl
 			else
 			{
 				inverseCircle = null;
-				double _horizAxisY = ctx.GetDistCalc().CalcBoxByDistFromPt_yHorizAxisDEG(GetCenter(), dist, ctx);
+				double _horizAxisY = ctx.GetDistCalc().CalcBoxByDistFromPt_yHorizAxisDEG(GetCenter(), radiusDEG, ctx);
 				//some rare numeric conditioning cases can cause this to be barely beyond the box
 				if (_horizAxisY > enclosingBox.GetMaxY())
 				{
@@ -139,9 +136,9 @@ namespace Spatial4n.Core.Shapes.Impl
 			/* y axis intersects */
 			if (r.RelateXRange(GetXAxis(), GetXAxis(), ctx).Intersects())
 			{ // at x horizontal
-				double yTop = GetCenter().GetY() + distDEG;
+				double yTop = GetCenter().GetY() + radiusDEG;
 				Debug.Assert(yTop <= 90);
-				double yBot = GetCenter().GetY() - distDEG;
+				double yBot = GetCenter().GetY() - radiusDEG;
 				Debug.Assert(yBot >= -90);
 				if (r.RelateYRange(yBot, yTop, ctx).Intersects())//back bottom
 					return SpatialRelation.INTERSECTS;
@@ -156,11 +153,11 @@ namespace Spatial4n.Core.Shapes.Impl
 			//This method handles the case where the circle wraps ONE pole, but not both.  For both,
 			// there is the inverseCircle case handled before now.  The only exception is for the case where
 			// the circle covers the entire globe, and we'll check that first.
-			if (distDEG == 180)//whole globe
+			if (radiusDEG == 180)//whole globe
 				return SpatialRelation.CONTAINS;
 
 			//Check if r is within the pole wrap region:
-			double yTop = GetCenter().GetY() + distDEG;
+			double yTop = GetCenter().GetY() + radiusDEG;
 			if (yTop > 90)
 			{
 				double yTopOverlap = yTop - 90;
@@ -170,7 +167,7 @@ namespace Spatial4n.Core.Shapes.Impl
 			}
 			else
 			{
-				double yBot = point.GetY() - distDEG;
+				double yBot = point.GetY() - radiusDEG;
 				if (yBot < -90)
 				{
 					double yBotOverlap = -90 - yBot;
@@ -256,13 +253,8 @@ namespace Spatial4n.Core.Shapes.Impl
 		public override string ToString()
 		{
 			//I'm deliberately making this look basic and not fully detailed with class name & misc fields.
-			//Add distance in degrees, which is easier to recognize, and earth radius agnostic.
-			String dStr = String.Format("{0:0.00}", distRadius);
-			if (ctx.IsGeo())
-			{
-				double distDEG = ctx.GetDistCalc().DistanceToDegrees(distRadius);
-				dStr += String.Format("={0:0.0}\u00B0", distDEG);
-			}
+			double distKm = DistanceUtils.ToRadians(radiusDEG) * DistanceUtils.EARTH_MEAN_RADIUS_KM;
+			String dStr = String.Format("{0:0.0}\u00B0 {1:0.00}km", radiusDEG, distKm);
 			return "Circle(" + point + ",d=" + dStr + ')';
 		}
 

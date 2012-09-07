@@ -26,10 +26,10 @@ namespace Spatial4n.Tests.context
         [Fact]
         public void TestDefault() 
         {
-            SpatialContext s = SpatialContext.GEO_KM;
+            SpatialContext s = SpatialContext.GEO;
             SpatialContext t = Call();//default
             Assert.Equal(s.GetType(), t.GetType());
-            Assert.Equal(s.GetUnits(), t.GetUnits());
+            Assert.Equal(s.IsGeo(), t.IsGeo());
             Assert.Equal(s.GetDistCalc(), t.GetDistCalc());
             Assert.Equal(s.GetWorldBounds(),t.GetWorldBounds());
         }
@@ -37,20 +37,20 @@ namespace Spatial4n.Tests.context
         [Fact]
         public void TestCustom()
         {
-            SpatialContext sc = Call("units", "u");
-            Assert.Equal(DistanceUnits.CARTESIAN, sc.GetUnits());
+            SpatialContext sc = Call("geo", "false");
+			Assert.True(!sc.IsGeo());
             Assert.Equal(new CartesianDistCalc(), sc.GetDistCalc());
 
-            sc = Call("units", "u",
+            sc = Call("geo", "false",
                       "distCalculator", "cartesian^2",
                       "worldBounds", "-100 0 75 200");//West South East North
             Assert.Equal(new CartesianDistCalc(true), sc.GetDistCalc());
             Assert.Equal(new RectangleImpl(-100, 75, 0, 200), sc.GetWorldBounds());
 
-            sc = Call("units", "miles",
+            sc = Call("geo", "true",
                       "distCalculator", "lawOfCosines");
-            Assert.Equal(DistanceUnits.MILES, sc.GetUnits());
-            var test = new GeodesicSphereDistCalc.LawOfCosines(sc.GetUnits().EarthRadius());
+			Assert.True(sc.IsGeo());
+            var test = new GeodesicSphereDistCalc.LawOfCosines();
             Assert.Equal(test, sc.GetDistCalc());
         }
   
@@ -58,14 +58,14 @@ namespace Spatial4n.Tests.context
         public void TestSystemPropertyLookup() 
         {
             var customInstance = Call("spatialContextFactory", typeof (DSCF).AssemblyQualifiedName);
-            Assert.Equal(DistanceUnits.CARTESIAN, customInstance.GetUnits());//DSCF returns this
+            Assert.True(!customInstance.IsGeo());//DSCF returns this
         }
 
         public class DSCF : SpatialContextFactory 
         {
             override protected SpatialContext NewSpatialContext()
             {
-                return new SpatialContext(DistanceUnits.CARTESIAN);
+                return new SpatialContext(false);
             }
         }
     }

@@ -16,10 +16,8 @@
  */
 
 using System;
-using System.Diagnostics;
 using Spatial4n.Core.Context;
 using Spatial4n.Core.Shapes;
-using Spatial4n.Core.Util;
 
 namespace Spatial4n.Core.Distance
 {
@@ -28,53 +26,30 @@ namespace Spatial4n.Core.Distance
 	/// </summary>
 	public abstract class GeodesicSphereDistCalc : AbstractDistanceCalculator
 	{
-		protected readonly double radius;
+		private readonly double radiusDEG = DistanceUtils.ToDegrees(1);//in degrees
 
-		protected GeodesicSphereDistCalc(double radius)
-		{
-			this.radius = radius;
-		}
-
-		public override double Distance(Point @from, double toX, double toY)
-		{
-			return DistanceLatLonRAD(DistanceUtils.ToRadians(from.GetY()), DistanceUtils.ToRadians(from.GetX()),
-				DistanceUtils.ToRadians(toY), DistanceUtils.ToRadians(toX)) * radius;
-		}
-
-		public override Point PointOnBearing(Point @from, double dist, double bearingDEG, SpatialContext ctx)
+		public override Point PointOnBearing(Point @from, double distDEG, double bearingDEG, SpatialContext ctx)
 		{
 			//TODO avoid unnecessary double[] intermediate object
-			if (dist == 0)
+			if (distDEG == 0)
 				return from;
 			double[] latLon = DistanceUtils.PointOnBearingRAD(
 				DistanceUtils.ToRadians(from.GetY()), DistanceUtils.ToRadians(from.GetX()),
-				DistanceUtils.Dist2Radians(dist, ctx.GetUnits().EarthRadius()),
+				DistanceUtils.ToRadians(distDEG),
 				DistanceUtils.ToRadians(bearingDEG), null);
 			return ctx.MakePoint(DistanceUtils.ToDegrees(latLon[1]), DistanceUtils.ToDegrees(latLon[0]));
 		}
 
-		public override double DistanceToDegrees(double distance)
+		public override Rectangle CalcBoxByDistFromPt(Point @from, double distDEG, SpatialContext ctx)
 		{
-			return DistanceUtils.Dist2Degrees(distance, radius);
-		}
-
-		public override double DegreesToDistance(double degrees)
-		{
-			return DistanceUtils.Radians2Dist(DistanceUtils.ToRadians(degrees), radius);
-
-		}
-
-		public override Rectangle CalcBoxByDistFromPt(Point @from, double distance, SpatialContext ctx)
-		{
-			Debug.Assert(radius == ctx.GetUnits().EarthRadius());
-			if (distance == 0)
+			if (distDEG == 0)
 				return from.GetBoundingBox();
-			return DistanceUtils.CalcBoxByDistFromPtDEG(from.GetY(), from.GetX(), distance, ctx);
+			return DistanceUtils.CalcBoxByDistFromPtDEG(from.GetY(), from.GetX(), distDEG, ctx);
 		}
 
-		public override double CalcBoxByDistFromPt_yHorizAxisDEG(Point from, double distance, SpatialContext ctx)
+		public override double CalcBoxByDistFromPt_yHorizAxisDEG(Point from, double distDEG, SpatialContext ctx)
 		{
-			return DistanceUtils.CalcBoxByDistFromPt_latHorizAxisDEG(from.GetY(), from.GetX(), distance, radius);
+			return DistanceUtils.CalcBoxByDistFromPt_latHorizAxisDEG(from.GetY(), from.GetX(), distDEG);
 		}
 
 		public override double Area(Rectangle rect)
@@ -82,7 +57,7 @@ namespace Spatial4n.Core.Distance
 			//From http://mathforum.org/library/drmath/view/63767.html
 			double lat1 = DistanceUtils.ToRadians(rect.GetMinY());
 			double lat2 = DistanceUtils.ToRadians(rect.GetMaxY());
-			return Math.PI / 180 * radius * radius *
+			return Math.PI / 180 * radiusDEG * radiusDEG *
 					Math.Abs(Math.Sin(lat1) - Math.Sin(lat2)) *
 					rect.GetWidth();
 		}
@@ -90,21 +65,25 @@ namespace Spatial4n.Core.Distance
 		public override double Area(Circle circle)
 		{
 			//formula is a simplified case of area(rect).
-			double lat = DistanceUtils.ToRadians(90 - DistanceToDegrees(circle.GetRadius()));
-			return 2 * Math.PI * radius * radius * (1 - Math.Sin(lat));
+			double lat = DistanceUtils.ToRadians(90 - circle.GetRadius());
+			return 2 * Math.PI * radiusDEG * radiusDEG * (1 - Math.Sin(lat));
 		}
 
 		public override bool Equals(object o)
 		{
-			if (this == o) return true;
-			var that = o as GeodesicSphereDistCalc;
-			return that != null && radius.Equals(that.radius);
+			if (o == null) return false;
+			return GetType() == o.GetType();
 		}
 
 		public override int GetHashCode()
 		{
-			long temp = radius != +0.0d ? BitConverter.DoubleToInt64Bits(radius) : 0L;
-			return (int)(temp ^ ((uint)temp >> 32));
+			return GetType().GetHashCode();
+		}
+
+		public override double Distance(Point @from, double toX, double toY)
+		{
+			return DistanceUtils.ToDegrees(DistanceLatLonRAD(DistanceUtils.ToRadians(from.GetY()),
+				DistanceUtils.ToRadians(from.GetX()), DistanceUtils.ToRadians(toY), DistanceUtils.ToRadians(toX)));
 		}
 
 		protected abstract double DistanceLatLonRAD(double lat1, double lon1, double lat2, double lon2);
@@ -112,25 +91,14 @@ namespace Spatial4n.Core.Distance
 		public class Haversine : GeodesicSphereDistCalc
 		{
 
-			public Haversine(double radius)
-				: base(radius)
-			{
-			}
-
 			protected override double DistanceLatLonRAD(double lat1, double lon1, double lat2, double lon2)
 			{
 				return DistanceUtils.DistHaversineRAD(lat1, lon1, lat2, lon2);
 			}
-
 		}
 
 		public class LawOfCosines : GeodesicSphereDistCalc
 		{
-			public LawOfCosines(double radius)
-				: base(radius)
-			{
-			}
-
 			protected override double DistanceLatLonRAD(double lat1, double lon1, double lat2, double lon2)
 			{
 				return DistanceUtils.DistLawOfCosinesRAD(lat1, lon1, lat2, lon2);
@@ -140,11 +108,6 @@ namespace Spatial4n.Core.Distance
 
 		public class Vincenty : GeodesicSphereDistCalc
 		{
-			public Vincenty(double radius)
-				: base(radius)
-			{
-			}
-
 			protected override double DistanceLatLonRAD(double lat1, double lon1, double lat2, double lon2)
 			{
 				return DistanceUtils.DistVincentyRAD(lat1, lon1, lat2, lon2);

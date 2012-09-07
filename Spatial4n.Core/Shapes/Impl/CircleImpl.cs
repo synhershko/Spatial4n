@@ -30,7 +30,7 @@ namespace Spatial4n.Core.Shapes.Impl
 	public class CircleImpl : Circle
 	{
 		protected readonly Point point;
-		protected readonly double distRadius;
+		protected readonly double radiusDEG;
 
 		protected readonly SpatialContext ctx;
 
@@ -40,13 +40,13 @@ namespace Spatial4n.Core.Shapes.Impl
 
 		//we don't have a line shape so we use a rectangle for these axis
 
-		public CircleImpl(Point p, double dist, SpatialContext ctx)
+		public CircleImpl(Point p, double radiusDEG, SpatialContext ctx)
 		{
 			//We assume any normalization / validation of params already occurred (including bounding dist)
 			this.point = p;
-			this.distRadius = dist;
+			this.radiusDEG = radiusDEG;
 			this.ctx = ctx;
-			this.enclosingBox = ctx.GetDistCalc().CalcBoxByDistFromPt(point, distRadius, ctx);
+			this.enclosingBox = ctx.GetDistCalc().CalcBoxByDistFromPt(point, radiusDEG, ctx);
 		}
 
 		public SpatialRelation Relate(Shape other, SpatialContext ctx)
@@ -189,7 +189,7 @@ namespace Spatial4n.Core.Shapes.Impl
 		public SpatialRelation Relate(Circle circle, SpatialContext ctx)
 		{
 			double crossDist = ctx.GetDistCalc().Distance(point, circle.GetCenter());
-			double aDist = distRadius, bDist = circle.GetRadius();
+			double aDist = radiusDEG, bDist = circle.GetRadius();
 			if (crossDist > aDist + bDist)
 				return SpatialRelation.DISJOINT;
 			if (crossDist < aDist && crossDist + bDist <= aDist)
@@ -208,7 +208,7 @@ namespace Spatial4n.Core.Shapes.Impl
 
 		public bool HasArea()
 		{
-			return distRadius > 0;
+			return radiusDEG > 0;
 		}
 
 		public Point GetCenter()
@@ -218,14 +218,14 @@ namespace Spatial4n.Core.Shapes.Impl
 
 		public double GetRadius()
 		{
-			return distRadius;
+			return radiusDEG;
 		}
 
 		public double GetArea(SpatialContext ctx)
 		{
 			if (ctx == null)
 			{
-				return Math.PI*distRadius*distRadius;
+				return Math.PI * radiusDEG * radiusDEG;
 			}
 			else
 			{
@@ -235,12 +235,12 @@ namespace Spatial4n.Core.Shapes.Impl
 
 		public bool Contains(double x, double y)
 		{
-			return ctx.GetDistCalc().Distance(point, x, y) <= distRadius;
+			return ctx.GetDistCalc().Distance(point, x, y) <= radiusDEG;
 		}
 
 		public override string ToString()
 		{
-			return "Circle(" + point + ",d=" + distRadius + ')';
+			return "Circle(" + point + ", d=" + radiusDEG + "\u00B0)";
 		}
 
 		public override bool Equals(object obj)

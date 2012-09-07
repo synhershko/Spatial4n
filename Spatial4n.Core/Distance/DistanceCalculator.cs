@@ -44,39 +44,21 @@ namespace Spatial4n.Core.Distance
 		/// distance, and bearing (given in degrees -- 0-360).
 		/// </summary>
 		/// <param name="from"></param>
-		/// <param name="distance"></param>
+		/// <param name="distDEG"></param>
 		/// <param name="bearingDEG"></param>
 		/// <param name="ctx"></param>
 		/// <returns></returns>
-		Point PointOnBearing(Point from, double distance, double bearingDEG, SpatialContext ctx);
-
-		/// <summary>
-		/// Converts a distance (in units of the sphere's radius, e.g. km) to degrees
-		/// (0-360). A spherical earth model is assumed for geospatial.  This is not
-		/// implemented for non-geospatial.
-		/// </summary>
-		/// <param name="distance"></param>
-		/// <returns></returns>
-		double DistanceToDegrees(double distance);
-
-		/// <summary>
-		/// Converts distance-degrees (0-360, e.g. as a length around the sphere) to
-		/// distance (in units of the sphere's radius, e.g. km). This is the opposite
-		/// of {@link #distanceToDegrees(double)}.
-		/// </summary>
-		/// <param name="degrees"></param>
-		/// <returns></returns>
-		double DegreesToDistance(double degrees);
+		Point PointOnBearing(Point from, double distDEG, double bearingDEG, SpatialContext ctx);
 
 		/// <summary>
 		/// Calculates the bounding box of a circle, as specified by its center point
 		/// and distance.
 		/// </summary>
 		/// <param name="from"></param>
-		/// <param name="distance"></param>
+		/// <param name="distDEG"></param>
 		/// <param name="ctx"></param>
 		/// <returns></returns>
-		Rectangle CalcBoxByDistFromPt(Point from, double distance, SpatialContext ctx);
+		Rectangle CalcBoxByDistFromPt(Point from, double distDEG, SpatialContext ctx);
 
 		/// <summary>
 		/// The <code>Y</code> coordinate of the horizontal axis (e.g. left-right line)
@@ -86,10 +68,10 @@ namespace Spatial4n.Core.Distance
 		/// to be slightly different.
 		/// </summary>
 		/// <param name="from"></param>
-		/// <param name="distance"></param>
+		/// <param name="distDEG"></param>
 		/// <param name="ctx"></param>
 		/// <returns></returns>
-		double CalcBoxByDistFromPt_yHorizAxisDEG(Point from, double distance, SpatialContext ctx);
+		double CalcBoxByDistFromPt_yHorizAxisDEG(Point from, double distDEG, SpatialContext ctx);
 
 		double Area(Rectangle rect);
 

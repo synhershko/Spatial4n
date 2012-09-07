@@ -104,7 +104,6 @@
     <Compile Include="Distance\AbstractDistanceCalculator.cs" />
     <Compile Include="Distance\CartesianDistCalc.cs" />
     <Compile Include="Distance\DistanceCalculator.cs" />
-    <Compile Include="Distance\DistanceUnits.cs" />
     <Compile Include="Distance\DistanceUtils.cs" />
     <Compile Include="Distance\GeodesicSphereDistCalc.cs" />
     <Compile Include="Exceptions\InvalidShapeException.cs" />

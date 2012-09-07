@@ -55,32 +55,22 @@ namespace Spatial4n.Core.Distance
 			return Math.Sqrt(result);
 		}
 
-		public override Point PointOnBearing(Point @from, double dist, double bearingDEG, SpatialContext ctx)
+		public override Point PointOnBearing(Point @from, double distDEG, double bearingDEG, SpatialContext ctx)
 		{
-			if (dist == 0)
+			if (distDEG == 0)
 				return from;
 			double bearingRAD = DistanceUtils.ToRadians(bearingDEG);
-			double x = Math.Sin(bearingRAD) * dist;
-			double y = Math.Cos(bearingRAD) * dist;
+			double x = Math.Sin(bearingRAD) * distDEG;
+			double y = Math.Cos(bearingRAD) * distDEG;
 			return ctx.MakePoint(from.GetX() + x, from.GetY() + y);
 		}
 
-		public override double DistanceToDegrees(double distance)
+		public override Rectangle CalcBoxByDistFromPt(Point from, double distDEG, SpatialContext ctx)
 		{
-			throw new InvalidOperationException("no geo!");
+			return ctx.MakeRect(from.GetX() - distDEG, from.GetX() + distDEG, from.GetY() - distDEG, from.GetY() + distDEG);
 		}
 
-		public override double DegreesToDistance(double degrees)
-		{
-			throw new InvalidOperationException("no geo!");
-		}
-
-		public override Rectangle CalcBoxByDistFromPt(Point @from, double distance, SpatialContext ctx)
-		{
-			return ctx.MakeRect(from.GetX() - distance, from.GetX() + distance, from.GetY() - distance, from.GetY() + distance);
-		}
-
-		public override double CalcBoxByDistFromPt_yHorizAxisDEG(Point @from, double distance, SpatialContext ctx)
+		public override double CalcBoxByDistFromPt_yHorizAxisDEG(Point @from, double distDEG, SpatialContext ctx)
 		{
 			return from.GetY();
 		}

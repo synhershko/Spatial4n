@@ -11,7 +11,7 @@ namespace Spatial4n.Tests.distance
 		private readonly Random random = new Random(RandomSeed.Seed());
 
 		//NOTE!  These are sometimes modified by tests.
-		private SpatialContext ctx = new SpatialContext(DistanceUnits.KILOMETERS);
+		private SpatialContext ctx = SpatialContext.GEO;
 		private const double EPS = 10e-4; //delta when doing double assertions. Geo eps is not that small.;
 
 		private DistanceCalculator dc() { return ctx.GetDistCalc(); }
@@ -22,10 +22,10 @@ namespace Spatial4n.Tests.distance
 		{
 			//See to verify: from http://www.movable-type.co.uk/scripts/latlong.html
 			Point ctr = pLL(0, 100);
-			CustomAssert.EqualWithDelta(11100, dc().Distance(ctr, pLL(10, 0)), 3);
-			CustomAssert.EqualWithDelta(11100, dc().Distance(ctr, pLL(10, -160)), 3);
+			CustomAssert.EqualWithDelta(11100, degToKm(dc().Distance(ctr, pLL(10, 0))), 3);
+			CustomAssert.EqualWithDelta(11100, degToKm(dc().Distance(ctr, pLL(10, -160))), 3);
 
-			CustomAssert.EqualWithDelta(314.40338, dc().Distance(pLL(1, 2), pLL(3, 4)), EPS);
+			CustomAssert.EqualWithDelta(314.40338, degToKm(dc().Distance(pLL(1, 2), pLL(3, 4))), EPS);
 
 			CustomAssert.EqualWithDelta(11100, dc().Distance(pLL(0, 100), pLL(10, 0)), 3.0);     // we get 11102.445304151641
 			CustomAssert.EqualWithDelta(11100, dc().Distance(pLL(0, 100), pLL(10, -160)), 3.0);  // we get 11102.445304151641
@@ -49,7 +49,7 @@ namespace Spatial4n.Tests.distance
 		{
 			//first test regression
 			{
-				double d = 6894.1;
+				double d = degToKm(6894.1);
 				Point pCtr = pLL(-20, 84);
 				Point pTgt = pLL(-42, 15);
 				Assert.True(dc().Distance(pCtr, pTgt) < d);
@@ -68,10 +68,10 @@ namespace Spatial4n.Tests.distance
 			CheckBBox(ctx.MakePoint(0, 0), 0.000001);
 			CheckBBox(ctx.MakePoint(0, 90), 0.000001);
 			CheckBBox(ctx.MakePoint(-32.7, -5.42), 9829);
-			CheckBBox(ctx.MakePoint(0, 90 - 20), ctx.GetDistCalc().DegreesToDistance(20));
+			CheckBBox(ctx.MakePoint(0, 90 - 20), degToKm(20));
 			{
 				double d = 0.010;//10m
-				CheckBBox(ctx.MakePoint(0, 90 - ctx.GetDistCalc().DistanceToDegrees(d + 0.001)), d);
+				CheckBBox(ctx.MakePoint(0, 90 - degToKm(d + 0.001)), d);
 			}
 
 			for (int T = 0; T < 100; T++)
@@ -84,9 +84,10 @@ namespace Spatial4n.Tests.distance
 			}
 		}
 
-		private void CheckBBox(Point ctr, double dist)
+		private void CheckBBox(Point ctr, double distKm)
 		{
-			String msg = "ctr: " + ctr + " dist: " + dist;
+			String msg = "ctr: "+ctr+" distKm: "+distKm;
+			double dist = kmToDeg(distKm);
 
 			Rectangle r = dc().CalcBoxByDistFromPt(ctr, dist, ctx);
 			double horizAxisLat = dc().CalcBoxByDistFromPt_yHorizAxisDEG(ctr, dist, ctx);
@@ -96,29 +97,30 @@ namespace Spatial4n.Tests.distance
 			//horizontal
 			if (r.GetWidth() >= 180)
 			{
-				double calcDist = dc().Distance(ctr, r.GetMinX(), r.GetMaxY() == 90 ? 90 : -90);
-				Assert.True(calcDist <= dist + EPS, msg);
+				double calcDistKm = degToKm(dc().Distance(ctr, r.GetMinX(), r.GetMaxY() == 90 ? 90 : -90));
+				Assert.True(calcDistKm <= distKm + EPS, msg);
 				//horizAxisLat is meaningless in this context
 			}
 			else
 			{
 				Point tPt = FindClosestPointOnVertToPoint(r.GetMinX(), r.GetMinY(), r.GetMaxY(), ctr);
-				double calcDist = dc().Distance(ctr, tPt);
-				CustomAssert.EqualWithDelta(/*msg,*/ dist, calcDist, EPS);
+				double calcDistKm = degToKm(dc().Distance(ctr, tPt));
+				CustomAssert.EqualWithDelta(/*msg,*/ distKm, calcDistKm, EPS);
 				CustomAssert.EqualWithDelta(/*msg,*/ tPt.GetY(), horizAxisLat, EPS);
 			}
 
 			//vertical
-			double topDist = dc().Distance(ctr, ctr.GetX(), r.GetMaxY());
+			double topDistKm = degToKm(dc().Distance(ctr, ctr.GetX(), r.GetMaxY()));
 			if (r.GetMaxY() == 90)
-				Assert.True(topDist <= dist + EPS, msg);
+				Assert.True(topDistKm <= distKm + EPS, msg);
 			else
-				CustomAssert.EqualWithDelta(dist, topDist, EPS);
-			double botDist = dc().Distance(ctr, ctr.GetX(), r.GetMinY());
+				CustomAssert.EqualWithDelta(dist, topDistKm, EPS);
+
+			double botDistKm = degToKm(dc().Distance(ctr, ctr.GetX(), r.GetMinY()));
 			if (r.GetMinY() == -90)
-				Assert.True(botDist <= dist + EPS, msg);
+				Assert.True(botDistKm <= distKm + EPS, msg);
 			else
-				CustomAssert.EqualWithDelta(/*msg,*/ dist, botDist, EPS);
+				CustomAssert.EqualWithDelta(/*msg,*/ distKm, botDistKm, EPS);
 		}
 
 		private Point FindClosestPointOnVertToPoint(double lon, double lowLat, double highLat, Point ctr)
@@ -155,7 +157,7 @@ namespace Spatial4n.Tests.distance
 		[Fact]
 		public void TestDistCalcPointOnBearing_Cartesian()
 		{
-			ctx = new SpatialContext(DistanceUnits.CARTESIAN);
+			ctx = new SpatialContext(false);
 			var EPS = 10e-6; //tighter epsilon (aka delta)
 			for (int i = 0; i < 1000; i++)
 			{
@@ -319,12 +321,12 @@ namespace Spatial4n.Tests.distance
 
 		private static double degToKm(double deg)
 		{
-			return DistanceUtils.Degrees2Dist(deg, DistanceUtils.EARTH_MEAN_RADIUS_KM);
+			return DistanceUtils.ToRadians(deg) * DistanceUtils.EARTH_MEAN_RADIUS_KM;
 		}
 
 		private static double kmToDeg(double km)
 		{
-			return DistanceUtils.Dist2Degrees(km, DistanceUtils.EARTH_MEAN_RADIUS_KM);
+			return DistanceUtils.ToDegrees(km / DistanceUtils.EARTH_MEAN_RADIUS_KM);
 		}
 	}
 }

@@ -29,7 +29,7 @@ namespace Spatial4n.Core.Context
     public class SpatialContextFactory
     {
         protected Dictionary<String, String> Args;
-        protected DistanceUnits Units;
+		protected bool geo = true;
         protected DistanceCalculator Calculator;
         protected Rectangle WorldBounds;
 
@@ -81,11 +81,9 @@ namespace Spatial4n.Core.Context
 
         protected void InitUnits()
         {
-            String unitsStr;
-            if (!Args.TryGetValue("units", out unitsStr) || unitsStr == null)
-                Units = DistanceUnits.KILOMETERS;
-            else
-                Units = DistanceUnits.FindDistanceUnit(unitsStr);
+			string geoStr;
+			if (Args.TryGetValue("geo", out geoStr) && geoStr == null)
+				bool.TryParse(geoStr, out geo);
         }
 
         protected void InitCalculator()
@@ -95,15 +93,15 @@ namespace Spatial4n.Core.Context
                 return;
             if (calcStr.Equals("haversine", StringComparison.InvariantCultureIgnoreCase))
             {
-                Calculator = new GeodesicSphereDistCalc.Haversine(Units.EarthRadius());
+                Calculator = new GeodesicSphereDistCalc.Haversine();
             }
             else if (calcStr.Equals("lawOfCosines", StringComparison.InvariantCultureIgnoreCase))
             {
-                Calculator = new GeodesicSphereDistCalc.LawOfCosines(Units.EarthRadius());
+                Calculator = new GeodesicSphereDistCalc.LawOfCosines();
             }
             else if (calcStr.Equals("vincentySphere", StringComparison.InvariantCultureIgnoreCase))
             {
-                Calculator = new GeodesicSphereDistCalc.Vincenty(Units.EarthRadius());
+                Calculator = new GeodesicSphereDistCalc.Vincenty();
             }
             else if (calcStr.Equals("cartesian", StringComparison.InvariantCultureIgnoreCase))
             {
@@ -126,14 +124,14 @@ namespace Spatial4n.Core.Context
                 return;
 
             //kinda ugly we do this just to read a rectangle.  TODO refactor
-            var simpleCtx = new SpatialContext(Units, Calculator, null);
+            var simpleCtx = new SpatialContext(geo, Calculator, null);
             WorldBounds = (Rectangle)simpleCtx.ReadShape(worldBoundsStr);
         }
 
         /** Subclasses should simply construct the instance from the initialized configuration. */
         protected virtual SpatialContext NewSpatialContext()
         {
-            return new SpatialContext(Units, Calculator, WorldBounds);
+            return new SpatialContext(geo, Calculator, WorldBounds);
         }
     }
 }

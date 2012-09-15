@@ -35,8 +35,20 @@ namespace Spatial4n.Core.Shapes
 		/// <returns></returns>
 		bool GetCrossesDateLine();
 
+        /// <summary>
+        /// Expert: Resets the state of this shape given the arguments. This is a
+        /// performance feature to avoid excessive Shape object allocation as well as
+        /// some argument error checking. Mutable shapes is error-prone so use with
+        /// care.
+        /// </summary>
+        /// <param name="minX"></param>
+        /// <param name="maxX"></param>
+        /// <param name="minY"></param>
+        /// <param name="maxY"></param>
+        void Reset(double minX, double maxX, double minY, double maxY);
+
 		/* There is no axis line shape, and this is more efficient then creating a flat Rectangle for intersect(). */
-		SpatialRelation RelateYRange(double minY, double maxY, SpatialContext ctx);
-		SpatialRelation RelateXRange(double minX, double maxX, SpatialContext ctx);
+		SpatialRelation RelateYRange(double minY, double maxY);
+		SpatialRelation RelateXRange(double minX, double maxX);
 	}
 }

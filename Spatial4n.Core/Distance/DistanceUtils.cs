@@ -18,21 +18,20 @@
 using System;
 using Spatial4n.Core.Context;
 using Spatial4n.Core.Shapes;
-using Spatial4n.Core.Util;
 
 namespace Spatial4n.Core.Distance
 {
 	public static class DistanceUtils
 	{
 		//pre-compute some angles that are commonly used
-		public static readonly double DEG_45_AS_RADS = Math.PI / 4.0;
+		public static readonly double DEG_45_AS_RADS = Math.PI / 4;
 		public static readonly double SIN_45_AS_RADS = Math.Sin(DEG_45_AS_RADS);
 		public static readonly double DEG_90_AS_RADS = Math.PI / 2;
 		public static readonly double DEG_180_AS_RADS = Math.PI;
 		public static readonly double DEG_225_AS_RADS = 5 * DEG_45_AS_RADS;
 		public static readonly double DEG_270_AS_RADS = 3 * DEG_90_AS_RADS;
 		
-		public static readonly double DEGREES_TO_RADIANS =  Math.PI / 180.0;
+		public static readonly double DEGREES_TO_RADIANS =  Math.PI / 180;
 		public static readonly double RADIANS_TO_DEGREES =  1 / DEGREES_TO_RADIANS;
 
 		public static readonly double KM_TO_MILES = 0.621371192;
@@ -49,6 +48,8 @@ namespace Spatial4n.Core.Distance
 		public static readonly double EARTH_MEAN_RADIUS_MI = EARTH_MEAN_RADIUS_KM * KM_TO_MILES;
 		public static readonly double EARTH_EQUATORIAL_RADIUS_MI = EARTH_EQUATORIAL_RADIUS_KM * KM_TO_MILES;
 
+        public static readonly double DEG_TO_KM = Degrees2Dist(1, EARTH_MEAN_RADIUS_KM);
+        public static readonly double KM_TO_DEG = 1 / DEG_TO_KM;
 		/// <summary>
 		/// Calculate the p-norm (i.e. length) between two vectors
 		/// </summary>
@@ -152,89 +153,69 @@ namespace Spatial4n.Core.Distance
 		 * @param result A preallocated array to hold the results.  If null, a new one is constructed.
 		 * @return The destination point, in radians.  First entry is latitude, second is longitude
 		 */
-		public static double[] PointOnBearingRAD(double startLat, double startLon, double distanceRAD, double bearingRAD, double[] result)
-		{
-			/*
-			lat2 = asin(sin(lat1)*cos(d/R) + cos(lat1)*sin(d/R)*cos(θ))
-			lon2 = lon1 + atan2(sin(θ)*sin(d/R)*cos(lat1), cos(d/R)−sin(lat1)*sin(lat2))
+        public static Point PointOnBearingRAD(double startLat, double startLon, double distanceRAD, double bearingRAD, SpatialContext ctx, Point reuse)
+        {
+            /*
+               lat2 = asin(sin(lat1)*cos(d/R) + cos(lat1)*sin(d/R)*cos(θ))
+             lon2 = lon1 + atan2(sin(θ)*sin(d/R)*cos(lat1), cos(d/R)−sin(lat1)*sin(lat2))
+              */
+            double cosAngDist = Math.Cos(distanceRAD);
+            double cosStartLat = Math.Cos(startLat);
+            double sinAngDist = Math.Sin(distanceRAD);
+            double sinStartLat = Math.Sin(startLat);
+            double lat2 = Math.Asin(sinStartLat*cosAngDist +
+                                    cosStartLat*sinAngDist*Math.Cos(bearingRAD));
+            double lon2 = startLon + Math.Atan2(Math.Sin(bearingRAD)*sinAngDist*cosStartLat,
+                                                cosAngDist - sinStartLat*Math.Sin(lat2));
 
-			 */
-			double cosAngDist = Math.Cos(distanceRAD);
-			double cosStartLat = Math.Cos(startLat);
-			double sinAngDist = Math.Sin(distanceRAD);
-			double sinStartLat = Math.Sin(startLat);
-			double lat2 = Math.Asin(sinStartLat * cosAngDist +
-					cosStartLat * sinAngDist * Math.Cos(bearingRAD));
+            // normalize lon first
+            if (lon2 > DEG_180_AS_RADS)
+            {
+                lon2 = -1.0*(DEG_180_AS_RADS - (lon2 - DEG_180_AS_RADS));
+            }
+            else if (lon2 < -DEG_180_AS_RADS)
+            {
+                lon2 = (lon2 + DEG_180_AS_RADS) + DEG_180_AS_RADS;
+            }
 
-			double lon2 = startLon + Math.Atan2(Math.Sin(bearingRAD) * sinAngDist * cosStartLat,
-					cosAngDist - sinStartLat * Math.Sin(lat2));
+            // normalize lat - could flip poles
+            if (lat2 > DEG_90_AS_RADS)
+            {
+                lat2 = DEG_90_AS_RADS - (lat2 - DEG_90_AS_RADS);
+                if (lon2 < 0)
+                {
+                    lon2 = lon2 + DEG_180_AS_RADS;
+                }
+                else
+                {
+                    lon2 = lon2 - DEG_180_AS_RADS;
+                }
+            }
+            else if (lat2 < -DEG_90_AS_RADS)
+            {
+                lat2 = -DEG_90_AS_RADS - (lat2 + DEG_90_AS_RADS);
+                if (lon2 < 0)
+                {
+                    lon2 = lon2 + DEG_180_AS_RADS;
+                }
+                else
+                {
+                    lon2 = lon2 - DEG_180_AS_RADS;
+                }
+            }
 
-			/*lat2 = (lat2*180)/Math.PI;
-			lon2 = (lon2*180)/Math.PI;*/
+            if (reuse == null)
+            {
+                return ctx.MakePoint(lon2, lat2);
+            }
+            else
+            {
+                reuse.Reset(lon2, lat2); //x y
+                return reuse;
+            }
+        }
 
-			// normalize lon first
-			if (result == null || result.Length != 2)
-			{
-				result = new double[2];
-			}
-			result[0] = lat2;
-			result[1] = lon2;
-			NormLngRAD(result);
-
-			// normalize lat - could flip poles
-			NormLatRAD(result);
-			return result;
-		}
-
-		/// <summary>
-		/// 
-		/// </summary>
-		/// <param name="latLng">The lat/lon, in radians. lat in position 0, lon in position 1</param>
-		[Obsolete]
-		public static void NormLatRAD(double[] latLng)
-		{
-
-			if (latLng[0] > DEG_90_AS_RADS)
-			{
-				latLng[0] = DEG_90_AS_RADS - (latLng[0] - DEG_90_AS_RADS);
-				if (latLng[1] < 0)
-				{
-					latLng[1] = latLng[1] + DEG_180_AS_RADS;
-				}
-				else
-				{
-					latLng[1] = latLng[1] - DEG_180_AS_RADS;
-				}
-			}
-			else if (latLng[0] < -DEG_90_AS_RADS)
-			{
-				latLng[0] = -DEG_90_AS_RADS - (latLng[0] + DEG_90_AS_RADS);
-				if (latLng[1] < 0)
-				{
-					latLng[1] = latLng[1] + DEG_180_AS_RADS;
-				}
-				else
-				{
-					latLng[1] = latLng[1] - DEG_180_AS_RADS;
-				}
-			}
-
-		}
-
-
-		/// <summary>
-		/// Returns a normalized Lng rectangle shape for the bounding box
-		/// </summary>
-		/// <param name="latLng">The lat/lon, in radians, lat in position 0, lon in position 1</param>
-		public static void NormLngRAD(double[] latLng) {
-		  if (latLng[1] > DEG_180_AS_RADS) {
-		    latLng[1] = -1.0 * (DEG_180_AS_RADS - (latLng[1] - DEG_180_AS_RADS));
-		  } else if (latLng[1] < -DEG_180_AS_RADS) {
-		    latLng[1] = (latLng[1] + DEG_180_AS_RADS) + DEG_180_AS_RADS;
-		  }
-		}
-
-		/// <summary>
+	    /// <summary>
 		/// Puts in range -180 <= lon_deg <= +180.
 		/// </summary>
 		/// <param name="lon_deg"></param>
@@ -243,7 +224,7 @@ namespace Spatial4n.Core.Distance
 		{
 			if (lon_deg >= -180 && lon_deg <= 180)
 				return lon_deg; //common case, and avoids slight double precision shifting
-			double off = (lon_deg + 180)%360;
+	        double off = (lon_deg + 180)%360;
 			if (off < 0)
 				return 180 + off;
 			else if (off == 0 && lon_deg > 0)
@@ -265,50 +246,72 @@ namespace Spatial4n.Core.Distance
 			return (off <= 180 ? off : 360 - off) - 90;
 		}
 
-		public static Rectangle CalcBoxByDistFromPtDEG(double lat, double lon, double distDEG, SpatialContext ctx)
-		{
-			//See http://janmatuschek.de/LatitudeLongitudeBoundingCoordinates Section 3.1, 3.2 and 3.3
+        public static Rectangle CalcBoxByDistFromPtDEG(double lat, double lon, double distDEG, SpatialContext ctx, Rectangle reuse)
+        {
+            //See http://janmatuschek.de/LatitudeLongitudeBoundingCoordinates Section 3.1, 3.2 and 3.3
+            double minX;
+            double maxX;
+            double minY;
+            double maxY;
+            if (distDEG == 0)
+            {
+                minX = lon;
+                maxX = lon;
+                minY = lat;
+                maxY = lat;
+            }
+            else if (distDEG >= 180)
+            {
+                //distance is >= opposite side of the globe
+                minX = -180;
+                maxX = 180;
+                minY = -90;
+                maxY = 90;
+            }
+            else
+            {
+                //--calc latitude bounds
+                maxY = lat + distDEG;
+                minY = lat - distDEG;
 
-			if (distDEG == 0)
-				return ctx.MakeRect(lon, lon, lat, lat);//essentially a point
+                if (maxY >= 90 || minY <= -90)
+                {
+                    //touches either pole
+                    //we have special logic for longitude
+                    minX = -180;
+                    maxX = 180; //world wrap: 360 deg
+                    if (maxY <= 90 && minY >= -90)
+                    {
+                        //doesn't pass either pole: 180 deg
+                        minX = NormLonDEG(lon - 90);
+                        maxX = NormLonDEG(lon + 90);
+                    }
+                    if (maxY > 90)
+                        maxY = 90;
+                    if (minY < -90)
+                        minY = -90;
+                }
+                else
+                {
+                    //--calc longitude bounds
+                    double lon_delta_deg = CalcBoxByDistFromPt_deltaLonDEG(lat, lon, distDEG);
 
-			if (distDEG >= 180)//distance is >= opposite side of the globe
-				return ctx.GetWorldBounds();
+                    minX = NormLonDEG(lon - lon_delta_deg);
+                    maxX = NormLonDEG(lon + lon_delta_deg);
+                }
+            }
+            if (reuse == null)
+            {
+                return ctx.MakeRectangle(minX, maxX, minY, maxY);
+            }
+            else
+            {
+                reuse.Reset(minX, maxX, minY, maxY);
+                return reuse;
+            }
+        }
 
-			//--calc latitude bounds
-			double latN_deg = lat + distDEG;
-			double latS_deg = lat - distDEG;
-
-			if (latN_deg >= 90 || latS_deg <= -90)
-			{//touches either pole
-				//we have special logic for longitude
-				double lonW_deg = -180, lonE_deg = 180;//world wrap: 360 deg
-				if (latN_deg <= 90 && latS_deg >= -90)
-				{//doesn't pass either pole: 180 deg
-					lonW_deg = lon - 90;
-					lonE_deg = lon + 90;
-				}
-				if (latN_deg > 90)
-					latN_deg = 90;
-				if (latS_deg < -90)
-					latS_deg = -90;
-
-				return ctx.MakeRect(lonW_deg, lonE_deg, latS_deg, latN_deg);
-			}
-			else
-			{
-				//--calc longitude bounds
-				double lon_delta_deg = CalcBoxByDistFromPt_deltaLonDEG(lat, lon, distDEG);
-
-				double lonW_deg = lon - lon_delta_deg;
-				double lonE_deg = lon + lon_delta_deg;
-
-				return ctx.MakeRect(lonW_deg, lonE_deg, latS_deg, latN_deg);//ctx will normalize longitude
-			}
-		}
-
-
-		/// <summary>
+	    /// <summary>
 		/// The delta longitude of a point-distance. In other words, half the width of
 		/// the bounding box of a circle.
 		/// </summary>

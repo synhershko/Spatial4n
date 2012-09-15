@@ -16,6 +16,7 @@
  */
 
 using System;
+using System.Diagnostics;
 using Spatial4n.Core.Context;
 using Spatial4n.Core.Distance;
 
@@ -28,54 +29,54 @@ namespace Spatial4n.Core.Shapes.Impl
 	/// </summary>
 	public class RectangleImpl : Rectangle
 	{
-		private readonly double minX;
-		private readonly double maxX;
-		private readonly double minY;
-		private readonly double maxY;
+        private readonly SpatialContext ctx;
+		private double minX;
+		private double maxX;
+		private double minY;
+		private double maxY;
 
-		//TODO change to West South East North to be more consistent with OGC?
-		public RectangleImpl(double minX, double maxX, double minY, double maxY)
+        public RectangleImpl(double minX, double maxX, double minY, double maxY, SpatialContext ctx)
 		{
-			//We assume any normalization / validation of params already occurred.
-			this.minX = minX;
-			this.maxX = maxX;
-			this.minY = minY;
-			this.maxY = maxY;
-			//assert minY <= maxY;
+            //TODO change to West South East North to be more consistent with OGC?
+            this.ctx = ctx;
+            Reset(minX, maxX, minY, maxY);
 		}
 
-		public RectangleImpl(Point lowerLeft, Point upperRight)
+        public RectangleImpl(Point lowerLeft, Point upperRight, SpatialContext ctx)
+            : this(lowerLeft.GetX(), upperRight.GetX(), lowerLeft.GetY(), upperRight.GetY(), ctx)
 		{
-			this.minX = lowerLeft.GetX();
-			this.maxX = upperRight.GetX();
-			this.minY = lowerLeft.GetY();
-			this.maxY = upperRight.GetY();
 		}
 
-		public RectangleImpl(Rectangle r)
+        public RectangleImpl(Rectangle r, SpatialContext ctx)
+            : this(r.GetMinX(), r.GetMaxX(), r.GetMinY(), r.GetMaxY(), ctx)
 		{
-			minX = r.GetMinX();
-			maxX = r.GetMaxX();
-			minY = r.GetMinY();
-			maxY = r.GetMaxY();
 		}
 
-		public SpatialRelation Relate(Shape other, SpatialContext ctx)
+        public void Reset(double minX, double maxX, double minY, double maxY)
+        {
+            this.minX = minX;
+            this.maxX = maxX;
+            this.minY = minY;
+            this.maxY = maxY;
+            Debug.Assert(minY <= maxY);
+        }
+
+	    public SpatialRelation Relate(Shape other)
 		{
 			var point = other as Point;
 			if (point != null)
 			{
-				return Relate(point, ctx);
+				return Relate(point);
 			}
 			var rectangle = other as Rectangle;
 			if (rectangle != null)
 			{
-				return Relate(rectangle, ctx);
+				return Relate(rectangle);
 			}
-			return other.Relate(this, ctx).Transpose();
+			return other.Relate(this).Transpose();
 		}
 
-		public SpatialRelation Relate(Point point, SpatialContext ctx)
+		public SpatialRelation Relate(Point point)
 		{
 			if (point.GetY() > GetMaxY() || point.GetY() < GetMinY())
 				return SpatialRelation.DISJOINT;
@@ -108,13 +109,13 @@ namespace Spatial4n.Core.Shapes.Impl
 			return SpatialRelation.CONTAINS;
 		}
 
-		public SpatialRelation Relate(Rectangle rect, SpatialContext ctx)
+		public SpatialRelation Relate(Rectangle rect)
 		{
-			SpatialRelation yIntersect = RelateYRange(rect.GetMinY(), rect.GetMaxY(), ctx);
+			SpatialRelation yIntersect = RelateYRange(rect.GetMinY(), rect.GetMaxY());
 			if (yIntersect == SpatialRelation.DISJOINT)
 				return SpatialRelation.DISJOINT;
 
-			SpatialRelation xIntersect = RelateXRange(rect.GetMinX(), rect.GetMaxX(), ctx);
+			SpatialRelation xIntersect = RelateXRange(rect.GetMinX(), rect.GetMaxX());
 			if (xIntersect == SpatialRelation.DISJOINT)
 				return SpatialRelation.DISJOINT;
 
@@ -146,7 +147,7 @@ namespace Spatial4n.Core.Shapes.Impl
 			double x = GetWidth() / 2 + minX;
 			if (minX > maxX)//WGS84
 				x = DistanceUtils.NormLonDEG(x); //in case falls outside the standard range
-			return new PointImpl(x, y);
+			return new PointImpl(x, y, ctx);
 		}
 
 		public double GetWidth()
@@ -223,12 +224,12 @@ namespace Spatial4n.Core.Shapes.Impl
 			return SpatialRelation.INTERSECTS;
 		}
 
-		public SpatialRelation RelateYRange(double ext_minY, double ext_maxY, SpatialContext ctx)
+		public SpatialRelation RelateYRange(double ext_minY, double ext_maxY)
 		{
 			return Relate_Range(minY, maxY, ext_minY, ext_maxY);
 		}
 
-		public SpatialRelation RelateXRange(double ext_minX, double ext_maxX, SpatialContext ctx)
+		public SpatialRelation RelateXRange(double ext_minX, double ext_maxX)
 		{
 			//For ext & this we have local minX and maxX variable pairs. We rotate them so that minX <= maxX
 			double minX = this.minX;

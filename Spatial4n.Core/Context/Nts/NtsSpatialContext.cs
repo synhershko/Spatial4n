@@ -37,7 +37,7 @@ namespace Spatial4n.Core.Context.Nts
 	/// </summary>
 	public class NtsSpatialContext : SpatialContext
 	{
-		public new static NtsSpatialContext GEO_KM = new NtsSpatialContext(true);
+		public new static readonly NtsSpatialContext GEO = new NtsSpatialContext(true);
 
 		private readonly GeometryFactory geometryFactory;
 
@@ -130,10 +130,10 @@ namespace Spatial4n.Core.Context.Nts
 
 		public override Shapes.Point MakePoint(double x, double y)
 		{
-			//A Jts Point is fairly heavyweight!  TODO could/should we optimize this?
-			x = NormX(x);
-			y = NormY(y);
-			return new NtsPoint(geometryFactory.CreatePoint(new Coordinate(x, y)));
+			//A Nts Point is fairly heavyweight!  TODO could/should we optimize this?
+			VerifyX(x);
+            VerifyY(y);
+            return new NtsPoint(geometryFactory.CreatePoint(new Coordinate(x, y)), this);
 		}
 
 		public GeometryFactory GetGeometryFactory()
@@ -143,9 +143,9 @@ namespace Spatial4n.Core.Context.Nts
 
 		public override String ToString()
 		{
-			if (this.Equals(GEO_KM))
+			if (this.Equals(GEO))
 			{
-				return GEO_KM.GetType().Name + ".GEO_KM";
+				return GEO.GetType().Name + ".GEO";
 			}
 			else
 			{

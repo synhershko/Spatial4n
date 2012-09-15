@@ -16,7 +16,6 @@
  */
 
 using System;
-using System.Diagnostics;
 using Spatial4n.Core.Context;
 
 namespace Spatial4n.Core.Shapes.Impl
@@ -25,34 +24,37 @@ namespace Spatial4n.Core.Shapes.Impl
 	/// A circle, also known as a point-radius, based on a
 	/// {@link com.spatial4j.core.distance.DistanceCalculator} which does all the work. This implementation
 	/// implementation should work for both cartesian 2D and geodetic sphere surfaces.
-	/// Threadsafe & immutable.
 	/// </summary>
 	public class CircleImpl : Circle
 	{
-		protected readonly Point point;
-		protected readonly double radiusDEG;
-
 		protected readonly SpatialContext ctx;
 
-		/* below is calculated & cached: */
+        protected Point point;
+        protected double radiusDEG;
 
-		protected readonly Rectangle enclosingBox;
+        // calculated & cached
+        protected Rectangle enclosingBox;
 
 		//we don't have a line shape so we use a rectangle for these axis
 
 		public CircleImpl(Point p, double radiusDEG, SpatialContext ctx)
 		{
-			//We assume any normalization / validation of params already occurred (including bounding dist)
+            //We assume any validation of params already occurred (including bounding dist)
+            this.ctx = ctx;
 			this.point = p;
 			this.radiusDEG = radiusDEG;
-			this.ctx = ctx;
-			this.enclosingBox = ctx.GetDistCalc().CalcBoxByDistFromPt(point, radiusDEG, ctx);
+            this.enclosingBox = ctx.GetDistCalc().CalcBoxByDistFromPt(point, this.radiusDEG, ctx, null);
 		}
 
-		public SpatialRelation Relate(Shape other, SpatialContext ctx)
-		{
-			Debug.Assert(this.ctx == ctx);
+        public virtual void Reset(double x, double y, double radiusDEG)
+        {
+            point.Reset(x, y);
+            this.radiusDEG = radiusDEG;
+            this.enclosingBox = ctx.GetDistCalc().CalcBoxByDistFromPt(point, this.radiusDEG, ctx, enclosingBox);
+        }
 
+		public SpatialRelation Relate(Shape other)
+		{
 			//This shortcut was problematic in testing due to distinctions of CONTAINS/WITHIN for no-area shapes (lines, points).
 			//    if (distance == 0) {
 			//      return point.relate(other,ctx).intersects() ? SpatialRelation.WITHIN : SpatialRelation.DISJOINT;
@@ -61,33 +63,33 @@ namespace Spatial4n.Core.Shapes.Impl
 			var other1 = other as Point;
 			if (other1 != null)
 			{
-				return Relate(other1, ctx);
+				return Relate(other1);
 			}
 			var rectangle = other as Rectangle;
 			if (rectangle != null)
 			{
-				return Relate(rectangle, ctx);
+				return Relate(rectangle);
 			}
 			var circle = other as Circle;
 			if (circle != null)
 			{
-				return Relate(circle, ctx);
+				return Relate(circle);
 			}
-			return other.Relate(this, ctx).Transpose();
+			return other.Relate(this).Transpose();
 
 		}
 
-		public SpatialRelation Relate(Point point, SpatialContext ctx)
+		public SpatialRelation Relate(Point point)
 		{
 			return Contains(point.GetX(), point.GetY()) ? SpatialRelation.CONTAINS : SpatialRelation.DISJOINT;
 		}
 
-		public SpatialRelation Relate(Rectangle r, SpatialContext ctx)
+		public SpatialRelation Relate(Rectangle r)
 		{
 			//Note: Surprisingly complicated!
 
 			//--We start by leveraging the fact we have a calculated bbox that is "cheaper" than use of DistanceCalculator.
-			SpatialRelation bboxSect = enclosingBox.Relate(r, ctx);
+			SpatialRelation bboxSect = enclosingBox.Relate(r);
 			if (bboxSect == SpatialRelation.DISJOINT || bboxSect == SpatialRelation.WITHIN)
 				return bboxSect;
 			if (bboxSect == SpatialRelation.CONTAINS && enclosingBox.Equals(r)) //nasty identity edge-case
@@ -95,10 +97,10 @@ namespace Spatial4n.Core.Shapes.Impl
 			//bboxSect is INTERSECTS or CONTAINS
 			//The result can be DISJOINT, CONTAINS, or INTERSECTS (not WITHIN)
 
-			return RelateRectanglePhase2(r, bboxSect, ctx);
+			return RelateRectanglePhase2(r, bboxSect);
 		}
 
-		protected virtual SpatialRelation RelateRectanglePhase2(Rectangle r, SpatialRelation bboxSect, SpatialContext ctx)
+		protected virtual SpatialRelation RelateRectanglePhase2(Rectangle r, SpatialRelation bboxSect)
 		{
 			/*
 			 !! DOES NOT WORK WITH GEO CROSSING DATELINE OR WORLD-WRAP.
@@ -186,7 +188,7 @@ namespace Spatial4n.Core.Shapes.Impl
 			return point.GetX();
 		}
 
-		public SpatialRelation Relate(Circle circle, SpatialContext ctx)
+		public SpatialRelation Relate(Circle circle)
 		{
 			double crossDist = ctx.GetDistCalc().Distance(point, circle.GetCenter());
 			double aDist = radiusDEG, bDist = circle.GetRadius();

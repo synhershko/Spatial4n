@@ -25,25 +25,38 @@ namespace Spatial4n.Core.Shapes.Impl
 	/// </summary>
 	public class PointImpl : Point
 	{
-		private readonly double x;
-		private readonly double y;
+        private readonly SpatialContext ctx;
+		private double x;
+		private double y;
 
-		public PointImpl(double x, double y)
-		{
-			this.x = x;
-			this.y = y;
-		}
+        /// <summary>
+        /// A simple constructor without normalization / validation.
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        /// <param name="ctx"></param>
+        public PointImpl(double x, double y, SpatialContext ctx)
+        {
+            this.ctx = ctx;
+            Reset(x, y);
+        }
 
-		public SpatialRelation Relate(Shape other, SpatialContext ctx)
+        public void Reset(double x, double y)
+        {
+            this.x = x;
+            this.y = y;
+        }
+
+		public SpatialRelation Relate(Shape other)
 		{
 			if (other is Point)
 				return this.Equals(other) ? SpatialRelation.INTERSECTS : SpatialRelation.DISJOINT;
-			return other.Relate(this, ctx).Transpose();
+			return other.Relate(this).Transpose();
 		}
 
 		public Rectangle GetBoundingBox()
 		{
-			return new RectangleImpl(x, x, y, y);
+		    return ctx.MakeRectangle(this, this);
 		}
 
 		public bool HasArea()
@@ -66,7 +79,7 @@ namespace Spatial4n.Core.Shapes.Impl
 			return y;
 		}
 
-		public double GetArea(SpatialContext ctx)
+	    public double GetArea(SpatialContext ctx)
 		{
 			return 0;
 		}

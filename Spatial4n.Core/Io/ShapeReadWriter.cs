@@ -179,7 +179,7 @@ namespace Spatial4n.Core.Io
 				double p3 = Double.Parse(st[tokenPos++], CultureInfo.InvariantCulture);
 				if (st.Length > tokenPos)
 					throw new InvalidShapeException("Only 4 numbers supported (rect) but found more: " + str);
-				return Ctx.MakeRect(p0, p2, p1, p3);
+				return Ctx.MakeRectangle(p0, p2, p1, p3);
 			}
 			return Ctx.MakePoint(p0, p1);
 		}

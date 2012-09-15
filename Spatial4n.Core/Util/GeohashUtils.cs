@@ -189,7 +189,7 @@ namespace Spatial4n.Core.Util
 					isEven = !isEven;
 				}
 			}
-			return ctx.MakeRect(minX, maxX, minY, maxY);
+			return ctx.MakeRectangle(minX, maxX, minY, maxY);
 		}
 
 		/** Array of geohashes 1 level below the baseGeohash. Sorted. */

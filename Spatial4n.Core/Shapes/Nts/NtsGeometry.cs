@@ -24,6 +24,7 @@ using NetTopologySuite.Operation.Union;
 using NetTopologySuite.Operation.Valid;
 using Spatial4n.Core.Context;
 using Spatial4n.Core.Context.Nts;
+using Spatial4n.Core.Distance;
 using Spatial4n.Core.Exceptions;
 using Spatial4n.Core.Shapes.Impl;
 
@@ -39,41 +40,55 @@ namespace Spatial4n.Core.Shapes.Nts
 		private readonly IGeometry geom;//cannot be a direct instance of GeometryCollection as it doesn't support relate()
 		private readonly bool _hasArea;
 		private readonly Rectangle bbox;
+        private readonly NtsSpatialContext ctx;
 
 		public NtsGeometry(IGeometry geom, NtsSpatialContext ctx, bool dateline180Check)
 		{
+            this.ctx = ctx;
+
 			//GeometryCollection isn't supported in relate()
 			if (geom.GetType() == typeof(GeometryCollection))
 				throw new ArgumentException("NtsGeometry does not support GeometryCollection but does support its subclasses.");
 
 			//NOTE: All this logic is fairly expensive. There are some short-circuit checks though.
-			if (ctx.IsGeo())
-			{
-				//Unwraps the geometry across the dateline so it exceeds the standard geo bounds (-180 to +180).
-				if (dateline180Check)
-					UnwrapDateline(geom);//potentially modifies geom
-				//If given multiple overlapping polygons, fix it by union
-				geom = UnionGeometryCollection(geom);//returns same or new geom
-				Envelope unwrappedEnv = geom.EnvelopeInternal;
+            if (ctx.IsGeo())
+            {
+                //Unwraps the geometry across the dateline so it exceeds the standard geo bounds (-180 to +180).
+                if (dateline180Check)
+                    UnwrapDateline(geom); //potentially modifies geom
+                //If given multiple overlapping polygons, fix it by union
+                geom = UnionGeometryCollection(geom); //returns same or new geom
+                Envelope unwrappedEnv = geom.EnvelopeInternal;
 
-				//Cuts an unwrapped geometry back into overlaid pages in the standard geo bounds.
-				geom = CutUnwrappedGeomInto360(geom);//returns same or new geom
-				Debug.Assert(geom.EnvelopeInternal.Width <= 360);
-				Debug.Assert(geom.GetType() != typeof(GeometryCollection)); //double check
+                //Cuts an unwrapped geometry back into overlaid pages in the standard geo bounds.
+                geom = CutUnwrappedGeomInto360(geom); //returns same or new geom
+                Debug.Assert(geom.EnvelopeInternal.Width <= 360);
+                Debug.Assert(geom.GetType() != typeof (GeometryCollection)); //double check
 
-				//note: this bbox may be sub-optimal. If geom is a collection of things near the dateline on both sides then
-				// the bbox will needlessly span most or all of the globe longitudinally.
-				// TODO so consider using MultiShape's planned minimal geo bounding box algorithm once implemented.
-				double envWidth = unwrappedEnv.Width;
-				//makeRect() will adjust minX and maxX considering the dateline and world wrap
-				bbox = ctx.MakeRect(unwrappedEnv.MinX, unwrappedEnv.MinX + envWidth,
-						unwrappedEnv.MinY, unwrappedEnv.MaxY);
-			}
-			else
-			{//not geo
-				Envelope env = geom.EnvelopeInternal;
-				bbox = new RectangleImpl(env.MinX, env.MaxX, env.MinY, env.MaxY);
-			}
+                //note: this bbox may be sub-optimal. If geom is a collection of things near the dateline on both sides then
+                // the bbox will needlessly span most or all of the globe longitudinally.
+                // TODO so consider using MultiShape's planned minimal geo bounding box algorithm once implemented.
+                double envWidth = unwrappedEnv.Width;
+
+                //adjust minX and maxX considering the dateline and world wrap
+                double minX, maxX;
+                if (envWidth >= 360)
+                {
+                    minX = -180;
+                    maxX = 180;
+                }
+                else
+                {
+                    minX = unwrappedEnv.MinX;
+                    maxX = DistanceUtils.NormLonDEG(unwrappedEnv.MinX + envWidth);
+                }
+                bbox = new RectangleImpl(minX, maxX, unwrappedEnv.MinY, unwrappedEnv.MaxY, ctx);
+            }
+            else
+            {//not geo
+                Envelope env = geom.EnvelopeInternal;
+                bbox = new RectangleImpl(env.MinX, env.MaxX, env.MinY, env.MaxY, ctx);
+            }
 			var _ = geom.EnvelopeInternal;//ensure envelope is cached internally, which is lazy evaluated. Keeps this thread-safe.
 
 			//Check geom validity; use helpful error
@@ -126,41 +141,41 @@ namespace Spatial4n.Core.Shapes.Nts
 
 		public Point GetCenter()
 		{
-			return new NtsPoint((NetTopologySuite.Geometries.Point)geom.Centroid);
+			return new NtsPoint((NetTopologySuite.Geometries.Point)geom.Centroid, ctx);
 		}
 
-		public SpatialRelation Relate(Shape other, SpatialContext ctx)
+		public SpatialRelation Relate(Shape other)
 		{
 			if (other is Point)
-				return Relate((Point)other, ctx);
+				return Relate((Point)other);
 			else if (other is Rectangle)
-				return Relate((Rectangle)other, ctx);
+				return Relate((Rectangle)other);
 			else if (other is Circle)
 				return Relate((Circle)other, ctx);
 			else if (other is NtsGeometry)
 				return Relate((NtsGeometry)other);
-			return other.Relate(this, ctx).Transpose();
+			return other.Relate(this).Transpose();
 		}
 
-		public SpatialRelation Relate(Point pt, SpatialContext ctx)
+		public SpatialRelation Relate(Point pt)
 		{
 			//TODO if not jtsPoint, test against bbox to avoid JTS if disjoint
 			var jtsPoint = (NtsPoint)(pt is NtsPoint ? pt : ctx.MakePoint(pt.GetX(), pt.GetY()));
 			return geom.Disjoint(jtsPoint.GetGeom()) ? SpatialRelation.DISJOINT : SpatialRelation.CONTAINS;
 		}
 
-		public SpatialRelation Relate(Rectangle rectangle, SpatialContext ctx)
+		public SpatialRelation Relate(Rectangle rectangle)
 		{
-			SpatialRelation bboxR = bbox.Relate(rectangle, ctx);
+			SpatialRelation bboxR = bbox.Relate(rectangle);
 			if (bboxR == SpatialRelation.WITHIN || bboxR == SpatialRelation.DISJOINT)
 				return bboxR;
-			IGeometry oGeom = ((NtsSpatialContext)ctx).GetGeometryFrom(rectangle);
+			IGeometry oGeom = ctx.GetGeometryFrom(rectangle);
 			return IntersectionMatrixToSpatialRelation(geom.Relate(oGeom));
 		}
 
 		public SpatialRelation Relate(Circle circle, SpatialContext ctx)
 		{
-			SpatialRelation bboxR = bbox.Relate(circle, ctx);
+			SpatialRelation bboxR = bbox.Relate(circle);
 			if (bboxR == SpatialRelation.WITHIN || bboxR == SpatialRelation.DISJOINT)
 				return bboxR;
 
@@ -172,7 +187,7 @@ namespace Spatial4n.Core.Shapes.Nts
 			foreach (Coordinate coord in coords)
 			{
 				i++;
-				SpatialRelation sect = circle.Relate(new PointImpl(coord.X, coord.Y), ctx);
+				SpatialRelation sect = circle.Relate(new PointImpl(coord.X, coord.Y, ctx));
 				if (sect == SpatialRelation.DISJOINT)
 					outside++;
 				if (i != outside && outside != 0)//short circuit: partially outside, partially inside
@@ -180,7 +195,7 @@ namespace Spatial4n.Core.Shapes.Nts
 			}
 			if (i == outside)
 			{
-				return (Relate(circle.GetCenter(), ctx) == SpatialRelation.DISJOINT)
+				return (Relate(circle.GetCenter()) == SpatialRelation.DISJOINT)
 					? SpatialRelation.DISJOINT : SpatialRelation.CONTAINS;
 			}
 			Debug.Assert(outside == 0);

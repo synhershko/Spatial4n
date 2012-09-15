@@ -22,6 +22,7 @@ using NetTopologySuite.Algorithm;
 using NetTopologySuite.Geometries;
 using NetTopologySuite.IO;
 using Spatial4n.Core.Context.Nts;
+using Spatial4n.Core.Distance;
 using Spatial4n.Core.Exceptions;
 using Spatial4n.Core.Shapes;
 using Spatial4n.Core.Shapes.Impl;
@@ -35,6 +36,8 @@ namespace Spatial4n.Core.Io
 		private const byte TYPE_BBOX = 1;
 		private const byte TYPE_GEOM = 2;
 
+        private bool normalizeGeomCoords = true;//TODO make configurable
+
 		public NtsShapeReadWriter(NtsSpatialContext ctx)
 			: base(ctx)
 		{
@@ -43,32 +46,44 @@ namespace Spatial4n.Core.Io
 		private class ShapeReaderWriterCoordinateSequenceFilter : ICoordinateSequenceFilter
 		{
 			private readonly NtsSpatialContext _ctx;
-			private bool changed = false;
+		    private readonly bool _normalizeGeomCoords;
+		    private bool changed = false;
 
-			public ShapeReaderWriterCoordinateSequenceFilter(NtsSpatialContext ctx)
+			public ShapeReaderWriterCoordinateSequenceFilter(NtsSpatialContext ctx, bool normalizeGeomCoords)
 			{
-				_ctx = ctx;
+			    _ctx = ctx;
+			    _normalizeGeomCoords = normalizeGeomCoords;
 			}
 
-			public void Filter(ICoordinateSequence seq, int i)
+		    public void Filter(ICoordinateSequence seq, int i)
 			{
-				double x = seq.GetX(i);
-				double xNorm = _ctx.NormX(x);
-				if (x != xNorm)
-				{
-					changed = true;
-					seq.SetOrdinate(i, Ordinate.X, xNorm);
-				}
-				double y = seq.GetY(i);
-				double yNorm = _ctx.NormY(y);
-				if (y != yNorm)
-				{
-					changed = true;
-					seq.SetOrdinate(i, Ordinate.Y, yNorm);
-				}
+			    double x = seq.GetX(i);
+			    double y = seq.GetY(i);
+
+			    if (_ctx.IsGeo() && _normalizeGeomCoords)
+			    {
+			        double xNorm = DistanceUtils.NormLonDEG(x);
+			        if (x != xNorm)
+			        {
+			            changed = true;
+			            seq.SetOrdinate(i, Ordinate.X, xNorm);
+			        }
+
+			        double yNorm = DistanceUtils.NormLatDEG(y);
+			        if (y != yNorm)
+			        {
+			            changed = true;
+			            seq.SetOrdinate(i, Ordinate.Y, yNorm);
+			        }
+			    }
+			    else
+			    {
+			        _ctx.VerifyX(x);
+			        _ctx.VerifyY(y);
+			    }
 			}
 
-			public bool Done
+		    public bool Done
 			{
 				get { return false; }
 			}
@@ -79,12 +94,9 @@ namespace Spatial4n.Core.Io
 			}
 		}
 
-		private void NormalizeCoordinates(IGeometry geom)
+		private void CheckCoordinates(IGeometry geom)
 		{
-			//TODO add configurable skip flag if input is in the right coordinates
-			if (!Ctx.IsGeo())
-				return;
-			geom.Apply(new ShapeReaderWriterCoordinateSequenceFilter((NtsSpatialContext)Ctx));
+            geom.Apply(new ShapeReaderWriterCoordinateSequenceFilter((NtsSpatialContext)Ctx, normalizeGeomCoords));
 		}
 
 		/// Reads the standard shape format + WKT.
@@ -99,12 +111,12 @@ namespace Spatial4n.Core.Io
 					var geom = reader.Read(str);
 
 					//Normalize coordinates to geo boundary
-					NormalizeCoordinates(geom);
+					CheckCoordinates(geom);
 
 					var ntsPoint = geom as NetTopologySuite.Geometries.Point;
 					if (ntsPoint != null)
 					{
-						return new NtsPoint(ntsPoint);
+						return new NtsPoint(ntsPoint, Ctx);
 					}
 					else if (geom.IsRectangle)
 					{
@@ -117,9 +129,9 @@ namespace Spatial4n.Core.Io
 						}
 						Envelope env = geom.EnvelopeInternal;
 						if (crossesDateline)
-							return new RectangleImpl(env.MaxX, env.MinX, env.MinY, env.MaxY);
+							return new RectangleImpl(env.MaxX, env.MinX, env.MinY, env.MaxY, Ctx);
 						else
-							return new RectangleImpl(env.MinX, env.MaxX, env.MinY, env.MaxY);
+							return new RectangleImpl(env.MinX, env.MaxX, env.MinY, env.MaxY, Ctx);
 					}
 					return new NtsGeometry(geom, (NtsSpatialContext) Ctx, true);
 				}
@@ -154,14 +166,14 @@ namespace Spatial4n.Core.Io
 				var type = bytes.ReadByte();
 				if (type == TYPE_POINT)
 				{
-					return new NtsPoint(((NtsSpatialContext)Ctx).GetGeometryFactory().CreatePoint(new Coordinate(bytes.ReadDouble(), bytes.ReadDouble())));
+					return new NtsPoint(((NtsSpatialContext)Ctx).GetGeometryFactory().CreatePoint(new Coordinate(bytes.ReadDouble(), bytes.ReadDouble())), Ctx);
 				}
 
 				if (type == TYPE_BBOX)
 				{
 					return new RectangleImpl(
 						bytes.ReadDouble(), bytes.ReadDouble(),
-						bytes.ReadDouble(), bytes.ReadDouble());
+						bytes.ReadDouble(), bytes.ReadDouble(), Ctx);
 				}
 
 				if (type == TYPE_GEOM)
@@ -171,7 +183,7 @@ namespace Spatial4n.Core.Io
 					{
 						IGeometry geom = reader.Read(stream);
 
-						NormalizeCoordinates(geom);
+						CheckCoordinates(geom);
 						return new NtsGeometry(geom, (NtsSpatialContext)Ctx, true);
 					}
 					catch (ParseException ex)

@@ -28,13 +28,20 @@ namespace Spatial4n.Core.Shapes.Nts
 	public class NtsPoint : Point
 	{
 		private readonly IPoint pointGeom;
+	    private readonly SpatialContext ctx;
 
-		public NtsPoint(IPoint pointGeom)
-		{
-			this.pointGeom = pointGeom;
-		}
+	    /// <summary>
+	    /// A simple constructor without normalization / validation.
+	    /// </summary>
+	    /// <param name="pointGeom"></param>
+	    /// <param name="ctx"> </param>
+	    public NtsPoint(IPoint pointGeom, SpatialContext ctx)
+	    {
+	        this.pointGeom = pointGeom;
+	        this.ctx = ctx;
+	    }
 
-		public IPoint GetGeom()
+	    public IPoint GetGeom()
 		{
 			return pointGeom;
 		}
@@ -56,17 +63,15 @@ namespace Spatial4n.Core.Shapes.Nts
 
 		public Rectangle GetBoundingBox()
 		{
-			double x = pointGeom.X;
-			double y = pointGeom.Y;
-			return new RectangleImpl(x, x, y, y);
+            return ctx.MakeRectangle(this, this);
 		}
 
-		public SpatialRelation Relate(Shape other, SpatialContext ctx)
+		public SpatialRelation Relate(Shape other)
 		{
 			// ** NOTE ** the overall order of logic is kept consistent here with simple.PointImpl.
 			if (other is Point)
 				return this.Equals(other) ? SpatialRelation.INTERSECTS : SpatialRelation.DISJOINT;
-			return other.Relate(this, ctx).Transpose();
+			return other.Relate(this).Transpose();
 		}
 
 		public double GetX()
@@ -79,8 +84,15 @@ namespace Spatial4n.Core.Shapes.Nts
 			return pointGeom.Y;
 		}
 
+	    public void Reset(double x, double y)
+	    {
+            var cSeq = pointGeom.CoordinateSequence;
+            cSeq.SetOrdinate(0, Ordinate.X, x);
+            cSeq.SetOrdinate(0, Ordinate.Y, y);
+	    }
 
-		public override String ToString()
+
+	    public override String ToString()
 		{
 			return "Pt(x=" + GetX() + ",y=" + GetY() + ")";
 		}

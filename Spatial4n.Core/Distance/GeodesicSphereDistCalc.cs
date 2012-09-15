@@ -28,23 +28,26 @@ namespace Spatial4n.Core.Distance
 	{
 		private readonly double radiusDEG = DistanceUtils.ToDegrees(1);//in degrees
 
-		public override Point PointOnBearing(Point @from, double distDEG, double bearingDEG, SpatialContext ctx)
+		public override Point PointOnBearing(Point @from, double distDEG, double bearingDEG, SpatialContext ctx, Point reuse)
 		{
-			//TODO avoid unnecessary double[] intermediate object
-			if (distDEG == 0)
-				return from;
-			double[] latLon = DistanceUtils.PointOnBearingRAD(
-				DistanceUtils.ToRadians(from.GetY()), DistanceUtils.ToRadians(from.GetX()),
-				DistanceUtils.ToRadians(distDEG),
-				DistanceUtils.ToRadians(bearingDEG), null);
-			return ctx.MakePoint(DistanceUtils.ToDegrees(latLon[1]), DistanceUtils.ToDegrees(latLon[0]));
+            if (distDEG == 0)
+            {
+                if (reuse == null)
+                    return from;
+                reuse.Reset(from.GetX(), from.GetY());
+                return reuse;
+            }
+            Point result = DistanceUtils.PointOnBearingRAD(
+                DistanceUtils.ToRadians(from.GetY()), DistanceUtils.ToRadians(from.GetX()),
+                DistanceUtils.ToRadians(distDEG),
+                DistanceUtils.ToRadians(bearingDEG), ctx, reuse);//output result is in radians
+            result.Reset(DistanceUtils.ToDegrees(result.GetX()), DistanceUtils.ToDegrees(result.GetY()));
+            return result;
 		}
 
-		public override Rectangle CalcBoxByDistFromPt(Point @from, double distDEG, SpatialContext ctx)
+		public override Rectangle CalcBoxByDistFromPt(Point from, double distDEG, SpatialContext ctx, Rectangle reuse)
 		{
-			if (distDEG == 0)
-				return from.GetBoundingBox();
-			return DistanceUtils.CalcBoxByDistFromPtDEG(from.GetY(), from.GetX(), distDEG, ctx);
+            return DistanceUtils.CalcBoxByDistFromPtDEG(from.GetY(), from.GetX(), distDEG, ctx, reuse);
 		}
 
 		public override double CalcBoxByDistFromPt_yHorizAxisDEG(Point from, double distDEG, SpatialContext ctx)

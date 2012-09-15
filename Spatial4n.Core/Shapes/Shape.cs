@@ -20,33 +20,38 @@ using Spatial4n.Core.Context;
 namespace Spatial4n.Core.Shapes
 {
 	/// <summary>
-	/// Shape instances are usually retrieved via one of the create* methods on a {@link SpatialContext}.
-	/// Shapes are generally immutable and thread-safe.
-	/// The sub-classes of Shape generally implement the same contract for {@link Object#equals(Object)}
-	/// and {@link Object#hashCode()} amongst the same sub-interface type.  This means, for example, that
-	/// multiple Point implementations of different classes are equal if they share the same x & y.
+	/// The base interface defining a geometric shape. Shape instances are usually
+	/// retrieved via one of the create* methods on a {@link SpatialContext}. Shapes
+	/// are generally immutable(*). The sub-classes of Shape generally implement the
+	/// same contract for {@link Object#equals(Object)} and {@link Object#hashCode()}
+	/// amongst the same sub-interface type.  This means, for example, that multiple
+	/// Point implementations of different classes are equal if they share the same x
+	/// & y.
+	/// <p/>
+	/// (*): If a particular shape has a <code>reset(...)</code> method then its use
+	/// means the shape is actually mutable. Mutating shape state is considered
+	/// expert and should be done with care.
 	/// </summary>
 	public interface Shape
 	{
-		/// <summary>
-		/// Describe the relationship between the two objects.  For example
-		/// <ul>
-		///   <li>this is WITHIN other</li>
-		///   <li>this CONTAINS other</li>
-		///   <li>this is DISJOINT other</li>
-		///   <li>this INTERSECTS other</li>
-		/// </ul>
-		/// Note that a Shape implementation may choose to return INTERSECTS when the
-		/// true answer is WITHIN or CONTAINS for performance reasons. If a shape does
-		/// this then it <i>must</i> document when it does.  Ideally the shape will not
-		/// do this approximation in all circumstances, just sometimes.
-		/// <p />
-		/// If the shapes are equal then the result is CONTAINS (preferred) or WITHIN.
-		/// </summary>
-		/// <param name="other"></param>
-		/// <param name="ctx"></param>
-		/// <returns></returns>
-		SpatialRelation Relate(Shape other, SpatialContext ctx);
+	    /// <summary>
+	    /// Describe the relationship between the two objects.  For example
+	    /// <ul>
+	    ///   <li>this is WITHIN other</li>
+	    ///   <li>this CONTAINS other</li>
+	    ///   <li>this is DISJOINT other</li>
+	    ///   <li>this INTERSECTS other</li>
+	    /// </ul>
+	    /// Note that a Shape implementation may choose to return INTERSECTS when the
+	    /// true answer is WITHIN or CONTAINS for performance reasons. If a shape does
+	    /// this then it <i>must</i> document when it does.  Ideally the shape will not
+	    /// do this approximation in all circumstances, just sometimes.
+	    /// <p />
+	    /// If the shapes are equal then the result is CONTAINS (preferred) or WITHIN.
+	    /// </summary>
+	    /// <param name="other"></param>
+	    /// <returns></returns>
+	    SpatialRelation Relate(Shape other);
 
 		/// <summary>
 		/// Get the bounding box for this Shape. This means the shape is within the

@@ -22,6 +22,15 @@ namespace Spatial4n.Core.Shapes
 	/// </summary>
 	public interface Point : Shape
 	{
+        /// <summary>
+        /// Expert: Resets the state of this point given the arguments. This is a performance
+        /// feature to avoid excessive Shape object allocation as well as some
+        /// argument normalization & error checking.
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        void Reset(double x, double y);
+
 		/// <summary>
 		/// The X coordinate, or Longitude in geospatial contexts.
 		/// </summary>

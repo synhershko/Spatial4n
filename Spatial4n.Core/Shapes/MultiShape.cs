@@ -52,16 +52,16 @@ namespace Spatial4n.Core.Shapes
                 maxX = Math.Max(maxX, r.GetMaxX());
                 maxY = Math.Max(maxY, r.GetMaxY());
             }
-            this.bbox = ctx.MakeRect(minX, maxX, minY, maxY);
+            this.bbox = ctx.MakeRectangle(minX, maxX, minY, maxY);
         }
 
-        public SpatialRelation Relate(Shape other, SpatialContext ctx)
+        public SpatialRelation Relate(Shape other)
         {
             bool allOutside = true;
             bool allContains = true;
             foreach (var geom in geoms)
             {
-                SpatialRelation sect = geom.Relate(other, ctx);
+                SpatialRelation sect = geom.Relate(other);
                 if (sect != SpatialRelation.DISJOINT)
                     allOutside = false;
                 if (sect != SpatialRelation.CONTAINS)

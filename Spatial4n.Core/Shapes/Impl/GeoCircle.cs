@@ -22,70 +22,89 @@ using Spatial4n.Core.Distance;
 
 namespace Spatial4n.Core.Shapes.Impl
 {
-	/// <summary>
-	/// A circle as it exists on the surface of a sphere.
-	/// </summary>
-	public class GeoCircle : CircleImpl
-	{
-		private readonly GeoCircle inverseCircle;//when distance reaches > 1/2 way around the world, cache the inverse.
-		private readonly double horizAxisY;//see getYAxis
+    /// <summary>
+    /// A circle as it exists on the surface of a sphere.
+    /// </summary>
+    public class GeoCircle : CircleImpl
+    {
+        private GeoCircle inverseCircle; //when distance reaches > 1/2 way around the world, cache the inverse.
+        private double horizAxisY; //see getYAxis
 
-		public GeoCircle(Point p, double radiusDEG, SpatialContext ctx)
-			: base(p, radiusDEG, ctx)
-		{
-			Debug.Assert(ctx.IsGeo());
+        public GeoCircle(Point p, double radiusDEG, SpatialContext ctx)
+            : base(p, radiusDEG, ctx)
+        {
+            Debug.Assert(ctx.IsGeo());
+            Init();
+        }
 
-			if (radiusDEG > 90)
-			{
-				//--spans more than half the globe
-				Debug.Assert(enclosingBox.GetWidth() == 360);
-				double backDistDEG = 180 - radiusDEG;
-				if (backDistDEG > 0)
-				{
-					double backRadius = 180 - radiusDEG;
-					//shrink inverseCircle as small as possible to avoid accidental overlap
-					backRadius -= Ulp(backRadius);
-					Point backPoint = ctx.MakePoint(GetCenter().GetX() + 180, GetCenter().GetY() + 180);
-					inverseCircle = new GeoCircle(backPoint, backRadius, ctx);
-				}
-				else
-					inverseCircle = null;//whole globe
-				horizAxisY = GetCenter().GetY();//although probably not used
-			}
-			else
-			{
-				inverseCircle = null;
-				double _horizAxisY = ctx.GetDistCalc().CalcBoxByDistFromPt_yHorizAxisDEG(GetCenter(), radiusDEG, ctx);
-				//some rare numeric conditioning cases can cause this to be barely beyond the box
-				if (_horizAxisY > enclosingBox.GetMaxY())
-				{
-					horizAxisY = enclosingBox.GetMaxY();
-				}
-				else if (_horizAxisY < enclosingBox.GetMinY())
-				{
-					horizAxisY = enclosingBox.GetMinY();
-				}
-				else
-				{
-					horizAxisY = _horizAxisY;
-				}
-				//Debug.Assert(enclosingBox.Relate_yRange(horizAxis, horizAxis, ctx).Intersects());
-			}
-		}
+        public override void Reset(double x, double y, double radiusDEG)
+        {
+            base.Reset(x, y, radiusDEG);
+            Init();
+        }
 
-		protected override double GetYAxis()
+        private void Init()
+        {
+            if (radiusDEG > 90)
+            {
+                //--spans more than half the globe
+                Debug.Assert(enclosingBox.GetWidth() == 360);
+                double backDistDEG = 180 - radiusDEG;
+                if (backDistDEG > 0)
+                {
+                    double backRadius = 180 - radiusDEG;
+                    //shrink inverseCircle as small as possible to avoid accidental overlap
+                    backRadius -= Ulp(backRadius);
+                    double backX = DistanceUtils.NormLonDEG(GetCenter().GetX() + 180);
+                    double backY = DistanceUtils.NormLatDEG(GetCenter().GetY() + 180);
+                    if (inverseCircle != null)
+                    {
+                        inverseCircle.Reset(backX, backY, backRadius);
+                    }
+                    else
+                    {
+                        inverseCircle = new GeoCircle(ctx.MakePoint(backX, backY), backRadius, ctx);
+                    }
+                }
+                else
+                {
+                    inverseCircle = null; //whole globe
+                }
+                horizAxisY = GetCenter().GetY(); //although probably not used
+            }
+            else
+            {
+                inverseCircle = null;
+                double _horizAxisY = ctx.GetDistCalc().CalcBoxByDistFromPt_yHorizAxisDEG(GetCenter(), radiusDEG, ctx);
+                //some rare numeric conditioning cases can cause this to be barely beyond the box
+                if (_horizAxisY > enclosingBox.GetMaxY())
+                {
+                    horizAxisY = enclosingBox.GetMaxY();
+                }
+                else if (_horizAxisY < enclosingBox.GetMinY())
+                {
+                    horizAxisY = enclosingBox.GetMinY();
+                }
+                else
+                {
+                    horizAxisY = _horizAxisY;
+                }
+                //Debug.Assert(enclosingBox.Relate_yRange(horizAxis, horizAxis, ctx).Intersects());
+            }
+        }
+
+        protected override double GetYAxis()
 		{
 			return horizAxisY;
 		}
 
-		/// <summary>
-		/// Called after bounding box is intersected.
-		/// </summary>
-		/// <param name="r"></param>
-		/// <param name="bboxSect">INTERSECTS or CONTAINS from enclosingBox's intersection</param>
-		/// <param name="ctx"></param>
-		/// <returns>DISJOINT, CONTAINS, or INTERSECTS (not WITHIN)</returns>
-		protected override SpatialRelation RelateRectanglePhase2(Rectangle r, SpatialRelation bboxSect, SpatialContext ctx)
+	    /// <summary>
+	    /// Called after bounding box is intersected.
+	    /// </summary>
+	    /// <param name="r"></param>
+	    /// <param name="bboxSect">INTERSECTS or CONTAINS from enclosingBox's intersection</param>
+	    /// <returns>DISJOINT, CONTAINS, or INTERSECTS (not WITHIN)</returns>
+	    protected override SpatialRelation RelateRectanglePhase2(Rectangle r, SpatialRelation bboxSect)
 		{
 			//Rectangle wraps around the world longitudinally creating a solid band; there are no corners to test intersection
 			if (r.GetWidth() == 360)
@@ -95,7 +114,7 @@ namespace Spatial4n.Core.Shapes.Impl
 
 			if (inverseCircle != null)
 			{
-				return inverseCircle.Relate(r, ctx).Inverse();
+				return inverseCircle.Relate(r).Inverse();
 			}
 
 			//if a pole is wrapped, we have a separate algorithm
@@ -107,7 +126,7 @@ namespace Spatial4n.Core.Shapes.Impl
 			//This is an optimization path for when there are no dateline or pole issues.
 			if (!enclosingBox.GetCrossesDateLine() && !r.GetCrossesDateLine())
 			{
-				return base.RelateRectanglePhase2(r, bboxSect, ctx);
+				return base.RelateRectanglePhase2(r, bboxSect);
 			}
 
 			//do quick check to see if all corners are within this circle for CONTAINS
@@ -115,7 +134,7 @@ namespace Spatial4n.Core.Shapes.Impl
 			if (cornersIntersect == 4)
 			{
 				//ensure r's x axis is within c's.  If it doesn't, r sneaks around the globe to touch the other side (intersect).
-				SpatialRelation xIntersect = r.RelateXRange(enclosingBox.GetMinX(), enclosingBox.GetMaxX(), ctx);
+				SpatialRelation xIntersect = r.RelateXRange(enclosingBox.GetMinX(), enclosingBox.GetMaxX());
 				if (xIntersect == SpatialRelation.WITHIN)
 					return SpatialRelation.CONTAINS;
 				return SpatialRelation.INTERSECTS;
@@ -129,18 +148,18 @@ namespace Spatial4n.Core.Shapes.Impl
 			// intersection.
 
 			/* x axis intersects  */
-			if (r.RelateYRange(GetYAxis(), GetYAxis(), ctx).Intersects() // at y vertical
-				  && r.RelateXRange(enclosingBox.GetMinX(), enclosingBox.GetMaxX(), ctx).Intersects())
+			if (r.RelateYRange(GetYAxis(), GetYAxis()).Intersects() // at y vertical
+				  && r.RelateXRange(enclosingBox.GetMinX(), enclosingBox.GetMaxX()).Intersects())
 				return SpatialRelation.INTERSECTS;
 
 			/* y axis intersects */
-			if (r.RelateXRange(GetXAxis(), GetXAxis(), ctx).Intersects())
+			if (r.RelateXRange(GetXAxis(), GetXAxis()).Intersects())
 			{ // at x horizontal
 				double yTop = GetCenter().GetY() + radiusDEG;
 				Debug.Assert(yTop <= 90);
 				double yBot = GetCenter().GetY() - radiusDEG;
 				Debug.Assert(yBot >= -90);
-				if (r.RelateYRange(yBot, yTop, ctx).Intersects())//back bottom
+				if (r.RelateYRange(yBot, yTop).Intersects())//back bottom
 					return SpatialRelation.INTERSECTS;
 			}
 
@@ -191,18 +210,18 @@ namespace Spatial4n.Core.Shapes.Impl
 			int cornersIntersect = NumCornersIntersect(r);
 			// (It might be possible to reduce contains() calls within nCI() to exactly two, but this intersection
 			//  code is complicated enough as it is.)
+            double frontX = GetCenter().GetX();
 			if (cornersIntersect == 4)
 			{//all
-				double backX = ctx.NormX(GetCenter().GetX() + 180);
-				if (r.RelateXRange(backX, backX, ctx).Intersects())
+                double backX = frontX <= 0 ? frontX + 180 : frontX - 180;
+                if (r.RelateXRange(backX, backX).Intersects())
 					return SpatialRelation.INTERSECTS;
 				else
 					return SpatialRelation.CONTAINS;
 			}
 			else if (cornersIntersect == 0)
 			{//none
-				double frontX = GetCenter().GetX();
-				if (r.RelateXRange(frontX, frontX, ctx).Intersects())
+				if (r.RelateXRange(frontX, frontX).Intersects())
 					return SpatialRelation.INTERSECTS;
 				else
 					return SpatialRelation.DISJOINT;
@@ -252,8 +271,7 @@ namespace Spatial4n.Core.Shapes.Impl
 
 		public override string ToString()
 		{
-			//I'm deliberately making this look basic and not fully detailed with class name & misc fields.
-			double distKm = DistanceUtils.ToRadians(radiusDEG) * DistanceUtils.EARTH_MEAN_RADIUS_KM;
+            double distKm = DistanceUtils.Degrees2Dist(radiusDEG, DistanceUtils.EARTH_MEAN_RADIUS_KM);
 			String dStr = String.Format("{0:0.0}\u00B0 {1:0.00}km", radiusDEG, distKm);
 			return "Circle(" + point + ",d=" + dStr + ')';
 		}

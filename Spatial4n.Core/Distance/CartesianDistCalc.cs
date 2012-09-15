@@ -39,7 +39,7 @@ namespace Spatial4n.Core.Distance
 			this.squared = squared;
 		}
 
-		public override double Distance(Point @from, double toX, double toY)
+		public override double Distance(Point from, double toX, double toY)
 		{
 			double result = 0;
 
@@ -55,22 +55,47 @@ namespace Spatial4n.Core.Distance
 			return Math.Sqrt(result);
 		}
 
-		public override Point PointOnBearing(Point @from, double distDEG, double bearingDEG, SpatialContext ctx)
-		{
-			if (distDEG == 0)
-				return from;
-			double bearingRAD = DistanceUtils.ToRadians(bearingDEG);
-			double x = Math.Sin(bearingRAD) * distDEG;
-			double y = Math.Cos(bearingRAD) * distDEG;
-			return ctx.MakePoint(from.GetX() + x, from.GetY() + y);
-		}
+        public override Point PointOnBearing(Point from, double distDEG, double bearingDEG, SpatialContext ctx, Point reuse)
+        {
+            if (distDEG == 0)
+            {
+                if (reuse == null)
+                    return from;
+                reuse.Reset(from.GetX(), from.GetY());
+                return reuse;
+            }
+            double bearingRAD = DistanceUtils.ToRadians(bearingDEG);
+            double x = from.GetX() + Math.Sin(bearingRAD)*distDEG;
+            double y = from.GetY() + Math.Cos(bearingRAD)*distDEG;
+            if (reuse == null)
+            {
+                return ctx.MakePoint(x, y);
+            }
+            else
+            {
+                reuse.Reset(x, y);
+                return reuse;
+            }
+        }
 
-		public override Rectangle CalcBoxByDistFromPt(Point from, double distDEG, SpatialContext ctx)
-		{
-			return ctx.MakeRect(from.GetX() - distDEG, from.GetX() + distDEG, from.GetY() - distDEG, from.GetY() + distDEG);
-		}
+        public override Rectangle CalcBoxByDistFromPt(Point from, double distDEG, SpatialContext ctx, Rectangle reuse)
+        {
+            double minX = from.GetX() - distDEG;
+            double maxX = from.GetX() + distDEG;
+            double minY = from.GetY() - distDEG;
+            double maxY = from.GetY() + distDEG;
+            if (reuse == null)
+            {
+                return ctx.MakeRectangle(minX, maxX, minY, maxY);
+            }
+            else
+            {
+                reuse.Reset(minX, maxX, minY, maxY);
+                return reuse;
+            }
+        }
 
-		public override double CalcBoxByDistFromPt_yHorizAxisDEG(Point @from, double distDEG, SpatialContext ctx)
+        public override double CalcBoxByDistFromPt_yHorizAxisDEG(Point from, double distDEG, SpatialContext ctx)
 		{
 			return from.GetY();
 		}

@@ -22,13 +22,22 @@ namespace Spatial4n.Core.Shapes
 	/// </summary>
 	public interface Circle : Shape
 	{
+        /// <summary>
+        /// Expert: Resets the state of this shape given the arguments. This is a
+        /// performance feature to avoid excessive Shape object allocation as well as
+        /// some argument error checking. Mutable shapes is error-prone so use with
+        /// care.
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        /// <param name="radiusDEG"></param>
+        void Reset(double x, double y, double radiusDEG);
+
 		/// <summary>
 		/// The distance from the point's center to its edge, measured in
 		/// {@link com.spatial4j.core.distance.DistanceUnits}.
 		/// </summary>
 		/// <returns></returns>
 		double GetRadius();
-
-		//TODO strange that this isn't in degrees, like everything else?
 	}
 }

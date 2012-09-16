@@ -53,10 +53,12 @@ namespace Spatial4n.Core.Shapes.Impl
                 if (backDistDEG > 0)
                 {
                     double backRadius = 180 - radiusDEG;
-                    //shrink inverseCircle as small as possible to avoid accidental overlap
-                    backRadius -= Ulp(backRadius);
                     double backX = DistanceUtils.NormLonDEG(GetCenter().GetX() + 180);
                     double backY = DistanceUtils.NormLatDEG(GetCenter().GetY() + 180);
+                    //Shrink inverseCircle as small as possible to avoid accidental overlap.
+                    // Note that this is tricky business to come up with a value small enough
+                    // but not too small or else numerical conditioning issues become a problem.
+                    backRadius -= Math.Max(Ulp(Math.Abs(backY) + backRadius), Ulp(Math.Abs(backX) + backRadius));
                     if (inverseCircle != null)
                     {
                         inverseCircle.Reset(backX, backY, backRadius);

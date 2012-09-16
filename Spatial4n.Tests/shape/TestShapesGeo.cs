@@ -117,6 +117,8 @@ namespace Spatial4n.Tests.shape
             //    assertEquals("dist != xy space", INTERSECTS, c.relate(r, ctx));//once failed here
             //}
 
+            assertEquals("edge rounding issue 2", SpatialRelation.INTERSECTS, ctx.MakeCircle(84, -40, 136).Relate(ctx.MakeRectangle(-150, -80, 34, 84)));
+
             assertEquals("edge rounding issue", SpatialRelation.CONTAINS, ctx.MakeCircle(0, 66, 156).Relate(ctx.MakePoint(0, -90)));
 
             assertEquals("nudge back circle", SpatialRelation.CONTAINS, ctx.MakeCircle(-150, -90, 122).Relate(ctx.MakeRectangle(0, -132, 32, 32)));

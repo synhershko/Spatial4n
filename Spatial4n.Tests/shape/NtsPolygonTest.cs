@@ -96,7 +96,7 @@ namespace Spatial4n.Tests.shape
 			//JTS considers a point on a boundary INTERSECTS, not CONTAINS
 			if (expectedSR == SpatialRelation.INTERSECTS && shape is Point)
 				expectedSR = SpatialRelation.CONTAINS;
-			AssertRelation(null, expectedSR, POLY_SHAPE, shape);
+			assertRelation(null, expectedSR, POLY_SHAPE, shape);
 
 			if (TEST_DL_POLY && ctx.IsGeo())
 			{
@@ -119,7 +119,7 @@ namespace Spatial4n.Tests.shape
 					throw new Exception("" + shape);
 				}
 
-				AssertRelation(null, expectedSR, POLY_SHAPE_DL, shape2);
+				assertRelation(null, expectedSR, POLY_SHAPE_DL, shape2);
 			}
 		}
 
@@ -154,9 +154,9 @@ namespace Spatial4n.Tests.shape
 
 			var jtsGeom = (NtsGeometry) ctx.ReadShape(wktStr);
 
-			AssertRelation(null, SpatialRelation.CONTAINS, jtsGeom,
+			assertRelation(null, SpatialRelation.CONTAINS, jtsGeom,
 			               ctx.MakePoint(-179.99, -16.9));
-			AssertRelation(null, SpatialRelation.CONTAINS, jtsGeom,
+			assertRelation(null, SpatialRelation.CONTAINS, jtsGeom,
 			               ctx.MakePoint(+179.99, -16.9));
 		}
 

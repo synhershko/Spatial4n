@@ -77,7 +77,7 @@ namespace Spatial4n.Tests.shape
             TestShapes2D.testCircleReset(ctx);
 
             //Test geo rectangle intersections
-            TestRectIntersect();
+            testRectIntersect();
         }
 
 		[Theory]

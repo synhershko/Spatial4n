@@ -30,30 +30,11 @@ namespace Spatial4n.Tests.distance
         {
             //See to verify: from http://www.movable-type.co.uk/scripts/latlong.html
             Point ctr = pLL(0, 100);
-            Assert.Equal(11100, dc().Distance(ctr, pLL(10, 0))*DistanceUtils.DEG_TO_KM, 3);
+            CustomAssert.EqualWithDelta(11100, dc().Distance(ctr, pLL(10, 0))*DistanceUtils.DEG_TO_KM, 3);
             double deg = dc().Distance(ctr, pLL(10, -160));
-            Assert.Equal(11100, deg*DistanceUtils.DEG_TO_KM, 3);
+            CustomAssert.EqualWithDelta(11100, deg*DistanceUtils.DEG_TO_KM, 3);
 
             CustomAssert.EqualWithDelta(314.40338, dc().Distance(pLL(1, 2), pLL(3, 4))*DistanceUtils.DEG_TO_KM, EPS);
-
-            CustomAssert.EqualWithDelta(11100, dc().Distance(pLL(0, 100), pLL(10, 0)), 3.0);
-                // we get 11102.445304151641
-            CustomAssert.EqualWithDelta(11100, dc().Distance(pLL(0, 100), pLL(10, -160)), 3.0);
-                // we get 11102.445304151641
-
-            Assert.Equal(314.4, dc().Distance(pLL(1, 2), pLL(3, 4)), precision: 1); //314.4
-            Assert.Equal(7506, dc().Distance(pLL(5, 70), pLL(10, 2)), precision: 0); //7506
-            Assert.Equal(6666, dc().Distance(pLL(5, 70), pLL(2, 10)), precision: 0); //6666
-            Assert.Equal(6675, dc().Distance(pLL(70, 5), pLL(10, 2)), precision: 0); //6675
-
-            Assert.Equal(841.4, dc().Distance(pLL(0.5, 1.2), pLL(7.8, 3.2)), precision: 1);
-            Assert.Equal(841.4, dc().Distance(pLL(7.8, 3.2), pLL(0.5, 1.2)), precision: 1);
-
-            Assert.Equal(67.10, dc().Distance(pLL(6.4, 7.9), pLL(5.8, 7.965)), precision: 2);
-            Assert.Equal(67.10, dc().Distance(pLL(6.4, 7.9), pLL(7.0, 7.965)), precision: 2);
-
-            CustomAssert.EqualWithDelta(314.40338, dc().Distance(pLL(1, 2), pLL(3, 4)), EPS);
-                //calculated value 314.40338388409333
         }
 
         [Fact]
@@ -61,45 +42,47 @@ namespace Spatial4n.Tests.distance
         {
             //first test regression
             {
-                double d = 6894.1*DistanceUtils.KM_TO_DEG;
+                double d = 6894.1 * DistanceUtils.KM_TO_DEG;
                 Point pCtr = pLL(-20, 84);
                 Point pTgt = pLL(-42, 15);
                 Assert.True(dc().Distance(pCtr, pTgt) < d);
                 //since the pairwise distance is less than d, a bounding box from ctr with d should contain pTgt.
                 Rectangle r = dc().CalcBoxByDistFromPt(pCtr, d, ctx, null);
                 Assert.Equal(SpatialRelation.CONTAINS, r.Relate(pTgt));
-                CheckBBox(pCtr, d);
+                checkBBox(pCtr, d);
             }
 
-            Assert.Equal(-45, dc().CalcBoxByDistFromPt_yHorizAxisDEG(ctx.MakePoint(-180, -45), 0, ctx), 0);
+            Assert.Equal(/*"0 dist, horiz line",*/
+                -45, dc().CalcBoxByDistFromPt_yHorizAxisDEG(ctx.MakePoint(-180, -45), 0, ctx), 0);
 
-            double MAXDIST = (double) 180*DistanceUtils.DEG_TO_KM;
-            CheckBBox(ctx.MakePoint(0, 0), MAXDIST);
-            CheckBBox(ctx.MakePoint(0, 0), MAXDIST*0.999999);
-            CheckBBox(ctx.MakePoint(0, 0), 0);
-            CheckBBox(ctx.MakePoint(0, 0), 0.000001);
-            CheckBBox(ctx.MakePoint(0, 90), 0.000001);
-            CheckBBox(ctx.MakePoint(-32.7, -5.42), 9829);
-            CheckBBox(ctx.MakePoint(0, 90 - 20), (double) 20*DistanceUtils.DEG_TO_KM);
+            double MAXDIST = (double)180 * DistanceUtils.DEG_TO_KM;
+            checkBBox(ctx.MakePoint(0, 0), MAXDIST);
+            checkBBox(ctx.MakePoint(0, 0), MAXDIST * 0.999999);
+            checkBBox(ctx.MakePoint(0, 0), 0);
+            checkBBox(ctx.MakePoint(0, 0), 0.000001);
+            checkBBox(ctx.MakePoint(0, 90), 0.000001);
+            checkBBox(ctx.MakePoint(-32.7, -5.42), 9829);
+            checkBBox(ctx.MakePoint(0, 90 - 20), (double)20 * DistanceUtils.DEG_TO_KM);
             {
-                double d = 0.010; //10m
-                CheckBBox(ctx.MakePoint(0, 90 - (d + 0.001)*DistanceUtils.KM_TO_DEG), d);
+                double d = 0.010;//10m
+                checkBBox(ctx.MakePoint(0, 90 - (d + 0.001) * DistanceUtils.KM_TO_DEG), d);
             }
 
             for (int T = 0; T < 100; T++)
             {
-                double lat = -90 + random.NextDouble()*180;
-                double lon = -180 + random.NextDouble()*360;
+                double lat = -90 + random.NextDouble() * 180;
+                double lon = -180 + random.NextDouble() * 360;
                 Point ctr = ctx.MakePoint(lon, lat);
-                double dist = MAXDIST*random.NextDouble();
-                CheckBBox(ctr, dist);
+                double dist = MAXDIST * random.NextDouble();
+                checkBBox(ctr, dist);
             }
         }
 
-        private void CheckBBox(Point ctr, double distKm)
+
+        private void checkBBox(Point ctr, double distKm)
         {
             String msg = "ctr: " + ctr + " distKm: " + distKm;
-            double dist = distKm*DistanceUtils.KM_TO_DEG;
+            double dist = distKm * DistanceUtils.KM_TO_DEG;
 
             Rectangle r = dc().CalcBoxByDistFromPt(ctr, dist, ctx, null);
             double horizAxisLat = dc().CalcBoxByDistFromPt_yHorizAxisDEG(ctr, dist, ctx);
@@ -110,30 +93,29 @@ namespace Spatial4n.Tests.distance
             if (r.GetWidth() >= 180)
             {
                 double deg = dc().Distance(ctr, r.GetMinX(), r.GetMaxY() == 90 ? 90 : -90);
-                double calcDistKm = deg*DistanceUtils.DEG_TO_KM;
-                Assert.True(calcDistKm <= distKm + EPS, msg);
+                double calcDistKm = deg * DistanceUtils.DEG_TO_KM;
+                Assert.True(/*msg,*/ calcDistKm <= distKm + EPS);
                 //horizAxisLat is meaningless in this context
             }
             else
             {
                 Point tPt = FindClosestPointOnVertToPoint(r.GetMinX(), r.GetMinY(), r.GetMaxY(), ctr);
-                double calcDistKm = dc().Distance(ctr, tPt)*DistanceUtils.DEG_TO_KM;
-                CustomAssert.EqualWithDelta( /*msg,*/ distKm, calcDistKm, EPS);
-                CustomAssert.EqualWithDelta( /*msg,*/ tPt.GetY(), horizAxisLat, EPS);
+                double calcDistKm = dc().Distance(ctr, tPt) * DistanceUtils.DEG_TO_KM;
+                CustomAssert.EqualWithDelta(/*msg,*/ distKm, calcDistKm, EPS);
+                CustomAssert.EqualWithDelta(/*msg,*/ tPt.GetY(), horizAxisLat, EPS);
             }
 
             //vertical
-            double topDistKm = dc().Distance(ctr, ctr.GetX(), r.GetMaxY())*DistanceUtils.DEG_TO_KM;
+            double topDistKm = dc().Distance(ctr, ctr.GetX(), r.GetMaxY()) * DistanceUtils.DEG_TO_KM;
             if (r.GetMaxY() == 90)
-                Assert.True(topDistKm <= distKm + EPS, msg);
+                Assert.True(/*msg,*/ topDistKm <= distKm + EPS);
             else
-                CustomAssert.EqualWithDelta(dist, topDistKm, EPS);
-
-            double botDistKm = dc().Distance(ctr, ctr.GetX(), r.GetMinY())*DistanceUtils.DEG_TO_KM;
+                CustomAssert.EqualWithDelta(msg, distKm, topDistKm, EPS);
+            double botDistKm = dc().Distance(ctr, ctr.GetX(), r.GetMinY()) * DistanceUtils.DEG_TO_KM;
             if (r.GetMinY() == -90)
-                Assert.True(botDistKm <= distKm + EPS, msg);
+                Assert.True(/*msg,*/ botDistKm <= distKm + EPS);
             else
-                CustomAssert.EqualWithDelta( /*msg,*/ distKm, botDistKm, EPS);
+                CustomAssert.EqualWithDelta(/*msg,*/ distKm, botDistKm, EPS);
         }
 
         private Point FindClosestPointOnVertToPoint(double lon, double lowLat, double highLat, Point ctr)

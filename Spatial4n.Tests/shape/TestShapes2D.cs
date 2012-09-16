@@ -50,10 +50,10 @@ namespace Spatial4n.Tests.shape
 			Assert.True(pt.Equals(center));
 			//Assert.Equal(/*msg,*/ pt, center);
 
-			AssertRelation(msg, SpatialRelation.CONTAINS, pt, pt2);
-			AssertRelation(msg, SpatialRelation.DISJOINT, pt, ctx.MakePoint(0, 1));
-			AssertRelation(msg, SpatialRelation.DISJOINT, pt, ctx.MakePoint(1, 0));
-			AssertRelation(msg, SpatialRelation.DISJOINT, pt, ctx.MakePoint(1, 1));
+			assertRelation(msg, SpatialRelation.CONTAINS, pt, pt2);
+			assertRelation(msg, SpatialRelation.DISJOINT, pt, ctx.MakePoint(0, 1));
+			assertRelation(msg, SpatialRelation.DISJOINT, pt, ctx.MakePoint(1, 0));
+			assertRelation(msg, SpatialRelation.DISJOINT, pt, ctx.MakePoint(1, 1));
 
             pt.Reset(1, 2);
             Assert.Equal(ctx.MakePoint(1, 2), pt);
@@ -89,7 +89,7 @@ namespace Spatial4n.Tests.shape
             r.Reset(1, 2, 3, 4);
             Assert.Equal(ctx.MakeRectangle(1, 2, 3, 4), r);
 
-			TestRectIntersect();
+			testRectIntersect();
 		}
 
 		[Theory]

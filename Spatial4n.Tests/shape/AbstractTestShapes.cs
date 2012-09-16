@@ -71,7 +71,7 @@ namespace Spatial4n.Tests.shape
             return ctx.MakeRectangle(minX, maxX, minY, maxY);
         }
 
-		protected void AssertRelation(String msg, SpatialRelation expected, Shape a, Shape b)
+		protected void assertRelation(String msg, SpatialRelation expected, Shape a, Shape b)
 		{
 			msg = a + " intersect " + b; //use different msg
 			AssertIntersect(msg, expected, a, b);
@@ -152,7 +152,7 @@ namespace Spatial4n.Tests.shape
 			Point center = r.GetCenter();
 			msg += " ctr:" + center;
 			//System.out.println(msg);
-			AssertRelation(msg, SpatialRelation.CONTAINS, r, center);
+			assertRelation(msg, SpatialRelation.CONTAINS, r, center);
 
 			DistanceCalculator dc = ctx.GetDistCalc();
 			double dUR = dc.Distance(center, r.GetMaxX(), r.GetMaxY());
@@ -169,57 +169,59 @@ namespace Spatial4n.Tests.shape
 				AssertEqualsRatio(msg, dUR, dLL);
 		}
 
-		protected void TestRectIntersect()
-		{
-			double INCR = 45;
-			double Y = 20;
-			for (double left = -180; left < 180; left += INCR)
-			{
-				for (double right = left; right - left <= 360; right += INCR)
+        protected void testRectIntersect()
+        {
+            //This test loops past the dateline for some variables but the makeNormRect()
+            // method ensures the rect is valid.
+            const double INCR = 45;
+            const double Y = 20;
+            for (double left = -180; left < 180; left += INCR)
+            {
+                for (double right = left; right - left <= 360; right += INCR)
                 {
-                    //This test loops past the dateline for some variables but the makeNormRect()
-                    // method ensures the rect is valid.
                     Rectangle r = makeNormRect(left, right, -Y, Y);
 
-					//test contains (which also tests within)
-					for (double left2 = left; left2 <= right; left2 += INCR)
-					{
-						for (double right2 = left2; right2 <= right; right2 += INCR)
-						{
-							Rectangle r2 = ctx.MakeRectangle(left2, right2, -Y, Y);
-							AssertRelation(null, SpatialRelation.CONTAINS, r, r2);
-
-							//test point contains
-							AssertRelation(null, SpatialRelation.CONTAINS, r, r2.GetCenter());
-						}
-					}
-
-					//test disjoint
-					for (double left2 = right + INCR; left2 - left < 360; left2 += INCR)
-					{
-						//test point disjoint
-						AssertRelation(null, SpatialRelation.DISJOINT, r, ctx.MakePoint(normX(left2), random.Next(-90, 90)));
-
-						for (double right2 = left2; right2 - left < 360; right2 += INCR)
-						{
+                    //test contains (which also tests within)
+                    for (double left2 = left; left2 <= right; left2 += INCR)
+                    {
+                        for (double right2 = left2; right2 <= right; right2 += INCR)
+                        {
                             Rectangle r2 = makeNormRect(left2, right2, -Y, Y);
-							AssertRelation(null, SpatialRelation.DISJOINT, r, r2);
-						}
-					}
-					//test intersect
-					for (double left2 = left + INCR; left2 <= right; left2 += INCR)
-					{
-						for (double right2 = right + INCR; right2 - left < 360; right2 += INCR)
-						{
-						    Rectangle r2 = makeNormRect(left2, right2, -Y, Y);
-							AssertRelation(null, SpatialRelation.INTERSECTS, r, r2);
-						}
-					}
-				}
-			}
-		}
+                            assertRelation(null, SpatialRelation.CONTAINS, r, r2);
 
-		protected void TestCircle(double x, double y, double dist)
+                            //test point contains
+                            assertRelation(null, SpatialRelation.CONTAINS, r, r2.GetCenter());
+                        }
+                    }
+
+                    //test disjoint
+                    for (double left2 = right + INCR; left2 - left < 360; left2 += INCR)
+                    {
+                        //test point disjoint
+                        assertRelation(null, SpatialRelation.DISJOINT, r, ctx.MakePoint(
+                            normX(left2), random.Next(-90, 90)));
+
+                        for (double right2 = left2; right2 - left < 360; right2 += INCR)
+                        {
+                            Rectangle r2 = makeNormRect(left2, right2, -Y, Y);
+                            assertRelation(null, SpatialRelation.DISJOINT, r, r2);
+                        }
+                    }
+                    //test intersect
+                    for (double left2 = left + INCR; left2 <= right; left2 += INCR)
+                    {
+                        for (double right2 = right + INCR; right2 - left < 360; right2 += INCR)
+                        {
+                            Rectangle r2 = makeNormRect(left2, right2, -Y, Y);
+                            assertRelation(null, SpatialRelation.INTERSECTS, r, r2);
+                        }
+                    }
+
+                }
+            }
+        }
+
+	    protected void TestCircle(double x, double y, double dist)
 		{
 			Circle c = ctx.MakeCircle(x, y, dist);
 			String msg = c.ToString();
@@ -239,8 +241,8 @@ namespace Spatial4n.Tests.shape
 				AssertEqualsRatio(msg, bbox.GetHeight(), dist * 2);
 				AssertEqualsRatio(msg, bbox.GetWidth(), dist * 2);
 			}
-			AssertRelation(msg, SpatialRelation.CONTAINS, c, c.GetCenter());
-			AssertRelation(msg, SpatialRelation.CONTAINS, bbox, c);
+			assertRelation(msg, SpatialRelation.CONTAINS, c, c.GetCenter());
+			assertRelation(msg, SpatialRelation.CONTAINS, bbox, c);
 		}
 
 		protected void TestCircleIntersect()
@@ -350,7 +352,7 @@ namespace Spatial4n.Tests.shape
 			{
 				foreach (Rectangle shape in shapes)
 				{
-					AssertRelation("bbox contains shape", SpatialRelation.CONTAINS, msBbox, shape);
+					assertRelation("bbox contains shape", SpatialRelation.CONTAINS, msBbox, shape);
 				}
 			}
 

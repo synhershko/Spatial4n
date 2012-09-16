@@ -14,5 +14,10 @@ namespace Spatial4n.Tests
 		{
 			Assert.InRange(actual, expected - delta, expected + delta);
 		}
+
+        public static void EqualWithDelta(string msg, double expected, double actual, double delta)
+        {
+            Assert.InRange(actual, expected - delta, expected + delta);
+        }
 	}
 }

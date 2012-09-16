@@ -82,7 +82,7 @@ namespace Spatial4n.Core.Context
         protected void InitUnits()
         {
 			string geoStr;
-			if (Args.TryGetValue("geo", out geoStr) && geoStr == null)
+			if (Args.TryGetValue("geo", out geoStr) && geoStr != null)
 				bool.TryParse(geoStr, out geo);
         }
 

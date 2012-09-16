@@ -45,7 +45,7 @@ namespace Spatial4n.Tests.context
                       "distCalculator", "cartesian^2",
                       "worldBounds", "-100 0 75 200");//West South East North
             Assert.Equal(new CartesianDistCalc(true), sc.GetDistCalc());
-            Assert.Equal(new RectangleImpl(-100, 75, 0, 200), sc.GetWorldBounds());
+            Assert.Equal(new RectangleImpl(-100, 75, 0, 200, sc), sc.GetWorldBounds());
 
             sc = Call("geo", "true",
                       "distCalculator", "lawOfCosines");

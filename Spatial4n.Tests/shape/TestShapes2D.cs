@@ -4,6 +4,7 @@ using System.Reflection;
 using Spatial4n.Core.Context;
 using Spatial4n.Core.Context.Nts;
 using Spatial4n.Core.Distance;
+using Spatial4n.Core.Exceptions;
 using Spatial4n.Core.Shapes;
 using Spatial4n.Core.Shapes.Impl;
 using Xunit;
@@ -17,9 +18,9 @@ namespace Spatial4n.Tests.shape
 		{
 			get
 			{
-				DistanceUnits units = DistanceUnits.CARTESIAN;
-				yield return new object[] { new SpatialContext(units) };
-				yield return new object[] { new NtsSpatialContext(units) };
+                Rectangle WB = new RectangleImpl(-2000, 2000, -300, 300, null);//whatever
+				yield return new object[] { new SpatialContext(false, null, WB) };
+				yield return new object[] { new NtsSpatialContext(null, false, null, WB) };
 			}
 		}
 
@@ -28,6 +29,9 @@ namespace Spatial4n.Tests.shape
 		public void TestSimplePoint(SpatialContext ctx)
 		{
 			base.ctx = ctx;
+
+		    Assert.Throws<InvalidShapeException>(() => ctx.MakePoint(2001, 0));
+		    Assert.Throws<InvalidShapeException>(() => ctx.MakePoint(0, -301));
 
 			Point pt = ctx.MakePoint(0, 0);
 			String msg = pt.ToString();
@@ -50,6 +54,9 @@ namespace Spatial4n.Tests.shape
 			AssertRelation(msg, SpatialRelation.DISJOINT, pt, ctx.MakePoint(0, 1));
 			AssertRelation(msg, SpatialRelation.DISJOINT, pt, ctx.MakePoint(1, 0));
 			AssertRelation(msg, SpatialRelation.DISJOINT, pt, ctx.MakePoint(1, 1));
+
+            pt.Reset(1, 2);
+            Assert.Equal(ctx.MakePoint(1, 2), pt);
 		}
 
 		[Theory]
@@ -57,6 +64,14 @@ namespace Spatial4n.Tests.shape
 		public void TestSimpleRectangle(SpatialContext ctx)
 		{
 			base.ctx = ctx;
+
+            double v = 2001 * (random.NextDouble() > 0.5 ? -1 : 1);
+		    Assert.Throws<InvalidShapeException>(() => ctx.MakeRectangle(v,0,0,0));
+            Assert.Throws<InvalidShapeException>(() => ctx.MakeRectangle(0,v,0,0));
+            Assert.Throws<InvalidShapeException>(() => ctx.MakeRectangle(0,0,v,0));
+            Assert.Throws<InvalidShapeException>(() => ctx.MakeRectangle(0,0,0,v));
+            Assert.Throws<InvalidShapeException>(() => ctx.MakeRectangle(0,0,10,-10));
+            Assert.Throws<InvalidShapeException>(() => ctx.MakeRectangle(10, -10, 0, 0));
 
 			double[] minXs = new double[] { -1000, -360, -180, -20, 0, 20, 180, 1000 };
 			foreach (double minX in minXs)
@@ -69,6 +84,10 @@ namespace Spatial4n.Tests.shape
 					TestRectangle(minX, width, 5, 10);
 				}
 			}
+
+            Rectangle r = ctx.MakeRectangle(0, 0, 0, 0);
+            r.Reset(1, 2, 3, 4);
+            Assert.Equal(ctx.MakeRectangle(1, 2, 3, 4), r);
 
 			TestRectIntersect();
 		}
@@ -89,16 +108,28 @@ namespace Spatial4n.Tests.shape
 					TestCircle(x, y, 5);
 				}
 			}
+
+            testCircleReset(ctx);
+
 			//INTERSECTION:
 			//Start with some static tests that have shown to cause failures at some point:
 			Assert.Equal( /*"getX not getY",*/
 				SpatialRelation.INTERSECTS,
-				ctx.MakeCircle(107, -81, 147).Relate(ctx.MakeRect(92, 121, -89, 74), ctx));
+				ctx.MakeCircle(107, -81, 147).Relate(ctx.MakeRectangle(92, 121, -89, 74)));
 
 			TestCircleIntersect();
 		}
 
-		public static void CheckShapesImplementEquals(Type[] classes)
+        public static void testCircleReset(SpatialContext ctx)
+        {
+            Circle c = ctx.MakeCircle(3, 4, 5);
+            Circle c2 = ctx.MakeCircle(5, 6, 7);
+            c2.Reset(3, 4, 5); // to c1
+            Assert.Equal(c, c2);
+            Assert.Equal(c.GetBoundingBox(), c2.GetBoundingBox());
+        }
+
+	    public static void CheckShapesImplementEquals(Type[] classes)
 		{
 			foreach (var clazz in classes)
 			{

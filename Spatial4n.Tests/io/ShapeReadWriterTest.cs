@@ -15,7 +15,7 @@ namespace Spatial4n.Tests.io
 			get
 			{
 				yield return new object[] { SpatialContext.GEO };
-				yield return new object[] { NtsSpatialContext.GEO_KM };
+				yield return new object[] { NtsSpatialContext.GEO };
 			}
 		}
 
@@ -42,7 +42,7 @@ namespace Spatial4n.Tests.io
 		public void testRectangle(SpatialContext ctx)
 		{
 			Shape s = ctx.ReadShape("-10 -20 10 20");
-			Assert.Equal(ctx.MakeRect(-10, 10, -20, 20), s);
+			Assert.Equal(ctx.MakeRectangle(-10, 10, -20, 20), s);
 			Assert.Equal(s, WriteThenRead(s, ctx));
 			Assert.True(s.HasArea());
 		}

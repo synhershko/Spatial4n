@@ -8,7 +8,7 @@ namespace Spatial4n.Tests.util
 {
     public class TestGeohashUtils
     {
-        SpatialContext ctx = SpatialContext.GEO_KM;
+        readonly SpatialContext ctx = SpatialContext.GEO;
 
         /**
          * Pass condition: lat=42.6, lng=-5.6 should be encoded as "ezs42e44yx96",

@@ -86,7 +86,7 @@ namespace Spatial4n.Core.Shapes.Impl
 
 		public override string ToString()
 		{
-			return "Pt(x=" + x + ",y=" + y + ")";
+		    return string.Format("Pt(x={0:0.0},y={1:0.0})", x, y);
 		}
 
 		public override bool Equals(object o)

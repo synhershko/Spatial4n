@@ -273,7 +273,7 @@ namespace Spatial4n.Core.Shapes.Impl
 		{
             double distKm = DistanceUtils.Degrees2Dist(radiusDEG, DistanceUtils.EARTH_MEAN_RADIUS_KM);
 			String dStr = String.Format("{0:0.0}\u00B0 {1:0.00}km", radiusDEG, distKm);
-			return "Circle(" + point + ",d=" + dStr + ')';
+			return "Circle(" + point + ", d=" + dStr + ')';
 		}
 
 		private static double Ulp(double value)

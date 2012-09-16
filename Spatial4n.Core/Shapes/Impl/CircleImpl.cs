@@ -242,7 +242,7 @@ namespace Spatial4n.Core.Shapes.Impl
 
 		public override string ToString()
 		{
-			return "Circle(" + point + ", d=" + radiusDEG + "\u00B0)";
+			return string.Format("Circle({0}, d={1:0.0}\u00B0)", point, radiusDEG);
 		}
 
 		public override bool Equals(object obj)

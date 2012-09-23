@@ -1,1 +1,2 @@
-620072c037014be66a2ba25115531c2d39b00e07
+spatial4j: a90cc17b6d7974e1bcc462145cf26953e4827b10 (1 commit ahead of tag 0.3)
+lucene integration: 62fe2ea1191aff0fed1fc28409625eaafe724711

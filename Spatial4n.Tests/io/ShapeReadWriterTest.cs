@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using Spatial4n.Core.Context;
 using Spatial4n.Core.Context.Nts;
 using Spatial4n.Core.Shapes;
@@ -57,6 +58,20 @@ namespace Spatial4n.Tests.io
 			Assert.Equal(s, ctx.ReadShape("CIRCLE( 4.56,1.23 d=7.89 )")); // use lat,lon and use 'd' abbreviation
 			Assert.True(s.HasArea());
 		}
+
+        [Theory]
+        [PropertyData("Contexts")]
+        public void testCircleWithCriticalCulture(SpatialContext ctx)
+        {
+            using (new TemporaryCulture(new CultureInfo("de-DE")))
+            {
+                Shape s = ctx.ReadShape("Circle(1.23 4.56 distance=7.89)");
+                Assert.Equal(ctx.MakeCircle(1.23, 4.56, 7.89), s);
+                Assert.Equal(s, WriteThenRead(s, ctx));
+                Assert.Equal(s, ctx.ReadShape("CIRCLE( 4.56,1.23 d=7.89 )")); // use lat,lon and use 'd' abbreviation
+                Assert.True(s.HasArea());
+            }
+        }
 
 
 		//  Looking for more tests?  Shapes are tested in TestShapes2D.

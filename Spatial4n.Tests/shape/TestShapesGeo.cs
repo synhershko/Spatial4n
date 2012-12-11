@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using Spatial4n.Core.Context;
 using Spatial4n.Core.Context.Nts;
 using Spatial4n.Core.Distance;
@@ -86,7 +87,7 @@ namespace Spatial4n.Tests.shape
 		{
 			base.ctx = ctx;
 
-            Assert.Equal("Circle(Pt(x=10.0,y=20.0), d=30.0° 3335.85km)", ctx.MakeCircle(10, 20, 30).ToString());
+            Assert.Equal(String.Format("Circle(Pt(x={0:0.0},y={1:0.0}), d={2:0.0}° {3:0.00}km)", 10, 20, 30, 3335.85), ctx.MakeCircle(10, 20, 30).ToString());
 
             double v = 200 * (random.NextDouble() > 0.5 ? -1 : 1);
 		    Assert.Throws<InvalidShapeException>(() => ctx.MakeCircle(v,0,5));

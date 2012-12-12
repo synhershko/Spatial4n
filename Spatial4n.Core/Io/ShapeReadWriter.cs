@@ -154,7 +154,7 @@ namespace Spatial4n.Core.Io
 						}
 						else
 						{
-							if (!Double.TryParse(arg, out d)) throw new InvalidShapeException("Missing Distance: " + str);
+							if (!Double.TryParse(arg, NumberStyles.Float | NumberStyles.AllowThousands, CultureInfo.InvariantCulture, out d)) throw new InvalidShapeException("Missing Distance: " + str);
 						}
 						if (st.Length > tokenPos)
 						{

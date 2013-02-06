@@ -114,6 +114,7 @@
     <Compile Include="shape\RoundingDistCalc.cs" />
     <Compile Include="shape\TestShapesGeo.cs" />
     <Compile Include="shape\TestShapes2D.cs" />
+    <Compile Include="TemporaryCulture.cs" />
     <Compile Include="util\TestGeohashUtils.cs" />
   </ItemGroup>
   <ItemGroup>

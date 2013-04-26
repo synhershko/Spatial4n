@@ -43,6 +43,12 @@ namespace Spatial4n.Core.Io
 		{
 		}
 
+		public NtsShapeReadWriter(NtsSpatialContext ctx, bool normalizeGeomCoords)
+			: base(ctx)
+		{
+			this.normalizeGeomCoords = normalizeGeomCoords;
+		}
+
 		private class ShapeReaderWriterCoordinateSequenceFilter : ICoordinateSequenceFilter
 		{
 			private readonly NtsSpatialContext _ctx;

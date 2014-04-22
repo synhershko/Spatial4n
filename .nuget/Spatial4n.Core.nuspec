@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<package >
+<package>
   <metadata>
     <id>Spatial4n.Core</id>
     <version>??version??</version>
@@ -8,7 +8,7 @@
     <projectUrl>https://github.com/synhershko/spatial4n</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>A Geospatial Library for .NET - a .NET port of spatial4j</description>
-    <copyright>Copyright 2012 Itamar Syn-Hershko and the spatial4j project</copyright>
+    <copyright>Copyright 2012-2014 Itamar Syn-Hershko and the spatial4j project</copyright>
     <tags>Lucene Lucene.net spatial geospatial geo spatial4j search</tags>
   </metadata>
 </package>

@@ -8,6 +8,7 @@ install:
   - sudo apt-get install mono-devel mono-gmcs
 
 script:
+ - mono --runtime=v4.0 .nuget/NuGet.exe restore
  - xbuild 
- - .ci/xunit.sh Spatial4n.Tests/bin/Debug/Spatial4n.Tests.dll
+ - ./.ci/xunit.sh Spatial4n.Tests/bin/Debug/Spatial4n.Tests.dll
 

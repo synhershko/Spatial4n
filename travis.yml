@@ -1,0 +1,13 @@
+language: objective-c
+
+env:
+ global:
+  - EnableNuGetPackageRestore=true 
+
+install:
+  - sudo apt-get install mono-devel mono-gmcs
+
+script:
+ - xbuild 
+ - .ci/xunit.sh Spatial4n.Tests/bin/Debug/Spatial4n.Tests.dll
+

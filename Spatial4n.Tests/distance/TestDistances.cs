@@ -274,7 +274,7 @@ namespace Spatial4n.Tests.distance
         }
 
         [Fact]
-        public void assertDistanceConversion()
+        public void AssertDistanceConversion()
         {
             assertDistanceConversion(0);
             assertDistanceConversion(500);

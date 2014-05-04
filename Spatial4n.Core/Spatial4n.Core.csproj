@@ -12,8 +12,7 @@
     <AssemblyName>Spatial4n.Core</AssemblyName>
     <FileAlignment>512</FileAlignment>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
-    <TargetFrameworkProfile>
-    </TargetFrameworkProfile>
+    <TargetFrameworkProfile>Client</TargetFrameworkProfile>
     <RestorePackages>true</RestorePackages>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -81,7 +80,7 @@
     <DocumentationFile>$(OutputPath)\Spatial4n.Core.XML</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup>
-    <SignAssembly>true</SignAssembly>
+    <SignAssembly>false</SignAssembly>
   </PropertyGroup>
   <PropertyGroup>
     <AssemblyOriginatorKeyFile>Spatial4n.snk</AssemblyOriginatorKeyFile>

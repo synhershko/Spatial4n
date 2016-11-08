@@ -1,21 +1,15 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 11.00
-# Visual Studio 2010
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.25420.1
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Spatial4n.Core", "Spatial4n.Core\Spatial4n.Core.csproj", "{777904AC-46EF-466C-9E13-2A52A6735987}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Spatial4n.Tests", "Spatial4n.Tests\Spatial4n.Tests.csproj", "{1DE4AC79-7ECF-4C37-8EDA-F78D211151AB}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{38A2DEA1-817A-4A18-BCA6-2D214D2F190C}"
-	ProjectSection(SolutionItems) = preProject
-		.nuget\NuGet.targets = .nuget\NuGet.targets
-	EndProjectSection
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Spatial4n.Core.NTS", "Spatial4n.Core\Spatial4n.Core.NTS.csproj", "{DDCB0537-C471-4ACD-B48B-56EB1711EB4A}"
 EndProject
 Global
-	GlobalSection(TestCaseManagementSettings) = postSolution
-		CategoryFile = Spatial4n.vsmdi
-	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Debug35|Any CPU = Debug35|Any CPU
@@ -50,5 +44,8 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(TestCaseManagementSettings) = postSolution
+		CategoryFile = Spatial4n.vsmdi
 	EndGlobalSection
 EndGlobal

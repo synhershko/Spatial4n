@@ -108,12 +108,6 @@ namespace Spatial4n.Core.Shapes.Impl
 	    /// <returns>DISJOINT, CONTAINS, or INTERSECTS (not WITHIN)</returns>
 	    protected override SpatialRelation RelateRectanglePhase2(Rectangle r, SpatialRelation bboxSect)
 		{
-			//Rectangle wraps around the world longitudinally creating a solid band; there are no corners to test intersection
-			if (r.GetWidth() == 360)
-			{
-				return SpatialRelation.INTERSECTS;
-			}
-
 			if (inverseCircle != null)
 			{
 				return inverseCircle.Relate(r).Inverse();
@@ -131,8 +125,14 @@ namespace Spatial4n.Core.Shapes.Impl
 				return base.RelateRectanglePhase2(r, bboxSect);
 			}
 
-			//do quick check to see if all corners are within this circle for CONTAINS
-			int cornersIntersect = NumCornersIntersect(r);
+            //Rectangle wraps around the world longitudinally creating a solid band; there are no corners to test intersection
+            if (r.GetWidth() == 360)
+            {
+                return SpatialRelation.INTERSECTS;
+            }
+
+            //do quick check to see if all corners are within this circle for CONTAINS
+            int cornersIntersect = NumCornersIntersect(r);
 			if (cornersIntersect == 4)
 			{
 				//ensure r's x axis is within c's.  If it doesn't, r sneaks around the globe to touch the other side (intersect).

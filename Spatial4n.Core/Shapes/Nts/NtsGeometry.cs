@@ -27,6 +27,8 @@ using Spatial4n.Core.Context.Nts;
 using Spatial4n.Core.Distance;
 using Spatial4n.Core.Exceptions;
 using Spatial4n.Core.Shapes.Impl;
+using GeoAPI.Geometries.Prepared;
+using NetTopologySuite.Geometries.Prepared;
 
 namespace Spatial4n.Core.Shapes.Nts
 {
@@ -37,12 +39,17 @@ namespace Spatial4n.Core.Shapes.Nts
 	/// </summary>
 	public class NtsGeometry : Shape
 	{
+        /** System property boolean that can disable auto validation in an assert. */
+        //public static readonly string SYSPROP_ASSERT_VALIDATE = "spatial4j.JtsGeometry.assertValidate";
+
 		private readonly IGeometry geom;//cannot be a direct instance of GeometryCollection as it doesn't support relate()
 		private readonly bool _hasArea;
 		private readonly Rectangle bbox;
-        private readonly NtsSpatialContext ctx;
+        protected readonly NtsSpatialContext ctx;
+        protected IPreparedGeometry preparedGeometry;
+        protected bool validated = false;
 
-		public NtsGeometry(IGeometry geom, NtsSpatialContext ctx, bool dateline180Check)
+        public NtsGeometry(IGeometry geom, NtsSpatialContext ctx, bool dateline180Check)
 		{
             this.ctx = ctx;
 
@@ -57,70 +64,126 @@ namespace Spatial4n.Core.Shapes.Nts
                 if (dateline180Check)
                     UnwrapDateline(geom); //potentially modifies geom
                 //If given multiple overlapping polygons, fix it by union
-                geom = UnionGeometryCollection(geom); //returns same or new geom
-                Envelope unwrappedEnv = geom.EnvelopeInternal;
+                if (allowMultiOverlap)
+                    geom = UnionGeometryCollection(geom); //returns same or new geom
 
                 //Cuts an unwrapped geometry back into overlaid pages in the standard geo bounds.
                 geom = CutUnwrappedGeomInto360(geom); //returns same or new geom
                 Debug.Assert(geom.EnvelopeInternal.Width <= 360);
                 Debug.Assert(geom.GetType() != typeof (GeometryCollection)); //double check
 
-                //note: this bbox may be sub-optimal. If geom is a collection of things near the dateline on both sides then
-                // the bbox will needlessly span most or all of the globe longitudinally.
-                // TODO so consider using MultiShape's planned minimal geo bounding box algorithm once implemented.
-                double envWidth = unwrappedEnv.Width;
-
-                //adjust minX and maxX considering the dateline and world wrap
-                double minX, maxX;
-                if (envWidth >= 360)
-                {
-                    minX = -180;
-                    maxX = 180;
-                }
-                else
-                {
-                    minX = unwrappedEnv.MinX;
-                    maxX = DistanceUtils.NormLonDEG(unwrappedEnv.MinX + envWidth);
-                }
-                bbox = new RectangleImpl(minX, maxX, unwrappedEnv.MinY, unwrappedEnv.MaxY, ctx);
+                //Compute bbox
+                bbox = ComputeGeoBBox(geom);
             }
             else
             {//not geo
+                if (allowMultiOverlap)
+                    geom = UnionGeometryCollection(geom);//returns same or new geom
                 Envelope env = geom.EnvelopeInternal;
                 bbox = new RectangleImpl(env.MinX, env.MaxX, env.MinY, env.MaxY, ctx);
             }
 			var _ = geom.EnvelopeInternal;//ensure envelope is cached internally, which is lazy evaluated. Keeps this thread-safe.
 
-			//Check geom validity; use helpful error
-			// TODO add way to conditionally skip at your peril later
-			var isValidOp = new IsValidOp(geom);
-			if (!isValidOp.IsValid)
-				throw new InvalidShapeException(isValidOp.ValidationError.ToString());
 			this.geom = geom;
+            Debug.Assert(AssertValidate());//kinda expensive but caches valid state
 
-			this._hasArea = !((geom is ILineal) || (geom is IPuntal));
+            this._hasArea = !((geom is ILineal) || (geom is IPuntal));
 		}
 
-		public static SpatialRelation IntersectionMatrixToSpatialRelation(IntersectionMatrix matrix)
-		{
-			if (matrix.IsContains())
-				return SpatialRelation.CONTAINS;
-			else if (matrix.IsWithin() /* TODO needs to be matrix.IsCoveredBy()*/)
-				return SpatialRelation.WITHIN;
-			else if (matrix.IsDisjoint())
-				return SpatialRelation.DISJOINT;
-			return SpatialRelation.INTERSECTS;
-		}
+        /** called via assertion */
+        private bool AssertValidate()
+        {
+            // TODO: Work out how to use "property"
+            string assertValidate = System.getProperty(SYSPROP_ASSERT_VALIDATE);
+            if (assertValidate == null || bool.Parse(assertValidate))
+                Validate();
+            return true;
+        }
 
-		//----------------------------------------
-		//----------------------------------------
+        /**
+   * Validates the shape, throwing a descriptive error if it isn't valid. Note that this
+   * is usually called automatically by default, but that can be disabled.
+   *
+   * @throws InvalidShapeException with descriptive error if the shape isn't valid
+   */
+        public void Validate() 
+        {
+            if (!validated) {
+                IsValidOp isValidOp = new IsValidOp(geom);
+                if (!isValidOp.IsValid)
+                    throw new InvalidShapeException(isValidOp.ValidationError.ToString());
+                validated = true;
+            }
+        }
 
-		public bool HasArea()
+        /**
+   * Adds an index to this class internally to compute spatial relations faster. In JTS this
+   * is called a {@link com.vividsolutions.jts.geom.prep.PreparedGeometry}.  This
+   * isn't done by default because it takes some time to do the optimization, and it uses more
+   * memory.  Calling this method isn't thread-safe so be careful when this is done. If it was
+   * already indexed then nothing happens.
+   */
+        public void Index()
+        {
+            if (preparedGeometry == null)
+                preparedGeometry = PreparedGeometryFactory.Prepare(geom);
+        }
+
+        
+        public virtual bool IsEmpty
+        {
+            get { return geom.IsEmpty; }
+        }
+
+        /** Given {@code geoms} which has already been checked for being in world
+   * bounds, return the minimal longitude range of the bounding box.
+   */
+        protected Rectangle ComputeGeoBBox(Geometry geoms)
+        {
+            if (geoms.IsEmpty)
+                return new RectangleImpl(double.NaN, double.NaN, double.NaN, double.NaN, ctx);
+            Envelope env = geoms.EnvelopeInternal;//for minY & maxY (simple)
+            if (env.Width > 180 && geoms.NumGeometries > 1)
+            {
+                // This is ShapeCollection's bbox algorithm
+                Range xRange = null;
+                for (int i = 0; i < geoms.NumGeometries; i++)
+                {
+                    Envelope envI = geoms.GetGeometryN(i).EnvelopeInternal;
+                    Range xRange2 = new Range.LongitudeRange(envI.MinX, envI.MaxX);
+                    if (xRange == null)
+                    {
+                        xRange = xRange2;
+                    }
+                    else
+                    {
+                        xRange = xRange.ExpandTo(xRange2);
+                    }
+                    if (xRange == Range.LongitudeRange.WORLD_180E180W)
+                        break; // can't grow any bigger
+                }
+                // TODO: Inconsistent API between this and GeoAPI
+                return new RectangleImpl(xRange.GetMin(), xRange.GetMax(), env.MinY, env.MaxY, ctx);
+            }
+            else
+            {
+                return new RectangleImpl(env.MinX, env.MaxX, env.MinY, env.MaxY, ctx);
+            }
+        }
+
+        public virtual NtsGeometry GetBuffered(double distance, SpatialContext ctx)
+        {
+            //TODO doesn't work correctly across the dateline. The buffering needs to happen
+            // when it's transiently unrolled, prior to being sliced.
+            return this.ctx.MakeShape(geom.Buffer(distance), true, true);
+        }
+
+		public virtual bool HasArea()
 		{
 			return _hasArea;
 		}
 
-		public double GetArea(SpatialContext ctx)
+		public virtual double GetArea(SpatialContext ctx)
 		{
 			double geomArea = geom.Area;
 			if (ctx == null || geomArea == 0)
@@ -134,17 +197,19 @@ namespace Spatial4n.Core.Shapes.Nts
 			//  estimate)
 		}
 
-		public Rectangle GetBoundingBox()
+		public virtual Rectangle GetBoundingBox()
 		{
 			return bbox;
 		}
 
-		public Point GetCenter()
+		public virtual Point GetCenter()
 		{
-			return new NtsPoint((NetTopologySuite.Geometries.Point)geom.Centroid, ctx);
+            if (IsEmpty) //geom.getCentroid == null
+                return new NtsPoint(ctx.GetGeometryFactory().CreatePoint((Coordinate)null), ctx);
+            return new NtsPoint((NetTopologySuite.Geometries.Point)geom.Centroid, ctx);
 		}
 
-		public SpatialRelation Relate(Shape other)
+		public virtual SpatialRelation Relate(Shape other)
 		{
 			if (other is Point)
 				return Relate((Point)other);
@@ -154,26 +219,33 @@ namespace Spatial4n.Core.Shapes.Nts
 				return Relate((Circle)other, ctx);
 			else if (other is NtsGeometry)
 				return Relate((NtsGeometry)other);
-			return other.Relate(this).Transpose();
+            else if (other is BufferedLineString)
+                throw new NotSupportedException("Can't use BufferedLineString with NtsGeometry");
+            return other.Relate(this).Transpose();
 		}
 
-		public SpatialRelation Relate(Point pt)
+		public virtual SpatialRelation Relate(Point pt)
 		{
-			//TODO if not jtsPoint, test against bbox to avoid JTS if disjoint
-			var jtsPoint = (NtsPoint)(pt is NtsPoint ? pt : ctx.MakePoint(pt.GetX(), pt.GetY()));
-			return geom.Disjoint(jtsPoint.GetGeom()) ? SpatialRelation.DISJOINT : SpatialRelation.CONTAINS;
-		}
+            if (!GetBoundingBox().Relate(pt).Intersects())
+                return SpatialRelation.DISJOINT;
+            IGeometry ptGeom;
+            if (pt is NtsPoint)
+      ptGeom = ((NtsPoint)pt).GetGeom();
+    else
+      ptGeom = ctx.GetGeometryFactory().CreatePoint(new Coordinate(pt.GetX(), pt.GetY()));
+            return Relate(ptGeom);//is point-optimized
+        }
 
-		public SpatialRelation Relate(Rectangle rectangle)
+		public virtual SpatialRelation Relate(Rectangle rectangle)
 		{
 			SpatialRelation bboxR = bbox.Relate(rectangle);
 			if (bboxR == SpatialRelation.WITHIN || bboxR == SpatialRelation.DISJOINT)
 				return bboxR;
-			IGeometry oGeom = ctx.GetGeometryFrom(rectangle);
-			return IntersectionMatrixToSpatialRelation(geom.Relate(oGeom));
-		}
+            // FYI, the right answer could still be DISJOINT or WITHIN, but we don't know yet.
+            return Relate(ctx.GetGeometryFrom(rectangle));
+        }
 
-		public SpatialRelation Relate(Circle circle, SpatialContext ctx)
+		public virtual SpatialRelation Relate(Circle circle)
 		{
 			SpatialRelation bboxR = bbox.Relate(circle);
 			if (bboxR == SpatialRelation.WITHIN || bboxR == SpatialRelation.DISJOINT)
@@ -202,14 +274,46 @@ namespace Spatial4n.Core.Shapes.Nts
 			return SpatialRelation.WITHIN;
 		}
 
-		public SpatialRelation Relate(NtsGeometry jtsGeometry)
+		public virtual SpatialRelation Relate(NtsGeometry ntsGeometry)
 		{
-			IGeometry oGeom = jtsGeometry.geom;
-			//don't bother checking bbox since geom.relate() does this already
-			return IntersectionMatrixToSpatialRelation(geom.Relate(oGeom));
-		}
+            //don't bother checking bbox since geom.relate() does this already
+            return Relate(ntsGeometry.geom);
+        }
 
-		public override String ToString()
+        protected virtual SpatialRelation Relate(Geometry oGeom)
+        {
+            //see http://docs.geotools.org/latest/userguide/library/jts/dim9.html#preparedgeometry
+            if (oGeom is GeoAPI.Geometries.IPoint) // TODO: This may not be the correct data type....
+            {
+                if (preparedGeometry != null)
+                    return preparedGeometry.Disjoint(oGeom) ? SpatialRelation.DISJOINT : SpatialRelation.CONTAINS;
+                return geom.Disjoint(oGeom) ? SpatialRelation.DISJOINT : SpatialRelation.CONTAINS;
+            }
+            if (preparedGeometry == null)
+                return IntersectionMatrixToSpatialRelation(geom.Relate(oGeom));
+            else if (preparedGeometry.Covers(oGeom))
+                return SpatialRelation.CONTAINS;
+            else if (preparedGeometry.CoveredBy(oGeom))
+                return SpatialRelation.WITHIN;
+            else if (preparedGeometry.Intersects(oGeom))
+                return SpatialRelation.INTERSECTS;
+            return SpatialRelation.DISJOINT;
+        }
+
+        public static SpatialRelation IntersectionMatrixToSpatialRelation(IntersectionMatrix matrix)
+        {
+            //As indicated in SpatialRelation javadocs, Spatial4j CONTAINS & WITHIN are
+            // OGC's COVERS & COVEREDBY
+            if (matrix.IsCovers())
+                return SpatialRelation.CONTAINS;
+            else if (matrix.IsCoveredBy())
+                return SpatialRelation.WITHIN;
+            else if (matrix.IsDisjoint())
+                return SpatialRelation.DISJOINT;
+            return SpatialRelation.INTERSECTS;
+        }
+
+        public override string ToString()
 		{
 			return geom.ToString();
 		}
@@ -236,11 +340,11 @@ namespace Spatial4n.Core.Shapes.Nts
 
 		private class S4nGeometryFilter : IGeometryFilter
 		{
-			private readonly int[] _result;
+			private readonly int[] crossings;
 
-			public S4nGeometryFilter(int[] result)
+			public S4nGeometryFilter(int[] crossings)
 			{
-				_result = result;
+                this.crossings = crossings;
 			}
 
 			public void Filter(IGeometry geom)
@@ -262,7 +366,7 @@ namespace Spatial4n.Core.Shapes.Nts
 					}
 					else
 						return;
-				_result[0] = Math.Max(_result[0], cross);
+                crossings[0] = Math.Max(crossings[0], cross);
 			}
 		}
 
@@ -279,11 +383,10 @@ namespace Spatial4n.Core.Shapes.Nts
 		{
 			if (geom.EnvelopeInternal.Width < 180)
 				return 0;//can't possibly cross the dateline
-			int[] result = { 0 };//an array so that an inner class can modify it.
-			geom.Apply(new S4nGeometryFilter(result));
+			int[] crossings = { 0 };//an array so that an inner class can modify it.
+			geom.Apply(new S4nGeometryFilter(crossings));
 
-			int crossings = result[0];
-			return crossings;
+			return crossings[0];
 		}
 
 		/** See {@link #unwrapDateline(Geometry)}. */
@@ -343,7 +446,8 @@ namespace Spatial4n.Core.Shapes.Nts
 				}
 				if (shiftXPage != 0)
 					cseq.SetOrdinate(i, Ordinate.X, thisX);
-			}
+                prevX = thisX;
+            }
 			if (lineString is LinearRing)
 			{
 				Debug.Assert(cseq.GetCoordinate(0).Equals(cseq.GetCoordinate(size - 1)));
@@ -430,5 +534,22 @@ namespace Spatial4n.Core.Shapes.Nts
 			}
 			return UnaryUnionOp.Union(geomList);
 		}
-	}
+
+        //  private static Geometry removePolyHoles(Geometry geom) {
+        //    //TODO this does a deep copy of geom even if no changes needed; be smarter
+        //    GeometryTransformer gTrans = new GeometryTransformer() {
+        //      @Override
+        //      protected Geometry transformPolygon(Polygon geom, Geometry parent) {
+        //        if (geom.getNumInteriorRing() == 0)
+        //          return geom;
+        //        return factory.createPolygon((LinearRing) geom.getExteriorRing(),null);
+        //      }
+        //    };
+        //    return gTrans.transform(geom);
+        //  }
+        //
+        //  private static Geometry snapAndClean(Geometry geom) {
+        //    return new GeometrySnapper(geom).snapToSelf(GeometrySnapper.computeOverlaySnapTolerance(geom), true);
+        //  }
+    }
 }

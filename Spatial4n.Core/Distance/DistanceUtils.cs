@@ -24,11 +24,17 @@ namespace Spatial4n.Core.Distance
 	public static class DistanceUtils
 	{
 		//pre-compute some angles that are commonly used
+        [Obsolete]
 		public static readonly double DEG_45_AS_RADS = Math.PI / 4;
+        [Obsolete]
 		public static readonly double SIN_45_AS_RADS = Math.Sin(DEG_45_AS_RADS);
+
 		public static readonly double DEG_90_AS_RADS = Math.PI / 2;
 		public static readonly double DEG_180_AS_RADS = Math.PI;
+
+        [Obsolete]
 		public static readonly double DEG_225_AS_RADS = 5 * DEG_45_AS_RADS;
+        [Obsolete]
 		public static readonly double DEG_270_AS_RADS = 3 * DEG_90_AS_RADS;
 		
 		public static readonly double DEGREES_TO_RADIANS =  Math.PI / 180;
@@ -45,32 +51,40 @@ namespace Spatial4n.Core.Distance
 		public static readonly double EARTH_MEAN_RADIUS_KM = 6371.0087714;
 		public static readonly double EARTH_EQUATORIAL_RADIUS_KM = 6378.1370;
 
-		public static readonly double EARTH_MEAN_RADIUS_MI = EARTH_MEAN_RADIUS_KM * KM_TO_MILES;
+        /// <summary>
+        /// Equivalent to degrees2Dist(1, EARTH_MEAN_RADIUS_KM)
+        /// </summary>
+        public static readonly double DEG_TO_KM = DEGREES_TO_RADIANS * EARTH_MEAN_RADIUS_KM;
+        public static readonly double KM_TO_DEG = 1 / DEG_TO_KM;
+
+        public static readonly double EARTH_MEAN_RADIUS_MI = EARTH_MEAN_RADIUS_KM * KM_TO_MILES;
 		public static readonly double EARTH_EQUATORIAL_RADIUS_MI = EARTH_EQUATORIAL_RADIUS_KM * KM_TO_MILES;
 
-        public static readonly double DEG_TO_KM = Degrees2Dist(1, EARTH_MEAN_RADIUS_KM);
-        public static readonly double KM_TO_DEG = 1 / DEG_TO_KM;
-		/// <summary>
-		/// Calculate the p-norm (i.e. length) between two vectors
-		/// </summary>
-		/// <param name="vec1">The first vector</param>
-		/// <param name="vec2">The second vector</param>
-		/// <param name="power">The power (2 for cartesian distance, 1 for manhattan, etc.)</param>
-		/// <returns>The length. See http://en.wikipedia.org/wiki/Lp_space </returns>
-		public static double VectorDistance(double[] vec1, double[] vec2, double power)
+        /// <summary>
+        /// Calculate the p-norm (i.e. length) between two vectors
+        /// </summary>
+        /// <param name="vec1">The first vector</param>
+        /// <param name="vec2">The second vector</param>
+        /// <param name="power">The power (2 for cartesian distance, 1 for manhattan, etc.)</param>
+        /// <returns>The length. See http://en.wikipedia.org/wiki/Lp_space </returns>
+        [Obsolete]
+        public static double VectorDistance(double[] vec1, double[] vec2, double power)
 		{
-			return VectorDistance(vec1, vec2, power, 1.0 / power);
-		}
+            //only calc oneOverPower if it's needed
+            double oneOverPower = (power == 0 || power == 1.0 || power == 2.0) ? Double.NaN : 1.0 / power;
+            return VectorDistance(vec1, vec2, power, oneOverPower);
+        }
 
-		/// <summary>
-		/// Calculate the p-norm (i.e. length) between two vectors
-		/// </summary>
-		/// <param name="vec1">The first vector</param>
-		/// <param name="vec2">The second vector</param>
-		/// <param name="power">The power (2 for cartesian distance, 1 for manhattan, etc.)</param>
-		/// <param name="oneOverPower">If you've precalculated oneOverPower and cached it, use this method to save one division operation over {@link #vectorDistance(double[], double[], double)}.</param>
-		/// <returns>The length.</returns>
-		public static double VectorDistance(double[] vec1, double[] vec2, double power, double oneOverPower)
+        /// <summary>
+        /// Calculate the p-norm (i.e. length) between two vectors
+        /// </summary>
+        /// <param name="vec1">The first vector</param>
+        /// <param name="vec2">The second vector</param>
+        /// <param name="power">The power (2 for cartesian distance, 1 for manhattan, etc.)</param>
+        /// <param name="oneOverPower">If you've precalculated oneOverPower and cached it, use this method to save one division operation over {@link #vectorDistance(double[], double[], double)}.</param>
+        /// <returns>The length.</returns>
+        [Obsolete]
+        public static double VectorDistance(double[] vec1, double[] vec2, double power, double oneOverPower)
 		{
 			double result = 0;
 
@@ -86,7 +100,7 @@ namespace Spatial4n.Core.Distance
 			{
 				for (int i = 0; i < vec1.Length; i++)
 				{
-					result += vec1[i] - vec2[i];
+					result += Math.Abs(vec1[i] - vec2[i]);
 				}
 			}
 			else if (power == 2.0)
@@ -111,7 +125,7 @@ namespace Spatial4n.Core.Distance
 			return result;
 		}
 
-		/**
+        /**
 		 * Return the coordinates of a vector that is the corner of a box (upper right or lower left), assuming a Rectangular
 		 * coordinate system.  Note, this does not apply for points on a sphere or ellipse (although it could be used as an approximation).
 		 *
@@ -121,7 +135,8 @@ namespace Spatial4n.Core.Distance
 		 * @param upperRight If true, return the coords for the upper right corner, else return the lower left.
 		 * @return The point, either the upperLeft or the lower right
 		 */
-		public static double[] VectorBoxCorner(double[] center, double[] result, double distance, bool upperRight)
+         [Obsolete]
+        public static double[] VectorBoxCorner(double[] center, double[] result, double distance, bool upperRight)
 		{
 			if (result == null || result.Length != center.Length)
 			{
@@ -163,10 +178,11 @@ namespace Spatial4n.Core.Distance
             double cosStartLat = Math.Cos(startLat);
             double sinAngDist = Math.Sin(distanceRAD);
             double sinStartLat = Math.Sin(startLat);
-            double lat2 = Math.Asin(sinStartLat*cosAngDist +
+            double sinLat2 = Math.Asin(sinStartLat*cosAngDist +
                                     cosStartLat*sinAngDist*Math.Cos(bearingRAD));
+            double lat2 = Math.Asin(sinLat2);
             double lon2 = startLon + Math.Atan2(Math.Sin(bearingRAD)*sinAngDist*cosStartLat,
-                                                cosAngDist - sinStartLat*Math.Sin(lat2));
+                                                cosAngDist - sinStartLat * sinLat2);
 
             // normalize lon first
             if (lon2 > DEG_180_AS_RADS)
@@ -350,7 +366,14 @@ namespace Spatial4n.Core.Distance
 			//http://gis.stackexchange.com/questions/19221/find-tangent-point-on-circle-furthest-east-or-west
 			if (distDEG == 0)
 				return lat;
-			double lat_rad = ToRadians(lat);
+            // if we don't do this when == 90 or -90, computed result can be (+/-)89.9999 when at pole.
+            //     No biggie but more accurate.
+            else if (lat + distDEG >= 90)
+                return 90;
+            else if (lat - distDEG <= -90)
+                return -90;
+
+            double lat_rad = ToRadians(lat);
 			double dist_rad = ToRadians(distDEG);
 			double result_rad = Math.Asin(Math.Sin(lat_rad) / Math.Cos(dist_rad));
 			if (!Double.IsNaN(result_rad))
@@ -362,7 +385,48 @@ namespace Spatial4n.Core.Distance
 			return lat;
 		}
 
-		/**
+        /**
+       * Calculates the degrees longitude distance at latitude {@code lat} to cover
+       * a distance {@code dist}.
+       * <p/>
+       * Used to calculate a new expanded buffer distance to account for skewing
+       * effects for shapes that use the lat-lon space as a 2D plane instead of a
+       * sphere.  The expanded buffer will be sure to cover the intended area, but
+       * the shape is still skewed and so it will cover a larger area.  For latitude
+       * 0 (the equator) the result is the same buffer.  At 60 (or -60) degrees, the
+       * result is twice the buffer, meaning that a shape at 60 degrees is twice as
+       * high as it is wide when projected onto a lat-lon plane even if in the real
+       * world it's equal all around.
+       * <p/>
+       * If the result added to abs({@code lat}) is >= 90 degrees, then skewing is
+       * so severe that the caller should consider tossing the shape and
+       * substituting a spherical cap instead.
+       *
+       * @param lat  latitude in degrees
+       * @param dist distance in degrees
+       * @return longitudinal degrees (x delta) at input latitude that is >= dist
+       *         distance. Will be >= dist and <= 90.
+       */
+        public static double CalcLonDegreesAtLat(double lat, double dist)
+        {
+            //This code was pulled out of DistanceUtils.pointOnBearingRAD() and
+            // optimized
+            // for bearing = 90 degrees, and so we can get an intermediate calculation.
+            double distanceRAD = DistanceUtils.ToRadians(dist);
+            double startLat = DistanceUtils.ToRadians(lat);
+
+            double cosAngDist = Math.Cos(distanceRAD);
+            double cosStartLat = Math.Cos(startLat);
+            double sinAngDist = Math.Sin(distanceRAD);
+            double sinStartLat = Math.Sin(startLat);
+
+            double lonDelta = Math.Atan2(sinAngDist * cosStartLat,
+                cosAngDist * (1 - sinStartLat * sinStartLat));
+
+            return DistanceUtils.ToDegrees(lonDelta);
+        }
+
+        /**
 		 * The square of the cartesian Distance.  Not really a distance, but useful if all that matters is
 		 * comparing the result to another one.
 		 *
@@ -370,7 +434,8 @@ namespace Spatial4n.Core.Distance
 		 * @param vec2 The second point
 		 * @return The squared cartesian distance
 		 */
-		public static double DistSquaredCartesian(double[] vec1, double[] vec2)
+        [Obsolete]
+        public static double DistSquaredCartesian(double[] vec1, double[] vec2)
 		{
 			double result = 0;
 			for (int i = 0; i < vec1.Length; i++)

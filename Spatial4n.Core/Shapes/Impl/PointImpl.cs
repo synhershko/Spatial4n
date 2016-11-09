@@ -17,6 +17,7 @@
 
 using System;
 using Spatial4n.Core.Context;
+using System.Diagnostics;
 
 namespace Spatial4n.Core.Shapes.Impl
 {
@@ -41,45 +42,58 @@ namespace Spatial4n.Core.Shapes.Impl
             Reset(x, y);
         }
 
-        public void Reset(double x, double y)
+        public virtual bool IsEmpty
         {
+            get { return double.IsNaN(x); }
+        }
+
+        public virtual void Reset(double x, double y)
+        {
+            Debug.Assert(!IsEmpty);
             this.x = x;
             this.y = y;
         }
 
-		public SpatialRelation Relate(Shape other)
+        public virtual double GetX()
+        {
+            return x;
+        }
+
+        public virtual double GetY()
+        {
+            return y;
+        }
+
+        public virtual Rectangle GetBoundingBox()
+        {
+            return ctx.MakeRectangle(this, this);
+        }
+
+        public virtual Point GetCenter()
+        {
+            return this;
+        }
+
+        public virtual Circle GetBuffered(double distance, SpatialContext ctx)
+        {
+            return ctx.MakeCircle(this, distance);
+        }
+
+        public virtual SpatialRelation Relate(Shape other)
 		{
-			if (other is Point)
+            if (IsEmpty || other.IsEmpty)
+                return SpatialRelation.DISJOINT;
+            if (other is Point)
 				return this.Equals(other) ? SpatialRelation.INTERSECTS : SpatialRelation.DISJOINT;
 			return other.Relate(this).Transpose();
 		}
 
-		public Rectangle GetBoundingBox()
-		{
-		    return ctx.MakeRectangle(this, this);
-		}
+        public virtual bool HasArea()
+        {
+            return false;
+        }
 
-		public bool HasArea()
-		{
-			return false;
-		}
-
-		public Point GetCenter()
-		{
-			return this;
-		}
-
-		public double GetX()
-		{
-			return x;
-		}
-
-		public double GetY()
-		{
-			return y;
-		}
-
-	    public double GetArea(SpatialContext ctx)
+        public virtual double GetArea(SpatialContext ctx)
 		{
 			return 0;
 		}

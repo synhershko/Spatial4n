@@ -39,17 +39,27 @@ namespace Spatial4n.Core.Distance
 		/// <returns></returns>
 		double Distance(Point from, double toX, double toY);
 
-	    /// <summary>
-	    /// Calculates where a destination point is given an origin (<code>from</code>)
-	    /// distance, and bearing (given in degrees -- 0-360).
-	    /// </summary>
-	    /// <param name="from"></param>
-	    /// <param name="distDEG"></param>
-	    /// <param name="bearingDEG"></param>
-	    /// <param name="ctx"></param>
-	    /// <param name="reuse"> </param>
-	    /// <returns></returns>
-	    Point PointOnBearing(Point from, double distDEG, double bearingDEG, SpatialContext ctx, Point reuse);
+        /// <summary>
+        /// Returns true if the distance between from and to is &lt;= distance.
+        /// </summary>
+        /// <param name="from"></param>
+        /// <param name="toX"></param>
+        /// <param name="toY"></param>
+        /// <param name="distance"></param>
+        /// <returns></returns>
+        bool Within(Point from, double toX, double toY, double distance);
+
+        /// <summary>
+        /// Calculates where a destination point is given an origin (<code>from</code>)
+        /// distance, and bearing (given in degrees -- 0-360).
+        /// </summary>
+        /// <param name="from"></param>
+        /// <param name="distDEG"></param>
+        /// <param name="bearingDEG"></param>
+        /// <param name="ctx"></param>
+        /// <param name="reuse"> </param>
+        /// <returns></returns>
+        Point PointOnBearing(Point from, double distDEG, double bearingDEG, SpatialContext ctx, Point reuse);
 
 		/// <summary>
 		/// Calculates the bounding box of a circle, as specified by its center point

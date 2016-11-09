@@ -19,20 +19,18 @@ using Spatial4n.Core.Context;
 
 namespace Spatial4n.Core.Shapes
 {
-	/// <summary>
-	/// The base interface defining a geometric shape. Shape instances are usually
-	/// retrieved via one of the create* methods on a {@link SpatialContext}. Shapes
-	/// are generally immutable(*). The sub-classes of Shape generally implement the
-	/// same contract for {@link Object#equals(Object)} and {@link Object#hashCode()}
-	/// amongst the same sub-interface type.  This means, for example, that multiple
-	/// Point implementations of different classes are equal if they share the same x
-	/// & y.
-	/// <p/>
-	/// (*): If a particular shape has a <code>reset(...)</code> method then its use
-	/// means the shape is actually mutable. Mutating shape state is considered
-	/// expert and should be done with care.
-	/// </summary>
-	public interface Shape
+    /// <summary>
+    /// The base interface defining a geometric shape. Shape instances should be
+    /// instantiated via one of the create* methods on a {@link SpatialContext} or
+    /// by reading WKT which calls those methods; they should <em>not</em> be
+    /// created directly.
+    /// <para>
+    /// Shapes are generally immutable and thread-safe. If a particular shape has a
+    /// <code>Reset(...)</code> method then its use means the shape is actually
+    /// mutable. Mutating shape state is considered expert and should be done with care.
+    /// </para>
+    /// </summary>
+    public interface Shape
 	{
 	    /// <summary>
 	    /// Describe the relationship between the two objects.  For example
@@ -88,5 +86,30 @@ namespace Spatial4n.Core.Shapes
 		/// </summary>
 		/// <returns></returns>
 		Point GetCenter();
-	}
+
+        /// <summary>
+        /// Returns a buffered version of this shape.  The buffer is usually a
+        /// rounded-corner buffer, although some shapes might buffer differently. This
+        /// is an optional operation.
+        /// </summary>
+        /// <param name="distance"></param>
+        /// <param name="ctx"></param>
+        /// <returns>Not null, and the returned shape should contain the current shape.</returns>
+        Shape GetBuffered(double distance, SpatialContext ctx);
+
+        /// <summary>
+        /// Shapes can be "empty", which is to say it exists nowhere. The underlying coordinates are
+        /// typically NaN.
+        /// </summary>
+        bool IsEmpty { get; }
+
+        /// <summary>
+        /// The sub-classes of Shape generally implement the
+        /// same contract for <see cref="object.Equals(object)"/> and <see cref="object.GetHashCode()"/>
+        /// amongst the same sub-interface type.  This means, for example, that multiple
+        /// Point implementations of different classes are equal if they share the same x
+        /// & y.
+        /// </summary>
+        bool Equals(object other);
+    }
 }

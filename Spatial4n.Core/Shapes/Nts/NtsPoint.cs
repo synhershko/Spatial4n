@@ -19,85 +19,101 @@ using System;
 using GeoAPI.Geometries;
 using Spatial4n.Core.Context;
 using Spatial4n.Core.Shapes.Impl;
+using System.Diagnostics;
 
 namespace Spatial4n.Core.Shapes.Nts
 {
 	/// <summary>
-	/// Wraps a {@link com.vividsolutions.jts.geom.Point}.
+	/// Wraps a <see cref="NetTopologySuite.Geometries.Point"/> {@link com.vividsolutions.jts.geom.Point}.
 	/// </summary>
 	public class NtsPoint : Point
 	{
-		private readonly IPoint pointGeom;
-	    private readonly SpatialContext ctx;
+        private readonly SpatialContext ctx;
+        private readonly GeoAPI.Geometries.IPoint pointGeom;
+        private readonly bool empty;//cached
 
 	    /// <summary>
 	    /// A simple constructor without normalization / validation.
 	    /// </summary>
 	    /// <param name="pointGeom"></param>
 	    /// <param name="ctx"> </param>
-	    public NtsPoint(IPoint pointGeom, SpatialContext ctx)
+	    public NtsPoint(GeoAPI.Geometries.IPoint pointGeom, SpatialContext ctx)
 	    {
-	        this.pointGeom = pointGeom;
-	        this.ctx = ctx;
-	    }
+            this.ctx = ctx;
+            this.pointGeom = pointGeom;
+            this.empty = pointGeom.IsEmpty;
+        }
 
-	    public IPoint GetGeom()
+	    public virtual GeoAPI.Geometries.IPoint GetGeom()
 		{
 			return pointGeom;
 		}
 
-		public Point GetCenter()
+        public virtual bool IsEmpty
+        {
+            get { return empty; }
+        }
+
+        public virtual Spatial4n.Core.Shapes.Point GetCenter()
 		{
 			return this;
 		}
 
-		public bool HasArea()
+		public virtual bool HasArea()
 		{
 			return false;
 		}
 
-		public double GetArea(SpatialContext ctx)
+		public virtual double GetArea(SpatialContext ctx)
 		{
 			return 0;
 		}
 
-		public Rectangle GetBoundingBox()
+		public virtual Rectangle GetBoundingBox()
 		{
             return ctx.MakeRectangle(this, this);
 		}
 
-		public SpatialRelation Relate(Shape other)
+        public virtual Circle GetBuffered(double distance, SpatialContext ctx)
+        {
+            return ctx.MakeCircle(this, distance);
+        }
+
+        public virtual SpatialRelation Relate(Shape other)
 		{
-			// ** NOTE ** the overall order of logic is kept consistent here with simple.PointImpl.
-			if (other is Point)
+            // ** NOTE ** the overall order of logic is kept consistent here with simple.PointImpl.
+            if (IsEmpty || other.IsEmpty)
+                return SpatialRelation.DISJOINT;
+            if (other is Spatial4n.Core.Shapes.Point)
 				return this.Equals(other) ? SpatialRelation.INTERSECTS : SpatialRelation.DISJOINT;
 			return other.Relate(this).Transpose();
 		}
 
-		public double GetX()
+		public virtual double GetX()
 		{
-			return pointGeom.X;
+            return IsEmpty ? double.NaN : pointGeom.X;
+        }
+
+		public virtual double GetY()
+		{
+            return IsEmpty ? double.NaN : pointGeom.Y;
 		}
 
-		public double GetY()
-		{
-			return pointGeom.Y;
-		}
-
-	    public void Reset(double x, double y)
+	    public virtual void Reset(double x, double y)
 	    {
+            Debug.Assert(!IsEmpty);
             var cSeq = pointGeom.CoordinateSequence;
             cSeq.SetOrdinate(0, Ordinate.X, x);
             cSeq.SetOrdinate(0, Ordinate.Y, y);
 	    }
 
 
-	    public override String ToString()
+	    public override string ToString()
 		{
 			return string.Format("Pt(x={0:0.0},y={1:0.0})", GetX(), GetY());
 		}
 
-		public override bool Equals(Object o)
+		public override bool Equals(object o)
 		{
 			return PointImpl.Equals(this, o);
 		}

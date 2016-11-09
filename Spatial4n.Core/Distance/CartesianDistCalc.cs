@@ -34,26 +34,36 @@ namespace Spatial4n.Core.Distance
 			squared = false;
 		}
 
-		public CartesianDistCalc(bool squared)
+        /**
+   * @param squared Set to true to have {@link #distance(com.spatial4j.core.shape.Point, com.spatial4j.core.shape.Point)}
+   *                return the square of the correct answer. This is a
+   *                performance optimization used when sorting in which the
+   *                actual distance doesn't matter so long as the sort order is
+   *                consistent.
+   */
+        public CartesianDistCalc(bool squared)
 		{
 			this.squared = squared;
 		}
 
 		public override double Distance(Point from, double toX, double toY)
 		{
-			double result = 0;
+            double deltaX = from.GetX() - toX;
+            double deltaY = from.GetY() - toY;
+            double xSquaredPlusYSquared = deltaX * deltaX + deltaY * deltaY;
 
-			double v = from.GetX() - toX;
-			result += (v * v);
+            if (squared)
+                return xSquaredPlusYSquared;
 
-			v = from.GetY() - toY;
-			result += (v * v);
+            return Math.Sqrt(xSquaredPlusYSquared);
+        }
 
-			if (squared)
-				return result;
-
-			return Math.Sqrt(result);
-		}
+        public override bool Within(Point from, double toX, double toY, double distance)
+        {
+            double deltaX = from.GetX() - toX;
+            double deltaY = from.GetY() - toY;
+            return deltaX * deltaX + deltaY * deltaY <= distance * distance;
+        }
 
         public override Point PointOnBearing(Point from, double distDEG, double bearingDEG, SpatialContext ctx, Point reuse)
         {

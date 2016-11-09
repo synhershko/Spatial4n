@@ -23,6 +23,7 @@ using Spatial4n.Core.Exceptions;
 using Spatial4n.Core.Io;
 using Spatial4n.Core.Shapes;
 using Spatial4n.Core.Shapes.Impl;
+using System.Collections.Generic;
 
 namespace Spatial4n.Core.Context
 {
@@ -42,78 +43,109 @@ namespace Spatial4n.Core.Context
 		/// <summary>
 		/// A popular default SpatialContext implementation for geospatial.
 		/// </summary>
-		public static readonly SpatialContext GEO = new SpatialContext(true);
+		public static readonly SpatialContext GEO = new SpatialContext(new SpatialContextFactory());
 
 		//These are non-null
 		private readonly bool geo;
 		private readonly DistanceCalculator calculator;
 		private readonly Rectangle worldBounds;
 
-		private readonly ShapeReadWriter shapeReadWriter;
+        private readonly WktShapeParser wktShapeParser;
+        private readonly BinaryCodec binaryCodec;
 
-		protected virtual ShapeReadWriter MakeShapeReadWriter()
-		{
-			return new ShapeReadWriter(this);
-		}
+        private readonly bool normWrapLongitude;
 
-		[Obsolete]
-		public Shape ReadShape(String value)
-		{
-			return shapeReadWriter.ReadShape(value);
-		}
 
-		[Obsolete]
-		public String ToString(Shape shape)
-		{
-			return shapeReadWriter.WriteShape(shape);
-		}
 
-		/// <summary>
-		/// 
-		/// </summary>
-		/// <param name="geo">Establishes geo vs cartesian / Euclidean.</param>
-		/// <param name="calculator">Optional; defaults to Haversine or cartesian depending on units.</param>
-		/// <param name="worldBounds">Optional; defaults to GEO_WORLDBOUNDS or MAX_WORLDBOUNDS depending on units.</param> 
-		public SpatialContext(bool geo, DistanceCalculator calculator, Rectangle worldBounds)
-		{
-			this.geo = geo;
 
-			if (calculator == null)
-			{
-				calculator = IsGeo()
-					? (DistanceCalculator)new GeodesicSphereDistCalc.Haversine()
-					: new CartesianDistCalc();
-			}
-			this.calculator = calculator;
+        /// <summary>
+        /// Consider using <see cref="SpatialContextFactory"/> instead.
+        /// </summary>
+        /// <param name="geo">Establishes geo vs cartesian / Euclidean.</param>
+        /// <param name="calculator">Optional; defaults to Haversine or cartesian depending on units.</param>
+        /// <param name="worldBounds">Optional; defaults to GEO_WORLDBOUNDS or MAX_WORLDBOUNDS depending on units.</param> 
+        [Obsolete]
+        public SpatialContext(bool geo, DistanceCalculator calculator, Rectangle worldBounds)
+            : this(InitFromLegacyConstructor(geo, calculator, worldBounds))
+        { }
 
-			if (worldBounds == null)
-			{
-				worldBounds = IsGeo() ?
-                    new RectangleImpl(-180, 180, -90, 90, this)
-                    : new RectangleImpl(-Double.MaxValue, Double.MaxValue,-Double.MaxValue, Double.MaxValue, this);
-			}
-			else
-			{
-				if (IsGeo())
-					Debug.Assert(worldBounds.Equals(new RectangleImpl(-180, 180, -90, 90, this)));
-				if (worldBounds.GetCrossesDateLine())
-					throw new ArgumentException("worldBounds shouldn't cross dateline: " + worldBounds, "worldBounds");
-			}
-			//hopefully worldBounds' rect implementation is compatible
-			this.worldBounds = new RectangleImpl(worldBounds, this);
+        private static SpatialContextFactory InitFromLegacyConstructor(bool geo,
+                                                                 DistanceCalculator calculator,
+                                                                 Rectangle worldBounds)
+        {
+            SpatialContextFactory factory = new SpatialContextFactory();
+            factory.geo = geo;
+            factory.distCalc = calculator;
+            factory.worldBounds = worldBounds;
+            return factory;
+        }
 
-			shapeReadWriter = MakeShapeReadWriter();
-		}
+        [Obsolete]
+        public SpatialContext(bool geo)
+            : this(geo, null, null)
+        {
+        }
 
-		public SpatialContext(bool geo)
-			: this(geo, null, null)
-		{
-		}
+        /**
+   * Called by {@link com.spatial4j.core.context.SpatialContextFactory#newSpatialContext()}.
+   */
+        public SpatialContext(SpatialContextFactory factory)
+        {
+            this.geo = factory.geo;
 
+            if (factory.distCalc == null)
+            {
+                this.calculator = IsGeo()
+                        ? (DistanceCalculator)new GeodesicSphereDistCalc.Haversine()
+                        : new CartesianDistCalc();
+            }
+            else
+            {
+                this.calculator = factory.distCalc;
+            }
+
+            //TODO remove worldBounds from Spatial4j: see Issue #55
+            Rectangle bounds = factory.worldBounds;
+            if (bounds == null)
+            {
+                this.worldBounds = IsGeo()
+                        ? new RectangleImpl(-180, 180, -90, 90, this)
+                        : new RectangleImpl(-double.MaxValue, double.MaxValue,
+                        -double.MaxValue, double.MaxValue, this);
+            }
+            else
+            {
+                if (IsGeo() && !bounds.Equals(new RectangleImpl(-180, 180, -90, 90, this)))
+                    throw new ArgumentException("for geo (lat/lon), bounds must be " + GEO.GetWorldBounds());
+                if (bounds.GetMinX() > bounds.GetMaxX())
+                    throw new ArgumentException("worldBounds minX should be <= maxX: " + bounds);
+                if (bounds.GetMinY() > bounds.GetMaxY())
+                    throw new ArgumentException("worldBounds minY should be <= maxY: " + bounds);
+                //hopefully worldBounds' rect implementation is compatible
+                this.worldBounds = new RectangleImpl(bounds, this);
+            }
+
+            this.normWrapLongitude = factory.normWrapLongitude && this.IsGeo();
+            this.wktShapeParser = factory.MakeWktShapeParser(this);
+            this.binaryCodec = factory.MakeBinaryCodec(this);
+        }
+       
 		public DistanceCalculator GetDistCalc()
 		{
 			return calculator;
 		}
+
+        /** Convenience that uses {@link #getDistCalc()} */
+        public double CalcDistance(Point p, double x2, double y2)
+        {
+            return GetDistCalc().Distance(p, x2, y2);
+        }
+
+        /** Convenience that uses {@link #getDistCalc()} */
+        public double CalcDistance(Point p, Point p2)
+        {
+            return GetDistCalc().Distance(p, p2);
+        }
 
         /// <summary>
         /// The extent of x & y coordinates should fit within the return'ed rectangle.
@@ -125,14 +157,34 @@ namespace Spatial4n.Core.Context
 			return worldBounds;
 		}
 
-		/// <summary>
-		/// Is this a geospatial context (true) or simply 2d spatial (false).
-		/// </summary>
-		/// <returns></returns>
-		public bool IsGeo()
+        /** If true then {@link #normX(double)} will wrap longitudes outside of the standard
+        * geodetic boundary into it. Example: 181 will become -179. */
+        public bool IsNormWrapLongitude()
+        {
+            return normWrapLongitude;
+        }
+
+        /// <summary>
+        /// Is this a geospatial context (true) or simply 2d spatial (false).
+        /// </summary>
+        /// <returns></returns>
+        public bool IsGeo()
 		{
 			return geo;
 		}
+
+        /** Normalize the 'x' dimension. Might reduce precision or wrap it to be within the bounds. This
+   * is called by {@link com.spatial4j.core.io.WktShapeParser} before creating a shape. */
+        public double NormX(double x)
+        {
+            if (normWrapLongitude)
+                x = DistanceUtils.NormLonDEG(x);
+            return x;
+        }
+
+        /** Normalize the 'y' dimension. Might reduce precision or wrap it to be within the bounds. This
+         * is called by {@link com.spatial4j.core.io.WktShapeParser} before creating a shape. */
+        public double NormY(double y) { return y; }
 
         /// <summary>
         /// Ensure fits in {@link #getWorldBounds()}
@@ -141,7 +193,7 @@ namespace Spatial4n.Core.Context
         public void VerifyX(double x)
         {
             Rectangle bounds = GetWorldBounds();
-            if (!(x >= bounds.GetMinX() && x <= bounds.GetMaxX())) //NaN will fail
+            if (x < bounds.GetMinX() || x > bounds.GetMaxX()) //NaN will fail
                 throw new InvalidShapeException("Bad X value " + x + " is not in boundary " + bounds);
         }
 
@@ -152,7 +204,7 @@ namespace Spatial4n.Core.Context
         public void VerifyY(double y)
         {
             Rectangle bounds = GetWorldBounds();
-            if (!(y >= bounds.GetMinY() && y <= bounds.GetMaxY())) //NaN will fail
+            if (y < bounds.GetMinY() || y > bounds.GetMaxY()) //NaN will fail
                 throw new InvalidShapeException("Bad Y value " + y + " is not in boundary " + bounds);
         }
 
@@ -195,7 +247,7 @@ namespace Spatial4n.Core.Context
 	    {
 	        Rectangle bounds = GetWorldBounds();
 	        // Y
-	        if (!(minY >= bounds.GetMinY() && maxY <= bounds.GetMaxY())) //NaN will fail
+	        if (minY < bounds.GetMinY() || maxY > bounds.GetMaxY()) //NaN will fail
 	            throw new InvalidShapeException("Y values [" + minY + " to " + maxY + "] not in boundary " + bounds);
 	        if (minY > maxY)
 	            throw new InvalidShapeException("maxY must be >= minY: " + minY + " to " + maxY);
@@ -219,7 +271,7 @@ namespace Spatial4n.Core.Context
 	        }
 	        else
 	        {
-	            if (!(minX >= bounds.GetMinX() && maxX <= bounds.GetMaxX())) //NaN will fail
+	            if (minX < bounds.GetMinX() || maxX > bounds.GetMaxX()) //NaN will fail
 	                throw new InvalidShapeException("X values [" + minX + " to " + maxX + "] not in boundary " + bounds);
 	            if (minX > maxX)
 	                throw new InvalidShapeException("maxX must be >= minX: " + minX + " to " + maxX);
@@ -251,9 +303,13 @@ namespace Spatial4n.Core.Context
 		        throw new InvalidShapeException("distance must be >= 0; got " + distance);
 		    if (IsGeo())
 		    {
-		        if (distance > 180)
-		            throw new InvalidShapeException("distance must be <= 180; got " + distance);
-		        return new GeoCircle(point, distance, this);
+                if (distance > 180)
+                {
+                    // (it's debatable whether to error or not)
+                    //throw new InvalidShapeException("distance must be <= 180; got " + distance);
+                    distance = 180;
+                }
+                return new GeoCircle(point, distance, this);
 		    }
 		    else
 		    {
@@ -261,7 +317,76 @@ namespace Spatial4n.Core.Context
 		    }
 		}
 
-	    public override String ToString()
+        /** Constructs a line string. It's an ordered sequence of connected vertexes. There
+   * is no official shape/interface for it yet so we just return Shape. */
+        public Shape MakeLineString(List<Point> points)
+        {
+            return new BufferedLineString(points, 0, false, this);
+        }
+
+        /** Constructs a buffered line string. It's an ordered sequence of connected vertexes,
+         * with a buffer distance along the line in all directions. There
+         * is no official shape/interface for it so we just return Shape. */
+        public Shape MakeBufferedLineString(List<Point> points, double buf)
+        {
+            return new BufferedLineString(points, buf, IsGeo(), this);
+        }
+
+        /** Construct a ShapeCollection, analogous to an OGC GeometryCollection. */
+        public ShapeCollection<S> MakeCollection<S>(List<S> coll) where S : Shape
+        {
+            return new ShapeCollection<S>(coll, this);
+        }
+
+        /** The {@link com.spatial4j.core.io.WktShapeParser} used by {@link #readShapeFromWkt(String)}. */
+        public WktShapeParser getWktShapeParser()
+        {
+            return wktShapeParser;
+        }
+
+        /** Reads a shape from the string formatted in WKT.
+   * @see com.spatial4j.core.io.WktShapeParser
+   * @param wkt non-null WKT.
+   * @return non-null
+   * @throws ParseException if it failed to parse.
+   */
+        public Shape ReadShapeFromWkt(string wkt) 
+        {
+            return wktShapeParser.Parse(wkt);
+        }
+
+        public BinaryCodec BinaryCodec
+        { 
+            get { return binaryCodec; }
+        }
+
+        [Obsolete]
+        public Shape ReadShape(string value)
+        {
+            Shape s = LegacyShapeReadWriterFormat.ReadShapeOrNull(value, this);
+            if (s == null)
+            {
+                try
+                {
+                    s = ReadShapeFromWkt(value);
+                }
+                catch (FormatException e) // In java this was ParseException
+                {
+                    if (e.InnerException is InvalidShapeException)
+                        throw (InvalidShapeException)e.InnerException;
+                    throw new InvalidShapeException(e.ToString(), e);
+                }
+            }
+            return s;
+        }
+
+        [Obsolete]
+        public string ToString(Shape shape)
+        {
+            return LegacyShapeReadWriterFormat.WriteShape(shape);
+        }
+
+        public override string ToString()
 		{
 			if (this.Equals(GEO))
 				return GEO.GetType().Name + ".GEO";

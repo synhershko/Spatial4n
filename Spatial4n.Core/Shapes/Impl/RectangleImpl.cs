@@ -54,16 +54,128 @@ namespace Spatial4n.Core.Shapes.Impl
 
         public void Reset(double minX, double maxX, double minY, double maxY)
         {
+            Debug.Assert(!IsEmpty);
             this.minX = minX;
             this.maxX = maxX;
             this.minY = minY;
             this.maxY = maxY;
-            Debug.Assert(minY <= maxY);
+            Debug.Assert(minY <= maxY || double.IsNaN(minY), "minY, maxY: " + minY + ", " + maxY);
         }
 
-	    public SpatialRelation Relate(Shape other)
+        public virtual bool IsEmpty
+        {
+            get { return double.IsNaN(minX); }
+        }
+
+        public virtual Rectangle GetBuffered(double distance, SpatialContext ctx)
+        {
+            if (ctx.IsGeo())
+            {
+                //first check pole touching, triggering a world-wrap rect
+                if (maxY + distance >= 90)
+                {
+                    return ctx.MakeRectangle(-180, 180, Math.Max(-90, minY - distance), 90);
+                }
+                else if (minY - distance <= -90)
+                {
+                    return ctx.MakeRectangle(-180, 180, -90, Math.Min(90, maxY + distance));
+                }
+                else
+                {
+                    //doesn't touch pole
+                    double latDistance = distance;
+                    double closestToPoleY = (maxY - minY > 0) ? maxY : minY;
+                    double lonDistance = DistanceUtils.CalcBoxByDistFromPt_deltaLonDEG(
+                        closestToPoleY, minX, distance);//lat,lon order
+                                                        //could still wrap the world though...
+                    if (lonDistance * 2 + GetWidth() >= 360)
+                        return ctx.MakeRectangle(-180, 180, minY - latDistance, maxY + latDistance);
+                    return ctx.MakeRectangle(
+                        DistanceUtils.NormLonDEG(minX - lonDistance),
+                        DistanceUtils.NormLonDEG(maxX + lonDistance),
+                        minY - latDistance, maxY + latDistance);
+                }
+            }
+            else
+            {
+                Rectangle worldBounds = ctx.GetWorldBounds();
+                double newMinX = Math.Max(worldBounds.GetMinX(), minX - distance);
+                double newMaxX = Math.Min(worldBounds.GetMaxX(), maxX + distance);
+                double newMinY = Math.Max(worldBounds.GetMinY(), minY - distance);
+                double newMaxY = Math.Min(worldBounds.GetMaxY(), maxY + distance);
+                return ctx.MakeRectangle(newMinX, newMaxX, newMinY, newMaxY);
+            }
+        }
+
+        public virtual bool HasArea()
+        {
+            return maxX != minX && maxY != minY;
+        }
+
+        public virtual double GetArea(SpatialContext ctx)
+        {
+            if (ctx == null)
+            {
+                return GetWidth() * GetHeight();
+            }
+            else
+            {
+                return ctx.GetDistCalc().Area(this);
+            }
+        }
+
+        public virtual bool GetCrossesDateLine()
+        {
+            return (minX > maxX);
+        }
+
+        public virtual double GetHeight()
+        {
+            return maxY - minY;
+        }
+
+        public virtual double GetWidth()
+        {
+            double w = maxX - minX;
+            if (w < 0)
+            {
+                //only true when minX > maxX (WGS84 assumed)
+                w += 360;
+                Debug.Assert(w >= 0);
+            }
+            return w;
+        }
+
+        public virtual double GetMaxX()
+        {
+            return maxX;
+        }
+
+        public virtual double GetMaxY()
+        {
+            return maxY;
+        }
+
+        public virtual double GetMinX()
+        {
+            return minX;
+        }
+
+        public virtual double GetMinY()
+        {
+            return minY;
+        }
+
+        public virtual Rectangle GetBoundingBox()
+        {
+            return this;
+        }
+
+        public virtual SpatialRelation Relate(Shape other)
 		{
-			var point = other as Point;
+            if (IsEmpty || other.IsEmpty)
+                return SpatialRelation.DISJOINT;
+            var point = other as Point;
 			if (point != null)
 			{
 				return Relate(point);
@@ -76,7 +188,7 @@ namespace Spatial4n.Core.Shapes.Impl
 			return other.Relate(this).Transpose();
 		}
 
-		public SpatialRelation Relate(Point point)
+		public virtual SpatialRelation Relate(Point point)
 		{
 			if (point.GetY() > GetMaxY() || point.GetY() < GetMinY())
 				return SpatialRelation.DISJOINT;
@@ -109,7 +221,7 @@ namespace Spatial4n.Core.Shapes.Impl
 			return SpatialRelation.CONTAINS;
 		}
 
-		public SpatialRelation Relate(Rectangle rect)
+		public virtual SpatialRelation Relate(Rectangle rect)
 		{
 			SpatialRelation yIntersect = RelateYRange(rect.GetMinY(), rect.GetMaxY());
 			if (yIntersect == SpatialRelation.DISJOINT)
@@ -129,79 +241,6 @@ namespace Spatial4n.Core.Shapes.Impl
 				return xIntersect;
 
 			return SpatialRelation.INTERSECTS;
-		}
-
-		public Rectangle GetBoundingBox()
-		{
-			return this;
-		}
-
-		public bool HasArea()
-		{
-			return maxX != minX && maxY != minY;
-		}
-
-		public Point GetCenter()
-		{
-			double y = GetHeight() / 2 + minY;
-			double x = GetWidth() / 2 + minX;
-			if (minX > maxX)//WGS84
-				x = DistanceUtils.NormLonDEG(x); //in case falls outside the standard range
-			return new PointImpl(x, y, ctx);
-		}
-
-		public double GetWidth()
-		{
-			double w = maxX - minX;
-			if (w < 0)
-			{
-				//only true when minX > maxX (WGS84 assumed)
-				w += 360;
-				//assert w >= 0;
-			}
-			return w;
-		}
-
-		public double GetHeight()
-		{
-			return maxY - minY;
-		}
-
-		public double GetMinX()
-		{
-			return minX;
-		}
-
-		public double GetMinY()
-		{
-			return minY;
-		}
-
-		public double GetMaxX()
-		{
-			return maxX;
-		}
-
-		public double GetMaxY()
-		{
-			return maxY;
-		}
-
-		public double GetArea(SpatialContext ctx)
-		{
-			if (ctx == null)
-			{
-				return GetWidth()*GetHeight();
-			}
-			else
-			{
-				return ctx.GetDistCalc().Area(this);
-			}
-		}
-
-		public bool GetCrossesDateLine()
-		{
-			return (minX > maxX);
 		}
 
 		private static SpatialRelation Relate_Range(double int_min, double int_max, double ext_min, double ext_max)
@@ -274,7 +313,18 @@ namespace Spatial4n.Core.Shapes.Impl
 			return "Rect(minX=" + minX + ",maxX=" + maxX + ",minY=" + minY + ",maxY=" + maxY + ")";
 		}
 
-		public override bool Equals(object obj)
+        public virtual Point GetCenter()
+        {
+            if (double.IsNaN(minX))
+                return ctx.MakePoint(double.NaN, double.NaN);
+            double y = GetHeight() / 2 + minY;
+            double x = GetWidth() / 2 + minX;
+            if (minX > maxX)//WGS84
+                x = DistanceUtils.NormLonDEG(x); //in case falls outside the standard range
+            return new PointImpl(x, y, ctx);
+        }
+
+        public override bool Equals(object obj)
 		{
 			return Equals(this, obj);
 		}
@@ -285,7 +335,7 @@ namespace Spatial4n.Core.Shapes.Impl
 		/// <param name="thiz"></param>
 		/// <param name="o"></param>
 		/// <returns></returns>
-		public static bool Equals(Rectangle thiz, Object o)
+		public static bool Equals(Rectangle thiz, object o)
 		{
 			if (thiz == null)
 				throw new ArgumentNullException("thiz");

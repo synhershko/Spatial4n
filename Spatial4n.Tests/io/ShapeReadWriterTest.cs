@@ -22,13 +22,13 @@ namespace Spatial4n.Tests.io
 
 		private T WriteThenRead<T>(T s, SpatialContext ctx) where T : Shape
 		{
-			String buff = ctx.ToString(s);
+			string buff = ctx.ToString(s);
 			return (T)ctx.ReadShape(buff);
 		}
 
 		[Theory]
 		[PropertyData("Contexts")]
-		public void testPoint(SpatialContext ctx)
+		public virtual void TestPoint(SpatialContext ctx)
 		{
 			Shape s = ctx.ReadShape("10 20");
 			Assert.Equal(ctx.MakePoint(10, 20), s);
@@ -40,7 +40,7 @@ namespace Spatial4n.Tests.io
 
 		[Theory]
 		[PropertyData("Contexts")]
-		public void testRectangle(SpatialContext ctx)
+		public virtual void TestRectangle(SpatialContext ctx)
 		{
 			Shape s = ctx.ReadShape("-10 -20 10 20");
 			Assert.Equal(ctx.MakeRectangle(-10, 10, -20, 20), s);
@@ -50,7 +50,7 @@ namespace Spatial4n.Tests.io
 
 		[Theory]
 		[PropertyData("Contexts")]
-		public void testCircle(SpatialContext ctx)
+		public virtual void TestCircle(SpatialContext ctx)
 		{
 			Shape s = ctx.ReadShape("Circle(1.23 4.56 distance=7.89)");
 			Assert.Equal(ctx.MakeCircle(1.23, 4.56, 7.89), s);
@@ -61,7 +61,7 @@ namespace Spatial4n.Tests.io
 
         [Theory]
         [PropertyData("Contexts")]
-        public void testCircleWithCriticalCulture(SpatialContext ctx)
+        public virtual void TestCircleWithCriticalCulture(SpatialContext ctx)
         {
             using (new TemporaryCulture(new CultureInfo("de-DE")))
             {

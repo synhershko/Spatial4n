@@ -58,7 +58,7 @@ namespace Spatial4n.Core.Shapes
 		/// Postcondition: <code>this.getBoundingBox().relate(this) == CONTAINS</code>
 		/// </summary>
 		/// <returns></returns>
-		Rectangle GetBoundingBox();
+		Rectangle GetBoundingBox(); // TODO: Make into property
 
 		/// <summary>
 		/// Does the shape have area?  This will be false for points and lines. It will
@@ -67,16 +67,16 @@ namespace Spatial4n.Core.Shapes
 		/// rectangle with no height or no width).
 		/// </summary>
 		/// <returns></returns>
-		bool HasArea();
+		bool HasArea();// TODO: Make into property
 
-		/// <summary>
-		/// Calculates the area of the shape in the units of {@link
-		/// com.spatial4j.core.distance.DistanceUnits}. If ctx is null then simple
-		/// Euclidean calculations will be used.  This figure can be an estimate.
-		/// </summary>
-		/// <param name="ctx"></param>
-		/// <returns></returns>
-		double GetArea(SpatialContext ctx);
+        /// <summary>
+        /// Calculates the area of the shape in the units of {@link
+        /// com.spatial4j.core.distance.DistanceUnits}. If ctx is null then simple
+        /// Euclidean calculations will be used.  This figure can be an estimate.
+        /// </summary>
+        /// <param name="ctx"></param>
+        /// <returns></returns>
+        double GetArea(SpatialContext ctx);
 
 		/// <summary>
 		/// Returns the center point of this shape. This is usually the same as

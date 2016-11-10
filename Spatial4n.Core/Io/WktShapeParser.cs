@@ -1,11 +1,13 @@
-﻿using GeoAPI.IO;
-using Spatial4n.Core.Context;
+﻿using Spatial4n.Core.Context;
+using Spatial4n.Core.Exceptions;
 using Spatial4n.Core.Shapes;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace Spatial4n.Core.Io
 {
@@ -40,7 +42,7 @@ namespace Spatial4n.Core.Io
             if (shape != null)
                 return shape;
             string shortenedString = (wktString.Length <= 128 ? wktString : wktString.Substring(0, (128 - 3) - 0) + "...");
-            throw new ParseException("Unknown Shape definition [" + shortenedString + "]"/*, 0*/);
+            throw new ParseException("Unknown Shape definition [" + shortenedString + "]", 0);
         }
 
         /**
@@ -74,23 +76,23 @@ namespace Spatial4n.Core.Io
             }
             catch (Exception e)
             {//most likely InvalidShapeException
-                ParseException pe = new ParseException(e.ToString()/*, state.offset*/);
+                ParseException pe = new ParseException(e.ToString(), state.offset);
                 //pe.initCause(e);
                 throw pe;
             }
             if (result != null && !state.Eof)
-                throw new ParseException("end of shape expected"/*, state.offset*/);
+                throw new ParseException("end of shape expected", state.offset);
             return result;
         }
 
         /** (internal) Creates a new State with the given String. It's only called by
          * {@link #parseIfSupported(String)}. This is an extension point for subclassing. */
-        protected virtual State NewState(string wktString)
+        protected internal virtual State NewState(string wktString)
         {
             //NOTE: if we wanted to re-use old States to reduce object allocation, we might do that
             // here. But in the scheme of things, it doesn't seem worth the bother as it complicates the
             // thread-safety story of the API for too little of a gain.
-            return new State(wktString);
+            return new State(this, wktString);
         }
 
         /**
@@ -113,7 +115,7 @@ namespace Spatial4n.Core.Io
          * @param shapeType Non-Null string; could have mixed case. The first character is a letter.
          * @return The shape or null if not supported / unknown.
          */
-        protected virtual Shape ParseShapeByType(State state, string shapeType)
+        protected internal virtual Shape ParseShapeByType(State state, string shapeType)
         {
             Debug.Assert(char.IsLetter(shapeType[0]), "Shape must start with letter: " + shapeType);
 
@@ -206,8 +208,9 @@ namespace Spatial4n.Core.Io
         protected virtual Shape ParseMultiPointShape(State state)
         {
             if (state.NextIfEmptyAndSkipZM())
-                return ctx.MakeCollection(new List<Point>());
-            List<Point> shapes = new List<Point>();
+                return ctx.MakeCollection(/*new List<Point>()*/ new List<Shape>());
+            //List<Point> shapes = new List<Point>();
+            List<Shape> shapes = new List<Shape>();
             state.NextExpect('(');
             do
             {
@@ -311,7 +314,7 @@ namespace Spatial4n.Core.Io
             string type = state.NextWord();
             Shape shape = ParseShapeByType(state, type);
             if (shape == null)
-                throw new ParseException("Shape of type " + type + " is unknown"/*, state.offset*/);
+                throw new ParseException("Shape of type " + type + " is unknown", state.offset);
             return shape;
         }
 
@@ -353,6 +356,8 @@ namespace Spatial4n.Core.Io
         /** The parse state. */
         public class State
         {
+            private readonly WktShapeParser outerInstance;
+
             /** Set in {@link #parseIfSupported(String)}. */
             public string rawString;
             /** Offset of the next char in {@link #rawString} to be read. */
@@ -360,19 +365,22 @@ namespace Spatial4n.Core.Io
             /** Dimensionality specifier (e.g. 'Z', or 'M') following a shape type name. */
             public string dimension;
 
-            public State(string rawString)
+            public State(WktShapeParser outerInstance, string rawString)
             {
+                if (outerInstance == null)
+                    throw new ArgumentNullException("outerInstance");
+                this.outerInstance = outerInstance;
                 this.rawString = rawString;
             }
 
             public virtual SpatialContext Ctx
             {
-                get { return ctx; }
+                get { return outerInstance.ctx; }
             }
 
             public virtual WktShapeParser Parser
             {
-                get { return WktShapeParser.this; }
+                get { return outerInstance; }
             }
 
             /**
@@ -386,12 +394,13 @@ namespace Spatial4n.Core.Io
             {
                 int startOffset = offset;
                 while (offset < rawString.Length &&
-                    Character.isJavaIdentifierPart(rawString[offset]))
+                    /*Character.isJavaIdentifierPart(rawString[offset]) */
+                    IsIdentifierPartCharacter(rawString[offset]))
                 {
                     offset++;
                 }
                 if (startOffset == offset)
-                    throw new ParseException("Word expected"/*, startOffset*/);
+                    throw new ParseException("Word expected", startOffset);
                 string result = rawString.Substring(startOffset, offset - startOffset);
                 NextIfWhitespace();
                 return result;
@@ -410,7 +419,7 @@ namespace Spatial4n.Core.Io
                 if (Eof)
                     return false;
                 char c = rawString[offset];
-                if (c == '(' || !Character.isJavaIdentifierPart(c))
+                if (c == '(' || !IsIdentifierPartCharacter(rawString[offset])    /*Character.isJavaIdentifierPart(c)*/)
                     return false;
                 string word = NextWord();
                 if (word.Equals("EMPTY", StringComparison.OrdinalIgnoreCase))
@@ -421,13 +430,13 @@ namespace Spatial4n.Core.Io
                 if (Eof)
                     return false;
                 c = rawString[offset];
-                if (c == '(' || !Character.isJavaIdentifierPart(c))
+                if (c == '(' || /*!Character.isJavaIdentifierPart(c)*/ IsIdentifierPartCharacter(rawString[offset]))
                     return false;
                 word = NextWord();
                 if (word.Equals("EMPTY", StringComparison.OrdinalIgnoreCase))
                     return true;
-                throw new ParseException("Expected EMPTY because found dimension; but got [" + word + "]"/*,
-          offset*/);
+                throw new ParseException("Expected EMPTY because found dimension; but got [" + word + "]",
+                    offset);
             }
 
             /**
@@ -442,7 +451,7 @@ namespace Spatial4n.Core.Io
                 int startOffset = offset;
                 SkipDouble();
                 if (startOffset == offset)
-                    throw new ParseException("Expected a number"/*, offset*/);
+                    throw new ParseException("Expected a number", offset);
                 double result;
                 try
                 {
@@ -450,7 +459,7 @@ namespace Spatial4n.Core.Io
                 }
                 catch (Exception e)
                 {
-                    throw new ParseException(e.ToString()/*, offset*/);
+                    throw new ParseException(e.ToString(), offset);
                 }
                 NextIfWhitespace();
                 return result;
@@ -496,10 +505,10 @@ namespace Spatial4n.Core.Io
             public virtual void NextExpect(char expected)
             {
                 if (Eof)
-                    throw new ParseException("Expected [" + expected + "] found EOF"/*, offset*/);
+                    throw new ParseException("Expected [" + expected + "] found EOF", offset);
                 char c = rawString[offset];
                 if (c != expected)
-                    throw new ParseException("Expected [" + expected + "] found [" + c + "]"/*, offset*/);
+                    throw new ParseException("Expected [" + expected + "] found [" + c + "]", offset);
                 offset++;
                 NextIfWhitespace();
             }
@@ -588,10 +597,43 @@ namespace Spatial4n.Core.Io
                     }
                 }
                 if (parenStack != 0)
-                    throw new ParseException("Unbalanced parenthesis"/*, startOffset*/);
+                    throw new ParseException("Unbalanced parenthesis", startOffset);
                 return rawString.Substring(startOffset, offset - startOffset);
             }
 
+            // Was Character.isJavaIdentifierPart(char) in Java
+            // Pieced this together from the Javadoc: http://docs.oracle.com/javase/7/docs/api/java/lang/Character.html#isJavaIdentifierPart(char)
+            internal static bool IsIdentifierPartCharacter(char c)
+            {
+                if (char.IsLetterOrDigit(c)) return true;
+
+                // NOTE: char.GetUnicodeCategory throws an exception when in the range 0x00d800 to 0x00dfff
+                if (c < 0x00d800 && c > 0x00dfff)
+                {
+                    UnicodeCategory category = char.GetUnicodeCategory(c);
+
+                    return category == UnicodeCategory.CurrencySymbol ||
+                        category == UnicodeCategory.ConnectorPunctuation ||
+                        category == UnicodeCategory.LetterNumber ||
+                        category == UnicodeCategory.SpacingCombiningMark ||
+                        category == UnicodeCategory.Format ||
+                        IsIdentifierIgnorable(c);
+                }
+
+                return identifierPart.IsMatch(c.ToString()) ||
+                    IsIdentifierIgnorable(c);
+            }
+
+            internal static bool IsIdentifierIgnorable(char c)
+            {
+                return (c >= '\u0000' && c <= '\u0008') ||
+                    (c >= '\u000E' && c <= '\u001B') ||
+                    (c >= '\u007F' && c <= '\u009F') ||
+                    // NOTE: char.GetUnicodeCategory throws an exception when in the range 0x00d800 to 0x00dfff
+                    (c < 0x00d800 && c > 0x00dfff && char.GetUnicodeCategory(c) == UnicodeCategory.Format);
+            }
+
+            private static Regex identifierPart = new Regex(@"\p{Sc}|\p{Pc}|\p{Nl}|\p{Mc}", RegexOptions.Compiled);
         }//class State
     }
 }

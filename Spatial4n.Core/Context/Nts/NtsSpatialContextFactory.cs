@@ -18,6 +18,7 @@
 using GeoAPI.Geometries;
 using NetTopologySuite.Geometries;
 using NetTopologySuite.Geometries.Implementation;
+using Spatial4n.Core.Io.Nts;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -54,15 +55,15 @@ namespace Spatial4n.Core.Context.Nts
         {
             base.Init(args/*, classLoader*/);
 
-            initField("datelineRule");
-            initField("validationRule");
-            initField("autoIndex");
-            initField("allowMultiOverlap");
-            initField("useJtsPoint");
-            initField("useJtsLineString");
+            InitField("datelineRule");
+            InitField("validationRule");
+            InitField("autoIndex");
+            InitField("allowMultiOverlap");
+            InitField("useJtsPoint");
+            InitField("useJtsLineString");
 
-            String scaleStr = args["precisionScale"];
-            String modelStr = args["precisionModel"];
+            string scaleStr = args["precisionScale"];
+            string modelStr = args["precisionModel"];
 
             if (scaleStr != null)
             {
@@ -74,11 +75,11 @@ namespace Spatial4n.Core.Context.Nts
             {
                 if (modelStr.Equals("floating"))
                 {
-                    precisionModel = new PrecisionModel(PrecisionModel.FLOATING);
+                    precisionModel = new PrecisionModel(PrecisionModels.Floating);
                 }
                 else if (modelStr.Equals("floating_single"))
                 {
-                    precisionModel = new PrecisionModel(PrecisionModel.FLOATING_SINGLE);
+                    precisionModel = new PrecisionModel(PrecisionModels.FloatingSingle);
                 }
                 else if (modelStr.Equals("fixed"))
                 {
@@ -98,7 +99,7 @@ namespace Spatial4n.Core.Context.Nts
             return new GeometryFactory(precisionModel, srid, coordinateSequenceFactory);
         }
 
-        protected override SpatialContext NewSpatialContext()
+        protected internal override SpatialContext NewSpatialContext()
         {
             return new NtsSpatialContext(this);
         }

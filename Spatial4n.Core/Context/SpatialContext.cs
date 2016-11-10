@@ -82,9 +82,8 @@ namespace Spatial4n.Core.Context
 
         [Obsolete]
         public SpatialContext(bool geo)
-            : this(geo, null, null)
-        {
-        }
+            : this(InitFromLegacyConstructor(geo, null, null))
+        { }
 
         /**
    * Called by {@link com.spatial4j.core.context.SpatialContextFactory#newSpatialContext()}.
@@ -130,19 +129,19 @@ namespace Spatial4n.Core.Context
             this.binaryCodec = factory.MakeBinaryCodec(this);
         }
        
-		public DistanceCalculator GetDistCalc()
+		public virtual DistanceCalculator GetDistCalc()
 		{
 			return calculator;
 		}
 
         /** Convenience that uses {@link #getDistCalc()} */
-        public double CalcDistance(Point p, double x2, double y2)
+        public virtual double CalcDistance(Point p, double x2, double y2)
         {
             return GetDistCalc().Distance(p, x2, y2);
         }
 
         /** Convenience that uses {@link #getDistCalc()} */
-        public double CalcDistance(Point p, Point p2)
+        public virtual double CalcDistance(Point p, Point p2)
         {
             return GetDistCalc().Distance(p, p2);
         }
@@ -152,14 +151,14 @@ namespace Spatial4n.Core.Context
         /// Do *NOT* invoke reset() on this return type.
         /// </summary>
         /// <returns></returns>
-		public Rectangle GetWorldBounds()
+		public virtual Rectangle GetWorldBounds()
 		{
 			return worldBounds;
 		}
 
         /** If true then {@link #normX(double)} will wrap longitudes outside of the standard
         * geodetic boundary into it. Example: 181 will become -179. */
-        public bool IsNormWrapLongitude()
+        public virtual bool IsNormWrapLongitude()
         {
             return normWrapLongitude;
         }
@@ -168,14 +167,14 @@ namespace Spatial4n.Core.Context
         /// Is this a geospatial context (true) or simply 2d spatial (false).
         /// </summary>
         /// <returns></returns>
-        public bool IsGeo()
+        public virtual bool IsGeo()
 		{
 			return geo;
 		}
 
         /** Normalize the 'x' dimension. Might reduce precision or wrap it to be within the bounds. This
    * is called by {@link com.spatial4j.core.io.WktShapeParser} before creating a shape. */
-        public double NormX(double x)
+        public virtual double NormX(double x)
         {
             if (normWrapLongitude)
                 x = DistanceUtils.NormLonDEG(x);
@@ -184,13 +183,13 @@ namespace Spatial4n.Core.Context
 
         /** Normalize the 'y' dimension. Might reduce precision or wrap it to be within the bounds. This
          * is called by {@link com.spatial4j.core.io.WktShapeParser} before creating a shape. */
-        public double NormY(double y) { return y; }
+        public virtual double NormY(double y) { return y; }
 
         /// <summary>
         /// Ensure fits in {@link #getWorldBounds()}
         /// </summary>
         /// <param name="x"></param>
-        public void VerifyX(double x)
+        public virtual void VerifyX(double x)
         {
             Rectangle bounds = GetWorldBounds();
             if (x < bounds.GetMinX() || x > bounds.GetMaxX()) //NaN will fail
@@ -201,7 +200,7 @@ namespace Spatial4n.Core.Context
         /// Ensure fits in {@link #getWorldBounds()}
         /// </summary>
         /// <param name="y"></param>
-        public void VerifyY(double y)
+        public virtual void VerifyY(double y)
         {
             Rectangle bounds = GetWorldBounds();
             if (y < bounds.GetMinY() || y > bounds.GetMaxY()) //NaN will fail
@@ -227,7 +226,7 @@ namespace Spatial4n.Core.Context
 		/// <param name="lowerLeft"></param>
 		/// <param name="upperRight"></param>
 		/// <returns></returns>
-		public Rectangle MakeRectangle(Point lowerLeft, Point upperRight)
+		public virtual Rectangle MakeRectangle(Point lowerLeft, Point upperRight)
 		{
 			return MakeRectangle(lowerLeft.GetX(), upperRight.GetX(),
 			                lowerLeft.GetY(), upperRight.GetY());
@@ -243,7 +242,7 @@ namespace Spatial4n.Core.Context
 	    /// <param name="minY"></param>
 	    /// <param name="maxY"></param>
 	    /// <returns></returns>
-		public Rectangle MakeRectangle(double minX, double maxX, double minY, double maxY)
+		public virtual Rectangle MakeRectangle(double minX, double maxX, double minY, double maxY)
 	    {
 	        Rectangle bounds = GetWorldBounds();
 	        // Y
@@ -286,7 +285,7 @@ namespace Spatial4n.Core.Context
 		/// <param name="y"></param>
 		/// <param name="distance"></param>
 		/// <returns></returns>
-		public Circle MakeCircle(double x, double y, double distance)
+		public virtual Circle MakeCircle(double x, double y, double distance)
 		{
 			return MakeCircle(MakePoint(x, y), distance);
 		}
@@ -297,7 +296,7 @@ namespace Spatial4n.Core.Context
 		/// <param name="point"></param>
 		/// <param name="distance"></param>
 		/// <returns></returns>
-        public Circle MakeCircle(Point point, double distance)
+        public virtual Circle MakeCircle(Point point, double distance)
 		{
 		    if (distance < 0)
 		        throw new InvalidShapeException("distance must be >= 0; got " + distance);
@@ -319,7 +318,7 @@ namespace Spatial4n.Core.Context
 
         /** Constructs a line string. It's an ordered sequence of connected vertexes. There
    * is no official shape/interface for it yet so we just return Shape. */
-        public Shape MakeLineString(List<Point> points)
+        public virtual Shape MakeLineString(IList<Point> points)
         {
             return new BufferedLineString(points, 0, false, this);
         }
@@ -327,19 +326,19 @@ namespace Spatial4n.Core.Context
         /** Constructs a buffered line string. It's an ordered sequence of connected vertexes,
          * with a buffer distance along the line in all directions. There
          * is no official shape/interface for it so we just return Shape. */
-        public Shape MakeBufferedLineString(List<Point> points, double buf)
+        public virtual Shape MakeBufferedLineString(IList<Point> points, double buf)
         {
             return new BufferedLineString(points, buf, IsGeo(), this);
         }
 
         /** Construct a ShapeCollection, analogous to an OGC GeometryCollection. */
-        public ShapeCollection<S> MakeCollection<S>(List<S> coll) where S : Shape
+        public virtual ShapeCollection MakeCollection(IList<Shape> coll) //where S : Shape
         {
-            return new ShapeCollection<S>(coll, this);
+            return new ShapeCollection(coll, this);
         }
 
         /** The {@link com.spatial4j.core.io.WktShapeParser} used by {@link #readShapeFromWkt(String)}. */
-        public WktShapeParser getWktShapeParser()
+        public virtual WktShapeParser GetWktShapeParser()
         {
             return wktShapeParser;
         }
@@ -350,18 +349,18 @@ namespace Spatial4n.Core.Context
    * @return non-null
    * @throws ParseException if it failed to parse.
    */
-        public Shape ReadShapeFromWkt(string wkt) 
+        public virtual Shape ReadShapeFromWkt(string wkt) 
         {
             return wktShapeParser.Parse(wkt);
         }
 
-        public BinaryCodec BinaryCodec
+        public virtual BinaryCodec BinaryCodec
         { 
             get { return binaryCodec; }
         }
 
         [Obsolete]
-        public Shape ReadShape(string value)
+        public virtual Shape ReadShape(string value)
         {
             Shape s = LegacyShapeReadWriterFormat.ReadShapeOrNull(value, this);
             if (s == null)
@@ -370,7 +369,7 @@ namespace Spatial4n.Core.Context
                 {
                     s = ReadShapeFromWkt(value);
                 }
-                catch (FormatException e) // In java this was ParseException
+                catch (ParseException e)
                 {
                     if (e.InnerException is InvalidShapeException)
                         throw (InvalidShapeException)e.InnerException;
@@ -381,7 +380,7 @@ namespace Spatial4n.Core.Context
         }
 
         [Obsolete]
-        public string ToString(Shape shape)
+        public virtual string ToString(Shape shape)
         {
             return LegacyShapeReadWriterFormat.WriteShape(shape);
         }

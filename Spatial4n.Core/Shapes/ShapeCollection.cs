@@ -14,7 +14,7 @@ namespace Spatial4n.Core.Shapes
     /// retained if an application requires it, although logically it's treated as an
     /// unordered Set, mostly.
     /// <para>
-    /// Ideally, <see cref="Relate(Shape)"/> should return the same result no matter what
+    /// Ideally, <see cref="ShapeCollection{S}.Relate(Shapes.Shape)"/> should return the same result no matter what
     /// the shape order is, although the default implementation can be order
     /// dependent when the shapes overlap; see <see cref="RelateContainsShortCircuits()"/>.
     /// To improve performance slightly, the caller could order the shapes by
@@ -29,11 +29,11 @@ namespace Spatial4n.Core.Shapes
     /// bbox'es, for example.
     /// </para>
     /// </summary>
-    /// <typeparam name="S"></typeparam>
-    public class ShapeCollection<S> : Collection<S>, Shape
-        where S : Shape
+    /// <typeparam name="Shape"></typeparam>
+    public class ShapeCollection : Collection<Shape>, Shape
+        //where S : Shape
     {
-        protected readonly List<S> shapes;
+        protected readonly IList<Shape> shapes;
         protected readonly Rectangle bbox;
 
         /**
@@ -41,7 +41,7 @@ namespace Spatial4n.Core.Shapes
          * @param shapes Copied by reference! (make a defensive copy if caller modifies)
          * @param ctx
          */
-        public ShapeCollection(List<S> shapes, SpatialContext ctx)
+        public ShapeCollection(IList<Shape> shapes, SpatialContext ctx)
         {
             // TODO: Work out if there is a way to mimic this behavior (create a custom IRandomAccess?)
             //if (!(shapes is RandomAccess))
@@ -50,14 +50,14 @@ namespace Spatial4n.Core.Shapes
             this.bbox = ComputeBoundingBox(shapes, ctx);
         }
 
-        protected virtual Rectangle ComputeBoundingBox(ICollection<Shape> shapes, SpatialContext ctx)
+        protected virtual Rectangle ComputeBoundingBox(ICollection<Shapes.Shape> shapes, SpatialContext ctx)
         {
             if (!shapes.Any())
                 return ctx.MakeRectangle(double.NaN, double.NaN, double.NaN, double.NaN);
             Range xRange = null;
             double minY = double.PositiveInfinity;
             double maxY = double.NegativeInfinity;
-            foreach (Shape geom in shapes)
+            foreach (Shapes.Shape geom in shapes)
             {
                 Rectangle r = geom.GetBoundingBox();
 
@@ -76,12 +76,12 @@ namespace Spatial4n.Core.Shapes
             return ctx.MakeRectangle(xRange.GetMin(), xRange.GetMax(), minY, maxY);
         }
 
-        public virtual List<S> GetShapes()
+        public virtual IList<Shape> GetShapes()
         {
             return shapes;
         }
 
-        new public S this[int index]
+        new public Shape this[int index]
         {
             get
             {
@@ -113,7 +113,7 @@ namespace Spatial4n.Core.Shapes
 
         public virtual bool HasArea()
         {
-            foreach (Shape geom in shapes)
+            foreach (Shapes.Shape geom in shapes)
             {
                 if (geom.HasArea())
                 {
@@ -126,8 +126,8 @@ namespace Spatial4n.Core.Shapes
 
         public virtual Shape GetBuffered(double distance, SpatialContext ctx)
         {
-            List<Shape> bufColl = new List<Shape>(Count);
-            foreach (Shape shape in shapes)
+            List<Shapes.Shape> bufColl = new List<Shapes.Shape>(Count);
+            foreach (Shapes.Shape shape in shapes)
             {
                 bufColl.Add(shape.GetBuffered(distance, ctx));
             }
@@ -144,7 +144,7 @@ namespace Spatial4n.Core.Shapes
             bool containsWillShortCircuit = (other is Point) ||
                 RelateContainsShortCircuits();
             SpatialRelation? sect = null;
-            foreach (Shape shape in shapes)
+            foreach (Shapes.Shape shape in shapes)
             {
                 SpatialRelation nextSect = shape.Relate(other);
 
@@ -216,7 +216,7 @@ namespace Spatial4n.Core.Shapes
         {
             double MAX_AREA = bbox.GetArea(ctx);
             double sum = 0;
-            foreach (Shape geom in shapes)
+            foreach (Shapes.Shape geom in shapes)
             {
                 sum += geom.GetArea(ctx);
                 if (sum >= MAX_AREA)
@@ -253,7 +253,7 @@ namespace Spatial4n.Core.Shapes
             if (this == o) return true;
             if (o == null || GetType() != o.GetType()) return false;
 
-            ShapeCollection<S> that = (ShapeCollection<S>)o;
+            ShapeCollection that = (ShapeCollection)o;
 
             if (!shapes.Equals(that.shapes)) return false;
 
@@ -264,5 +264,14 @@ namespace Spatial4n.Core.Shapes
         {
             return shapes.GetHashCode();
         }
+
+        #region Added for .NET support
+
+        public virtual bool IsEmpty
+        {
+            get { return !shapes.Any(); }
+        }
+
+        #endregion
     }
 }

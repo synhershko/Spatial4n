@@ -104,8 +104,8 @@ namespace Spatial4n.Core.Shapes.Impl
 
                 //Given a right triangle of A, B, C sides, C (hypotenuse) ==
                 // buf, and A + B == the bounding box offset from pA & pB in x & y.
-                double bboxBuf = buf * (1 + Math.Abs(linePrimary.getSlope()))
-                    * linePrimary.getDistDenomInv();
+                double bboxBuf = buf * (1 + Math.Abs(linePrimary.GetSlope()))
+                    * linePrimary.GetDistDenomInv();
                 Debug.Assert(bboxBuf >= buf && bboxBuf <= buf * 1.5);
 
                 if (pA.GetX() <= pB.GetX())
@@ -139,13 +139,13 @@ namespace Spatial4n.Core.Shapes.Impl
                 Math.Min(bounds.GetMaxY(), maxY));
         }
 
-        public override bool IsEmpty
+        public virtual bool IsEmpty
         {
             get { return pA.IsEmpty; }
         }
 
 
-        public override Shape GetBuffered(double distance, SpatialContext ctx)
+        public virtual Shape GetBuffered(double distance, SpatialContext ctx)
         {
             return new BufferedLine(pA, pB, buf + distance, ctx);
         }
@@ -170,7 +170,7 @@ namespace Spatial4n.Core.Shapes.Impl
         }
 
 
-        public override SpatialRelation Relate(Shape other)
+        public virtual SpatialRelation Relate(Shape other)
         {
             if (other is Point)
                 return Contains((Point)other) ? SpatialRelation.CONTAINS : SpatialRelation.DISJOINT;
@@ -206,27 +206,27 @@ namespace Spatial4n.Core.Shapes.Impl
             return linePrimary.Contains(p) && linePerp.Contains(p);
         }
 
-        public virtual Rectangle BoundingBox
+        public virtual Rectangle GetBoundingBox()
         {
-            get { return bbox; }
+            return bbox;
         }
 
 
-        public override bool HasArea
+        public virtual bool HasArea()
         {
-            get { return buf > 0; }
+            return buf > 0;
         }
 
 
-        public override double GetArea(SpatialContext ctx)
+        public virtual double GetArea(SpatialContext ctx)
         {
             return linePrimary.GetBuf() * linePerp.GetBuf() * 4;
         }
 
 
-        public override Point GetCenter()
+        public virtual Point GetCenter()
         {
-            return BoundingBox.GetCenter();
+            return GetBoundingBox().GetCenter();
         }
 
         public virtual Point GetA()

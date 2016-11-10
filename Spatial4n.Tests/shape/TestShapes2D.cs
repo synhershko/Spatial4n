@@ -19,14 +19,19 @@ namespace Spatial4n.Tests.shape
 			get
 			{
                 Rectangle WB = new RectangleImpl(-2000, 2000, -300, 300, null);//whatever
-				yield return new object[] { new SpatialContext(false, null, WB) };
-				yield return new object[] { new NtsSpatialContext(null, false, null, WB) };
+				yield return new object[] { new SpatialContextFactory() { geo = false, worldBounds = WB }.NewSpatialContext() };
+				yield return new object[] { new NtsSpatialContextFactory() { geo = false, worldBounds = WB }.NewSpatialContext() };
 			}
 		}
 
-		[Theory]
+        //public TestShapes2D(SpatialContext ctx)
+        //    : base(ctx)
+        //{
+        //}
+
+        [Theory]
 		[PropertyData("Contexts")]
-		public void TestSimplePoint(SpatialContext ctx)
+		public virtual void TestSimplePoint(SpatialContext ctx)
 		{
 			base.ctx = ctx;
 
@@ -34,7 +39,7 @@ namespace Spatial4n.Tests.shape
 		    Assert.Throws<InvalidShapeException>(() => ctx.MakePoint(0, -301));
 
 			Point pt = ctx.MakePoint(0, 0);
-			String msg = pt.ToString();
+			string msg = pt.ToString();
 
 			//test equals & hashcode
 			Point pt2 = ctx.MakePoint(0, 0);
@@ -50,18 +55,22 @@ namespace Spatial4n.Tests.shape
 			Assert.True(pt.Equals(center));
 			//Assert.Equal(/*msg,*/ pt, center);
 
-			assertRelation(msg, SpatialRelation.CONTAINS, pt, pt2);
-			assertRelation(msg, SpatialRelation.DISJOINT, pt, ctx.MakePoint(0, 1));
-			assertRelation(msg, SpatialRelation.DISJOINT, pt, ctx.MakePoint(1, 0));
-			assertRelation(msg, SpatialRelation.DISJOINT, pt, ctx.MakePoint(1, 1));
+			AssertRelation(msg, SpatialRelation.CONTAINS, pt, pt2);
+			AssertRelation(msg, SpatialRelation.DISJOINT, pt, ctx.MakePoint(0, 1));
+			AssertRelation(msg, SpatialRelation.DISJOINT, pt, ctx.MakePoint(1, 0));
+			AssertRelation(msg, SpatialRelation.DISJOINT, pt, ctx.MakePoint(1, 1));
 
             pt.Reset(1, 2);
             Assert.Equal(ctx.MakePoint(1, 2), pt);
-		}
+
+            Assert.Equal(ctx.MakeCircle(pt, 3), pt.GetBuffered(3, ctx));
+
+            TestEmptiness(ctx.MakePoint(double.NaN, double.NaN));
+        }
 
 		[Theory]
 		[PropertyData("Contexts")]
-		public void TestSimpleRectangle(SpatialContext ctx)
+		public virtual void TestSimpleRectangle(SpatialContext ctx)
 		{
 			base.ctx = ctx;
 
@@ -89,12 +98,17 @@ namespace Spatial4n.Tests.shape
             r.Reset(1, 2, 3, 4);
             Assert.Equal(ctx.MakeRectangle(1, 2, 3, 4), r);
 
-			testRectIntersect();
-		}
+			TestRectIntersect();
+
+            if (!ctx.IsGeo())
+                AssertEquals(ctx.MakeRectangle(0.9, 2.1, 2.9, 4.1), ctx.MakeRectangle(1, 2, 3, 4).GetBuffered(0.1, ctx));
+
+            TestEmptiness(ctx.MakeRectangle(double.NaN, double.NaN, double.NaN, double.NaN));
+        }
 
 		[Theory]
 		[PropertyData("Contexts")]
-		public void TestSimpleCircle(SpatialContext ctx)
+		public virtual void TestSimpleCircle(SpatialContext ctx)
 		{
 			base.ctx = ctx;
 
@@ -109,7 +123,7 @@ namespace Spatial4n.Tests.shape
 				}
 			}
 
-            testCircleReset(ctx);
+            TestCircleReset(ctx);
 
 			//INTERSECTION:
 			//Start with some static tests that have shown to cause failures at some point:
@@ -118,9 +132,13 @@ namespace Spatial4n.Tests.shape
 				ctx.MakeCircle(107, -81, 147).Relate(ctx.MakeRectangle(92, 121, -89, 74)));
 
 			TestCircleIntersect();
-		}
 
-        public static void testCircleReset(SpatialContext ctx)
+            Assert.Equal(ctx.MakeCircle(1, 2, 10), ctx.MakeCircle(1, 2, 6).GetBuffered(4, ctx));
+
+            TestEmptiness(ctx.MakeCircle(double.NaN, double.NaN, random.nextBoolean() ? 0 : double.NaN));
+        }
+
+        public static void TestCircleReset(SpatialContext ctx)
         {
             Circle c = ctx.MakeCircle(3, 4, 5);
             Circle c2 = ctx.MakeCircle(5, 6, 7);
@@ -129,7 +147,33 @@ namespace Spatial4n.Tests.shape
             Assert.Equal(c.GetBoundingBox(), c2.GetBoundingBox());
         }
 
-	    public static void CheckShapesImplementEquals(Type[] classes)
+        [Theory]
+        [PropertyData("Contexts")]
+        public virtual void TestBufferedLineString(SpatialContext ctx)
+        {
+            base.ctx = ctx;
+
+            //see BufferedLineStringTest & BufferedLineTest for more
+
+            TestEmptiness(ctx.MakeBufferedLineString(new List<Point>(), random.Next(3+1)));
+        }
+
+        [Fact]
+        public virtual void TestImplementsEqualsAndHash()
+        {
+            CheckShapesImplementEquals(new[]
+                                    {
+                                        typeof(PointImpl),
+                                        typeof(CircleImpl),
+										//GeoCircle.class  no: its fields are caches, not part of its identity
+                                        typeof(RectangleImpl),
+                                        typeof(ShapeCollection),
+                                        typeof(BufferedLineString),
+                                        typeof(BufferedLine)
+                                    });
+        }
+
+        public static void CheckShapesImplementEquals(Type[] classes)
 		{
 			foreach (var clazz in classes)
 			{
@@ -154,19 +198,6 @@ namespace Spatial4n.Tests.shape
 					Assert.True(false, "Shape needs to define 'GetHashCode' : " + clazz.Name);
 				}
 			}
-		}
-
-		[Fact]
-		public void TestImplementsEqualsAndHash()
-		{
-			CheckShapesImplementEquals(new[]
-                                    {
-                                        typeof(PointImpl),
-                                        typeof(CircleImpl),
-										//GeoCircle.class  no: its fields are caches, not part of its identity
-                                        typeof(RectangleImpl),
-                                        typeof(MultiShape),
-                                    });
 		}
 	}
 }

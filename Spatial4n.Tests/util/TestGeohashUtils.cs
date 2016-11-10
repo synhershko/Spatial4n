@@ -15,9 +15,9 @@ namespace Spatial4n.Tests.util
          * lat=57.64911 lng=10.40744 should be encoded as "u4pruydqqvj8"
          */
         [Fact]
-        public void TestEncode()
+        public virtual void TestEncode()
         {
-            String hash = GeohashUtils.EncodeLatLon(42.6, -5.6);
+            string hash = GeohashUtils.EncodeLatLon(42.6, -5.6);
             Assert.Equal("ezs42e44yx96", hash);
 
             hash = GeohashUtils.EncodeLatLon(57.64911, 10.40744);
@@ -29,9 +29,9 @@ namespace Spatial4n.Tests.util
          * decoded within 0.00001 of the original value
          */
         [Fact]
-        public void TestDecodePreciseLongitudeLatitude()
+        public virtual void TestDecodePreciseLongitudeLatitude()
         {
-            String hash = GeohashUtils.EncodeLatLon(52.3738007, 4.8909347);
+            string hash = GeohashUtils.EncodeLatLon(52.3738007, 4.8909347);
 
             Point point = GeohashUtils.Decode(hash, ctx);
 
@@ -44,9 +44,9 @@ namespace Spatial4n.Tests.util
          * within 0.00001 of the original value
          */
         [Fact]
-        public void TestDecodeImpreciseLongitudeLatitude()
+        public virtual void TestDecodeImpreciseLongitudeLatitude()
         {
-            String hash = GeohashUtils.EncodeLatLon(84.6, 10.5);
+            string hash = GeohashUtils.EncodeLatLon(84.6, 10.5);
 
             Point point = GeohashUtils.Decode(hash, ctx);
 
@@ -58,9 +58,9 @@ namespace Spatial4n.Tests.util
          * see https://issues.apache.org/jira/browse/LUCENE-1815 for details
          */
         [Fact]
-        public void TestDecodeEncode()
+        public virtual void TestDecodeEncode()
         {
-            String geoHash = "u173zq37x014";
+            string geoHash = "u173zq37x014";
             Assert.Equal(geoHash, GeohashUtils.EncodeLatLon(52.3738007, 4.8909347));
             Point point = GeohashUtils.Decode(geoHash, ctx);
             CustomAssert.EqualWithDelta(52.37380061d, point.GetY(), 0.000001d);
@@ -78,7 +78,7 @@ namespace Spatial4n.Tests.util
 
         /** see the table at http://en.wikipedia.org/wiki/Geohash */
         [Fact]
-        public void testHashLenToWidth()
+        public virtual void TestHashLenToWidth()
         {
             //test odd & even len
             double[] boxOdd = GeohashUtils.LookupDegreesSizeForHashLen(3);
@@ -91,7 +91,7 @@ namespace Spatial4n.Tests.util
 
         /** see the table at http://en.wikipedia.org/wiki/Geohash */
         [Fact]
-        public void testLookupHashLenForWidthHeight()
+        public virtual void TestLookupHashLenForWidthHeight()
         {
             Assert.Equal(1, GeohashUtils.LookupHashLenForWidthHeight(999, 999));
 

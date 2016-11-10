@@ -74,7 +74,7 @@ namespace Spatial4n.Core.Shapes.Nts
             return ctx.MakeRectangle(this, this);
 		}
 
-        public virtual Circle GetBuffered(double distance, SpatialContext ctx)
+        public virtual /*Circle*/ Shape GetBuffered(double distance, SpatialContext ctx)
         {
             return ctx.MakeCircle(this, distance);
         }

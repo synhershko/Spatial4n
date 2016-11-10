@@ -27,7 +27,7 @@ namespace Spatial4n.Core.Distance
 			return Distance(from, to.GetX(), to.GetY());
 		}
 
-        public override bool Within(Point from, double toX, double toY, double distance)
+        public virtual bool Within(Point from, double toX, double toY, double distance)
         {
             return Distance(from, toX, toY) <= distance;
         }

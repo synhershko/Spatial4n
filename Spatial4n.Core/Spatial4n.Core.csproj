@@ -99,6 +99,7 @@
     <Compile Include="Distance\DistanceUtils.cs" />
     <Compile Include="Distance\GeodesicSphereDistCalc.cs" />
     <Compile Include="Exceptions\InvalidShapeException.cs" />
+    <Compile Include="Exceptions\ParseException.cs" />
     <Compile Include="Io\BinaryCodec.cs" />
     <Compile Include="Io\LegacyShapeReadWriterFormat.cs" />
     <Compile Include="Io\ParseUtils.cs" />
@@ -112,6 +113,7 @@
     <Compile Include="Shapes\Point.cs" />
     <Compile Include="Shapes\Rectangle.cs" />
     <Compile Include="Shapes\Shape.cs" />
+    <Compile Include="Shapes\ShapeCollection.cs" />
     <Compile Include="Shapes\SpatialRelation.cs" />
     <Compile Include="Util\GeohashUtils.cs" />
   </ItemGroup>
@@ -120,6 +122,12 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Io\Nts\" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="Spatial4n.Core.NTS.csproj">
+      <Project>{DDCB0537-C471-4ACD-B48B-56EB1711EB4A}</Project>
+      <Name>Spatial4n.Core.NTS</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

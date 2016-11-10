@@ -10,14 +10,14 @@ namespace Spatial4n.Tests.io
 		readonly SpatialContext ctx = NtsSpatialContext.GEO;
 
 		[Fact]
-		public void wktGeoPt()
+		public virtual void WktGeoPt()
 		{
 			Shape s = ctx.ReadShape("Point(-160 30)");
 			Assert.Equal(ctx.MakePoint(-160, 30), s);
 		}
 
 		[Fact]
-		public void wktGeoRect()
+		public virtual void WktGeoRect()
 		{
 			//REMEMBER: Polygon WKT's outer ring is counter-clockwise order. If you accidentally give the other direction,
 			// JtsSpatialContext will give the wrong result for a rectangle crossing the dateline.

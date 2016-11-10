@@ -30,9 +30,9 @@ namespace Spatial4n.Core.Io.Nts
         }
 
         /** @see JtsWktShapeParser.ValidationRule */
-        public ValidationRule ValidationRule
+        public ValidationRule GetValidationRule() // .NET: naming conflict if made into property
         {
-            get { return validationRule; }
+            return validationRule;
         }
 
         /**
@@ -55,12 +55,12 @@ namespace Spatial4n.Core.Io.Nts
 
 
         /** @see DatelineRule */
-        public DatelineRule DatelineRule
+        public DatelineRule GetDatelineRule() // .NET: naming conflict if made into property
         {
-            get { return datelineRule; }
+            return datelineRule;
         }
 
-        protected override Shape ParseShapeByType(WktShapeParser.State state, string shapeType)
+        protected internal override Shape ParseShapeByType(WktShapeParser.State state, string shapeType)
         {
             if (shapeType.Equals("POLYGON", StringComparison.OrdinalIgnoreCase))
             {

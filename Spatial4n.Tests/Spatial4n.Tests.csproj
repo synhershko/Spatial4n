@@ -81,17 +81,18 @@
     <CodeAnalysisFailOnMissingRules>false</CodeAnalysisFailOnMissingRules>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="GeoAPI, Version=1.7.2.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\GeoAPI.1.7.2\lib\net40-client\GeoAPI.dll</HintPath>
+    <Reference Include="GeoAPI, Version=1.7.4.0, Culture=neutral, PublicKeyToken=a1a0da7def465678, processorArchitecture=MSIL">
+      <HintPath>..\packages\GeoAPI.1.7.4\lib\net40-client\GeoAPI.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="Microsoft.VisualStudio.QualityTools.UnitTestFramework, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
-    <Reference Include="NetTopologySuite, Version=1.13.2.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\NetTopologySuite.1.13.2\lib\net40-client\NetTopologySuite.dll</HintPath>
+    <Reference Include="NetTopologySuite, Version=1.14.0.0, Culture=neutral, PublicKeyToken=f580a05016ebada1, processorArchitecture=MSIL">
+      <HintPath>..\packages\NetTopologySuite.1.14\lib\net40-client\NetTopologySuite.dll</HintPath>
+      <Private>True</Private>
     </Reference>
-    <Reference Include="PowerCollections">
-      <HintPath>..\packages\NetTopologySuite.1.13.2\lib\net40-client\PowerCollections.dll</HintPath>
+    <Reference Include="PowerCollections, Version=1.0.0.0, Culture=neutral, PublicKeyToken=2573bf8a1bdddcd5, processorArchitecture=MSIL">
+      <HintPath>..\packages\NetTopologySuite.1.14\lib\net40-client\PowerCollections.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core">
@@ -112,16 +113,29 @@
   <ItemGroup>
     <Compile Include="context\SpatialContextFactoryTest.cs" />
     <Compile Include="CustomAssert.cs" />
+    <Compile Include="io\BinaryCodecTest.cs" />
+    <Compile Include="io\NtsWKTReaderShapeParserTest.cs" />
+    <Compile Include="io\NtsWktShapeParserTest.cs" />
+    <Compile Include="io\NtsBinaryCodecTest.cs" />
     <Compile Include="io\NtsShapeReadWriterTest.cs" />
+    <Compile Include="io\PolygonBuilder.cs" />
     <Compile Include="io\ShapeReadWriterTest.cs" />
+    <Compile Include="io\WktCustomShapeParserTest.cs" />
+    <Compile Include="io\WktShapeParserTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="distance\TestDistances.cs" />
     <Compile Include="PropertyDataAttribute.cs" />
+    <Compile Include="RandomExtensions.cs" />
     <Compile Include="RandomSeed.cs" />
     <Compile Include="RepeatTestAttribute.cs" />
     <Compile Include="shape\AbstractTestShapes.cs" />
-    <Compile Include="shape\NtsPolygonTest.cs" />
+    <Compile Include="shape\BufferedLineStringTest.cs" />
+    <Compile Include="shape\BufferedLineTest.cs" />
+    <Compile Include="shape\NtsGeometryTest.cs" />
+    <Compile Include="shape\RandomizedShapeTest.cs" />
+    <Compile Include="shape\RectIntersectionTestHelper.cs" />
     <Compile Include="shape\RoundingDistCalc.cs" />
+    <Compile Include="shape\ShapeCollectionTest.cs" />
     <Compile Include="shape\TestShapesGeo.cs" />
     <Compile Include="shape\TestShapes2D.cs" />
     <Compile Include="TemporaryCulture.cs" />

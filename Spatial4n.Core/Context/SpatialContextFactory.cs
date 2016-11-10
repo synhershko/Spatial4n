@@ -21,6 +21,7 @@ using System.Reflection;
 using Spatial4n.Core.Distance;
 using Spatial4n.Core.Shapes;
 using System.Linq;
+using Spatial4n.Core.Io;
 
 namespace Spatial4n.Core.Context
 {
@@ -82,7 +83,7 @@ namespace Spatial4n.Core.Context
             }
         }
 
-        protected void Init(IDictionary<string, string> args/*, ClassLoader classLoader*/)
+        protected virtual void Init(IDictionary<string, string> args/*, ClassLoader classLoader*/)
         {
             this.args = args;
             // this.classLoader = classLoader;
@@ -101,7 +102,7 @@ namespace Spatial4n.Core.Context
         }
 
         /** Gets {@code name} from args and populates a field by the same name with the value. */
-        protected void InitField(string name)
+        protected virtual void InitField(string name)
         {
             //  note: java.beans API is more verbose to use correctly (?) but would arguably be better
             FieldInfo field;
@@ -168,9 +169,9 @@ namespace Spatial4n.Core.Context
         //	bool.TryParse(geoStr, out geo);
         //     }
 
-        protected void InitCalculator()
+        protected virtual void InitCalculator()
         {
-            String calcStr;
+            string calcStr;
             if (!args.TryGetValue("distCalculator", out calcStr) || calcStr == null)
                 return;
             if (calcStr.Equals("haversine", StringComparison.InvariantCultureIgnoreCase))
@@ -199,7 +200,7 @@ namespace Spatial4n.Core.Context
             }
         }
 
-        protected void InitWorldBounds()
+        protected virtual void InitWorldBounds()
         {
             string worldBoundsStr;
             if (!args.TryGetValue("worldBounds", out worldBoundsStr) || worldBoundsStr == null)
@@ -211,19 +212,19 @@ namespace Spatial4n.Core.Context
         }
 
         /** Subclasses should simply construct the instance from the initialized configuration. */
-        protected virtual SpatialContext NewSpatialContext()
+        protected internal virtual SpatialContext NewSpatialContext()
         {
             return new SpatialContext(this);
         }
 
-        public WktShapeParser MakeWktShapeParser(SpatialContext ctx)
+        public virtual WktShapeParser MakeWktShapeParser(SpatialContext ctx)
         {
-            return MakeClassInstance(wktShapeParserClass, ctx, this);
+            return MakeClassInstance<WktShapeParser>(wktShapeParserClass, ctx, this);
         }
 
-        public BinaryCodec makeBinaryCodec(SpatialContext ctx)
+        public virtual BinaryCodec MakeBinaryCodec(SpatialContext ctx)
         {
-            return MakeClassInstance(binaryCodecClass, ctx, this);
+            return MakeClassInstance<BinaryCodec>(binaryCodecClass, ctx, this);
         }
 
         private T MakeClassInstance<T>(Type clazz, params object[] ctorArgs)

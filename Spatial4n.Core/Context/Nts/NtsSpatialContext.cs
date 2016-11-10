@@ -25,19 +25,20 @@ using Spatial4n.Core.Exceptions;
 using Spatial4n.Core.Io;
 using Spatial4n.Core.Shapes;
 using Spatial4n.Core.Shapes.Nts;
+using Point = Spatial4n.Core.Shapes.Point;
 
 namespace Spatial4n.Core.Context.Nts
 {
-	/// <summary>
-	/// Enhances the default <see cref="SpatialContext"/> with support for Polygons (and
-	/// other geometry) plus
-	/// reading <a href="http://en.wikipedia.org/wiki/Well-known_text">WKT</a>. The
-	/// popular <a href="https://sourceforge.net/projects/jts-topo-suite/">JTS</a>
-	/// library does the heavy lifting.
-	/// </summary>
-	public class NtsSpatialContext : SpatialContext
-	{
-		public new static readonly NtsSpatialContext GEO;
+    /// <summary>
+    /// Enhances the default <see cref="SpatialContext"/> with support for Polygons (and
+    /// other geometry) plus
+    /// reading <a href="http://en.wikipedia.org/wiki/Well-known_text">WKT</a>. The
+    /// popular <a href="https://sourceforge.net/projects/jts-topo-suite/">JTS</a>
+    /// library does the heavy lifting.
+    /// </summary>
+    public class NtsSpatialContext : SpatialContext
+    {
+        public new static readonly NtsSpatialContext GEO;
 
         static NtsSpatialContext()
         {
@@ -49,8 +50,8 @@ namespace Spatial4n.Core.Context.Nts
         protected readonly GeometryFactory geometryFactory;
 
         protected readonly bool allowMultiOverlap;
-        protected readonly bool useJtsPoint;
-        protected readonly bool useJtsLineString;
+        protected readonly bool useNtsPoint;
+        protected readonly bool useNtsLineString;
 
         /// <summary>
         /// Called by <see cref="NtsSpatialContextFactory.NewSpatialContext()"/>.
@@ -62,8 +63,8 @@ namespace Spatial4n.Core.Context.Nts
             this.geometryFactory = factory.GetGeometryFactory();
 
             this.allowMultiOverlap = factory.allowMultiOverlap;
-            this.useJtsPoint = factory.useJtsPoint;
-            this.useJtsLineString = factory.useJtsLineString;
+            this.useNtsPoint = factory.useJtsPoint;
+            this.useNtsLineString = factory.useJtsLineString;
         }
 
         /// <summary>
@@ -78,29 +79,30 @@ namespace Spatial4n.Core.Context.Nts
             get { return allowMultiOverlap; }
         }
 
-        protected override ShapeReadWriter MakeShapeReadWriter()
-		{
-			return new NtsShapeReadWriter(this);
-		}
+        ////      protected override ShapeReadWriter MakeShapeReadWriter()
+        ////{
+        ////	return new NtsShapeReadWriter(this);
+        ////}
 
         public override double NormX(double x)
         {
             x = base.NormX(x);
-            return geometryFactory.GetPrecisionModel().MakePrecise(x);
+            return geometryFactory.PrecisionModel.MakePrecise(x);
         }
 
         public override double NormY(double y)
         {
             y = base.NormY(y);
-            return geometryFactory.GetPrecisionModel().MakePrecise(y);
+            return geometryFactory.PrecisionModel.MakePrecise(y);
         }
 
         public override string ToString(Shape shape)
         {
             //Note: this logic is from the defunct NtsShapeReadWriter
-            if (shape is NtsGeometry) {
+            if (shape is NtsGeometry)
+            {
                 NtsGeometry jtsGeom = (NtsGeometry)shape;
-                return jtsGeom.GetGeom().ToText();
+                return jtsGeom.GetGeom().AsText();
             }
             //Note: doesn't handle ShapeCollection or BufferedLineString
             return base.ToString(shape);
@@ -112,74 +114,74 @@ namespace Spatial4n.Core.Context.Nts
         /// </summary>
         /// <param name="shape">Not null</param>
         /// <returns>Not null</returns>
-        public IGeometry GetGeometryFrom(Shape shape)
-		{
-			if (shape is NtsGeometry)
-			{
-				return ((NtsGeometry)shape).GetGeom();
-			}
-			if (shape is NtsPoint)
-			{
-				return ((NtsPoint)shape).GetGeom();
-			}
+        public virtual IGeometry GetGeometryFrom(Shape shape)
+        {
+            if (shape is NtsGeometry)
+            {
+                return ((NtsGeometry)shape).GetGeom();
+            }
+            if (shape is NtsPoint)
+            {
+                return ((NtsPoint)shape).GetGeom();
+            }
 
-			var point = shape as Shapes.Point;
-			if (point != null)
-			{
-				return geometryFactory.CreatePoint(new Coordinate(point.GetX(), point.GetY()));
-			}
+            var point = shape as Shapes.Point;
+            if (point != null)
+            {
+                return geometryFactory.CreatePoint(new Coordinate(point.GetX(), point.GetY()));
+            }
 
-			var r = shape as Rectangle;
-			if (r != null)
-			{
+            var r = shape as Rectangle;
+            if (r != null)
+            {
 
-				if (r.GetCrossesDateLine())
-				{
-					var pair = new List<IGeometry>(2)
-                   	{
-                   		geometryFactory.ToGeometry(new Envelope(
-                   		                           	r.GetMinX(), GetWorldBounds().GetMaxX(), r.GetMinY(), r.GetMaxY())),
-                   		geometryFactory.ToGeometry(new Envelope(
-                   		                           	GetWorldBounds().GetMinX(), r.GetMaxX(), r.GetMinY(), r.GetMaxY()))
-                   	};
-					return geometryFactory.BuildGeometry(pair);//a MultiPolygon or MultiLineString
-				}
-				else
-				{
-					return geometryFactory.ToGeometry(new Envelope(r.GetMinX(), r.GetMaxX(), r.GetMinY(), r.GetMaxY()));
-				}
-			}
+                if (r.GetCrossesDateLine())
+                {
+                    var pair = new List<IGeometry>(2)
+                       {
+                           geometryFactory.ToGeometry(new Envelope(
+                                                          r.GetMinX(), GetWorldBounds().GetMaxX(), r.GetMinY(), r.GetMaxY())),
+                           geometryFactory.ToGeometry(new Envelope(
+                                                          GetWorldBounds().GetMinX(), r.GetMaxX(), r.GetMinY(), r.GetMaxY()))
+                       };
+                    return geometryFactory.BuildGeometry(pair);//a MultiPolygon or MultiLineString
+                }
+                else
+                {
+                    return geometryFactory.ToGeometry(new Envelope(r.GetMinX(), r.GetMaxX(), r.GetMinY(), r.GetMaxY()));
+                }
+            }
 
-			var circle = shape as Circle;
-			if (circle != null)
-			{
-				// TODO, this should maybe pick a bunch of points
-				// and make a circle like:
-				//  http://docs.codehaus.org/display/GEOTDOC/01+How+to+Create+a+Geometry#01HowtoCreateaGeometry-CreatingaCircle
-				// If this crosses the dateline, it could make two parts
-				// is there an existing utility that does this?
+            var circle = shape as Circle;
+            if (circle != null)
+            {
+                // TODO, this should maybe pick a bunch of points
+                // and make a circle like:
+                //  http://docs.codehaus.org/display/GEOTDOC/01+How+to+Create+a+Geometry#01HowtoCreateaGeometry-CreatingaCircle
+                // If this crosses the dateline, it could make two parts
+                // is there an existing utility that does this?
 
-				if (circle.GetBoundingBox().GetCrossesDateLine())
-					throw new ArgumentException("Doesn't support dateline cross yet: " + circle);//TODO
-				var gsf = new GeometricShapeFactory(geometryFactory)
-							{
-								Size = circle.GetBoundingBox().GetWidth() / 2.0f,
-								NumPoints = 4 * 25,//multiple of 4 is best
-								Centre = new Coordinate(circle.GetCenter().GetX(), circle.GetCenter().GetY())
-							};
-				return gsf.CreateCircle();
-			}
-			throw new InvalidShapeException("can't make Geometry from: " + shape);
-		}
+                if (circle.GetBoundingBox().GetCrossesDateLine())
+                    throw new ArgumentException("Doesn't support dateline cross yet: " + circle);//TODO
+                var gsf = new GeometricShapeFactory(geometryFactory)
+                {
+                    Size = circle.GetBoundingBox().GetWidth() / 2.0f,
+                    NumPoints = 4 * 25,//multiple of 4 is best
+                    Centre = new Coordinate(circle.GetCenter().GetX(), circle.GetCenter().GetY())
+                };
+                return gsf.CreateCircle();
+            }
+            throw new InvalidShapeException("can't make Geometry from: " + shape);
+        }
 
         // Should {@link #makePoint(double, double)} return {@link JtsPoint}?
-        public bool UseNtsPoint
+        public virtual bool UseNtsPoint
         {
             get { return useNtsPoint; }
         }
 
-		public override Shapes.Point MakePoint(double x, double y)
-		{
+        public override Point MakePoint(double x, double y)
+        {
             if (!UseNtsPoint)
                 return base.MakePoint(x, y);
             //A Nts Point is fairly heavyweight!  TODO could/should we optimize this?
@@ -187,10 +189,10 @@ namespace Spatial4n.Core.Context.Nts
             VerifyY(y);
             Coordinate coord = double.IsNaN(x) ? null : new Coordinate(x, y);
             return new NtsPoint(geometryFactory.CreatePoint(coord), this);
-		}
+        }
 
         /** Should {@link #makeLineString(java.util.List)} return {@link JtsGeometry}? */
-        public bool UseNtsLineString
+        public virtual bool UseNtsLineString
         {
             get
             {
@@ -200,7 +202,7 @@ namespace Spatial4n.Core.Context.Nts
             }
         }
 
-        public override Shape MakeLineString(List<Shapes.Point> points)
+        public override Shape MakeLineString(IList<Point> points)
         {
             if (!useNtsLineString)
                 return base.MakeLineString(points);
@@ -209,58 +211,61 @@ namespace Spatial4n.Core.Context.Nts
             for (int i = 0; i < coords.Length; i++)
             {
                 Shapes.Point p = points[i];
-                if (p is NtsPoint) {
-                NtsPoint jtsPoint = (NtsPoint)p;
-                coords[i] = jtsPoint.GetGeom().Coordinate;
-            } else {
-                coords[i] = new Coordinate(p.GetX(), p.GetY());
+                if (p is NtsPoint)
+                {
+                    NtsPoint jtsPoint = (NtsPoint)p;
+                    coords[i] = jtsPoint.GetGeom().Coordinate;
+                }
+                else
+                {
+                    coords[i] = new Coordinate(p.GetX(), p.GetY());
+                }
+            }
+            ILineString lineString = geometryFactory.CreateLineString(coords);
+            return MakeShape(lineString);
+        }
+
+        /**
+         * INTERNAL
+         * @see #makeShape(com.vividsolutions.jts.geom.Geometry)
+         *
+         * @param geom Non-null
+         * @param dateline180Check if both this is true and {@link #isGeo()}, then JtsGeometry will check
+         *                         for adjacent coordinates greater than 180 degrees longitude apart, and
+         *                         it will do tricks to make that line segment (and the shape as a whole)
+         *                         cross the dateline even though JTS doesn't have geodetic support.
+         * @param allowMultiOverlap See {@link #isAllowMultiOverlap()}.
+         */
+        public virtual NtsGeometry MakeShape(IGeometry geom, bool dateline180Check, bool allowMultiOverlap)
+        {
+            return new NtsGeometry(geom, this, dateline180Check, allowMultiOverlap);
+        }
+
+        /**
+         * INTERNAL: Creates a {@link Shape} from a JTS {@link Geometry}. Generally, this shouldn't be
+         * called when one of the other factory methods are available, such as for points. The caller
+         * needs to have done some verification/normalization of the coordinates by now, if any.
+         */
+        public virtual NtsGeometry MakeShape(IGeometry geom)
+        {
+            return MakeShape(geom, true/*dateline180Check*/, allowMultiOverlap);
+        }
+
+        public virtual GeometryFactory GetGeometryFactory()
+        {
+            return geometryFactory;
+        }
+
+        public override string ToString()
+        {
+            if (this.Equals(GEO))
+            {
+                return GEO.GetType().Name + ".GEO";
+            }
+            else
+            {
+                return base.ToString();
             }
         }
-        LineString lineString = geometryFactory.CreateLineString(coords);
-        return MakeShape(lineString);
     }
-
-    /**
-     * INTERNAL
-     * @see #makeShape(com.vividsolutions.jts.geom.Geometry)
-     *
-     * @param geom Non-null
-     * @param dateline180Check if both this is true and {@link #isGeo()}, then JtsGeometry will check
-     *                         for adjacent coordinates greater than 180 degrees longitude apart, and
-     *                         it will do tricks to make that line segment (and the shape as a whole)
-     *                         cross the dateline even though JTS doesn't have geodetic support.
-     * @param allowMultiOverlap See {@link #isAllowMultiOverlap()}.
-     */
-    public NtsGeometry MakeShape(IGeometry geom, bool dateline180Check, bool allowMultiOverlap)
-    {
-        return new NtsGeometry(geom, this, dateline180Check, allowMultiOverlap);
-    }
-
-    /**
-     * INTERNAL: Creates a {@link Shape} from a JTS {@link Geometry}. Generally, this shouldn't be
-     * called when one of the other factory methods are available, such as for points. The caller
-     * needs to have done some verification/normalization of the coordinates by now, if any.
-     */
-    public NtsGeometry MakeShape(Geometry geom)
-    {
-        return MakeShape(geom, true/*dateline180Check*/, allowMultiOverlap);
-    }
-
-    public GeometryFactory GetGeometryFactory()
-		{
-			return geometryFactory;
-		}
-
-		public override string ToString()
-		{
-			if (this.Equals(GEO))
-			{
-				return GEO.GetType().Name + ".GEO";
-			}
-			else
-			{
-				return base.ToString();
-			}
-		}
-	}
 }

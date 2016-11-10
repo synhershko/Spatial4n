@@ -67,7 +67,7 @@ namespace Spatial4n.Core.Shapes.Impl
             get { return double.IsNaN(minX); }
         }
 
-        public virtual Rectangle GetBuffered(double distance, SpatialContext ctx)
+        public virtual /*Rectangle*/ Shape GetBuffered(double distance, SpatialContext ctx)
         {
             if (ctx.IsGeo())
             {

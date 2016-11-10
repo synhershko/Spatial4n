@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Collections;
 
 namespace Spatial4n.Core.Shapes.Impl
 {
@@ -16,7 +17,7 @@ namespace Spatial4n.Core.Shapes.Impl
         //TODO add some geospatial awareness like:
         // segment that spans at the dateline (split it at DL?).
 
-        private readonly ShapeCollection<BufferedLine> segments;
+        private readonly /*ShapeCollection<BufferedLine>*/ ShapeCollection segments;
         private readonly double buf;
 
         /**
@@ -38,18 +39,19 @@ namespace Spatial4n.Core.Shapes.Impl
          *                                  is computed.
          * @param ctx
          */
-        public BufferedLineString(List<Point> points, double buf, bool expandBufForLongitudeSkew,
+        public BufferedLineString(IList<Point> points, double buf, bool expandBufForLongitudeSkew,
                                   SpatialContext ctx)
         {
             this.buf = buf;
 
             if (!points.Any())
             {
-                this.segments = ctx.MakeCollection(new List<BufferedLine>());
+                this.segments = ctx.MakeCollection(/*new List<BufferedLine>()*/ new List<Shape>());
             }
             else
             {
-                List<BufferedLine> segments = new List<BufferedLine>(points.Count - 1);
+                //List<BufferedLine> segments = new List<BufferedLine>(points.Count - 1);
+                List<Shape> segments = new List<Shape>(points.Count - 1);
 
                 Point prevPoint = null;
                 foreach (Point point in points)
@@ -75,9 +77,9 @@ namespace Spatial4n.Core.Shapes.Impl
         }
 
 
-        public virtual bool IsEmpty()
+        public virtual bool IsEmpty
         {
-            return segments.isEmpty();
+            get { return segments.IsEmpty; }
         }
 
         public virtual Shape GetBuffered(double distance, SpatialContext ctx)
@@ -85,7 +87,7 @@ namespace Spatial4n.Core.Shapes.Impl
             return ctx.MakeBufferedLineString(GetPoints(), buf + distance);
         }
 
-        public virtual ShapeCollection<BufferedLine> GetSegments()
+        public virtual /*ShapeCollection<BufferedLine>*/ ShapeCollection GetSegments()
         {
             return segments;
         }
@@ -107,7 +109,7 @@ namespace Spatial4n.Core.Shapes.Impl
 
         public virtual bool HasArea()
         {
-            return segments.HasArea;
+            return segments.HasArea();
         }
 
 
@@ -119,7 +121,7 @@ namespace Spatial4n.Core.Shapes.Impl
 
         public virtual Rectangle GetBoundingBox()
         {
-            return segments.BoundingBox; 
+            return segments.GetBoundingBox(); 
         }
 
 
@@ -144,11 +146,106 @@ namespace Spatial4n.Core.Shapes.Impl
             return str.ToString();
         }
 
-        public virtual List<Point> GetPoints()
+        private class PointListAnonymousHelper : IList<Point>
+        {
+            private readonly IList<Point> pointList = new List<Point>();
+            private readonly IList<Shape> lines;
+
+            public PointListAnonymousHelper(IList<Shape> lines)
+            {
+                this.lines = lines;
+            }
+
+
+            public Point this[int index]
+            {
+                get
+                {
+                    if (index == 0)
+                        return ((BufferedLine)lines[0]).GetA();
+                    return ((BufferedLine)lines[index - 1]).GetB();
+                }
+                set
+                {
+                    pointList[index] = value;
+                }
+            }
+
+            public int Count
+            {
+                get
+                {
+                    return pointList.Count;
+                }
+            }
+
+            public bool IsReadOnly
+            {
+                get
+                {
+                    return pointList.IsReadOnly;
+                }
+            }
+
+            public void Add(Point item)
+            {
+                pointList.Add(item);
+            }
+
+            public void Clear()
+            {
+                pointList.Clear();
+            }
+
+            public bool Contains(Point item)
+            {
+                return pointList.Contains(item);
+            }
+
+            public void CopyTo(Point[] array, int arrayIndex)
+            {
+                pointList.CopyTo(array, arrayIndex);
+            }
+
+            public IEnumerator<Point> GetEnumerator()
+            {
+                return pointList.GetEnumerator();
+            }
+
+            public int IndexOf(Point item)
+            {
+                return pointList.IndexOf(item);
+            }
+
+            public void Insert(int index, Point item)
+            {
+                pointList.Insert(index, item);
+            }
+
+            public bool Remove(Point item)
+            {
+                return pointList.Remove(item);
+            }
+
+            public void RemoveAt(int index)
+            {
+                pointList.RemoveAt(index);
+            }
+
+            IEnumerator IEnumerable.GetEnumerator()
+            {
+                return pointList.GetEnumerator();
+            }
+        }
+
+        public virtual IList<Point> GetPoints()
         {
             if (!segments.Any())
                 return new List<Point>();
-            List<BufferedLine> lines = segments.GetShapes();
+            //List<BufferedLine> lines = segments.GetShapes();
+            IList<Shape> lines = segments.GetShapes();
+            return new PointListAnonymousHelper(lines);
+
             //        return new AbstractList<Point>() {
             //  @Override
             //  public Point get(int index)

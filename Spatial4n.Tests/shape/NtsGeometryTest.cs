@@ -1,0 +1,268 @@
+﻿using GeoAPI.Geometries;
+using Spatial4n.Core.Context.Nts;
+using Spatial4n.Core.Io.Nts;
+using Spatial4n.Core.Shapes;
+using Spatial4n.Core.Shapes.Impl;
+using Spatial4n.Core.Shapes.Nts;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
+using System.Linq;
+using System.Text;
+using Xunit;
+
+namespace Spatial4n.Tests.shape
+{
+    /// <summary>
+    /// Tests {@link com.spatial4j.core.shape.jts.JtsGeometry} and some other code related
+    /// to {@link com.spatial4j.core.context.jts.JtsSpatialContext}.
+    /// </summary>
+    public class NtsGeometryTest : AbstractTestShapes
+    {
+        protected readonly Random random = new Random(RandomSeed.Seed());
+
+
+        private readonly string POLY_STR = "Polygon((-10 30, -40 40, -10 -20, 40 20, 0 0, -10 30))";
+        private NtsGeometry POLY_SHAPE;
+        private readonly int DL_SHIFT = 180;//since POLY_SHAPE contains 0 0, I know a shift of 180 will make it cross the DL.
+        private NtsGeometry POLY_SHAPE_DL;//POLY_SHAPE shifted by DL_SHIFT to cross the dateline
+
+        public NtsGeometryTest()
+            : base(NtsSpatialContext.GEO)
+        {
+            POLY_SHAPE = (NtsGeometry)ctx.ReadShapeFromWkt(POLY_STR);
+
+            if (ctx.IsGeo())
+            {
+                POLY_SHAPE_DL = ShiftPoly(POLY_SHAPE, DL_SHIFT);
+                Assert.True(POLY_SHAPE_DL.GetBoundingBox().GetCrossesDateLine());
+            }
+        }
+
+        private class CoordinateFilterAnonymousHelper : ICoordinateFilter
+        {
+            private readonly NtsGeometryTest outerInstance;
+            private readonly int lon_shift;
+
+            public CoordinateFilterAnonymousHelper(NtsGeometryTest outerInstance, int lon_shift)
+            {
+                this.outerInstance = outerInstance;
+                this.lon_shift = lon_shift;
+            }
+
+            public void Filter(Coordinate coord)
+            {
+                coord.X = outerInstance.NormX(coord.X + lon_shift);
+                if (outerInstance.ctx.IsGeo() && Math.Abs(coord.X) == 180 && outerInstance.random.nextBoolean())
+                    coord.X = -coord.X;//invert sign of dateline boundary some of the time
+            }
+        }
+
+        private NtsGeometry ShiftPoly(NtsGeometry poly, int lon_shift)
+        {
+            //Random random = RandomizedContext.current().getRandom();
+            IGeometry pGeom = poly.GetGeom();
+            Assert.True(pGeom.IsValid);
+            //shift 180 to the right
+            pGeom = (IGeometry)pGeom.Clone();
+            pGeom.Apply(new CoordinateFilterAnonymousHelper(this, lon_shift));
+            //        pGeom.Apply(new CoordinateFilter()
+            //    {
+            //        @Override
+            //  public void filter(Coordinate coord)
+            //    {
+            //        coord.x = normX(coord.x + lon_shift);
+            //        if (ctx.isGeo() && Math.abs(coord.x) == 180 && random.nextBoolean())
+            //            coord.x = -coord.x;//invert sign of dateline boundary some of the time
+            //    }
+            //});
+            pGeom.GeometryChanged();
+            Assert.False(pGeom.IsValid);
+            return (NtsGeometry)ctx.ReadShapeFromWkt(pGeom.AsText());
+        }
+
+        [Fact]
+        public virtual void TestRelations()
+        {
+            TestRelations(false);
+            TestRelations(true);
+        }
+        public virtual void TestRelations(bool prepare)
+        {
+            Debug.Assert(!((NtsWktShapeParser)ctx.GetWktShapeParser()).IsAutoIndex);
+            //base polygon
+            NtsGeometry @base = (NtsGeometry)ctx.ReadShapeFromWkt("POLYGON((0 0, 10 0, 5 5, 0 0))");
+            //shares only "10 0" with base
+            NtsGeometry polyI = (NtsGeometry)ctx.ReadShapeFromWkt("POLYGON((10 0, 20 0, 15 5, 10 0))");
+            //within base: differs from base by one point is within
+            NtsGeometry polyW = (NtsGeometry)ctx.ReadShapeFromWkt("POLYGON((0 0, 9 0, 5 5, 0 0))");
+            //a boundary point of base
+            Point pointB = ctx.MakePoint(0, 0);
+            //a shared boundary line of base
+            NtsGeometry lineB = (NtsGeometry)ctx.ReadShapeFromWkt("LINESTRING(0 0, 10 0)");
+            //a line sharing only one point with base
+            NtsGeometry lineI = (NtsGeometry)ctx.ReadShapeFromWkt("LINESTRING(10 0, 20 0)");
+
+            if (prepare) @base.Index();
+            AssertRelation(SpatialRelation.CONTAINS, @base, @base);//preferred result as there is no EQUALS
+            AssertRelation(SpatialRelation.INTERSECTS, @base, polyI);
+            AssertRelation(SpatialRelation.CONTAINS, @base, polyW);
+            AssertRelation(SpatialRelation.CONTAINS, @base, pointB);
+            AssertRelation(SpatialRelation.CONTAINS, @base, lineB);
+            AssertRelation(SpatialRelation.INTERSECTS, @base, lineI);
+            if (prepare) lineB.Index();
+            AssertRelation(SpatialRelation.CONTAINS, lineB, lineB);//line contains itself
+            AssertRelation(SpatialRelation.CONTAINS, lineB, pointB);
+        }
+
+        [Fact]
+        public virtual void TestEmpty()
+        {
+            Shape emptyGeom = ctx.ReadShapeFromWkt("POLYGON EMPTY");
+            TestEmptiness(emptyGeom);
+            AssertRelation("EMPTY", SpatialRelation.DISJOINT, emptyGeom, POLY_SHAPE);
+        }
+
+        [Fact]
+        public virtual void TestArea()
+        {
+            //simple bbox
+            Rectangle r = RandomRectangle(20);
+            NtsSpatialContext ctxJts = (NtsSpatialContext)ctx;
+            NtsGeometry rPoly = ctxJts.MakeShape(ctxJts.GetGeometryFrom(r), false, false);
+            Assert.Equal(r.GetArea(null), rPoly.GetArea(null), (int)0.0);
+            Assert.Equal(r.GetArea(ctx), rPoly.GetArea(ctx), (int)0.000001);//same since fills 100%
+
+            Assert.Equal(1300, POLY_SHAPE.GetArea(null), (int)0.0);
+
+            //fills 27%
+            Assert.Equal(0.27, POLY_SHAPE.GetArea(ctx) / POLY_SHAPE.GetBoundingBox().GetArea(ctx), (int)0.009);
+            Assert.True(POLY_SHAPE.GetBoundingBox().GetArea(ctx) > POLY_SHAPE.GetArea(ctx));
+        }
+
+        [Fact]
+        [RepeatTest(100)]
+        public virtual void TestPointAndRectIntersect()
+        {
+            Rectangle r = RandomRectangle(5);
+
+            AssertJtsConsistentRelate(r);
+            AssertJtsConsistentRelate(r.GetCenter());
+        }
+
+        [Fact]
+        public virtual void TestRegressions()
+        {
+            AssertJtsConsistentRelate(new PointImpl(-10, 4, ctx));//PointImpl not JtsPoint, and CONTAINS
+            AssertJtsConsistentRelate(new PointImpl(-15, -10, ctx));//point on boundary
+            AssertJtsConsistentRelate(ctx.MakeRectangle(135, 180, -10, 10));//180 edge-case
+        }
+
+        [Fact]
+        public virtual void TestWidthGreaterThan180()
+        {
+            //does NOT cross the dateline but is a wide shape >180
+            NtsGeometry jtsGeo = (NtsGeometry)ctx.ReadShapeFromWkt("POLYGON((-161 49, 0 49, 20 49, 20 89.1, 0 89.1, -161 89.2, -161 49))");
+            Assert.Equal(161 + 20, jtsGeo.GetBoundingBox().GetWidth(), (int)0.001);
+
+            //shift it to cross the dateline and check that it's still good
+            jtsGeo = ShiftPoly(jtsGeo, 180);
+            Assert.Equal(161 + 20, jtsGeo.GetBoundingBox().GetWidth(), (int)0.001);
+        }
+
+        private void AssertJtsConsistentRelate(Shape shape)
+        {
+            IntersectionMatrix expectedM = POLY_SHAPE.GetGeom().Relate(((NtsSpatialContext)ctx).GetGeometryFrom(shape));
+            SpatialRelation expectedSR = NtsGeometry.IntersectionMatrixToSpatialRelation(expectedM);
+            //JTS considers a point on a boundary INTERSECTS, not CONTAINS
+            if (expectedSR == SpatialRelation.INTERSECTS && shape is Point)
+                expectedSR = SpatialRelation.CONTAINS;
+            AssertRelation(null, expectedSR, POLY_SHAPE, shape);
+
+            if (ctx.IsGeo())
+            {
+                //shift shape, set to shape2
+                Shape shape2;
+                if (shape is Rectangle)
+                {
+                    Rectangle r = (Rectangle)shape;
+                    shape2 = MakeNormRect(r.GetMinX() + DL_SHIFT, r.GetMaxX() + DL_SHIFT, r.GetMinY(), r.GetMaxY());
+                }
+                else if (shape is Point)
+                {
+                    Point p = (Point)shape;
+                    shape2 = ctx.MakePoint(NormX(p.GetX() + DL_SHIFT), p.GetY());
+                }
+                else
+                {
+                    throw new Exception("" + shape);
+                }
+
+                AssertRelation(null, expectedSR, POLY_SHAPE_DL, shape2);
+            }
+        }
+
+        [Fact]
+        public virtual void TestRussia()
+        {
+            string wktStr = ReadFirstLineFromRsrc("/russia.wkt.txt");
+            //Russia exercises JtsGeometry fairly well because of these characteristics:
+            // * a MultiPolygon
+            // * crosses the dateline
+            // * has coordinates needing normalization (longitude +180.000xxx)
+
+            //TODO THE RUSSIA TEST DATA SET APPEARS CORRUPT
+            // But this test "works" anyhow, and exercises a ton.
+            //Unexplained holes revealed via KML export:
+            // TODO Test contains: 64°12'44.82"N    61°29'5.20"E
+            //  64.21245  61.48475
+            // FAILS
+            //AssertRelation(null,SpatialRelation.CONTAINS, shape, ctx.makePoint(61.48, 64.21));
+
+            NtsSpatialContextFactory factory = new NtsSpatialContextFactory();
+            factory.normWrapLongitude = true;
+
+            NtsSpatialContext ctx = (NtsSpatialContext)factory.NewSpatialContext();
+
+            Shape shape = ctx.ReadShapeFromWkt(wktStr);
+            //System.out.println("Russia Area: "+shape.getArea(ctx));
+        }
+
+        [Fact]
+        public virtual void TestFiji()
+        {
+            //Fiji is a group of islands crossing the dateline.
+            string wktStr = ReadFirstLineFromRsrc("/fiji.wkt.txt");
+
+            NtsSpatialContextFactory factory = new NtsSpatialContextFactory();
+            factory.normWrapLongitude = true;
+            NtsSpatialContext ctx = (NtsSpatialContext)factory.NewSpatialContext();
+
+            Shape shape = ctx.ReadShapeFromWkt(wktStr);
+
+            AssertRelation(null, SpatialRelation.CONTAINS, shape,
+                    ctx.MakePoint(-179.99, -16.9));
+            AssertRelation(null, SpatialRelation.CONTAINS, shape,
+                    ctx.MakePoint(+179.99, -16.9));
+            Assert.True(shape.GetBoundingBox().GetWidth() < 5);//smart bbox
+            Console.WriteLine("Fiji Area: " + shape.GetArea(ctx));
+        }
+
+        private string ReadFirstLineFromRsrc(string wktRsrcPath)
+        {
+            //InputStream is = getClass().getResourceAsStream(wktRsrcPath);
+            Stream input = GetType().Assembly.GetManifestResourceStream(wktRsrcPath);
+            Assert.NotNull(input);
+            try
+            {
+                TextReader br = new StreamReader(input, Encoding.UTF8);
+                return br.ReadLine();
+            }
+            finally
+            {
+                input.Dispose();
+            }
+        }
+    }
+}

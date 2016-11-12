@@ -79,7 +79,7 @@ namespace Spatial4n.Tests.io
                 if (false)
                     other.NewState(wkt);
 
-                return new State(other, wkt);
+                return new State(this, wkt);
             }
 
             protected internal override Shape ParseShapeByType(State state, string shapeType)

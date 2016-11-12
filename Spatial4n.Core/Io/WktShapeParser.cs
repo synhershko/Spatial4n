@@ -430,7 +430,7 @@ namespace Spatial4n.Core.Io
                 if (Eof)
                     return false;
                 c = rawString[offset];
-                if (c == '(' || /*!Character.isJavaIdentifierPart(c)*/ IsIdentifierPartCharacter(rawString[offset]))
+                if (c == '(' || /*!Character.isJavaIdentifierPart(c)*/ !IsIdentifierPartCharacter(rawString[offset]))
                     return false;
                 word = NextWord();
                 if (word.Equals("EMPTY", StringComparison.OrdinalIgnoreCase))

@@ -146,121 +146,25 @@ namespace Spatial4n.Core.Shapes.Impl
             return str.ToString();
         }
 
-        private class PointListAnonymousHelper : IList<Point>
-        {
-            private readonly IList<Point> pointList = new List<Point>();
-            private readonly IList<Shape> lines;
-
-            public PointListAnonymousHelper(IList<Shape> lines)
-            {
-                this.lines = lines;
-            }
-
-
-            public Point this[int index]
-            {
-                get
-                {
-                    if (index == 0)
-                        return ((BufferedLine)lines[0]).GetA();
-                    return ((BufferedLine)lines[index - 1]).GetB();
-                }
-                set
-                {
-                    pointList[index] = value;
-                }
-            }
-
-            public int Count
-            {
-                get
-                {
-                    return pointList.Count;
-                }
-            }
-
-            public bool IsReadOnly
-            {
-                get
-                {
-                    return pointList.IsReadOnly;
-                }
-            }
-
-            public void Add(Point item)
-            {
-                pointList.Add(item);
-            }
-
-            public void Clear()
-            {
-                pointList.Clear();
-            }
-
-            public bool Contains(Point item)
-            {
-                return pointList.Contains(item);
-            }
-
-            public void CopyTo(Point[] array, int arrayIndex)
-            {
-                pointList.CopyTo(array, arrayIndex);
-            }
-
-            public IEnumerator<Point> GetEnumerator()
-            {
-                return pointList.GetEnumerator();
-            }
-
-            public int IndexOf(Point item)
-            {
-                return pointList.IndexOf(item);
-            }
-
-            public void Insert(int index, Point item)
-            {
-                pointList.Insert(index, item);
-            }
-
-            public bool Remove(Point item)
-            {
-                return pointList.Remove(item);
-            }
-
-            public void RemoveAt(int index)
-            {
-                pointList.RemoveAt(index);
-            }
-
-            IEnumerator IEnumerable.GetEnumerator()
-            {
-                return pointList.GetEnumerator();
-            }
-        }
-
         public virtual IList<Point> GetPoints()
         {
             if (!segments.Any())
                 return new List<Point>();
-            //List<BufferedLine> lines = segments.GetShapes();
-            IList<Shape> lines = segments.GetShapes();
-            return new PointListAnonymousHelper(lines);
+            IList<Shape> shapes = segments.GetShapes();
+            IList<Point> points = new List<Point>(); ;
 
-            //        return new AbstractList<Point>() {
-            //  @Override
-            //  public Point get(int index)
-            //    {
-            //        if (index == 0)
-            //            return lines.get(0).getA();
-            //        return lines.get(index - 1).getB();
-            //    }
+            foreach (var shape in shapes)
+            {
+                if (!(shape is BufferedLine))
+                    continue;
 
-            //    @Override
-            //  public int size()
-            //    {
-            //        return lines.size() + 1;
-            //    }
-            //};
+                BufferedLine line = shape as BufferedLine;
+
+                points.Add(line.GetA());
+                points.Add(line.GetB());
+            }
+
+            return points;
         }
 
 

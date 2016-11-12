@@ -1,4 +1,5 @@
 ﻿using GeoAPI.Geometries;
+using Spatial4n.Core.Context;
 using Spatial4n.Core.Context.Nts;
 using Spatial4n.Core.Io.Nts;
 using Spatial4n.Core.Shapes;
@@ -21,6 +22,15 @@ namespace Spatial4n.Tests.shape
     public class NtsGeometryTest : AbstractTestShapes
     {
         protected readonly Random random = new Random(RandomSeed.Seed());
+
+        public static IEnumerable<object[]> Contexts
+        {
+            get
+            {
+                yield return new object[] { SpatialContext.GEO };
+                yield return new object[] { NtsSpatialContext.GEO };
+            }
+        }
 
 
         private readonly string POLY_STR = "Polygon((-10 30, -40 40, -10 -20, 40 20, 0 0, -10 30))";

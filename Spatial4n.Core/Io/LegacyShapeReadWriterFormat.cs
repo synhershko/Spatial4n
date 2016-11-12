@@ -124,7 +124,7 @@ namespace Spatial4n.Core.Io
                         string body = str.Substring(circleLength, idx - circleLength);
                         //StringTokenizer st = new StringTokenizer(body, " ");
                         //String token = st.nextToken();
-                        tokens = body.Split(' ');
+                        tokens = body.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
                         nextToken = 0;
                         string token = tokens[nextToken];
                         Point pt;

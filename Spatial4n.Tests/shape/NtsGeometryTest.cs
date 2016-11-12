@@ -85,10 +85,10 @@ namespace Spatial4n.Tests.shape
         [Fact]
         public virtual void TestRelations()
         {
-            TestRelations(false);
-            TestRelations(true);
+            TestRelationsImpl(false);
+            TestRelationsImpl(true);
         }
-        public virtual void TestRelations(bool prepare)
+        public virtual void TestRelationsImpl(bool prepare)
         {
             Debug.Assert(!((NtsWktShapeParser)ctx.GetWktShapeParser()).IsAutoIndex);
             //base polygon
@@ -206,7 +206,7 @@ namespace Spatial4n.Tests.shape
         [Fact]
         public virtual void TestRussia()
         {
-            string wktStr = ReadFirstLineFromRsrc("/russia.wkt.txt");
+            string wktStr = ReadFirstLineFromRsrc("russia.wkt.txt");
             //Russia exercises JtsGeometry fairly well because of these characteristics:
             // * a MultiPolygon
             // * crosses the dateline
@@ -233,7 +233,7 @@ namespace Spatial4n.Tests.shape
         public virtual void TestFiji()
         {
             //Fiji is a group of islands crossing the dateline.
-            string wktStr = ReadFirstLineFromRsrc("/fiji.wkt.txt");
+            string wktStr = ReadFirstLineFromRsrc("fiji.wkt.txt");
 
             NtsSpatialContextFactory factory = new NtsSpatialContextFactory();
             factory.normWrapLongitude = true;
@@ -251,17 +251,16 @@ namespace Spatial4n.Tests.shape
 
         private string ReadFirstLineFromRsrc(string wktRsrcPath)
         {
-            //InputStream is = getClass().getResourceAsStream(wktRsrcPath);
-            Stream input = GetType().Assembly.GetManifestResourceStream(wktRsrcPath);
-            Assert.NotNull(input);
-            try
+            var projectPath = AppDomain.CurrentDomain.BaseDirectory.Substring(0,
+                AppDomain.CurrentDomain.BaseDirectory.LastIndexOf("Spatial4n.Tests", StringComparison.InvariantCultureIgnoreCase));
+
+            var fullPath = Path.Combine(projectPath, "Spatial4n.Tests");
+            fullPath = Path.Combine(fullPath, "resources");
+            fullPath = Path.Combine(fullPath, wktRsrcPath);
+
+            using (var stream = File.OpenText(fullPath))
             {
-                TextReader br = new StreamReader(input, Encoding.UTF8);
-                return br.ReadLine();
-            }
-            finally
-            {
-                input.Dispose();
+                return stream.ReadLine();
             }
         }
     }

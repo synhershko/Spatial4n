@@ -271,12 +271,12 @@ namespace Spatial4n.Tests.distance
         [Fact]
         public void AssertDistanceConversion()
         {
-            AssertDistanceConversion(0);
-            AssertDistanceConversion(500);
-            AssertDistanceConversion(DistanceUtils.EARTH_MEAN_RADIUS_KM);
+            AssertDistanceConversionImpl(0);
+            AssertDistanceConversionImpl(500);
+            AssertDistanceConversionImpl(DistanceUtils.EARTH_MEAN_RADIUS_KM);
         }
 
-        private void AssertDistanceConversion(double dist)
+        private void AssertDistanceConversionImpl(double dist)
         {
             double radius = DistanceUtils.EARTH_MEAN_RADIUS_KM;
             //test back & forth conversion for both

@@ -129,8 +129,8 @@ namespace Spatial4n.Tests.shape
         {
             //simple bbox
             Rectangle r = RandomRectangle(20);
-            NtsSpatialContext ctxJts = (NtsSpatialContext)ctx;
-            NtsGeometry rPoly = ctxJts.MakeShape(ctxJts.GetGeometryFrom(r), false, false);
+            NtsSpatialContext ctxNts = (NtsSpatialContext)ctx;
+            NtsGeometry rPoly = ctxNts.MakeShape(ctxNts.GetGeometryFrom(r), false, false);
             Assert.Equal(r.GetArea(null), rPoly.GetArea(null), (int)0.0);
             Assert.Equal(r.GetArea(ctx), rPoly.GetArea(ctx), (int)0.000001);//same since fills 100%
 
@@ -147,35 +147,35 @@ namespace Spatial4n.Tests.shape
         {
             Rectangle r = RandomRectangle(5);
 
-            AssertJtsConsistentRelate(r);
-            AssertJtsConsistentRelate(r.GetCenter());
+            AssertNtsConsistentRelate(r);
+            AssertNtsConsistentRelate(r.GetCenter());
         }
 
         [Fact]
         public virtual void TestRegressions()
         {
-            AssertJtsConsistentRelate(new PointImpl(-10, 4, ctx));//PointImpl not JtsPoint, and CONTAINS
-            AssertJtsConsistentRelate(new PointImpl(-15, -10, ctx));//point on boundary
-            AssertJtsConsistentRelate(ctx.MakeRectangle(135, 180, -10, 10));//180 edge-case
+            AssertNtsConsistentRelate(new PointImpl(-10, 4, ctx));//PointImpl not NtsPoint, and CONTAINS
+            AssertNtsConsistentRelate(new PointImpl(-15, -10, ctx));//point on boundary
+            AssertNtsConsistentRelate(ctx.MakeRectangle(135, 180, -10, 10));//180 edge-case
         }
 
         [Fact]
         public virtual void TestWidthGreaterThan180()
         {
             //does NOT cross the dateline but is a wide shape >180
-            NtsGeometry jtsGeo = (NtsGeometry)ctx.ReadShapeFromWkt("POLYGON((-161 49, 0 49, 20 49, 20 89.1, 0 89.1, -161 89.2, -161 49))");
-            Assert.Equal(161 + 20, jtsGeo.GetBoundingBox().GetWidth(), (int)0.001);
+            NtsGeometry ntsGeo = (NtsGeometry)ctx.ReadShapeFromWkt("POLYGON((-161 49, 0 49, 20 49, 20 89.1, 0 89.1, -161 89.2, -161 49))");
+            Assert.Equal(161 + 20, ntsGeo.GetBoundingBox().GetWidth(), (int)0.001);
 
             //shift it to cross the dateline and check that it's still good
-            jtsGeo = ShiftPoly(jtsGeo, 180);
-            Assert.Equal(161 + 20, jtsGeo.GetBoundingBox().GetWidth(), (int)0.001);
+            ntsGeo = ShiftPoly(ntsGeo, 180);
+            Assert.Equal(161 + 20, ntsGeo.GetBoundingBox().GetWidth(), (int)0.001);
         }
 
-        private void AssertJtsConsistentRelate(Shape shape)
+        private void AssertNtsConsistentRelate(Shape shape)
         {
             IntersectionMatrix expectedM = POLY_SHAPE.GetGeom().Relate(((NtsSpatialContext)ctx).GetGeometryFrom(shape));
             SpatialRelation expectedSR = NtsGeometry.IntersectionMatrixToSpatialRelation(expectedM);
-            //JTS considers a point on a boundary INTERSECTS, not CONTAINS
+            //NTS considers a point on a boundary INTERSECTS, not CONTAINS
             if (expectedSR == SpatialRelation.INTERSECTS && shape is Point)
                 expectedSR = SpatialRelation.CONTAINS;
             AssertRelation(null, expectedSR, POLY_SHAPE, shape);
@@ -207,7 +207,7 @@ namespace Spatial4n.Tests.shape
         public virtual void TestRussia()
         {
             string wktStr = ReadFirstLineFromRsrc("russia.wkt.txt");
-            //Russia exercises JtsGeometry fairly well because of these characteristics:
+            //Russia exercises NtsGeometry fairly well because of these characteristics:
             // * a MultiPolygon
             // * crosses the dateline
             // * has coordinates needing normalization (longitude +180.000xxx)

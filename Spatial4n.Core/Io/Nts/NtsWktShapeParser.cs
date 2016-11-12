@@ -29,14 +29,14 @@ namespace Spatial4n.Core.Io.Nts
             this.autoIndex = factory.autoIndex;
         }
 
-        /** @see JtsWktShapeParser.ValidationRule */
+        /** @see NtsWktShapeParser.ValidationRule */
         public ValidationRule GetValidationRule() // .NET: naming conflict if made into property
         {
             return validationRule;
         }
 
         /**
-         * JtsGeometry shapes are automatically validated when {@link #getValidationRule()} isn't
+         * NtsGeometry shapes are automatically validated when {@link #getValidationRule()} isn't
          * {@code none}.
          */
         public bool IsAutoValidate
@@ -45,8 +45,8 @@ namespace Spatial4n.Core.Io.Nts
         }
 
         /**
-         * If JtsGeometry shapes should be automatically prepared (i.e. optimized) when read via WKT.
-         * @see com.spatial4j.core.shape.jts.JtsGeometry#index()
+         * If NtsGeometry shapes should be automatically prepared (i.e. optimized) when read via WKT.
+         * @see com.spatial4j.core.shape.jts.NtsGeometry#index()
          */
         public bool IsAutoIndex
         {
@@ -73,7 +73,7 @@ namespace Spatial4n.Core.Io.Nts
             return base.ParseShapeByType(state, shapeType);
         }
 
-        /** Bypasses {@link JtsSpatialContext#makeLineString(java.util.List)} so that we can more
+        /** Bypasses {@link NtsSpatialContext#makeLineString(java.util.List)} so that we can more
          * efficiently get the LineString without creating a {@code List<Point>}.
          */
         protected override Shape ParseLineStringShape(WktShapeParser.State state)
@@ -127,7 +127,7 @@ namespace Spatial4n.Core.Io.Nts
             {
                 if (datelineRule == DatelineRule.ccwRect)
                 {
-                    // If JTS says it is clockwise, then it's actually a dateline crossing rectangle.
+                    // If NTS says it is clockwise, then it's actually a dateline crossing rectangle.
                     crossesDateline = !CGAlgorithms.IsCCW(geometry.Coordinates);
                 }
                 else
@@ -142,7 +142,7 @@ namespace Spatial4n.Core.Io.Nts
         }
 
         /**
-         * Reads a polygon, returning a JTS polygon.
+         * Reads a polygon, returning a NTS polygon.
          */
         protected IPolygon Polygon(WktShapeParser.State state)
         {
@@ -189,7 +189,7 @@ namespace Spatial4n.Core.Io.Nts
 
 
         /**
-         * Reads a list of JTS Coordinate sequences from the current position.
+         * Reads a list of NTS Coordinate sequences from the current position.
          * <pre>
          *   '(' coordinateSequence (',' coordinateSequence )* ')'
          * </pre>
@@ -207,7 +207,7 @@ namespace Spatial4n.Core.Io.Nts
         }
 
         /**
-         * Reads a JTS Coordinate sequence from the current position.
+         * Reads a NTS Coordinate sequence from the current position.
          * <pre>
          *   '(' coordinate (',' coordinate )* ')'
          * </pre>
@@ -227,7 +227,7 @@ namespace Spatial4n.Core.Io.Nts
         /**
          * Reads a {@link com.vividsolutions.jts.geom.Coordinate} from the current position.
          * It's akin to {@link #point(com.spatial4j.core.io.WktShapeParser.State)} but for
-         * a JTS Coordinate.  Only the first 2 numbers are parsed; any remaining are ignored.
+         * a NTS Coordinate.  Only the first 2 numbers are parsed; any remaining are ignored.
          */
         protected Coordinate Coordinate(WktShapeParser.State state)
         {
@@ -279,7 +279,7 @@ namespace Spatial4n.Core.Io.Nts
         }
 
         /**
-         * Indicates the algorithm used to process JTS Polygons and JTS LineStrings for detecting dateline
+         * Indicates the algorithm used to process NTS Polygons and NTS LineStrings for detecting dateline
          * crossings. It only applies when geo=true.
          */
         public enum DatelineRule
@@ -301,7 +301,7 @@ namespace Spatial4n.Core.Io.Nts
             ccwRect
         }
 
-        /** Indicates how JTS geometries (notably polygons but applies to other geometries too) are
+        /** Indicates how NTS geometries (notably polygons but applies to other geometries too) are
          * validated (if at all) and repaired (if at all).
          */
         public enum ValidationRule

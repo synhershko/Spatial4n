@@ -63,8 +63,8 @@ namespace Spatial4n.Core.Context.Nts
             this.geometryFactory = factory.GetGeometryFactory();
 
             this.allowMultiOverlap = factory.allowMultiOverlap;
-            this.useNtsPoint = factory.useJtsPoint;
-            this.useNtsLineString = factory.useJtsLineString;
+            this.useNtsPoint = factory.useNtsPoint;
+            this.useNtsLineString = factory.useNtsLineString;
         }
 
         /// <summary>
@@ -101,16 +101,16 @@ namespace Spatial4n.Core.Context.Nts
             //Note: this logic is from the defunct NtsShapeReadWriter
             if (shape is NtsGeometry)
             {
-                NtsGeometry jtsGeom = (NtsGeometry)shape;
-                return jtsGeom.GetGeom().AsText();
+                NtsGeometry ntsGeom = (NtsGeometry)shape;
+                return ntsGeom.GetGeom().AsText();
             }
             //Note: doesn't handle ShapeCollection or BufferedLineString
             return base.ToString(shape);
         }
 
         /// <summary>
-        /// Gets a JTS <see cref="Geometry"/> for the given <see cref="Shape"/>. Some shapes hold a
-        /// JTS geometry whereas new ones must be created for the rest.
+        /// Gets a NTS <see cref="Geometry"/> for the given <see cref="Shape"/>. Some shapes hold a
+        /// NTS geometry whereas new ones must be created for the rest.
         /// </summary>
         /// <param name="shape">Not null</param>
         /// <returns>Not null</returns>
@@ -174,7 +174,7 @@ namespace Spatial4n.Core.Context.Nts
             throw new InvalidShapeException("can't make Geometry from: " + shape);
         }
 
-        // Should {@link #makePoint(double, double)} return {@link JtsPoint}?
+        // Should {@link #makePoint(double, double)} return {@link NtsPoint}?
         public virtual bool UseNtsPoint
         {
             get { return useNtsPoint; }
@@ -191,7 +191,7 @@ namespace Spatial4n.Core.Context.Nts
             return new NtsPoint(geometryFactory.CreatePoint(coord), this);
         }
 
-        /** Should {@link #makeLineString(java.util.List)} return {@link JtsGeometry}? */
+        /** Should {@link #makeLineString(java.util.List)} return {@link NtsGeometry}? */
         public virtual bool UseNtsLineString
         {
             get
@@ -213,8 +213,8 @@ namespace Spatial4n.Core.Context.Nts
                 Shapes.Point p = points[i];
                 if (p is NtsPoint)
                 {
-                    NtsPoint jtsPoint = (NtsPoint)p;
-                    coords[i] = jtsPoint.GetGeom().Coordinate;
+                    NtsPoint ntsPoint = (NtsPoint)p;
+                    coords[i] = ntsPoint.GetGeom().Coordinate;
                 }
                 else
                 {
@@ -230,10 +230,10 @@ namespace Spatial4n.Core.Context.Nts
          * @see #makeShape(com.vividsolutions.jts.geom.Geometry)
          *
          * @param geom Non-null
-         * @param dateline180Check if both this is true and {@link #isGeo()}, then JtsGeometry will check
+         * @param dateline180Check if both this is true and {@link #isGeo()}, then NtsGeometry will check
          *                         for adjacent coordinates greater than 180 degrees longitude apart, and
          *                         it will do tricks to make that line segment (and the shape as a whole)
-         *                         cross the dateline even though JTS doesn't have geodetic support.
+         *                         cross the dateline even though NTS doesn't have geodetic support.
          * @param allowMultiOverlap See {@link #isAllowMultiOverlap()}.
          */
         public virtual NtsGeometry MakeShape(IGeometry geom, bool dateline180Check, bool allowMultiOverlap)
@@ -242,7 +242,7 @@ namespace Spatial4n.Core.Context.Nts
         }
 
         /**
-         * INTERNAL: Creates a {@link Shape} from a JTS {@link Geometry}. Generally, this shouldn't be
+         * INTERNAL: Creates a {@link Shape} from a NTS {@link Geometry}. Generally, this shouldn't be
          * called when one of the other factory methods are available, such as for points. The caller
          * needs to have done some verification/normalization of the coordinates by now, if any.
          */

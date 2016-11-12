@@ -34,7 +34,7 @@ namespace Spatial4n.Tests.io
         public virtual void WktGeoRect()
         {
             //REMEMBER: Polygon WKT's outer ring is counter-clockwise order. If you accidentally give the other direction,
-            // JtsSpatialContext will give the wrong result for a rectangle crossing the dateline.
+            // NtsSpatialContext will give the wrong result for a rectangle crossing the dateline.
 
             // In these two tests, we give the same set of points, one that does not cross the dateline, and the 2nd does. The
             // order is counter-clockwise in both cases as it should be.

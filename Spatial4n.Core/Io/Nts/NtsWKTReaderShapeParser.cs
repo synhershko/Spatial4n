@@ -15,7 +15,7 @@ namespace Spatial4n.Core.Io.Nts
 {
     public class NtsWKTReaderShapeParser : NtsWktShapeParser
     {
-        //Note: Historically, the code here originated from the defunct JtsShapeReadWriter.
+        //Note: Historically, the code here originated from the defunct NtsShapeReadWriter.
 
         public NtsWKTReaderShapeParser(NtsSpatialContext ctx, NtsSpatialContextFactory factory)
             : base(ctx, factory)
@@ -28,7 +28,7 @@ namespace Spatial4n.Core.Io.Nts
         }
 
         /**
-         * Reads WKT from the {@code str} via JTS's {@link com.vividsolutions.jts.io.WKTReader}.
+         * Reads WKT from the {@code str} via NTS's {@link com.vividsolutions.jts.io.WKTReader}.
          * @param str
          * @param reader <pre>new WKTReader(ctx.getGeometryFactory()))</pre>
          * @return Non-Null
@@ -127,7 +127,7 @@ namespace Spatial4n.Core.Io.Nts
 
         protected virtual void CheckCoordinates(IGeometry geom)
         {
-            // note: JTS WKTReader has already normalized coords with the JTS PrecisionModel.
+            // note: NTS WKTReader has already normalized coords with the JTS PrecisionModel.
             geom.Apply(new CoordinateSequenceFilterAnonymousHelper(this));
             //        geom.Apply(new CoordinateSequenceFilter() {
             //      boolean changed = false;

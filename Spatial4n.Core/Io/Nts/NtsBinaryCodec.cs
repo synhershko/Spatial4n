@@ -86,7 +86,7 @@ namespace Spatial4n.Core.Io.Nts
             //public override int Read(byte[] buffer, int offset, int count)
             //{
             //    if (first)
-            //    {//we don't write JTS's leading BOM so synthesize reading it
+            //    {//we don't write NTS's leading BOM so synthesize reading it
             //        if (count != 1)
             //            throw new InvalidOperationException("Expected initial read of one byte, not: " + count);
             //        buffer[0] = wkbXDR; //WKBConstants.wkbXDR;//0
@@ -215,7 +215,7 @@ namespace Spatial4n.Core.Io.Nts
                 //////    @Override
                 //////        public void read(byte[] buf) throws IOException
                 //////    {
-                //////          if (first) {//we don't write JTS's leading BOM so synthesize reading it
+                //////          if (first) {//we don't write NTS's leading BOM so synthesize reading it
                 //////            if (buf.length != 1)
                 //////                throw new IllegalStateException("Expected initial read of one byte, not: " + buf.length);
                 //////            buf[0] = WKBConstants.wkbXDR;//0
@@ -345,7 +345,7 @@ namespace Spatial4n.Core.Io.Nts
             new WKBWriter().Write(geom, new OutputStreamAnonymousHelper(dataOutput));
 
     //        new WKBWriter().Write(geom, new OutStream()
-    //                                               {//a strange JTS abstraction
+    //                                               {//a strange NTS abstraction
     //                                                   boolean first = true;
     //        @Override
     //                                                     public void write(byte[] buf, int len) throws IOException

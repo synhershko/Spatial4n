@@ -29,7 +29,7 @@ namespace Spatial4n.Tests.io
         {
         }
 
-        //This test uses WKT to specify the shapes because the Jts based subclass tests will test
+        //This test uses WKT to specify the shapes because the Nts based subclass tests will test
         // using floats instead of doubles, and WKT is normalized whereas ctx.makeXXX is not.
 
         [Fact]

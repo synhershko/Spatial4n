@@ -29,7 +29,7 @@ namespace Spatial4n.Core.Context.Nts
     {
         protected static readonly PrecisionModel defaultPrecisionModel = new PrecisionModel();//floating
 
-        //These 3 are JTS defaults for new GeometryFactory()
+        //These 3 are NTS defaults for new GeometryFactory()
         public PrecisionModel precisionModel = defaultPrecisionModel;
         public int srid = 0;
         public ICoordinateSequenceFactory coordinateSequenceFactory = CoordinateArraySequenceFactory.Instance;
@@ -42,8 +42,8 @@ namespace Spatial4n.Core.Context.Nts
         public bool allowMultiOverlap = false;//ignored if geo=false
 
         //kinda advanced options:
-        public bool useJtsPoint = true;
-        public bool useJtsLineString = true;
+        public bool useNtsPoint = true;
+        public bool useNtsLineString = true;
 
         public NtsSpatialContextFactory()
         {
@@ -59,8 +59,8 @@ namespace Spatial4n.Core.Context.Nts
             InitField("validationRule");
             InitField("autoIndex");
             InitField("allowMultiOverlap");
-            InitField("useJtsPoint");
-            InitField("useJtsLineString");
+            InitField("useNtsPoint");
+            InitField("useNtsLineString");
 
             string scaleStr = args["precisionScale"];
             string modelStr = args["precisionModel"];

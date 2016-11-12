@@ -33,14 +33,14 @@ using NetTopologySuite.Geometries.Prepared;
 namespace Spatial4n.Core.Shapes.Nts
 {
     /// <summary>
-    /// Wraps a JTS {@link Geometry} (i.e. may be a polygon or basically anything).
-    /// JTS's does a great deal of the hard work, but there is work here in handling
+    /// Wraps a NTS {@link Geometry} (i.e. may be a polygon or basically anything).
+    /// NTS's does a great deal of the hard work, but there is work here in handling
     /// dateline wrap.
     /// </summary>
     public class NtsGeometry : Shape
     {
         /** System property boolean that can disable auto validation in an assert. */
-        //public static readonly string SYSPROP_ASSERT_VALIDATE = "spatial4j.JtsGeometry.assertValidate";
+        //public static readonly string SYSPROP_ASSERT_VALIDATE = "spatial4j.NtsGeometry.assertValidate";
 
         private readonly IGeometry geom;//cannot be a direct instance of GeometryCollection as it doesn't support relate()
         private readonly bool _hasArea;
@@ -118,7 +118,7 @@ namespace Spatial4n.Core.Shapes.Nts
         }
 
         /**
-   * Adds an index to this class internally to compute spatial relations faster. In JTS this
+   * Adds an index to this class internally to compute spatial relations faster. In NTS this
    * is called a {@link com.vividsolutions.jts.geom.prep.PreparedGeometry}.  This
    * isn't done by default because it takes some time to do the optimization, and it uses more
    * memory.  Calling this method isn't thread-safe so be careful when this is done. If it was
@@ -373,7 +373,7 @@ namespace Spatial4n.Core.Shapes.Nts
 
         /**
 		 * If <code>geom</code> spans the dateline, then this modifies it to be a
-		 * valid JTS geometry that extends to the right of the standard -180 to +180
+		 * valid NTS geometry that extends to the right of the standard -180 to +180
 		 * width such that some points are greater than +180 but some remain less.
 		 * Takes care to invoke {@link com.vividsolutions.jts.geom.Geometry#geometryChanged()}
 		 * if needed.
@@ -527,7 +527,7 @@ namespace Spatial4n.Core.Shapes.Nts
                     break;
                 var rect = (Geometry)geom.Factory.ToGeometry(new Envelope(minX, minX + 360, -90, 90));
                 Debug.Assert(rect.IsValid);
-                var pageGeom = (Geometry)rect.Intersection(geom);//JTS is doing some hard work
+                var pageGeom = (Geometry)rect.Intersection(geom);//NTS is doing some hard work
                 Debug.Assert(pageGeom.IsValid);
 
                 ShiftGeomByX(pageGeom, page * -360);

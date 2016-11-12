@@ -19,11 +19,11 @@ namespace Spatial4n.Tests.io
         //public static Iterable<Object[]> parameters()
         //      {
         //          //try floats
-        //          JtsSpatialContextFactory factory = new JtsSpatialContextFactory();
+        //          NtsSpatialContextFactory factory = new NtsSpatialContextFactory();
         //          factory.precisionModel = new PrecisionModel(PrecisionModel.FLOATING_SINGLE);
 
         //          return Arrays.asList($$(
-        //              $(JtsSpatialContext.GEO),//doubles
+        //              $(NtsSpatialContext.GEO),//doubles
         //      $(factory.newSpatialContext())//floats
         //          ));
         //      }

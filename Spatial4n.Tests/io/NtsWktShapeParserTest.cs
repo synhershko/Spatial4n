@@ -129,7 +129,7 @@ namespace Spatial4n.Tests.io
         [Fact]
         public virtual void TestLineStringDateline()
         {
-            //works because we use JTS (JtsGeometry); BufferedLineString doesn't yet do DL wrap.
+            //works because we use NTS (NtsGeometry); BufferedLineString doesn't yet do DL wrap.
             Shape s = ctx.ReadShapeFromWkt("LINESTRING(160 10, -170 15)");
             Assert.Equal(30, s.GetBoundingBox().GetWidth(), (int)0.0);
         }
@@ -164,7 +164,7 @@ namespace Spatial4n.Tests.io
         public virtual void TestPolygonRepair()
         {
             //because we're going to test validation
-            //System.setProperty(JtsGeometry.SYSPROP_ASSERT_VALIDATE, "false"); // TODO: Figure this out...
+            //System.setProperty(NtsGeometry.SYSPROP_ASSERT_VALIDATE, "false"); // TODO: Figure this out...
 
 
             //note: doesn't repair all cases; this case isn't:

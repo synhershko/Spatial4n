@@ -57,10 +57,10 @@ namespace Spatial4n.Tests.context
         }
 
         [Fact]
-        public void TestJtsContextFactory()
+        public void TestNtsContextFactory()
         {
             NtsSpatialContext ctx = (NtsSpatialContext)Call(
-                "spatialContextFactory", typeof(NtsSpatialContextFactory).Name,
+                "spatialContextFactory", typeof(NtsSpatialContextFactory).FullName,
                 "geo", "true",
                 "normWrapLongitude", "true",
                 "precisionScale", "2.0",

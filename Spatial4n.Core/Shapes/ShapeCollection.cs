@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
+using System.Collections;
 
 namespace Spatial4n.Core.Shapes
 {
@@ -30,7 +31,7 @@ namespace Spatial4n.Core.Shapes
     /// </para>
     /// </summary>
     /// <typeparam name="Shape"></typeparam>
-    public class ShapeCollection : Collection<Shape>, Shape
+    public class ShapeCollection : ICollection<Shape>, Shape
         //where S : Shape
     {
         protected readonly IList<Shape> shapes;
@@ -81,7 +82,7 @@ namespace Spatial4n.Core.Shapes
             return shapes;
         }
 
-        new public Shape this[int index]
+        public Shape this[int index]
         {
             get
             {
@@ -95,7 +96,7 @@ namespace Spatial4n.Core.Shapes
         //          return shapes.get(index);
         //      }
 
-        new public int Count
+        public int Count
         {
             get { return shapes.Count; }
         }
@@ -250,22 +251,100 @@ namespace Spatial4n.Core.Shapes
 
         public override bool Equals(object o)
         {
+            // Spatial4n NOTE: This was modified from the original implementation
+            // to act like the collections of Java, which compare values rather than references.
             if (this == o) return true;
             if (o == null || GetType() != o.GetType()) return false;
 
             ShapeCollection that = (ShapeCollection)o;
 
-            if (!shapes.Equals(that.shapes)) return false;
+            if (!ValueEquals(that)) return false;
 
+            return true;
+        }
+
+        private bool ValueEquals(ShapeCollection other)
+        {
+            var iter = other.GetEnumerator();
+            foreach (Shape value in this)
+            {
+                iter.MoveNext();
+                if (!value.Equals(iter.Current))
+                {
+                    return false;
+                }
+            }
             return true;
         }
 
         public override int GetHashCode()
         {
-            return shapes.GetHashCode();
+            // Spatial4n NOTE: This was modified from the original implementation
+            // to act like the collections of Java, which compare values rather than references.
+            int hashCode = 31;
+            foreach (Shape value in this)
+            {
+                if (value != null)
+                {
+                    hashCode = ((hashCode << 5) + hashCode) ^ value.GetHashCode();
+                }
+                else
+                {
+                    hashCode = ((hashCode << 5) + hashCode) ^ 0; /* 0 for null */
+                }
+            }
+
+            return hashCode;
         }
 
-        #region Added for .NET support
+        #region ICollection<T>
+
+        public void Add(Shape item)
+        {
+            shapes.Add(item);
+        }
+
+        public void Clear()
+        {
+            shapes.Clear();
+        }
+
+        public bool Contains(Shape item)
+        {
+            return shapes.Contains(item);
+        }
+
+        public void CopyTo(Shape[] array, int arrayIndex)
+        {
+            shapes.CopyTo(array, arrayIndex);
+        }
+
+        public bool Remove(Shape item)
+        {
+            return shapes.Remove(item);
+        }
+
+        public IEnumerator<Shape> GetEnumerator()
+        {
+            return shapes.GetEnumerator();
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return shapes.GetEnumerator();
+        }
+
+        public bool IsReadOnly
+        {
+            get
+            {
+                return shapes.IsReadOnly;
+            }
+        }
+
+        #endregion
+
+        #region Added for .NET support of the IShape interface
 
         public virtual bool IsEmpty
         {

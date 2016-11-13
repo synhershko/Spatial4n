@@ -40,7 +40,7 @@ namespace Spatial4n.Core.Shapes.Nts
     public class NtsGeometry : Shape
     {
         /** System property boolean that can disable auto validation in an assert. */
-        //public static readonly string SYSPROP_ASSERT_VALIDATE = "spatial4j.NtsGeometry.assertValidate";
+        public static readonly string SYSPROP_ASSERT_VALIDATE = "spatial4n.NtsGeometry.assertValidate";
 
         private readonly IGeometry geom;//cannot be a direct instance of GeometryCollection as it doesn't support relate()
         private readonly bool _hasArea;
@@ -93,8 +93,7 @@ namespace Spatial4n.Core.Shapes.Nts
         /** called via assertion */
         private bool AssertValidate()
         {
-            // TODO: Work out how to use "property"
-            string assertValidate = bool.TrueString; //System.getProperty(SYSPROP_ASSERT_VALIDATE);
+            string assertValidate = Environment.GetEnvironmentVariable(SYSPROP_ASSERT_VALIDATE); //System.getProperty(SYSPROP_ASSERT_VALIDATE);
             if (assertValidate == null || bool.Parse(assertValidate))
                 Validate();
             return true;

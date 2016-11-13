@@ -25,7 +25,7 @@ namespace Spatial4n.Core.Exceptions
     /// parsing exceptions; that's usually <see cref="ParseException"/>.
     /// </summary>
 	[Serializable]
-	public class InvalidShapeException : Exception
+	public class InvalidShapeException : ApplicationException
 	{
 		public InvalidShapeException(string reason) : base(reason)
 		{

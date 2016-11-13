@@ -6,6 +6,7 @@ using Spatial4n.Core.Context.Nts;
 using Spatial4n.Core.Exceptions;
 using Spatial4n.Core.Io.Nts;
 using Spatial4n.Core.Shapes;
+using Spatial4n.Core.Shapes.Nts;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -165,7 +166,7 @@ namespace Spatial4n.Tests.io
         {
             //because we're going to test validation
             //System.setProperty(NtsGeometry.SYSPROP_ASSERT_VALIDATE, "false"); // TODO: Figure this out...
-
+            Environment.SetEnvironmentVariable(NtsGeometry.SYSPROP_ASSERT_VALIDATE, bool.FalseString);
 
             //note: doesn't repair all cases; this case isn't:
             //ctx.readShapeFromWkt("POLYGON((0 0, 10 0, 10 20))");//doesn't connect around

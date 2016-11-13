@@ -117,7 +117,6 @@
     <Compile Include="io\NtsWKTReaderShapeParserTest.cs" />
     <Compile Include="io\NtsWktShapeParserTest.cs" />
     <Compile Include="io\NtsBinaryCodecTest.cs" />
-    <Compile Include="io\NtsShapeReadWriterTest.cs" />
     <Compile Include="io\PolygonBuilder.cs" />
     <Compile Include="io\ShapeReadWriterTest.cs" />
     <Compile Include="io\WktCustomShapeParserTest.cs" />

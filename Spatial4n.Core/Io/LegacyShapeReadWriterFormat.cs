@@ -47,13 +47,13 @@ namespace Spatial4n.Core.Io
         }
 
         /** Overloaded to provide a number format. */
-        public static string WriteShape(Shape shape, /*NumberFormat nf*/ string numberFormat) // TODO: Add culture overload?
+        public static string WriteShape(Shape shape, /*NumberFormat nf*/ string numberFormat)
         {
             if (shape is Point)
             {
                 Point point = (Point)shape;
                 //return nf.format(point.GetX()) + " " + nf.format(point.GetY());
-                return point.GetX().ToString(numberFormat) + " " + point.GetY().ToString(numberFormat);
+                return point.GetX().ToString(numberFormat, CultureInfo.InvariantCulture) + " " + point.GetY().ToString(numberFormat, CultureInfo.InvariantCulture);
             }
             else if (shape is Rectangle)
             {
@@ -63,10 +63,10 @@ namespace Spatial4n.Core.Io
                 //        nf.format(rect.GetMinY()) + " " +
                 //        nf.format(rect.GetMaxX()) + " " +
                 //        nf.format(rect.GetMaxY());
-                return rect.GetMinX().ToString(numberFormat) + " " +
-                    rect.GetMinY().ToString(numberFormat) + " " +
-                    rect.GetMaxX().ToString(numberFormat) + " " +
-                    rect.GetMaxY().ToString(numberFormat);
+                return rect.GetMinX().ToString(numberFormat, CultureInfo.InvariantCulture) + " " +
+                    rect.GetMinY().ToString(numberFormat, CultureInfo.InvariantCulture) + " " +
+                    rect.GetMaxX().ToString(numberFormat, CultureInfo.InvariantCulture) + " " +
+                    rect.GetMaxY().ToString(numberFormat, CultureInfo.InvariantCulture);
             }
             else if (shape is Circle)
             {
@@ -77,9 +77,9 @@ namespace Spatial4n.Core.Io
                 //    "d=" + nf.format(c.GetRadius()) +
                 //    ")";
                 return "Circle(" +
-                    c.GetCenter().GetX().ToString(numberFormat) + " " +
-                    c.GetCenter().GetY().ToString(numberFormat) + " " +
-                    "d=" + c.GetRadius().ToString(numberFormat) +
+                    c.GetCenter().GetX().ToString(numberFormat, CultureInfo.InvariantCulture) + " " +
+                    c.GetCenter().GetY().ToString(numberFormat, CultureInfo.InvariantCulture) + " " +
+                    "d=" + c.GetRadius().ToString(numberFormat, CultureInfo.InvariantCulture) +
                     ")";
             }
             return shape.ToString();

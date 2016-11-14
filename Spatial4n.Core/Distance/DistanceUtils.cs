@@ -178,11 +178,11 @@ namespace Spatial4n.Core.Distance
             double cosStartLat = Math.Cos(startLat);
             double sinAngDist = Math.Sin(distanceRAD);
             double sinStartLat = Math.Sin(startLat);
-            double sinLat2 = Math.Asin(sinStartLat*cosAngDist +
-                                    cosStartLat*sinAngDist*Math.Cos(bearingRAD));
+            double sinLat2 = sinStartLat * cosAngDist +
+                cosStartLat * sinAngDist * Math.Cos(bearingRAD);
             double lat2 = Math.Asin(sinLat2);
-            double lon2 = startLon + Math.Atan2(Math.Sin(bearingRAD)*sinAngDist*cosStartLat,
-                                                cosAngDist - sinStartLat * sinLat2);
+            double lon2 = startLon + Math.Atan2(Math.Sin(bearingRAD) * sinAngDist * cosStartLat,
+                cosAngDist - sinStartLat * sinLat2);
 
             // normalize lon first
             if (lon2 > DEG_180_AS_RADS)
@@ -232,7 +232,7 @@ namespace Spatial4n.Core.Distance
         }
 
 	    /// <summary>
-		/// Puts in range -180 <= lon_deg <= +180.
+		/// Puts in range -180 &lt;= lon_deg &lt;= +180.
 		/// </summary>
 		/// <param name="lon_deg"></param>
 		/// <returns></returns>
@@ -240,7 +240,7 @@ namespace Spatial4n.Core.Distance
 		{
 			if (lon_deg >= -180 && lon_deg <= 180)
 				return lon_deg; //common case, and avoids slight double precision shifting
-	        double off = (lon_deg + 180)%360;
+	        double off = (lon_deg + 180) % 360;
 			if (off < 0)
 				return 180 + off;
 			else if (off == 0 && lon_deg > 0)

@@ -12,8 +12,15 @@ namespace Spatial4n.Tests.distance
         private readonly Random random = new Random(RandomSeed.Seed());
 
         //NOTE!  These are sometimes modified by tests.
-        private SpatialContext ctx = SpatialContext.GEO;
-        private const double EPS = 10e-4; //delta when doing double assertions. Geo eps is not that small.;
+        private SpatialContext ctx;
+        private double EPS; //delta when doing double assertions. Geo eps is not that small.;
+
+        // Setup for every test
+        public TestDistances()
+        {
+            ctx = SpatialContext.GEO;
+            EPS = 10e-4;
+        }
 
         private DistanceCalculator Dc()
         {
@@ -47,7 +54,7 @@ namespace Spatial4n.Tests.distance
                 CheckBBox(pCtr, d);
             }
 
-            Assert.Equal(/*"0 dist, horiz line",*/
+            CustomAssert.EqualWithDelta(/*"0 dist, horiz line",*/
                 -45, Dc().CalcBoxByDistFromPt_yHorizAxisDEG(ctx.MakePoint(-180, -45), 0, ctx), 0);
 
             double MAXDIST = (double)180 * DistanceUtils.DEG_TO_KM;
@@ -148,10 +155,10 @@ namespace Spatial4n.Tests.distance
         public virtual void TestDistCalcPointOnBearing_Cartesian()
         {
             ctx = new SpatialContext(false);
-            var EPS = 10e-6; //tighter epsilon (aka delta)
+            EPS = 10e-6; //tighter epsilon (aka delta)
             for (int i = 0; i < 1000; i++)
             {
-                TestDistCalcPointOnBearing(random.Next(100), EPS);
+                TestDistCalcPointOnBearing(random.Next(100));
             }
         }
 
@@ -176,18 +183,18 @@ namespace Spatial4n.Tests.distance
             for (int i = 0; i < 1000; i++)
             {
                 int dist = random.Next((int)maxDistKm);
-                var EPS = (dist < maxDistKm * 0.75 ? 10e-6 : 10e-3);
-                TestDistCalcPointOnBearing(dist, EPS);
+                EPS = (dist < maxDistKm * 0.75 ? 10e-6 : 10e-3);
+                TestDistCalcPointOnBearing(dist);
             }
         }
 
-        private void TestDistCalcPointOnBearing(double distKm, double EPS)
+        private void TestDistCalcPointOnBearing(double distKm)
         {
-            for (int angDEG = 0; angDEG < 360; angDEG += random.Next(1, 20))
+            for (int angDEG = 0; angDEG < 360; angDEG += random.Next(1, 20 + 1))
             {
                 Point c = ctx.MakePoint(
-                    DistanceUtils.NormLonDEG(random.Next(359)),
-                    random.Next(-90, 90));
+                    DistanceUtils.NormLonDEG(random.Next(359 + 1)),
+                    random.Next(-90, 90 + 1));
 
                 //0 distance means same point
                 Point p2 = Dc().PointOnBearing(c, 0, angDEG, ctx, null);
@@ -195,11 +202,11 @@ namespace Spatial4n.Tests.distance
 
                 p2 = Dc().PointOnBearing(c, distKm * DistanceUtils.KM_TO_DEG, angDEG, ctx, null);
                 double calcDistKm = Dc().Distance(c, p2) * DistanceUtils.DEG_TO_KM;
-                AssertEqualsRatio(distKm, calcDistKm, EPS);
+                AssertEqualsRatio(distKm, calcDistKm);
             }
         }
 
-        private static void AssertEqualsRatio(double expected, double actual, double EPS)
+        private void AssertEqualsRatio(double expected, double actual)
         {
             double delta = Math.Abs(actual - expected);
             double baseValue = Math.Min(actual, expected);

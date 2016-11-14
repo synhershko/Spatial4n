@@ -15,11 +15,11 @@
  * limitations under the License.
  */
 
+using Spatial4n.Core.Context;
+using Spatial4n.Core.Shapes;
 using System;
 using System.Diagnostics;
 using System.Text;
-using Spatial4n.Core.Context;
-using Spatial4n.Core.Shapes;
 
 namespace Spatial4n.Core.Util
 {

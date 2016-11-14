@@ -16,14 +16,9 @@
  */
 
 using GeoAPI.Geometries;
-using NetTopologySuite.Geometries;
 using NetTopologySuite.Utilities;
 using Spatial4n.Core.Context.Nts;
 using Spatial4n.Core.Shapes;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using Xunit;
 
 namespace Spatial4n.Tests.io

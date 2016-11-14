@@ -15,16 +15,16 @@
  * limitations under the License.
  */
 
-using System;
 using Spatial4n.Core.Context;
 using Spatial4n.Core.Shapes;
+using System;
 
 namespace Spatial4n.Core.Distance
 {
-	/// <summary>
-	/// A base class for a Distance Calculator that assumes a spherical earth model. 
-	/// </summary>
-	public abstract class GeodesicSphereDistCalc : AbstractDistanceCalculator
+    /// <summary>
+    /// A base class for a Distance Calculator that assumes a spherical earth model. 
+    /// </summary>
+    public abstract class GeodesicSphereDistCalc : AbstractDistanceCalculator
 	{
 		private readonly double radiusDEG = DistanceUtils.ToDegrees(1);//in degrees
 

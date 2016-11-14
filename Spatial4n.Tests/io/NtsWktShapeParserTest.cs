@@ -17,8 +17,6 @@
 
 using GeoAPI.Geometries;
 using NetTopologySuite.Geometries;
-using NetTopologySuite.GeometriesGraph;
-using NetTopologySuite.Operation.Overlay;
 using Spatial4n.Core.Context.Nts;
 using Spatial4n.Core.Exceptions;
 using Spatial4n.Core.Io.Nts;
@@ -28,7 +26,6 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Text;
 using Xunit;
 
 namespace Spatial4n.Tests.io

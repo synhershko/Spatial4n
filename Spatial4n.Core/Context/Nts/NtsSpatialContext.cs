@@ -15,16 +15,14 @@
  * limitations under the License.
  */
 
-using System;
-using System.Collections.Generic;
 using GeoAPI.Geometries;
 using NetTopologySuite.Geometries;
 using NetTopologySuite.Utilities;
-using Spatial4n.Core.Distance;
 using Spatial4n.Core.Exceptions;
-using Spatial4n.Core.Io;
 using Spatial4n.Core.Shapes;
 using Spatial4n.Core.Shapes.Nts;
+using System;
+using System.Collections.Generic;
 using IPoint = Spatial4n.Core.Shapes.IPoint;
 
 namespace Spatial4n.Core.Context.Nts

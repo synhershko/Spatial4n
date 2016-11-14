@@ -15,10 +15,10 @@
  * limitations under the License.
  */
 
-using System;
 using Spatial4n.Core.Context;
 using Spatial4n.Core.Distance;
 using Spatial4n.Core.Shapes;
+using System;
 
 namespace Spatial4n.Tests.shape
 {

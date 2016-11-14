@@ -15,18 +15,17 @@
  * limitations under the License.
  */
 
-using System;
-using System.Collections.Generic;
-using System.Globalization;
 using Spatial4n.Core.Context;
 using Spatial4n.Core.Context.Nts;
 using Spatial4n.Core.Shapes;
+using System.Collections.Generic;
+using System.Globalization;
 using Xunit;
 using Xunit.Extensions;
 
 namespace Spatial4n.Tests.io
 {
-	public class ShapeReadWriterTest
+    public class ShapeReadWriterTest
 	{
 		public static IEnumerable<object[]> Contexts
 		{

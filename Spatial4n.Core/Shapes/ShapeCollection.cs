@@ -18,11 +18,10 @@
 using Spatial4n.Core.Context;
 using Spatial4n.Core.Shapes.Impl;
 using System;
+using System.Collections;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
-using System.Collections;
 
 namespace Spatial4n.Core.Shapes
 {

@@ -15,9 +15,9 @@
  * limitations under the License.
  */
 
+using Spatial4n.Core.Exceptions;
 using System;
 using System.Globalization;
-using Spatial4n.Core.Exceptions;
 
 namespace Spatial4n.Core.Io
 {

@@ -15,15 +15,13 @@
  * limitations under the License.
  */
 
-using System;
-using System.Collections.Generic;
 using Spatial4n.Core.Context;
-using Spatial4n.Core.Distance;
-using Spatial4n.Core.Shapes.Impl;
-using Xunit;
 using Spatial4n.Core.Context.Nts;
+using Spatial4n.Core.Distance;
 using Spatial4n.Core.Io.Nts;
-using Spatial4n.Core;
+using Spatial4n.Core.Shapes.Impl;
+using System.Collections.Generic;
+using Xunit;
 
 namespace Spatial4n.Tests.context
 {

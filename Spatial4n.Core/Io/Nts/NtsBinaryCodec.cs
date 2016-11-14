@@ -16,16 +16,11 @@
  */
 
 using GeoAPI.Geometries;
-using NetTopologySuite.Geometries;
 using NetTopologySuite.IO;
 using Spatial4n.Core.Context.Nts;
 using Spatial4n.Core.Exceptions;
 using Spatial4n.Core.Shapes;
-using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
 
 namespace Spatial4n.Core.Io.Nts
 {

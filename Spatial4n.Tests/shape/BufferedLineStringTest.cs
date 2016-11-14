@@ -15,14 +15,11 @@
  * limitations under the License.
  */
 
-using NetTopologySuite.Geometries;
 using Spatial4n.Core.Context;
 using Spatial4n.Core.Shapes;
 using Spatial4n.Core.Shapes.Impl;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using Xunit;
 
 namespace Spatial4n.Tests.shape

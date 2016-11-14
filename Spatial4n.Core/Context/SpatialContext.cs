@@ -15,14 +15,12 @@
  * limitations under the License.
  */
 
-using System;
-using System.Diagnostics;
-using System.Globalization;
 using Spatial4n.Core.Distance;
 using Spatial4n.Core.Exceptions;
 using Spatial4n.Core.Io;
 using Spatial4n.Core.Shapes;
 using Spatial4n.Core.Shapes.Impl;
+using System;
 using System.Collections.Generic;
 
 namespace Spatial4n.Core.Context

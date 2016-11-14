@@ -15,7 +15,6 @@
  * limitations under the License.
  */
 
-using System;
 using Spatial4n.Core.Context;
 using Spatial4n.Core.Shapes;
 using Spatial4n.Core.Util;

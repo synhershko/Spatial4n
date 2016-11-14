@@ -15,20 +15,19 @@
  * limitations under the License.
  */
 
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
 using GeoAPI.Geometries;
+using GeoAPI.Geometries.Prepared;
 using NetTopologySuite.Geometries;
+using NetTopologySuite.Geometries.Prepared;
 using NetTopologySuite.Operation.Union;
 using NetTopologySuite.Operation.Valid;
 using Spatial4n.Core.Context;
 using Spatial4n.Core.Context.Nts;
-using Spatial4n.Core.Distance;
 using Spatial4n.Core.Exceptions;
 using Spatial4n.Core.Shapes.Impl;
-using GeoAPI.Geometries.Prepared;
-using NetTopologySuite.Geometries.Prepared;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace Spatial4n.Core.Shapes.Nts
 {

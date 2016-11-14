@@ -21,8 +21,6 @@ using Spatial4n.Core.Shapes.Impl;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
 using Xunit;
 
 namespace Spatial4n.Tests.shape

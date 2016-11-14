@@ -6,6 +6,7 @@ using Spatial4n.Core.Shapes.Impl;
 using Xunit;
 using Spatial4n.Core.Context.Nts;
 using Spatial4n.Core.Io.Nts;
+using Spatial4n.Core;
 
 namespace Spatial4n.Tests.context
 {
@@ -60,16 +61,16 @@ namespace Spatial4n.Tests.context
         public void TestNtsContextFactory()
         {
             NtsSpatialContext ctx = (NtsSpatialContext)Call(
-                "spatialContextFactory", typeof(NtsSpatialContextFactory).FullName,
+                "spatialContextFactory", typeof(NtsSpatialContextFactory).AssemblyQualifiedName,
                 "geo", "true",
                 "normWrapLongitude", "true",
                 "precisionScale", "2.0",
-                "wktShapeParserClass", typeof(CustomWktShapeParser).Name,
+                "wktShapeParserClass", typeof(CustomWktShapeParser).AssemblyQualifiedName,
                 "datelineRule", "ccwRect",
                 "validationRule", "repairConvexHull",
                 "autoIndex", "true");
             Assert.True(ctx.IsNormWrapLongitude());
-            Assert.Equal(2.0, ctx.GetGeometryFactory().PrecisionModel.Scale, (int)0.0);
+            CustomAssert.EqualWithDelta(2.0, ctx.GetGeometryFactory().PrecisionModel.Scale, 0.0);
             Assert.True(CustomWktShapeParser.once);//cheap way to test it was created
             Assert.Equal(NtsWktShapeParser.DatelineRule.ccwRect,
                 ((NtsWktShapeParser)ctx.GetWktShapeParser()).GetDatelineRule());
@@ -78,16 +79,16 @@ namespace Spatial4n.Tests.context
 
             //ensure geo=false with worldbounds works -- fixes #72
             ctx = (NtsSpatialContext)Call(
-                "spatialContextFactory", typeof(NtsSpatialContextFactory).Name,
+                "spatialContextFactory", typeof(NtsSpatialContextFactory).AssemblyQualifiedName,
                 "geo", "false",//set to false
                 "worldBounds", "ENVELOPE(-500,500,300,-300)",
                 "normWrapLongitude", "true",
                 "precisionScale", "2.0",
-                "wktShapeParserClass", typeof(CustomWktShapeParser).Name,
+                "wktShapeParserClass", typeof(CustomWktShapeParser).AssemblyQualifiedName,
                 "datelineRule", "ccwRect",
                 "validationRule", "repairConvexHull",
                 "autoIndex", "true");
-            Assert.Equal(300, ctx.GetWorldBounds().GetMaxY(), (int)0.0);
+            CustomAssert.EqualWithDelta(300, ctx.GetWorldBounds().GetMaxY(), 0.0);
         }
 
         [Fact]
@@ -99,7 +100,7 @@ namespace Spatial4n.Tests.context
 
         public class DSCF : SpatialContextFactory
         {
-            new public SpatialContext NewSpatialContext()
+            protected internal override SpatialContext NewSpatialContext()
             {
                 geo = false;
                 return new SpatialContext(false);

@@ -55,38 +55,32 @@ namespace Spatial4n.Core.Context
         /// <returns></returns>
         public static SpatialContext MakeSpatialContext(IDictionary<string, string> args)
         {
-            // .NET TODO: dependency injection
-            //if (classLoader == null)
-            //    classLoader = SpatialContextFactory.class.getClassLoader();
             SpatialContextFactory instance;
             string cname;
-            //if (!Configuration.GetValue("SpatialContextFactory", out cname) || cname == null)
-            if (!args.TryGetValue("spatialContextFactory", out cname) || cname == null)
+            args.TryGetValue("spatialContextFactory", out cname);
+            if (cname == null)
+            {
+                cname = Environment.GetEnvironmentVariable("SpatialContextFactory");
+            }
+            if (cname == null)
             {
                 instance = new SpatialContextFactory();
-                instance.Init(args);
-                return instance.NewSpatialContext();
             }
             else
             {
                 Type t = Type.GetType(cname);
+
+                // TODO: Replace with typeLoader
                 instance = (SpatialContextFactory)Activator.CreateInstance(t);
-
-                //See if the specified type has subclassed the "NewSpatialContext" method and if so call it to do the setup
-                var subClassedMethod = t.GetMethod("NewSpatialContext", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.DeclaredOnly);
-                if (subClassedMethod != null)
-                    return (SpatialContext)subClassedMethod.Invoke(instance, new object[] { });
-
-                //Otherwise fallback to the default behaviour
-                instance.Init(args);
-                return instance.NewSpatialContext();
             }
+
+            instance.Init(args);
+            return instance.NewSpatialContext();
         }
 
-        protected virtual void Init(IDictionary<string, string> args/*, ClassLoader classLoader*/)
+        protected virtual void Init(IDictionary<string, string> args)
         {
             this.args = args;
-            // this.classLoader = classLoader;
 
             InitField("geo");
 
@@ -130,9 +124,7 @@ namespace Spatial4n.Core.Context
                     {
                         try
                         {
-                            Type concreteType = Type.GetType(str);
-                            o = Activator.CreateInstance(concreteType);
-                            //o = classLoader.loadClass(str);
+                            o = Type.GetType(str);
                         }
                         catch (TypeLoadException e)
                         {
@@ -141,7 +133,6 @@ namespace Spatial4n.Core.Context
                     }
                     else if (field.FieldType.IsEnum)
                     {
-                        //o = Enum.valueOf(field.getType().asSubclass(Enum.class), str);
                         o = Enum.Parse(field.FieldType, str, true);
                     }
                     else
@@ -161,13 +152,6 @@ namespace Spatial4n.Core.Context
                 }
             }
         }
-
-        //     protected void InitUnits()
-        //     {
-        //string geoStr;
-        //if (args.TryGetValue("geo", out geoStr) && geoStr != null)
-        //	bool.TryParse(geoStr, out geo);
-        //     }
 
         protected virtual void InitCalculator()
         {

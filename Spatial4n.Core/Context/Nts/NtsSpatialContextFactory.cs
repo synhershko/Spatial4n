@@ -51,9 +51,9 @@ namespace Spatial4n.Core.Context.Nts
             base.binaryCodecClass = typeof(NtsBinaryCodec);
         }
 
-        protected override void Init(IDictionary<string, string> args/*, ClassLoader classLoader*/)
+        protected override void Init(IDictionary<string, string> args)
         {
-            base.Init(args/*, classLoader*/);
+            base.Init(args);
 
             InitField("datelineRule");
             InitField("validationRule");
@@ -62,8 +62,10 @@ namespace Spatial4n.Core.Context.Nts
             InitField("useNtsPoint");
             InitField("useNtsLineString");
 
-            string scaleStr = args["precisionScale"];
-            string modelStr = args["precisionModel"];
+            string scaleStr;
+            string modelStr;
+            args.TryGetValue("precisionScale", out scaleStr);
+            args.TryGetValue("precisionModel", out modelStr);
 
             if (scaleStr != null)
             {

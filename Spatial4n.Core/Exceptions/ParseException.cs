@@ -2,10 +2,8 @@
 
 namespace Spatial4n.Core.Exceptions
 {
-
-
     [Serializable]
-    public class ParseException : /*GeoAPI.IO.ParseException*/ Exception
+    public class ParseException : Exception
     {
         public ParseException(string message, int errorOffset)
             : base(message)

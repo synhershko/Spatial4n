@@ -30,7 +30,7 @@ namespace Spatial4n.Core.Shapes
     /// with respect to OGC's terminology.
     /// </summary>
     public enum SpatialRelation
-	{
+    {
         //see http://docs.geotools.org/latest/userguide/library/jts/dim9.html#preparedgeometry
 
         NULL_VALUE, // TODO: Remove???
@@ -63,26 +63,26 @@ namespace Spatial4n.Core.Shapes
     }
 
     public static class SpatialRelationComparators
-	{
-		public static SpatialRelation Transpose(this SpatialRelation sr)
-		{
-			switch (sr)
-			{
-				case SpatialRelation.CONTAINS: return SpatialRelation.WITHIN;
-				case SpatialRelation.WITHIN: return SpatialRelation.CONTAINS;
-				default: return sr;
-			}
-		}
+    {
+        public static SpatialRelation Transpose(this SpatialRelation sr)
+        {
+            switch (sr)
+            {
+                case SpatialRelation.CONTAINS: return SpatialRelation.WITHIN;
+                case SpatialRelation.WITHIN: return SpatialRelation.CONTAINS;
+                default: return sr;
+            }
+        }
 
-		/// <summary>
-		/// If you were to call aShape.relate(bShape) and aShape.relate(cShape), you could call
-		/// this to merge the intersect results as if bShape & cShape were combined into {@link MultShape}.
-		/// </summary>
-		/// <param name="this"></param>
-		/// <param name="other"></param>
-		/// <returns></returns>
-		public static SpatialRelation Combine(this SpatialRelation @this, SpatialRelation other)
-		{
+        /// <summary>
+        /// If you were to call aShape.relate(bShape) and aShape.relate(cShape), you could call
+        /// this to merge the intersect results as if bShape & cShape were combined into {@link MultShape}.
+        /// </summary>
+        /// <param name="this"></param>
+        /// <param name="other"></param>
+        /// <returns></returns>
+        public static SpatialRelation Combine(this SpatialRelation @this, SpatialRelation other)
+        {
             // You can think of this algorithm as a state transition / automata.
             // 1. The answer must be the same no matter what the order is.
             // 2. If any INTERSECTS, then the result is INTERSECTS (done).
@@ -92,28 +92,28 @@ namespace Spatial4n.Core.Shapes
             // 6. X + X == X.
 
             if (other == @this)
-				return @this;
+                return @this;
             if (@this == SpatialRelation.DISJOINT && other == SpatialRelation.CONTAINS
                 || @this == SpatialRelation.CONTAINS && other == SpatialRelation.DISJOINT)
                 return SpatialRelation.CONTAINS;
             return SpatialRelation.INTERSECTS;
-		}
+        }
 
-		public static bool Intersects(this SpatialRelation @this)
-		{
-			return @this != SpatialRelation.DISJOINT;
-		}
+        public static bool Intersects(this SpatialRelation @this)
+        {
+            return @this != SpatialRelation.DISJOINT;
+        }
 
-		/** Not commutative!  WITHIN.inverse().inverse() != WITHIN. */
-		public static SpatialRelation Inverse(this SpatialRelation @this)
-		{
-			switch (@this)
-			{
-				case SpatialRelation.DISJOINT: return SpatialRelation.CONTAINS;
-				case SpatialRelation.CONTAINS: return SpatialRelation.DISJOINT;
-				case SpatialRelation.WITHIN: return SpatialRelation.INTERSECTS;//not commutative!
-			}
-			return SpatialRelation.INTERSECTS;
-		}
-	}
+        /** Not commutative!  WITHIN.inverse().inverse() != WITHIN. */
+        public static SpatialRelation Inverse(this SpatialRelation @this)
+        {
+            switch (@this)
+            {
+                case SpatialRelation.DISJOINT: return SpatialRelation.CONTAINS;
+                case SpatialRelation.CONTAINS: return SpatialRelation.DISJOINT;
+                case SpatialRelation.WITHIN: return SpatialRelation.INTERSECTS;//not commutative!
+            }
+            return SpatialRelation.INTERSECTS;
+        }
+    }
 }

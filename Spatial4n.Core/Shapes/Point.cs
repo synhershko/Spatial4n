@@ -17,11 +17,11 @@
 
 namespace Spatial4n.Core.Shapes
 {
-	/// <summary>
-	/// A Point with X & Y coordinates.
-	/// </summary>
-	public interface Point : Shape
-	{
+    /// <summary>
+    /// A Point with X & Y coordinates.
+    /// </summary>
+    public interface Point : Shape
+    {
         /// <summary>
         /// Expert: Resets the state of this point given the arguments. This is a performance
         /// feature to avoid excessive Shape object allocation as well as some
@@ -31,16 +31,16 @@ namespace Spatial4n.Core.Shapes
         /// <param name="y"></param>
         void Reset(double x, double y);
 
-		/// <summary>
-		/// The X coordinate, or Longitude in geospatial contexts.
-		/// </summary>
-		/// <returns></returns>
-		double GetX();
+        /// <summary>
+        /// The X coordinate, or Longitude in geospatial contexts.
+        /// </summary>
+        /// <returns></returns>
+        double GetX();
 
-		/// <summary>
-		/// The Y coordinate, or Latitude in geospatial contexts.
-		/// </summary>
-		/// <returns></returns>
-		double GetY();
-	}
+        /// <summary>
+        /// The Y coordinate, or Latitude in geospatial contexts.
+        /// </summary>
+        /// <returns></returns>
+        double GetY();
+    }
 }

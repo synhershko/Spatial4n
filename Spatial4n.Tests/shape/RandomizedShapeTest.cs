@@ -18,6 +18,14 @@ namespace Spatial4n.Tests.shape
     public abstract class RandomizedShapeTest
     {
         protected readonly Random random = new Random(RandomSeed.Seed());
+        private static readonly double DEFAULT_MULTIPLIER = 1.0d;
+
+        /**
+        * The global multiplier property (Double).
+        * 
+        * @see #multiplier()
+        */
+        public static readonly string SYSPROP_MULTIPLIER = "randomized.multiplier";
 
         protected static readonly double EPS = 10e-9;
 
@@ -426,7 +434,14 @@ namespace Spatial4n.Tests.shape
 
         public int Multiplier()
         {
-            return 3; // TODO: Make this settable
+            string mult = Environment.GetEnvironmentVariable(SYSPROP_MULTIPLIER);
+            int result;
+            if (int.TryParse(mult, out result))
+            {
+                return result;
+            }
+
+            return (int)DEFAULT_MULTIPLIER;
         }
 
         #endregion

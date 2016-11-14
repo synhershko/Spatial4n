@@ -35,10 +35,10 @@ namespace Spatial4n.Core.Io
         /// <param name="externalVal">The value to parse</param>
         /// <param name="dimension">The expected number of values for the point</param>
         /// <returns>An array of the values that make up the point (aka vector)</returns>
-        public static String[] ParsePoint(String[] _out, String externalVal, int dimension)
+        public static string[] ParsePoint(string[] _out, string externalVal, int dimension)
         {
             //TODO: Should we support sparse vectors?
-            if (_out == null || _out.Length != dimension) _out = new String[dimension];
+            if (_out == null || _out.Length != dimension) _out = new string[dimension];
             int idx = externalVal.IndexOf(',');
             int end = idx;
             int start = 0;
@@ -89,7 +89,7 @@ namespace Spatial4n.Core.Io
         /// <param name="externalVal">The value to parse</param>
         /// <param name="dimension">The expected number of values for the point</param>
         /// <returns>An array of the values that make up the point (aka vector)</returns>
-        public static double[] ParsePointDouble(double[] @out, String externalVal, int dimension)
+        public static double[] ParsePointDouble(double[] @out, string externalVal, int dimension)
         {
             if (@out == null || @out.Length != dimension) @out = new double[dimension];
             int idx = externalVal.IndexOf(',');
@@ -99,7 +99,7 @@ namespace Spatial4n.Core.Io
             if (idx == -1 && dimension == 1 && externalVal.Length > 0)
             {
                 //we have a single point, dimension better be 1
-                @out[0] = Double.Parse(externalVal.Trim(), CultureInfo.InvariantCulture);
+                @out[0] = double.Parse(externalVal.Trim(), CultureInfo.InvariantCulture);
                 i = 1;
             }
             else if (idx > 0)
@@ -117,7 +117,7 @@ namespace Spatial4n.Core.Io
                     }
                     //Substring in .NET is (startPosn, length), But in Java it's (startPosn, endPosn)
                     //see http://docs.oracle.com/javase/1.4.2/docs/api/java/lang/String.html#substring(int, int)
-                    @out[i] = Double.Parse(externalVal.Substring(start, (end - start)), CultureInfo.InvariantCulture);
+                    @out[i] = double.Parse(externalVal.Substring(start, (end - start)), CultureInfo.InvariantCulture);
                     start = idx + 1;
                     end = externalVal.IndexOf(',', start);
                     idx = end;

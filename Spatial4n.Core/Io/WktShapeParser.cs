@@ -208,8 +208,7 @@ namespace Spatial4n.Core.Io
         protected virtual Shape ParseMultiPointShape(State state)
         {
             if (state.NextIfEmptyAndSkipZM())
-                return ctx.MakeCollection(/*new List<Point>()*/ new List<Shape>());
-            //List<Point> shapes = new List<Point>();
+                return ctx.MakeCollection(new List<Shape>());
             List<Shape> shapes = new List<Shape>();
             state.NextExpect('(');
             do
@@ -394,7 +393,6 @@ namespace Spatial4n.Core.Io
             {
                 int startOffset = offset;
                 while (offset < rawString.Length &&
-                    /*Character.isJavaIdentifierPart(rawString[offset]) */
                     IsIdentifierPartCharacter(rawString[offset]))
                 {
                     offset++;
@@ -419,7 +417,7 @@ namespace Spatial4n.Core.Io
                 if (Eof)
                     return false;
                 char c = rawString[offset];
-                if (c == '(' || !IsIdentifierPartCharacter(rawString[offset])    /*Character.isJavaIdentifierPart(c)*/)
+                if (c == '(' || !IsIdentifierPartCharacter(rawString[offset]))
                     return false;
                 string word = NextWord();
                 if (word.Equals("EMPTY", StringComparison.OrdinalIgnoreCase))
@@ -430,7 +428,7 @@ namespace Spatial4n.Core.Io
                 if (Eof)
                     return false;
                 c = rawString[offset];
-                if (c == '(' || /*!Character.isJavaIdentifierPart(c)*/ !IsIdentifierPartCharacter(rawString[offset]))
+                if (c == '(' || !IsIdentifierPartCharacter(rawString[offset]))
                     return false;
                 word = NextWord();
                 if (word.Equals("EMPTY", StringComparison.OrdinalIgnoreCase))

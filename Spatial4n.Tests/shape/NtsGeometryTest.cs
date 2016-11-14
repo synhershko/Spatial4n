@@ -21,8 +21,6 @@ namespace Spatial4n.Tests.shape
     /// </summary>
     public class NtsGeometryTest : AbstractTestShapes
     {
-        protected readonly Random random = new Random(RandomSeed.Seed());
-
         public static IEnumerable<object[]> Contexts
         {
             get
@@ -71,22 +69,11 @@ namespace Spatial4n.Tests.shape
 
         private NtsGeometry ShiftPoly(NtsGeometry poly, int lon_shift)
         {
-            //Random random = RandomizedContext.current().getRandom();
             IGeometry pGeom = poly.GetGeom();
             Assert.True(pGeom.IsValid);
             //shift 180 to the right
             pGeom = (IGeometry)pGeom.Clone();
             pGeom.Apply(new CoordinateFilterAnonymousHelper(this, lon_shift));
-            //        pGeom.Apply(new CoordinateFilter()
-            //    {
-            //        @Override
-            //  public void filter(Coordinate coord)
-            //    {
-            //        coord.x = normX(coord.x + lon_shift);
-            //        if (ctx.isGeo() && Math.abs(coord.x) == 180 && random.nextBoolean())
-            //            coord.x = -coord.x;//invert sign of dateline boundary some of the time
-            //    }
-            //});
             pGeom.GeometryChanged();
             Assert.False(pGeom.IsValid);
             return (NtsGeometry)ctx.ReadShapeFromWkt(pGeom.AsText());

@@ -17,11 +17,11 @@
 
 namespace Spatial4n.Core.Shapes
 {
-	/// <summary>
-	/// A circle, also known as a point-radius since that is what it is comprised of.
-	/// </summary>
-	public interface Circle : Shape
-	{
+    /// <summary>
+    /// A circle, also known as a point-radius since that is what it is comprised of.
+    /// </summary>
+    public interface Circle : Shape
+    {
         /// <summary>
         /// Expert: Resets the state of this shape given the arguments. This is a
         /// performance feature to avoid excessive Shape object allocation as well as
@@ -33,11 +33,11 @@ namespace Spatial4n.Core.Shapes
         /// <param name="radiusDEG"></param>
         void Reset(double x, double y, double radiusDEG);
 
-		/// <summary>
-		/// The distance from the point's center to its edge, measured in
-		/// {@link com.spatial4j.core.distance.DistanceUnits}.
-		/// </summary>
-		/// <returns></returns>
-		double GetRadius();
-	}
+        /// <summary>
+        /// The distance from the point's center to its edge, measured in
+        /// {@link com.spatial4j.core.distance.DistanceUnits}.
+        /// </summary>
+        /// <returns></returns>
+        double GetRadius();
+    }
 }

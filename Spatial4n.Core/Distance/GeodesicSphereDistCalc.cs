@@ -116,6 +116,5 @@ namespace Spatial4n.Core.Distance
 				return DistanceUtils.DistVincentyRAD(lat1, lon1, lat2, lon2);
 			}
 		}
-
 	}
 }

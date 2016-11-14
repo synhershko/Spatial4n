@@ -100,11 +100,11 @@ namespace Spatial4n.Core.Shapes.Nts
         }
 
         /**
-   * Validates the shape, throwing a descriptive error if it isn't valid. Note that this
-   * is usually called automatically by default, but that can be disabled.
-   *
-   * @throws InvalidShapeException with descriptive error if the shape isn't valid
-   */
+        * Validates the shape, throwing a descriptive error if it isn't valid. Note that this
+        * is usually called automatically by default, but that can be disabled.
+        *
+        * @throws InvalidShapeException with descriptive error if the shape isn't valid
+        */
         public void Validate()
         {
             if (!validated)
@@ -117,12 +117,12 @@ namespace Spatial4n.Core.Shapes.Nts
         }
 
         /**
-   * Adds an index to this class internally to compute spatial relations faster. In NTS this
-   * is called a {@link com.vividsolutions.jts.geom.prep.PreparedGeometry}.  This
-   * isn't done by default because it takes some time to do the optimization, and it uses more
-   * memory.  Calling this method isn't thread-safe so be careful when this is done. If it was
-   * already indexed then nothing happens.
-   */
+        * Adds an index to this class internally to compute spatial relations faster. In NTS this
+        * is called a {@link com.vividsolutions.jts.geom.prep.PreparedGeometry}.  This
+        * isn't done by default because it takes some time to do the optimization, and it uses more
+        * memory.  Calling this method isn't thread-safe so be careful when this is done. If it was
+        * already indexed then nothing happens.
+        */
         public void Index()
         {
             if (preparedGeometry == null)
@@ -136,8 +136,8 @@ namespace Spatial4n.Core.Shapes.Nts
         }
 
         /** Given {@code geoms} which has already been checked for being in world
-   * bounds, return the minimal longitude range of the bounding box.
-   */
+        * bounds, return the minimal longitude range of the bounding box.
+        */
         protected Rectangle ComputeGeoBBox(IGeometry geoms)
         {
             if (geoms.IsEmpty)
@@ -171,7 +171,7 @@ namespace Spatial4n.Core.Shapes.Nts
             }
         }
 
-        public virtual /*NtsGeometry*/ Shape GetBuffered(double distance, SpatialContext ctx)
+        public virtual Shape GetBuffered(double distance, SpatialContext ctx)
         {
             //TODO doesn't work correctly across the dateline. The buffering needs to happen
             // when it's transiently unrolled, prior to being sliced.

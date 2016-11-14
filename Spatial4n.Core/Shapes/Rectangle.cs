@@ -19,21 +19,21 @@ using Spatial4n.Core.Context;
 
 namespace Spatial4n.Core.Shapes
 {
-	public interface Rectangle :Shape
-	{
-		double GetWidth();
-		double GetHeight();
+    public interface Rectangle : Shape
+    {
+        double GetWidth();
+        double GetHeight();
 
-		double GetMinX();
-		double GetMinY();
-		double GetMaxX();
-		double GetMaxY();
+        double GetMinX();
+        double GetMinY();
+        double GetMaxX();
+        double GetMaxY();
 
-		/// <summary>
-		/// Only meaningful for geospatial contexts.
-		/// </summary>
-		/// <returns></returns>
-		bool GetCrossesDateLine();
+        /// <summary>
+        /// Only meaningful for geospatial contexts.
+        /// </summary>
+        /// <returns></returns>
+        bool GetCrossesDateLine();
 
         /// <summary>
         /// Expert: Resets the state of this shape given the arguments. This is a
@@ -47,8 +47,8 @@ namespace Spatial4n.Core.Shapes
         /// <param name="maxY"></param>
         void Reset(double minX, double maxX, double minY, double maxY);
 
-		/* There is no axis line shape, and this is more efficient then creating a flat Rectangle for intersect(). */
-		SpatialRelation RelateYRange(double minY, double maxY);
-		SpatialRelation RelateXRange(double minX, double maxX);
-	}
+        /* There is no axis line shape, and this is more efficient then creating a flat Rectangle for intersect(). */
+        SpatialRelation RelateYRange(double minY, double maxY);
+        SpatialRelation RelateXRange(double minX, double maxX);
+    }
 }

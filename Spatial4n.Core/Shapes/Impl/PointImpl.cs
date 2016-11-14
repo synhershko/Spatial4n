@@ -21,14 +21,14 @@ using System.Diagnostics;
 
 namespace Spatial4n.Core.Shapes.Impl
 {
-	/// <summary>
-	/// A basic 2D implementation of a Point.
-	/// </summary>
-	public class PointImpl : Point
-	{
+    /// <summary>
+    /// A basic 2D implementation of a Point.
+    /// </summary>
+    public class PointImpl : Point
+    {
         private readonly SpatialContext ctx;
-		private double x;
-		private double y;
+        private double x;
+        private double y;
 
         /// <summary>
         /// A simple constructor without normalization / validation.
@@ -74,19 +74,19 @@ namespace Spatial4n.Core.Shapes.Impl
             return this;
         }
 
-        public virtual /*Circle*/ Shape GetBuffered(double distance, SpatialContext ctx)
+        public virtual Shape GetBuffered(double distance, SpatialContext ctx)
         {
             return ctx.MakeCircle(this, distance);
         }
 
         public virtual SpatialRelation Relate(Shape other)
-		{
+        {
             if (IsEmpty || other.IsEmpty)
                 return SpatialRelation.DISJOINT;
             if (other is Point)
-				return this.Equals(other) ? SpatialRelation.INTERSECTS : SpatialRelation.DISJOINT;
-			return other.Relate(this).Transpose();
-		}
+                return this.Equals(other) ? SpatialRelation.INTERSECTS : SpatialRelation.DISJOINT;
+            return other.Relate(this).Transpose();
+        }
 
         public virtual bool HasArea()
         {
@@ -94,59 +94,59 @@ namespace Spatial4n.Core.Shapes.Impl
         }
 
         public virtual double GetArea(SpatialContext ctx)
-		{
-			return 0;
-		}
+        {
+            return 0;
+        }
 
-		public override string ToString()
-		{
-		    return string.Format("Pt(x={0:0.0#############},y={1:0.0#############})", x, y);
-		}
+        public override string ToString()
+        {
+            return string.Format("Pt(x={0:0.0#############},y={1:0.0#############})", x, y);
+        }
 
-		public override bool Equals(object o)
-		{
-			return Equals(this, o);
-		}
+        public override bool Equals(object o)
+        {
+            return Equals(this, o);
+        }
 
-		/// <summary>
-		/// All {@link Point} implementations should use this definition of {@link Object#equals(Object)}.
-		/// </summary>
-		/// <param name="thiz"></param>
-		/// <param name="o"></param>
-		/// <returns></returns>
-		public static bool Equals(Point thiz, Object o)
-		{
-			if (thiz == null)
-				throw new ArgumentNullException("thiz");
+        /// <summary>
+        /// All {@link Point} implementations should use this definition of {@link Object#equals(Object)}.
+        /// </summary>
+        /// <param name="thiz"></param>
+        /// <param name="o"></param>
+        /// <returns></returns>
+        public static bool Equals(Point thiz, Object o)
+        {
+            if (thiz == null)
+                throw new ArgumentNullException("thiz");
 
-			if (thiz == o) return true;
-			
-			var point = o as Point;
-			if (point == null) return false;
+            if (thiz == o) return true;
 
-			return thiz.GetX().Equals(point.GetX()) && thiz.GetY().Equals(point.GetY());
-		}
+            var point = o as Point;
+            if (point == null) return false;
 
-		public override int GetHashCode()
-		{
-			return GetHashCode(this);
-		}
+            return thiz.GetX().Equals(point.GetX()) && thiz.GetY().Equals(point.GetY());
+        }
 
-		/// <summary>
-		/// All {@link Point} implementations should use this definition of {@link Object#hashCode()}.
-		/// </summary>
-		/// <param name="thiz"></param>
-		/// <returns></returns>
-		public static int GetHashCode(Point thiz)
-		{
-			if (thiz == null)
-				throw new ArgumentNullException("thiz");
+        public override int GetHashCode()
+        {
+            return GetHashCode(this);
+        }
 
-			long temp = thiz.GetX() != +0.0d ? BitConverter.DoubleToInt64Bits(thiz.GetX()) : 0L;
-			int result = (int)(temp ^ ((uint)temp >> 32));
-			temp = thiz.GetY() != +0.0d ? BitConverter.DoubleToInt64Bits(thiz.GetY()) : 0L;
-			result = 31 * result + (int)(temp ^ ((uint)temp >> 32));
-			return result;
-		}
-	}
+        /// <summary>
+        /// All {@link Point} implementations should use this definition of {@link Object#hashCode()}.
+        /// </summary>
+        /// <param name="thiz"></param>
+        /// <returns></returns>
+        public static int GetHashCode(Point thiz)
+        {
+            if (thiz == null)
+                throw new ArgumentNullException("thiz");
+
+            long temp = thiz.GetX() != +0.0d ? BitConverter.DoubleToInt64Bits(thiz.GetX()) : 0L;
+            int result = (int)(temp ^ ((uint)temp >> 32));
+            temp = thiz.GetY() != +0.0d ? BitConverter.DoubleToInt64Bits(thiz.GetY()) : 0L;
+            result = 31 * result + (int)(temp ^ ((uint)temp >> 32));
+            return result;
+        }
+    }
 }

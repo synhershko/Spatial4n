@@ -43,26 +43,20 @@ namespace Spatial4n.Core.Io
          */
         public static string WriteShape(Shape shape)
         {
-            return WriteShape(shape, /*makeNumberFormat(6)*/ "0.000000");
+            return WriteShape(shape, "0.000000");
         }
 
         /** Overloaded to provide a number format. */
-        public static string WriteShape(Shape shape, /*NumberFormat nf*/ string numberFormat)
+        public static string WriteShape(Shape shape, string numberFormat)
         {
             if (shape is Point)
             {
                 Point point = (Point)shape;
-                //return nf.format(point.GetX()) + " " + nf.format(point.GetY());
                 return point.GetX().ToString(numberFormat, CultureInfo.InvariantCulture) + " " + point.GetY().ToString(numberFormat, CultureInfo.InvariantCulture);
             }
             else if (shape is Rectangle)
             {
                 Rectangle rect = (Rectangle)shape;
-                //return
-                //    nf.format(rect.GetMinX()) + " " +
-                //        nf.format(rect.GetMinY()) + " " +
-                //        nf.format(rect.GetMaxX()) + " " +
-                //        nf.format(rect.GetMaxY());
                 return rect.GetMinX().ToString(numberFormat, CultureInfo.InvariantCulture) + " " +
                     rect.GetMinY().ToString(numberFormat, CultureInfo.InvariantCulture) + " " +
                     rect.GetMaxX().ToString(numberFormat, CultureInfo.InvariantCulture) + " " +
@@ -71,11 +65,6 @@ namespace Spatial4n.Core.Io
             else if (shape is Circle)
             {
                 Circle c = (Circle)shape;
-                //return "Circle(" +
-                //    nf.format(c.GetCenter().GetX()) + " " +
-                //    nf.format(c.GetCenter().GetY()) + " " +
-                //    "d=" + nf.format(c.GetRadius()) +
-                //    ")";
                 return "Circle(" +
                     c.GetCenter().GetX().ToString(numberFormat, CultureInfo.InvariantCulture) + " " +
                     c.GetCenter().GetY().ToString(numberFormat, CultureInfo.InvariantCulture) + " " +
@@ -84,18 +73,6 @@ namespace Spatial4n.Core.Io
             }
             return shape.ToString();
         }
-
-        ///**
-        // * A convenience method to create a suitable NumberFormat for writing numbers.
-        // */
-        //public static NumberFormat makeNumberFormat(int fractionDigits)
-        //{
-        //    NumberFormat nf = NumberFormat.getInstance(Locale.ROOT);//not thread-safe
-        //    nf.setGroupingUsed(false);
-        //    nf.setMaximumFractionDigits(fractionDigits);
-        //    nf.setMinimumFractionDigits(fractionDigits);
-        //    return nf;
-        //}
 
         /** Reads the shape specification as defined in the class javadocs. If the first character is
          * a letter but it doesn't complete out "Circle" or "CIRCLE" then this method returns null,
@@ -122,8 +99,6 @@ namespace Spatial4n.Core.Io
                     {
                         int circleLength = "Circle(".Length;
                         string body = str.Substring(circleLength, idx - circleLength);
-                        //StringTokenizer st = new StringTokenizer(body, " ");
-                        //String token = st.nextToken();
                         tokens = body.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
                         nextToken = 0;
                         string token = tokens[nextToken];
@@ -140,7 +115,6 @@ namespace Spatial4n.Core.Io
                         }
                         double? d = null;
 
-                        //string arg = st.nextToken();
                         string arg = tokens[++nextToken];
                         idx = arg.IndexOf('=');
                         if (idx > 0)
@@ -159,7 +133,7 @@ namespace Spatial4n.Core.Io
                         {
                             d = double.Parse(arg, CultureInfo.InvariantCulture);
                         }
-                        //if (st.hasMoreTokens())
+                        // if we have additional tokens...
                         if (nextToken < tokens.Length - 1)
                         {
                             throw new InvalidShapeException("Extra arguments: " + tokens[++nextToken] /*st.nextToken()*/ + " :: " + str);
@@ -177,21 +151,16 @@ namespace Spatial4n.Core.Io
 
             if (str.IndexOf(',') != -1)
                 return ReadLatCommaLonPoint(str, ctx);
-            //StringTokenizer st = new StringTokenizer(str, " ");
             tokens = str.Split(' ');
             nextToken = 0;
-            //double p0 = Double.parseDouble(st.nextToken());
-            //double p1 = Double.parseDouble(st.nextToken());
             double p0 = double.Parse(tokens[nextToken], CultureInfo.InvariantCulture);
             double p1 = double.Parse(tokens[++nextToken], CultureInfo.InvariantCulture);
-            //if (st.hasMoreTokens()) 
+            // if we have additional tokens...
             if (nextToken < tokens.Length - 1)
             {
-                //double p2 = Double.parseDouble(st.nextToken());
-                //double p3 = Double.parseDouble(st.nextToken());
                 double p2 = double.Parse(tokens[++nextToken], CultureInfo.InvariantCulture);
                 double p3 = double.Parse(tokens[++nextToken], CultureInfo.InvariantCulture);
-                //if (st.hasMoreTokens())
+                // if we have additional tokens...
                 if (nextToken < tokens.Length - 1)
                     throw new InvalidShapeException("Only 4 numbers supported (rect) but found more: " + str);
                 return ctx.MakeRectangle(p0, p2, p1, p3);

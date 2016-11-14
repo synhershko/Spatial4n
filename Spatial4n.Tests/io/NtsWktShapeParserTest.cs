@@ -103,12 +103,12 @@ namespace Spatial4n.Tests.io
         public virtual void TestParseMultiPolygon()
         {
             Shape p1 = new PolygonBuilder(ctx)
-        .Point(100, 0)
-        .Point(101, 0)//101
-        .Point(101, 2)//101
-        .Point(100, 1)
-        .Point(100, 0)
-        .Build();
+                .Point(100, 0)
+                .Point(101, 0)//101
+                .Point(101, 2)//101
+                .Point(100, 1)
+                .Point(100, 0)
+                .Build();
             Shape p2 = new PolygonBuilder(ctx)
                 .Point(100, 0)
                 .Point(102, 0)//102

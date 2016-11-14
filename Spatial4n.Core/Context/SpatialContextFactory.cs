@@ -69,8 +69,6 @@ namespace Spatial4n.Core.Context
             else
             {
                 Type t = Type.GetType(cname);
-
-                // TODO: Replace with typeLoader
                 instance = (SpatialContextFactory)Activator.CreateInstance(t);
             }
 
@@ -99,17 +97,7 @@ namespace Spatial4n.Core.Context
         protected virtual void InitField(string name)
         {
             //  note: java.beans API is more verbose to use correctly (?) but would arguably be better
-            FieldInfo field;
-            //try
-            //{
-            field = GetType().GetField(name, BindingFlags.GetField | BindingFlags.Public | BindingFlags.Instance | BindingFlags.NonPublic);
-            //}
-            //catch (NoSuchFieldException e)
-            //{
-            //    throw new Error(e);
-            //}
-            //string str = args[name];
-            //if (str != null)
+            FieldInfo field = GetType().GetField(name, BindingFlags.GetField | BindingFlags.Public | BindingFlags.Instance | BindingFlags.NonPublic);
             string str;
             if (args.TryGetValue(name, out str))
             {

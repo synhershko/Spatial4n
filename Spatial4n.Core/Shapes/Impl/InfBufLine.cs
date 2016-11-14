@@ -91,7 +91,7 @@ namespace Spatial4n.Core.Shapes.Impl
         //   * @return
         //   */
         //  double interceptBuffOffset() {
-        //    if (Double.isInfinite(slope))
+        //    if (double.isInfinite(slope))
         //      return slope;
         //    if (buf == 0)
         //      return 0;

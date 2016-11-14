@@ -66,7 +66,7 @@ namespace Spatial4n.Tests.io
             AssertParses("POINT (-45.3 +80.4 )", expected);
             AssertParses("POINT (-45.3 8.04e1 )", expected);
 
-            AssertParses("POINT EMPTY", ctx.MakePoint(Double.NaN, Double.NaN));
+            AssertParses("POINT EMPTY", ctx.MakePoint(double.NaN, double.NaN));
 
             //other dimensions are skipped
             AssertParses("POINT (100 90 2)", ctx.MakePoint(100, 90));

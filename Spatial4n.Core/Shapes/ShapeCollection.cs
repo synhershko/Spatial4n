@@ -32,7 +32,7 @@ namespace Spatial4n.Core.Shapes
     /// </summary>
     /// <typeparam name="Shape"></typeparam>
     public class ShapeCollection : ICollection<Shape>, Shape
-        //where S : Shape
+    //where S : Shape
     {
         protected readonly IList<Shape> shapes;
         protected readonly Rectangle bbox;
@@ -89,12 +89,6 @@ namespace Spatial4n.Core.Shapes
                 return shapes[index];
             }
         }
-
-        //      @Override
-        //public S get(int index)
-        //      {
-        //          return shapes.get(index);
-        //      }
 
         public int Count
         {
@@ -211,7 +205,6 @@ namespace Spatial4n.Core.Shapes
             }
             return true;
         }
-
 
         public virtual double GetArea(SpatialContext ctx)
         {

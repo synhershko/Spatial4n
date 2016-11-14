@@ -27,28 +27,28 @@ using System.Collections.Generic;
 
 namespace Spatial4n.Core.Context
 {
-	/// <summary>
-	/// This is a facade to most of Spatial4j, holding things like {@link
-	/// DistanceUnits}, {@link DistanceCalculator}, and the coordinate world
-	/// boundaries, and acting as a factory for the {@link Shape}s.
-	/// <p/>
-	/// A SpatialContext has public constructors, but note the convenience
-	/// instance {@link #GEO}.  Also, if you wish to construct one based on
-	/// configuration information then consider using {@link SpatialContextFactory}.
-	/// <p/>
-	/// Thread-safe & immutable.
-	/// </summary>
-	public class SpatialContext
-	{
-		/// <summary>
-		/// A popular default SpatialContext implementation for geospatial.
-		/// </summary>
-		public static readonly SpatialContext GEO = new SpatialContext(new SpatialContextFactory());
+    /// <summary>
+    /// This is a facade to most of Spatial4j, holding things like {@link
+    /// DistanceUnits}, {@link DistanceCalculator}, and the coordinate world
+    /// boundaries, and acting as a factory for the {@link Shape}s.
+    /// <p/>
+    /// A SpatialContext has public constructors, but note the convenience
+    /// instance {@link #GEO}.  Also, if you wish to construct one based on
+    /// configuration information then consider using {@link SpatialContextFactory}.
+    /// <p/>
+    /// Thread-safe & immutable.
+    /// </summary>
+    public class SpatialContext
+    {
+        /// <summary>
+        /// A popular default SpatialContext implementation for geospatial.
+        /// </summary>
+        public static readonly SpatialContext GEO = new SpatialContext(new SpatialContextFactory());
 
-		//These are non-null
-		private readonly bool geo;
-		private readonly DistanceCalculator calculator;
-		private readonly Rectangle worldBounds;
+        //These are non-null
+        private readonly bool geo;
+        private readonly DistanceCalculator calculator;
+        private readonly Rectangle worldBounds;
 
         private readonly WktShapeParser wktShapeParser;
         private readonly BinaryCodec binaryCodec;
@@ -128,11 +128,11 @@ namespace Spatial4n.Core.Context
             this.wktShapeParser = factory.MakeWktShapeParser(this);
             this.binaryCodec = factory.MakeBinaryCodec(this);
         }
-       
-		public virtual DistanceCalculator GetDistCalc()
-		{
-			return calculator;
-		}
+
+        public virtual DistanceCalculator GetDistCalc()
+        {
+            return calculator;
+        }
 
         /** Convenience that uses {@link #getDistCalc()} */
         public virtual double CalcDistance(Point p, double x2, double y2)
@@ -152,9 +152,9 @@ namespace Spatial4n.Core.Context
         /// </summary>
         /// <returns></returns>
 		public virtual Rectangle GetWorldBounds()
-		{
-			return worldBounds;
-		}
+        {
+            return worldBounds;
+        }
 
         /** If true then {@link #normX(double)} will wrap longitudes outside of the standard
         * geodetic boundary into it. Example: 181 will become -179. */
@@ -168,9 +168,9 @@ namespace Spatial4n.Core.Context
         /// </summary>
         /// <returns></returns>
         public virtual bool IsGeo()
-		{
-			return geo;
-		}
+        {
+            return geo;
+        }
 
         /** Normalize the 'x' dimension. Might reduce precision or wrap it to be within the bounds. This
    * is called by {@link com.spatial4j.core.io.WktShapeParser} before creating a shape. */
@@ -207,101 +207,101 @@ namespace Spatial4n.Core.Context
                 throw new InvalidShapeException("Bad Y value " + y + " is not in boundary " + bounds);
         }
 
-	    /// <summary>
-		/// Construct a point.
-		/// </summary>
-		/// <param name="x"></param>
-		/// <param name="y"></param>
-		/// <returns></returns>
-		public virtual Point MakePoint(double x, double y)
-		{
+        /// <summary>
+        /// Construct a point.
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        /// <returns></returns>
+        public virtual Point MakePoint(double x, double y)
+        {
             VerifyX(x);
             VerifyY(y);
-			return new PointImpl(x, y, this);
-		}
+            return new PointImpl(x, y, this);
+        }
 
-	    /// <summary>
-		/// Construct a rectangle. The parameters will be normalized.
-		/// </summary>
-		/// <param name="lowerLeft"></param>
-		/// <param name="upperRight"></param>
-		/// <returns></returns>
-		public virtual Rectangle MakeRectangle(Point lowerLeft, Point upperRight)
-		{
-			return MakeRectangle(lowerLeft.GetX(), upperRight.GetX(),
-			                lowerLeft.GetY(), upperRight.GetY());
-		}
+        /// <summary>
+        /// Construct a rectangle. The parameters will be normalized.
+        /// </summary>
+        /// <param name="lowerLeft"></param>
+        /// <param name="upperRight"></param>
+        /// <returns></returns>
+        public virtual Rectangle MakeRectangle(Point lowerLeft, Point upperRight)
+        {
+            return MakeRectangle(lowerLeft.GetX(), upperRight.GetX(),
+                            lowerLeft.GetY(), upperRight.GetY());
+        }
 
-	    /// <summary>
-	    /// Construct a rectangle. If just one longitude is on the dateline (+/- 180)
-	    /// then potentially adjust its sign to ensure the rectangle does not cross the
-	    /// dateline.
-	    /// </summary>
-	    /// <param name="minX"></param>
-	    /// <param name="maxX"></param>
-	    /// <param name="minY"></param>
-	    /// <param name="maxY"></param>
-	    /// <returns></returns>
-		public virtual Rectangle MakeRectangle(double minX, double maxX, double minY, double maxY)
-	    {
-	        Rectangle bounds = GetWorldBounds();
-	        // Y
-	        if (minY < bounds.GetMinY() || maxY > bounds.GetMaxY()) //NaN will fail
-	            throw new InvalidShapeException("Y values [" + minY + " to " + maxY + "] not in boundary " + bounds);
-	        if (minY > maxY)
-	            throw new InvalidShapeException("maxY must be >= minY: " + minY + " to " + maxY);
-	        // X
-	        if (IsGeo())
-	        {
-	            VerifyX(minX);
-	            VerifyX(maxX);
-	            //TODO consider removing this logic so that there is no normalization here
-	            //if (minX != maxX) {   USUALLY TRUE, inline check below
-	            //If an edge coincides with the dateline then don't make this rect cross it
-	            if (minX == 180 && minX != maxX)
-	            {
-	                minX = -180;
-	            }
-	            else if (maxX == -180 && minX != maxX)
-	            {
-	                maxX = 180;
-	            }
-	            //}
-	        }
-	        else
-	        {
-	            if (minX < bounds.GetMinX() || maxX > bounds.GetMaxX()) //NaN will fail
-	                throw new InvalidShapeException("X values [" + minX + " to " + maxX + "] not in boundary " + bounds);
-	            if (minX > maxX)
-	                throw new InvalidShapeException("maxX must be >= minX: " + minX + " to " + maxX);
-	        }
-	        return new RectangleImpl(minX, maxX, minY, maxY, this);
-	    }
+        /// <summary>
+        /// Construct a rectangle. If just one longitude is on the dateline (+/- 180)
+        /// then potentially adjust its sign to ensure the rectangle does not cross the
+        /// dateline.
+        /// </summary>
+        /// <param name="minX"></param>
+        /// <param name="maxX"></param>
+        /// <param name="minY"></param>
+        /// <param name="maxY"></param>
+        /// <returns></returns>
+        public virtual Rectangle MakeRectangle(double minX, double maxX, double minY, double maxY)
+        {
+            Rectangle bounds = GetWorldBounds();
+            // Y
+            if (minY < bounds.GetMinY() || maxY > bounds.GetMaxY()) //NaN will fail
+                throw new InvalidShapeException("Y values [" + minY + " to " + maxY + "] not in boundary " + bounds);
+            if (minY > maxY)
+                throw new InvalidShapeException("maxY must be >= minY: " + minY + " to " + maxY);
+            // X
+            if (IsGeo())
+            {
+                VerifyX(minX);
+                VerifyX(maxX);
+                //TODO consider removing this logic so that there is no normalization here
+                //if (minX != maxX) {   USUALLY TRUE, inline check below
+                //If an edge coincides with the dateline then don't make this rect cross it
+                if (minX == 180 && minX != maxX)
+                {
+                    minX = -180;
+                }
+                else if (maxX == -180 && minX != maxX)
+                {
+                    maxX = 180;
+                }
+                //}
+            }
+            else
+            {
+                if (minX < bounds.GetMinX() || maxX > bounds.GetMaxX()) //NaN will fail
+                    throw new InvalidShapeException("X values [" + minX + " to " + maxX + "] not in boundary " + bounds);
+                if (minX > maxX)
+                    throw new InvalidShapeException("maxX must be >= minX: " + minX + " to " + maxX);
+            }
+            return new RectangleImpl(minX, maxX, minY, maxY, this);
+        }
 
-		/// <summary>
+        /// <summary>
         /// Construct a circle. The units of "distance" should be the same as x & y.
-		/// </summary>
-		/// <param name="x"></param>
-		/// <param name="y"></param>
-		/// <param name="distance"></param>
-		/// <returns></returns>
-		public virtual Circle MakeCircle(double x, double y, double distance)
-		{
-			return MakeCircle(MakePoint(x, y), distance);
-		}
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        /// <param name="distance"></param>
+        /// <returns></returns>
+        public virtual Circle MakeCircle(double x, double y, double distance)
+        {
+            return MakeCircle(MakePoint(x, y), distance);
+        }
 
-		/// <summary>
+        /// <summary>
         /// Construct a circle. The units of "distance" should be the same as x & y.
-		/// </summary>
-		/// <param name="point"></param>
-		/// <param name="distance"></param>
-		/// <returns></returns>
+        /// </summary>
+        /// <param name="point"></param>
+        /// <param name="distance"></param>
+        /// <returns></returns>
         public virtual Circle MakeCircle(Point point, double distance)
-		{
-		    if (distance < 0)
-		        throw new InvalidShapeException("distance must be >= 0; got " + distance);
-		    if (IsGeo())
-		    {
+        {
+            if (distance < 0)
+                throw new InvalidShapeException("distance must be >= 0; got " + distance);
+            if (IsGeo())
+            {
                 if (distance > 180)
                 {
                     // (it's debatable whether to error or not)
@@ -309,12 +309,12 @@ namespace Spatial4n.Core.Context
                     distance = 180;
                 }
                 return new GeoCircle(point, distance, this);
-		    }
-		    else
-		    {
-		        return new CircleImpl(point, distance, this);
-		    }
-		}
+            }
+            else
+            {
+                return new CircleImpl(point, distance, this);
+            }
+        }
 
         /** Constructs a line string. It's an ordered sequence of connected vertexes. There
    * is no official shape/interface for it yet so we just return Shape. */
@@ -349,13 +349,13 @@ namespace Spatial4n.Core.Context
    * @return non-null
    * @throws ParseException if it failed to parse.
    */
-        public virtual Shape ReadShapeFromWkt(string wkt) 
+        public virtual Shape ReadShapeFromWkt(string wkt)
         {
             return wktShapeParser.Parse(wkt);
         }
 
         public virtual BinaryCodec BinaryCodec
-        { 
+        {
             get { return binaryCodec; }
         }
 
@@ -386,15 +386,15 @@ namespace Spatial4n.Core.Context
         }
 
         public override string ToString()
-		{
-			if (this.Equals(GEO))
-				return GEO.GetType().Name + ".GEO";
+        {
+            if (this.Equals(GEO))
+                return GEO.GetType().Name + ".GEO";
 
-			return GetType().Name + "{" +
-			       "geo=" + geo +
-			       ", calculator=" + calculator +
-			       ", worldBounds=" + worldBounds +
-			       '}';
-		}
-	}
+            return GetType().Name + "{" +
+                   "geo=" + geo +
+                   ", calculator=" + calculator +
+                   ", worldBounds=" + worldBounds +
+                   '}';
+        }
+    }
 }

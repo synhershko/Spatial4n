@@ -31,43 +31,43 @@ namespace Spatial4n.Core.Shapes
     /// </para>
     /// </summary>
     public interface Shape
-	{
-	    /// <summary>
-	    /// Describe the relationship between the two objects.  For example
-	    /// <ul>
-	    ///   <li>this is WITHIN other</li>
-	    ///   <li>this CONTAINS other</li>
-	    ///   <li>this is DISJOINT other</li>
-	    ///   <li>this INTERSECTS other</li>
-	    /// </ul>
-	    /// Note that a Shape implementation may choose to return INTERSECTS when the
-	    /// true answer is WITHIN or CONTAINS for performance reasons. If a shape does
-	    /// this then it <i>must</i> document when it does.  Ideally the shape will not
-	    /// do this approximation in all circumstances, just sometimes.
-	    /// <p />
-	    /// If the shapes are equal then the result is CONTAINS (preferred) or WITHIN.
-	    /// </summary>
-	    /// <param name="other"></param>
-	    /// <returns></returns>
-	    SpatialRelation Relate(Shape other);
+    {
+        /// <summary>
+        /// Describe the relationship between the two objects.  For example
+        /// <ul>
+        ///   <li>this is WITHIN other</li>
+        ///   <li>this CONTAINS other</li>
+        ///   <li>this is DISJOINT other</li>
+        ///   <li>this INTERSECTS other</li>
+        /// </ul>
+        /// Note that a Shape implementation may choose to return INTERSECTS when the
+        /// true answer is WITHIN or CONTAINS for performance reasons. If a shape does
+        /// this then it <i>must</i> document when it does.  Ideally the shape will not
+        /// do this approximation in all circumstances, just sometimes.
+        /// <p />
+        /// If the shapes are equal then the result is CONTAINS (preferred) or WITHIN.
+        /// </summary>
+        /// <param name="other"></param>
+        /// <returns></returns>
+        SpatialRelation Relate(Shape other);
 
-		/// <summary>
-		/// Get the bounding box for this Shape. This means the shape is within the
-		/// bounding box and that it touches each side of the rectangle.
-		/// <p/>
-		/// Postcondition: <code>this.getBoundingBox().relate(this) == CONTAINS</code>
-		/// </summary>
-		/// <returns></returns>
-		Rectangle GetBoundingBox(); // TODO: Make into property
+        /// <summary>
+        /// Get the bounding box for this Shape. This means the shape is within the
+        /// bounding box and that it touches each side of the rectangle.
+        /// <p/>
+        /// Postcondition: <code>this.getBoundingBox().relate(this) == CONTAINS</code>
+        /// </summary>
+        /// <returns></returns>
+        Rectangle GetBoundingBox(); // TODO: Make into property
 
-		/// <summary>
-		/// Does the shape have area?  This will be false for points and lines. It will
-		/// also be false for shapes that normally have area but are constructed in a
-		/// degenerate case as to not have area (e.g. a circle with 0 radius or
-		/// rectangle with no height or no width).
-		/// </summary>
-		/// <returns></returns>
-		bool HasArea();// TODO: Make into property
+        /// <summary>
+        /// Does the shape have area?  This will be false for points and lines. It will
+        /// also be false for shapes that normally have area but are constructed in a
+        /// degenerate case as to not have area (e.g. a circle with 0 radius or
+        /// rectangle with no height or no width).
+        /// </summary>
+        /// <returns></returns>
+        bool HasArea();// TODO: Make into property
 
         /// <summary>
         /// Calculates the area of the shape in the units of {@link
@@ -78,14 +78,14 @@ namespace Spatial4n.Core.Shapes
         /// <returns></returns>
         double GetArea(SpatialContext ctx);
 
-		/// <summary>
-		/// Returns the center point of this shape. This is usually the same as
-		/// <code>getBoundingBox().getCenter()</code> but it doesn't have to be.
-		/// <p />
-		/// Postcondition: <code>this.relate(this.getCenter()) == CONTAINS</code>
-		/// </summary>
-		/// <returns></returns>
-		Point GetCenter();
+        /// <summary>
+        /// Returns the center point of this shape. This is usually the same as
+        /// <code>getBoundingBox().getCenter()</code> but it doesn't have to be.
+        /// <p />
+        /// Postcondition: <code>this.relate(this.getCenter()) == CONTAINS</code>
+        /// </summary>
+        /// <returns></returns>
+        Point GetCenter();
 
         /// <summary>
         /// Returns a buffered version of this shape.  The buffer is usually a

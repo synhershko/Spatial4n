@@ -28,13 +28,13 @@ namespace Spatial4n.Tests.shape
 			}
 		}
 
-  //  	public TestShapesGeo()
-  //  	{
-  //  	}
+        //public TestShapesGeo()
+        //{
+        //}
 
-		//public TestShapesGeo(SpatialContext ctx) : base(ctx)
-  //  	{
-  //  	}
+        //public TestShapesGeo(SpatialContext ctx) : base(ctx)
+        //{
+        //}
 
         private static double DegToKm(double deg)
         {
@@ -115,7 +115,7 @@ namespace Spatial4n.Tests.shape
 		{
 			base.ctx = ctx;
 
-            Assert.Equal(String.Format("Circle(Pt(x={0:0.0},y={1:0.0}), d={2:0.0}° {3:0.00}km)", 10, 20, 30, 3335.85), ctx.MakeCircle(10, 20, 30).ToString());
+            Assert.Equal(string.Format("Circle(Pt(x={0:0.0},y={1:0.0}), d={2:0.0}° {3:0.00}km)", 10, 20, 30, 3335.85), ctx.MakeCircle(10, 20, 30).ToString());
 
             double v = 200 * (random.NextDouble() > 0.5 ? -1 : 1);
 		    Assert.Throws<InvalidShapeException>(() => ctx.MakeCircle(v,0,5));

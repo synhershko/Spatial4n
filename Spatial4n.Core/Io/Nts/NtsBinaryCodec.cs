@@ -67,66 +67,25 @@ namespace Spatial4n.Core.Io.Nts
 
         }
 
+
+        /// <summary>
+        /// Spatial4n specific class. The primary purpose of this class is
+        /// to ensure the inner stream does not get disposed prematurely.
+        /// </summary>
         private class InputStreamAnonymousHelper : Stream
         {
             private readonly BinaryReader dataInput;
-            bool first = true;
 
             public InputStreamAnonymousHelper(BinaryReader dataInput)
             {
                 this.dataInput = dataInput;
             }
 
-
             public override int Read(byte[] buffer, int offset, int count)
             {
                 return Read(buffer, offset, count);
             }
 
-            //public override int Read(byte[] buffer, int offset, int count)
-            //{
-            //    if (first)
-            //    {//we don't write NTS's leading BOM so synthesize reading it
-            //        if (count != 1)
-            //            throw new InvalidOperationException("Expected initial read of one byte, not: " + count);
-            //        buffer[0] = wkbXDR; //WKBConstants.wkbXDR;//0
-            //        first = false;
-            //        return 1;
-            //    }
-            //    else
-            //    {
-            //        //TODO for performance, specialize for common array lengths: 1, 4, 8
-            //        //dataInput.ReadFully(buf);
-            //        //dataInput.Read()
-            //        //buf = ReadFully(dataInput.BaseStream);
-
-
-            //        return dataInput.BaseStream.Read(buffer, offset, count);
-            //    }
-            //}
-
-            //public override int Read(byte[] buf)
-            //{
-
-            //    return 
-            //}
-
-            //private static byte[] ReadFully(Stream input)
-            //{
-            //    //input.Seek(0, SeekOrigin.Begin);
-            //    if (input is MemoryStream)
-            //    {
-            //        return ((MemoryStream)input).ToArray();
-            //    }
-
-            //    using (var ms = new MemoryStream())
-            //    {
-            //        input.CopyTo(ms);
-            //        return ms.ToArray();
-            //    }
-            //}
-
-            #region Unmodified Stream Overrides
             public override bool CanRead
             {
                 get
@@ -177,11 +136,6 @@ namespace Spatial4n.Core.Io.Nts
                 dataInput.BaseStream.Flush();
             }
 
-            //public override int Read(byte[] buffer, int offset, int count)
-            //{
-            //    throw new NotImplementedException();
-            //}
-
             public override long Seek(long offset, SeekOrigin origin)
             {
                 return dataInput.BaseStream.Seek(offset, origin);
@@ -196,8 +150,6 @@ namespace Spatial4n.Core.Io.Nts
             {
                 dataInput.BaseStream.Write(buffer, offset, count);
             }
-
-            #endregion
         }
 
         public Shape ReadNtsGeom(/*DataInput*/BinaryReader dataInput)
@@ -206,26 +158,7 @@ namespace Spatial4n.Core.Io.Nts
             WKBReader reader = new WKBReader(ctx.GetGeometryFactory());
             try
             {
-                //Stream inStream = dataInput.BaseStream;
                 Stream inStream = new InputStreamAnonymousHelper(dataInput);
-
-                //Stream inStream = new InstreamAnonymousHelper();
-                //////      InStream inStream = new InStream() {//a strange NTS abstraction
-                //////        bool first = true;
-                //////    @Override
-                //////        public void read(byte[] buf) throws IOException
-                //////    {
-                //////          if (first) {//we don't write NTS's leading BOM so synthesize reading it
-                //////            if (buf.length != 1)
-                //////                throw new IllegalStateException("Expected initial read of one byte, not: " + buf.length);
-                //////            buf[0] = WKBConstants.wkbXDR;//0
-                //////            first = false;
-                //////        } else {
-                //////            //TODO for performance, specialize for common array lengths: 1, 4, 8
-                //////            dataInput.readFully(buf);
-                //////        }
-                //////    }
-                //////};
                 IGeometry geom = reader.Read(inStream);
                 //false: don't check for dateline-180 cross or multi-polygon overlaps; this won't happen
                 // once it gets written, and we're reading it now
@@ -238,6 +171,10 @@ namespace Spatial4n.Core.Io.Nts
             }
         }
 
+        /// <summary>
+        /// Spatial4n specific class. The primary purpose of this class is
+        /// to ensure the inner stream does not get disposed prematurely.
+        /// </summary>
         private class OutputStreamAnonymousHelper : Stream
         {
             private readonly BinaryWriter dataOutput;
@@ -246,27 +183,10 @@ namespace Spatial4n.Core.Io.Nts
                 this.dataOutput = dataOutput;
             }
 
-            bool first = true;
-
             public override void Write(byte[] buffer, int offset, int count)
             {
                 dataOutput.BaseStream.Write(buffer, offset, count);
             }
-
-            //public override void Write(byte[] buffer, int offset, int count)
-            //{
-            //    if (first)
-            //    {
-            //        first = false;
-            //        //skip byte order mark
-            //        if (count != 1 || buffer[0] != /*WKBConstants.*/wkbXDR)//the default
-            //            throw new InvalidOperationException("Unexpected WKB byte order mark");
-            //        return;
-            //    }
-            //    dataOutput.Write(buffer, offset, count);
-            //}
-
-            #region Unmodified Stream Overrides
 
             public override bool CanRead
             {
@@ -332,34 +252,13 @@ namespace Spatial4n.Core.Io.Nts
             {
                 return dataOutput.BaseStream.Read(buffer, offset, count);
             }
-
-            #endregion
         }
 
         public void WriteNtsGeom(/*DataOutput*/BinaryWriter dataOutput, Shape s)
         {
             NtsSpatialContext ctx = (NtsSpatialContext)base.ctx;
             IGeometry geom = ctx.GetGeometryFrom(s);//might even translate it
-            //var writer = new WKBWriter();
-            //writer.Write(geom, dataOutput.BaseStream);
             new WKBWriter().Write(geom, new OutputStreamAnonymousHelper(dataOutput));
-
-    //        new WKBWriter().Write(geom, new OutStream()
-    //                                               {//a strange NTS abstraction
-    //                                                   boolean first = true;
-    //        @Override
-    //                                                     public void write(byte[] buf, int len) throws IOException
-    //    {
-    //                                                       if (first) {
-    //            first = false;
-    //            //skip byte order mark
-    //            if (len != 1 || buf[0] != WKBConstants.wkbXDR)//the default
-    //                throw new IllegalStateException("Unexpected WKB byte order mark");
-    //            return;
-    //        }
-    //        dataOutput.write(buf, 0, len);
-    //    }
-    //});
         }
     }
 }

@@ -22,17 +22,17 @@ using Spatial4n.Core.Util;
 
 namespace Spatial4n.Core.Distance
 {
-	/// <summary>
-	/// Calculates based on Euclidean / Cartesian 2d plane.
-	/// </summary>
-	public class CartesianDistCalc : AbstractDistanceCalculator
-	{
-		private readonly bool squared;
+    /// <summary>
+    /// Calculates based on Euclidean / Cartesian 2d plane.
+    /// </summary>
+    public class CartesianDistCalc : AbstractDistanceCalculator
+    {
+        private readonly bool squared;
 
-		public CartesianDistCalc()
-		{
-			squared = false;
-		}
+        public CartesianDistCalc()
+        {
+            squared = false;
+        }
 
         /**
    * @param squared Set to true to have {@link #distance(com.spatial4j.core.shape.Point, com.spatial4j.core.shape.Point)}
@@ -42,12 +42,12 @@ namespace Spatial4n.Core.Distance
    *                consistent.
    */
         public CartesianDistCalc(bool squared)
-		{
-			this.squared = squared;
-		}
+        {
+            this.squared = squared;
+        }
 
-		public override double Distance(Point from, double toX, double toY)
-		{
+        public override double Distance(Point from, double toX, double toY)
+        {
             double deltaX = from.GetX() - toX;
             double deltaY = from.GetY() - toY;
             double xSquaredPlusYSquared = deltaX * deltaX + deltaY * deltaY;
@@ -75,8 +75,8 @@ namespace Spatial4n.Core.Distance
                 return reuse;
             }
             double bearingRAD = DistanceUtils.ToRadians(bearingDEG);
-            double x = from.GetX() + Math.Sin(bearingRAD)*distDEG;
-            double y = from.GetY() + Math.Cos(bearingRAD)*distDEG;
+            double x = from.GetX() + Math.Sin(bearingRAD) * distDEG;
+            double y = from.GetY() + Math.Cos(bearingRAD) * distDEG;
             if (reuse == null)
             {
                 return ctx.MakePoint(x, y);
@@ -106,32 +106,32 @@ namespace Spatial4n.Core.Distance
         }
 
         public override double CalcBoxByDistFromPt_yHorizAxisDEG(Point from, double distDEG, SpatialContext ctx)
-		{
-			return from.GetY();
-		}
+        {
+            return from.GetY();
+        }
 
-		public override double Area(Rectangle rect)
-		{
-			return rect.GetArea(null);
-		}
+        public override double Area(Rectangle rect)
+        {
+            return rect.GetArea(null);
+        }
 
-		public override double Area(Circle circle)
-		{
-			return circle.GetArea(null);
-		}
+        public override double Area(Circle circle)
+        {
+            return circle.GetArea(null);
+        }
 
-		public override bool Equals(object o)
-		{
-			if (this == o) return true;
+        public override bool Equals(object o)
+        {
+            if (this == o) return true;
 
-			var that = o as CartesianDistCalc;
-			if (that == null) return false;
-			return squared == that.squared;
-		}
+            var that = o as CartesianDistCalc;
+            if (that == null) return false;
+            return squared == that.squared;
+        }
 
-		public override int GetHashCode()
-		{
-			return (squared ? 1 : 0);
-		}
-	}
+        public override int GetHashCode()
+        {
+            return (squared ? 1 : 0);
+        }
+    }
 }

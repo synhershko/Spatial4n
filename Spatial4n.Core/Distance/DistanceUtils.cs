@@ -21,35 +21,35 @@ using Spatial4n.Core.Shapes;
 
 namespace Spatial4n.Core.Distance
 {
-	public static class DistanceUtils
-	{
-		//pre-compute some angles that are commonly used
+    public static class DistanceUtils
+    {
+        //pre-compute some angles that are commonly used
         [Obsolete]
-		public static readonly double DEG_45_AS_RADS = Math.PI / 4;
+        public static readonly double DEG_45_AS_RADS = Math.PI / 4;
         [Obsolete]
-		public static readonly double SIN_45_AS_RADS = Math.Sin(DEG_45_AS_RADS);
+        public static readonly double SIN_45_AS_RADS = Math.Sin(DEG_45_AS_RADS);
 
-		public static readonly double DEG_90_AS_RADS = Math.PI / 2;
-		public static readonly double DEG_180_AS_RADS = Math.PI;
+        public static readonly double DEG_90_AS_RADS = Math.PI / 2;
+        public static readonly double DEG_180_AS_RADS = Math.PI;
 
         [Obsolete]
-		public static readonly double DEG_225_AS_RADS = 5 * DEG_45_AS_RADS;
+        public static readonly double DEG_225_AS_RADS = 5 * DEG_45_AS_RADS;
         [Obsolete]
-		public static readonly double DEG_270_AS_RADS = 3 * DEG_90_AS_RADS;
-		
-		public static readonly double DEGREES_TO_RADIANS =  Math.PI / 180;
-		public static readonly double RADIANS_TO_DEGREES =  1 / DEGREES_TO_RADIANS;
+        public static readonly double DEG_270_AS_RADS = 3 * DEG_90_AS_RADS;
 
-		public static readonly double KM_TO_MILES = 0.621371192;
-		public static readonly double MILES_TO_KM = 1 / KM_TO_MILES;//1.609
+        public static readonly double DEGREES_TO_RADIANS = Math.PI / 180;
+        public static readonly double RADIANS_TO_DEGREES = 1 / DEGREES_TO_RADIANS;
 
-		/// <summary>
-		/// The International Union of Geodesy and Geophysics says the Earth's mean radius in KM is:
-		///
-		/// [1] http://en.wikipedia.org/wiki/Earth_radius
-		/// </summary>
-		public static readonly double EARTH_MEAN_RADIUS_KM = 6371.0087714;
-		public static readonly double EARTH_EQUATORIAL_RADIUS_KM = 6378.1370;
+        public static readonly double KM_TO_MILES = 0.621371192;
+        public static readonly double MILES_TO_KM = 1 / KM_TO_MILES;//1.609
+
+        /// <summary>
+        /// The International Union of Geodesy and Geophysics says the Earth's mean radius in KM is:
+        ///
+        /// [1] http://en.wikipedia.org/wiki/Earth_radius
+        /// </summary>
+        public static readonly double EARTH_MEAN_RADIUS_KM = 6371.0087714;
+        public static readonly double EARTH_EQUATORIAL_RADIUS_KM = 6378.1370;
 
         /// <summary>
         /// Equivalent to degrees2Dist(1, EARTH_MEAN_RADIUS_KM)
@@ -58,7 +58,7 @@ namespace Spatial4n.Core.Distance
         public static readonly double KM_TO_DEG = 1 / DEG_TO_KM;
 
         public static readonly double EARTH_MEAN_RADIUS_MI = EARTH_MEAN_RADIUS_KM * KM_TO_MILES;
-		public static readonly double EARTH_EQUATORIAL_RADIUS_MI = EARTH_EQUATORIAL_RADIUS_KM * KM_TO_MILES;
+        public static readonly double EARTH_EQUATORIAL_RADIUS_MI = EARTH_EQUATORIAL_RADIUS_KM * KM_TO_MILES;
 
         /// <summary>
         /// Calculate the p-norm (i.e. length) between two vectors
@@ -69,9 +69,9 @@ namespace Spatial4n.Core.Distance
         /// <returns>The length. See http://en.wikipedia.org/wiki/Lp_space </returns>
         [Obsolete]
         public static double VectorDistance(double[] vec1, double[] vec2, double power)
-		{
+        {
             //only calc oneOverPower if it's needed
-            double oneOverPower = (power == 0 || power == 1.0 || power == 2.0) ? Double.NaN : 1.0 / power;
+            double oneOverPower = (power == 0 || power == 1.0 || power == 2.0) ? double.NaN : 1.0 / power;
             return VectorDistance(vec1, vec2, power, oneOverPower);
         }
 
@@ -85,45 +85,45 @@ namespace Spatial4n.Core.Distance
         /// <returns>The length.</returns>
         [Obsolete]
         public static double VectorDistance(double[] vec1, double[] vec2, double power, double oneOverPower)
-		{
-			double result = 0;
+        {
+            double result = 0;
 
-			if (power == 0)
-			{
-				for (int i = 0; i < vec1.Length; i++)
-				{
-					result += vec1[i] - vec2[i] == 0 ? 0 : 1;
-				}
+            if (power == 0)
+            {
+                for (int i = 0; i < vec1.Length; i++)
+                {
+                    result += vec1[i] - vec2[i] == 0 ? 0 : 1;
+                }
 
-			}
-			else if (power == 1.0)
-			{
-				for (int i = 0; i < vec1.Length; i++)
-				{
-					result += Math.Abs(vec1[i] - vec2[i]);
-				}
-			}
-			else if (power == 2.0)
-			{
-				result = Math.Sqrt(DistSquaredCartesian(vec1, vec2));
-			}
-			else if (power == int.MaxValue || Double.IsInfinity(power))
-			{//infinite norm?
-				for (int i = 0; i < vec1.Length; i++)
-				{
-					result = Math.Max(result, Math.Max(vec1[i], vec2[i]));
-				}
-			}
-			else
-			{
-				for (int i = 0; i < vec1.Length; i++)
-				{
-					result += Math.Pow(vec1[i] - vec2[i], power);
-				}
-				result = Math.Pow(result, oneOverPower);
-			}
-			return result;
-		}
+            }
+            else if (power == 1.0)
+            {
+                for (int i = 0; i < vec1.Length; i++)
+                {
+                    result += Math.Abs(vec1[i] - vec2[i]);
+                }
+            }
+            else if (power == 2.0)
+            {
+                result = Math.Sqrt(DistSquaredCartesian(vec1, vec2));
+            }
+            else if (power == int.MaxValue || double.IsInfinity(power))
+            {//infinite norm?
+                for (int i = 0; i < vec1.Length; i++)
+                {
+                    result = Math.Max(result, Math.Max(vec1[i], vec2[i]));
+                }
+            }
+            else
+            {
+                for (int i = 0; i < vec1.Length; i++)
+                {
+                    result += Math.Pow(vec1[i] - vec2[i], power);
+                }
+                result = Math.Pow(result, oneOverPower);
+            }
+            return result;
+        }
 
         /**
 		 * Return the coordinates of a vector that is the corner of a box (upper right or lower left), assuming a Rectangular
@@ -135,29 +135,29 @@ namespace Spatial4n.Core.Distance
 		 * @param upperRight If true, return the coords for the upper right corner, else return the lower left.
 		 * @return The point, either the upperLeft or the lower right
 		 */
-         [Obsolete]
+        [Obsolete]
         public static double[] VectorBoxCorner(double[] center, double[] result, double distance, bool upperRight)
-		{
-			if (result == null || result.Length != center.Length)
-			{
-				result = new double[center.Length];
-			}
-			if (upperRight == false)
-			{
-				distance = -distance;
-			}
-			//We don't care about the power here,
-			// b/c we are always in a rectangular coordinate system, so any norm can be used by
-			//using the definition of sine
-			distance = SIN_45_AS_RADS * distance; // sin(Pi/4) == (2^0.5)/2 == opp/hyp == opp/distance, solve for opp, similarly for cosine
-			for (int i = 0; i < center.Length; i++)
-			{
-				result[i] = center[i] + distance;
-			}
-			return result;
-		}
+        {
+            if (result == null || result.Length != center.Length)
+            {
+                result = new double[center.Length];
+            }
+            if (upperRight == false)
+            {
+                distance = -distance;
+            }
+            //We don't care about the power here,
+            // b/c we are always in a rectangular coordinate system, so any norm can be used by
+            //using the definition of sine
+            distance = SIN_45_AS_RADS * distance; // sin(Pi/4) == (2^0.5)/2 == opp/hyp == opp/distance, solve for opp, similarly for cosine
+            for (int i = 0; i < center.Length; i++)
+            {
+                result[i] = center[i] + distance;
+            }
+            return result;
+        }
 
-		/**
+        /**
 		 * Given a start point (startLat, startLon) and a bearing on a sphere of radius <i>sphereRadius</i>, return the destination point.
 		 *
 		 *
@@ -187,7 +187,7 @@ namespace Spatial4n.Core.Distance
             // normalize lon first
             if (lon2 > DEG_180_AS_RADS)
             {
-                lon2 = -1.0*(DEG_180_AS_RADS - (lon2 - DEG_180_AS_RADS));
+                lon2 = -1.0 * (DEG_180_AS_RADS - (lon2 - DEG_180_AS_RADS));
             }
             else if (lon2 < -DEG_180_AS_RADS)
             {
@@ -231,36 +231,36 @@ namespace Spatial4n.Core.Distance
             }
         }
 
-	    /// <summary>
-		/// Puts in range -180 &lt;= lon_deg &lt;= +180.
-		/// </summary>
-		/// <param name="lon_deg"></param>
-		/// <returns></returns>
-		public static double NormLonDEG(double lon_deg)
-		{
-			if (lon_deg >= -180 && lon_deg <= 180)
-				return lon_deg; //common case, and avoids slight double precision shifting
-	        double off = (lon_deg + 180) % 360;
-			if (off < 0)
-				return 180 + off;
-			else if (off == 0 && lon_deg > 0)
-				return 180;
-			else
-				return -180 + off;
-		}
+        /// <summary>
+        /// Puts in range -180 &lt;= lon_deg &lt;= +180.
+        /// </summary>
+        /// <param name="lon_deg"></param>
+        /// <returns></returns>
+        public static double NormLonDEG(double lon_deg)
+        {
+            if (lon_deg >= -180 && lon_deg <= 180)
+                return lon_deg; //common case, and avoids slight double precision shifting
+            double off = (lon_deg + 180) % 360;
+            if (off < 0)
+                return 180 + off;
+            else if (off == 0 && lon_deg > 0)
+                return 180;
+            else
+                return -180 + off;
+        }
 
-		/// <summary>
-		/// Puts in range -90 &lt;= lat_deg &lt;= 90.
-		/// </summary>
-		/// <param name="lat_deg"></param>
-		/// <returns></returns>
-		public static double NormLatDEG(double lat_deg)
-		{
-			if (lat_deg >= -90 && lat_deg <= 90)
-				return lat_deg;//common case, and avoids slight double precision shifting
-			double off = Math.Abs((lat_deg + 90) % 360);
-			return (off <= 180 ? off : 360 - off) - 90;
-		}
+        /// <summary>
+        /// Puts in range -90 &lt;= lat_deg &lt;= 90.
+        /// </summary>
+        /// <param name="lat_deg"></param>
+        /// <returns></returns>
+        public static double NormLatDEG(double lat_deg)
+        {
+            if (lat_deg >= -90 && lat_deg <= 90)
+                return lat_deg;//common case, and avoids slight double precision shifting
+            double off = Math.Abs((lat_deg + 90) % 360);
+            return (off <= 180 ? off : 360 - off) - 90;
+        }
 
         public static Rectangle CalcBoxByDistFromPtDEG(double lat, double lon, double distDEG, SpatialContext ctx, Rectangle reuse)
         {
@@ -327,45 +327,45 @@ namespace Spatial4n.Core.Distance
             }
         }
 
-	    /// <summary>
-		/// The delta longitude of a point-distance. In other words, half the width of
-		/// the bounding box of a circle.
-		/// </summary>
-		/// <param name="lat"></param>
-		/// <param name="lon"></param>
-		/// <param name="distance"></param>
-		/// <param name="radius"></param>
-		/// <returns></returns>
-		public static double CalcBoxByDistFromPt_deltaLonDEG(double lat, double lon, double distDEG)
-		{
-			//http://gis.stackexchange.com/questions/19221/find-tangent-point-on-circle-furthest-east-or-west
-			if (distDEG == 0)
-				return 0;
-			double lat_rad = ToRadians(lat);
-			double dist_rad = ToRadians(distDEG);
-			double result_rad = Math.Asin(Math.Sin(dist_rad) / Math.Cos(lat_rad));
+        /// <summary>
+        /// The delta longitude of a point-distance. In other words, half the width of
+        /// the bounding box of a circle.
+        /// </summary>
+        /// <param name="lat"></param>
+        /// <param name="lon"></param>
+        /// <param name="distance"></param>
+        /// <param name="radius"></param>
+        /// <returns></returns>
+        public static double CalcBoxByDistFromPt_deltaLonDEG(double lat, double lon, double distDEG)
+        {
+            //http://gis.stackexchange.com/questions/19221/find-tangent-point-on-circle-furthest-east-or-west
+            if (distDEG == 0)
+                return 0;
+            double lat_rad = ToRadians(lat);
+            double dist_rad = ToRadians(distDEG);
+            double result_rad = Math.Asin(Math.Sin(dist_rad) / Math.Cos(lat_rad));
 
-			if (!Double.IsNaN(result_rad))
-				return ToDegrees(result_rad);
-			return 90;
-		}
+            if (!double.IsNaN(result_rad))
+                return ToDegrees(result_rad);
+            return 90;
+        }
 
-		/// <summary>
-		/// The latitude of the horizontal axis (e.g. left-right line)
-		/// of a circle.  The horizontal axis of a circle passes through its furthest
-		/// left-most and right-most edges. On a 2D plane, this result is always
-		/// <code>from.getY()</code> but, perhaps surprisingly, on a sphere it is going
-		/// to be slightly different.
-		/// </summary>
-		/// <param name="lat"></param>
-		/// <param name="lon"></param>
-		/// <param name="distance"></param>
-		/// <returns></returns>
-		public static double CalcBoxByDistFromPt_latHorizAxisDEG(double lat, double lon, double distDEG)
-		{
-			//http://gis.stackexchange.com/questions/19221/find-tangent-point-on-circle-furthest-east-or-west
-			if (distDEG == 0)
-				return lat;
+        /// <summary>
+        /// The latitude of the horizontal axis (e.g. left-right line)
+        /// of a circle.  The horizontal axis of a circle passes through its furthest
+        /// left-most and right-most edges. On a 2D plane, this result is always
+        /// <code>from.getY()</code> but, perhaps surprisingly, on a sphere it is going
+        /// to be slightly different.
+        /// </summary>
+        /// <param name="lat"></param>
+        /// <param name="lon"></param>
+        /// <param name="distance"></param>
+        /// <returns></returns>
+        public static double CalcBoxByDistFromPt_latHorizAxisDEG(double lat, double lon, double distDEG)
+        {
+            //http://gis.stackexchange.com/questions/19221/find-tangent-point-on-circle-furthest-east-or-west
+            if (distDEG == 0)
+                return lat;
             // if we don't do this when == 90 or -90, computed result can be (+/-)89.9999 when at pole.
             //     No biggie but more accurate.
             else if (lat + distDEG >= 90)
@@ -374,16 +374,16 @@ namespace Spatial4n.Core.Distance
                 return -90;
 
             double lat_rad = ToRadians(lat);
-			double dist_rad = ToRadians(distDEG);
-			double result_rad = Math.Asin(Math.Sin(lat_rad) / Math.Cos(dist_rad));
-			if (!Double.IsNaN(result_rad))
-				return ToDegrees(result_rad);
-			if (lat > 0)
-				return 90;
-			if (lat < 0)
-				return -90;
-			return lat;
-		}
+            double dist_rad = ToRadians(distDEG);
+            double result_rad = Math.Asin(Math.Sin(lat_rad) / Math.Cos(dist_rad));
+            if (!double.IsNaN(result_rad))
+                return ToDegrees(result_rad);
+            if (lat > 0)
+                return 90;
+            if (lat < 0)
+                return -90;
+            return lat;
+        }
 
         /**
        * Calculates the degrees longitude distance at latitude {@code lat} to cover
@@ -436,17 +436,17 @@ namespace Spatial4n.Core.Distance
 		 */
         [Obsolete]
         public static double DistSquaredCartesian(double[] vec1, double[] vec2)
-		{
-			double result = 0;
-			for (int i = 0; i < vec1.Length; i++)
-			{
-				double v = vec1[i] - vec2[i];
-				result += v * v;
-			}
-			return result;
-		}
+        {
+            double result = 0;
+            for (int i = 0; i < vec1.Length; i++)
+            {
+                double v = vec1[i] - vec2[i];
+                result += v * v;
+            }
+            return result;
+        }
 
-		/**
+        /**
 		 *
 		 * @param lat1     The y coordinate of the first point, in radians
 		 * @param lon1     The x coordinate of the first point, in radians
@@ -454,21 +454,21 @@ namespace Spatial4n.Core.Distance
 		 * @param lon2     The x coordinate of the second point, in radians
 		 * @return The distance between the two points, as determined by the Haversine formula, in radians.
 		 */
-		public static double DistHaversineRAD(double lat1, double lon1, double lat2, double lon2)
-		{
-			//TODO investigate slightly different formula using asin() and min() http://www.movable-type.co.uk/scripts/gis-faq-5.1.html
+        public static double DistHaversineRAD(double lat1, double lon1, double lat2, double lon2)
+        {
+            //TODO investigate slightly different formula using asin() and min() http://www.movable-type.co.uk/scripts/gis-faq-5.1.html
 
-			// Check for same position
-			if (lat1 == lat2 && lon1 == lon2)
-				return 0.0;
-			double hsinX = Math.Sin((lon1 - lon2) * 0.5);
-			double hsinY = Math.Sin((lat1 - lat2) * 0.5);
-			double h = hsinY * hsinY +
-					(Math.Cos(lat1) * Math.Cos(lat2) * hsinX * hsinX);
-			return 2 * Math.Atan2(Math.Sqrt(h), Math.Sqrt(1 - h));
-		}
+            // Check for same position
+            if (lat1 == lat2 && lon1 == lon2)
+                return 0.0;
+            double hsinX = Math.Sin((lon1 - lon2) * 0.5);
+            double hsinY = Math.Sin((lat1 - lat2) * 0.5);
+            double h = hsinY * hsinY +
+                    (Math.Cos(lat1) * Math.Cos(lat2) * hsinX * hsinX);
+            return 2 * Math.Atan2(Math.Sqrt(h), Math.Sqrt(1 - h));
+        }
 
-		/**
+        /**
 		 * Calculates the distance between two lat/lng's using the Law of Cosines. Due to numeric conditioning
 		 * errors, it is not as accurate as the Haversine formula for small distances.  But with
 		 * double precision, it isn't that bad -- <a href="http://www.movable-type.co.uk/scripts/latlong.html">
@@ -479,117 +479,117 @@ namespace Spatial4n.Core.Distance
 		 * <p/>
 		 * The arguments and return value are in radians.
 		 */
-		public static double DistLawOfCosinesRAD(double lat1, double lon1, double lat2, double lon2)
-		{
-			//TODO validate formula
+        public static double DistLawOfCosinesRAD(double lat1, double lon1, double lat2, double lon2)
+        {
+            //TODO validate formula
 
-			//(MIGRATED FROM org.apache.lucene.spatial.geometry.LatLng.arcDistance()) (Lucene 3x)
-			// Imported from mq java client.  Variable references changed to match.
+            //(MIGRATED FROM org.apache.lucene.spatial.geometry.LatLng.arcDistance()) (Lucene 3x)
+            // Imported from mq java client.  Variable references changed to match.
 
-			// Check for same position
-			if (lat1 == lat2 && lon1 == lon2)
-				return 0.0;
+            // Check for same position
+            if (lat1 == lat2 && lon1 == lon2)
+                return 0.0;
 
-			// Get the m_dLongitude difference. Don't need to worry about
-			// crossing 180 since cos(x) = cos(-x)
-			double dLon = lon2 - lon1;
+            // Get the m_dLongitude difference. Don't need to worry about
+            // crossing 180 since cos(x) = cos(-x)
+            double dLon = lon2 - lon1;
 
-			double a = DEG_90_AS_RADS - lat1;
-			double c = DEG_90_AS_RADS - lat2;
-			double cosB = (Math.Cos(a) * Math.Cos(c))
-				+ (Math.Sin(a) * Math.Sin(c) * Math.Cos(dLon));
+            double a = DEG_90_AS_RADS - lat1;
+            double c = DEG_90_AS_RADS - lat2;
+            double cosB = (Math.Cos(a) * Math.Cos(c))
+                + (Math.Sin(a) * Math.Sin(c) * Math.Cos(dLon));
 
-			// Find angle subtended (with some bounds checking) in radians
-			if (cosB < -1.0)
-				return Math.PI;
-			else if (cosB >= 1.0)
-				return 0;
-			else
-				return Math.Acos(cosB);
-		}
+            // Find angle subtended (with some bounds checking) in radians
+            if (cosB < -1.0)
+                return Math.PI;
+            else if (cosB >= 1.0)
+                return 0;
+            else
+                return Math.Acos(cosB);
+        }
 
-		/**
+        /**
 		 * Calculates the great circle distance using the Vincenty Formula, simplified for a spherical model. This formula
 		 * is accurate for any pair of points. The equation
 		 * was taken from <a href="http://en.wikipedia.org/wiki/Great-circle_distance">Wikipedia</a>.
 		 * <p/>
 		 * The arguments are in radians, and the result is in radians.
 		 */
-		public static double DistVincentyRAD(double lat1, double lon1, double lat2, double lon2)
-		{
-			// Check for same position
-			if (lat1 == lat2 && lon1 == lon2)
-				return 0.0;
+        public static double DistVincentyRAD(double lat1, double lon1, double lat2, double lon2)
+        {
+            // Check for same position
+            if (lat1 == lat2 && lon1 == lon2)
+                return 0.0;
 
-			double cosLat1 = Math.Cos(lat1);
-			double cosLat2 = Math.Cos(lat2);
-			double sinLat1 = Math.Sin(lat1);
-			double sinLat2 = Math.Sin(lat2);
-			double dLon = lon2 - lon1;
-			double cosDLon = Math.Cos(dLon);
-			double sinDLon = Math.Sin(dLon);
+            double cosLat1 = Math.Cos(lat1);
+            double cosLat2 = Math.Cos(lat2);
+            double sinLat1 = Math.Sin(lat1);
+            double sinLat2 = Math.Sin(lat2);
+            double dLon = lon2 - lon1;
+            double cosDLon = Math.Cos(dLon);
+            double sinDLon = Math.Sin(dLon);
 
-			double a = cosLat2 * sinDLon;
-			double b = cosLat1 * sinLat2 - sinLat1 * cosLat2 * cosDLon;
-			double c = sinLat1 * sinLat2 + cosLat1 * cosLat2 * cosDLon;
+            double a = cosLat2 * sinDLon;
+            double b = cosLat1 * sinLat2 - sinLat1 * cosLat2 * cosDLon;
+            double c = sinLat1 * sinLat2 + cosLat1 * cosLat2 * cosDLon;
 
-			return Math.Atan2(Math.Sqrt(a * a + b * b), c);
-		}
+            return Math.Atan2(Math.Sqrt(a * a + b * b), c);
+        }
 
-		/// <summary>
-		/// Converts a distance in the units of the radius to degrees (360 degrees are
-		/// in a circle). A spherical earth model is assumed.
-		/// </summary>
-		/// <param name="dist"></param>
-		/// <param name="radius"></param>
-		/// <returns></returns>
-		public static double Dist2Degrees(double dist, double radius)
-		{
-			return ToDegrees(Dist2Radians(dist, radius));
-		}
+        /// <summary>
+        /// Converts a distance in the units of the radius to degrees (360 degrees are
+        /// in a circle). A spherical earth model is assumed.
+        /// </summary>
+        /// <param name="dist"></param>
+        /// <param name="radius"></param>
+        /// <returns></returns>
+        public static double Dist2Degrees(double dist, double radius)
+        {
+            return ToDegrees(Dist2Radians(dist, radius));
+        }
 
-		public static double Degrees2Dist(double degrees, double radius)
-		{
-			return Radians2Dist(ToRadians(degrees), radius);
-		}
+        public static double Degrees2Dist(double degrees, double radius)
+        {
+            return Radians2Dist(ToRadians(degrees), radius);
+        }
 
-		/// <summary>
-		/// Converts a distance in the units of <code>radius</code> (e.g. kilometers)
-		/// to radians (multiples of the radius). A spherical earth model is assumed.
-		/// </summary>
-		/// <param name="dist"></param>
-		/// <param name="radius"></param>
-		/// <returns></returns>
-		public static double Dist2Radians(double dist, double radius)
-		{
-			return dist / radius;
-		}
+        /// <summary>
+        /// Converts a distance in the units of <code>radius</code> (e.g. kilometers)
+        /// to radians (multiples of the radius). A spherical earth model is assumed.
+        /// </summary>
+        /// <param name="dist"></param>
+        /// <param name="radius"></param>
+        /// <returns></returns>
+        public static double Dist2Radians(double dist, double radius)
+        {
+            return dist / radius;
+        }
 
-		public static double Radians2Dist(double radians, double radius)
-		{
-			return radians * radius;
-		}
+        public static double Radians2Dist(double radians, double radius)
+        {
+            return radians * radius;
+        }
 
-		/// <summary>
-		/// Same as {@link Math#toRadians(double)} but 3x faster (multiply vs. divide).
-		/// See CompareRadiansSnippet.java in tests.
-		/// </summary>
-		/// <param name="degrees"></param>
-		/// <returns></returns>
-		public static double ToRadians(double degrees)
-		{
-			return degrees * DEGREES_TO_RADIANS;
-		}
+        /// <summary>
+        /// Same as {@link Math#toRadians(double)} but 3x faster (multiply vs. divide).
+        /// See CompareRadiansSnippet.java in tests.
+        /// </summary>
+        /// <param name="degrees"></param>
+        /// <returns></returns>
+        public static double ToRadians(double degrees)
+        {
+            return degrees * DEGREES_TO_RADIANS;
+        }
 
-		/// <summary>
-		/// Same as {@link Math#toDegrees(double)} but 3x faster (multiply vs. divide).
-		/// See CompareRadiansSnippet.java in tests.
-		/// </summary>
-		/// <param name="radians"></param>
-		/// <returns></returns>
-		public static double ToDegrees(double radians)
-		{
-			return radians*RADIANS_TO_DEGREES;
-		}
-	}
+        /// <summary>
+        /// Same as {@link Math#toDegrees(double)} but 3x faster (multiply vs. divide).
+        /// See CompareRadiansSnippet.java in tests.
+        /// </summary>
+        /// <param name="radians"></param>
+        /// <returns></returns>
+        public static double ToDegrees(double radians)
+        {
+            return radians * RADIANS_TO_DEGREES;
+        }
+    }
 }

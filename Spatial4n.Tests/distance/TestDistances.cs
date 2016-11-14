@@ -88,7 +88,7 @@ namespace Spatial4n.Tests.distance
 
             Rectangle r = Dc().CalcBoxByDistFromPt(ctr, dist, ctx, null);
             double horizAxisLat = Dc().CalcBoxByDistFromPt_yHorizAxisDEG(ctr, dist, ctx);
-            if (!Double.IsNaN(horizAxisLat))
+            if (!double.IsNaN(horizAxisLat))
                 Assert.True(r.RelateYRange(horizAxisLat, horizAxisLat).Intersects());
 
             //horizontal
@@ -234,7 +234,7 @@ namespace Spatial4n.Tests.distance
             foreach (var pair in lats)
             {
                 CustomAssert.EqualWithDelta( /* "input "+pair[0],*/
-                    pair[1], DistanceUtils.NormLatDEG(pair[0]), Double.Epsilon);
+                    pair[1], DistanceUtils.NormLatDEG(pair[0]), double.Epsilon);
             }
             var random = new Random(RandomSeed.Seed());
             for (int i = -1000; i < 1000; i += random.Next(9) * 10)
@@ -264,7 +264,7 @@ namespace Spatial4n.Tests.distance
             foreach (var pair in lons)
             {
                 CustomAssert.EqualWithDelta( /*"input "+pair[0],*/
-                    pair[1], DistanceUtils.NormLonDEG(pair[0]), Double.Epsilon);
+                    pair[1], DistanceUtils.NormLonDEG(pair[0]), double.Epsilon);
             }
 
             var random = new Random(RandomSeed.Seed());

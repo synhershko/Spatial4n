@@ -121,49 +121,12 @@ namespace Spatial4n.Core.Io.Nts
                     return changed;
                 }
             }
-
-
         }
 
         protected virtual void CheckCoordinates(IGeometry geom)
         {
             // note: NTS WKTReader has already normalized coords with the JTS PrecisionModel.
             geom.Apply(new CoordinateSequenceFilterAnonymousHelper(this));
-            //        geom.Apply(new CoordinateSequenceFilter() {
-            //      boolean changed = false;
-            //        @Override
-            //      public void filter(CoordinateSequence seq, int i)
-            //    {
-            //        double x = seq.getX(i);
-            //        double y = seq.getY(i);
-
-            //        //Note: we don't simply call ctx.normX & normY because
-            //        //  those methods use the precisionModel, but WKTReader already
-            //        //  used the precisionModel. It's be nice to turn that off somehow but alas.
-            //        if (ctx.isGeo() && ctx.isNormWrapLongitude())
-            //        {
-            //            double xNorm = DistanceUtils.normLonDEG(x);
-            //            if (Double.compare(x, xNorm) != 0)
-            //            {//handles NaN
-            //                changed = true;
-            //                seq.setOrdinate(i, CoordinateSequence.X, xNorm);
-            //            }
-            //            //          double yNorm = DistanceUtils.normLatDEG(y);
-            //            //          if (y != yNorm) {
-            //            //            changed = true;
-            //            //            seq.setOrdinate(i,CoordinateSequence.Y,yNorm);
-            //            //          }
-            //        }
-            //        ctx.verifyX(x);
-            //        ctx.verifyY(y);
-            //    }
-
-            //    @Override
-            //      public boolean isDone() { return false; }
-
-            //    @Override
-            //      public boolean isGeometryChanged() { return changed; }
-            //});
         }
     }
 }

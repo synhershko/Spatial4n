@@ -46,11 +46,10 @@ namespace Spatial4n.Core.Shapes.Impl
 
             if (!points.Any())
             {
-                this.segments = ctx.MakeCollection(/*new List<BufferedLine>()*/ new List<Shape>());
+                this.segments = ctx.MakeCollection(new List<Shape>());
             }
             else
             {
-                //List<BufferedLine> segments = new List<BufferedLine>(points.Count - 1);
                 List<Shape> segments = new List<Shape>(points.Count - 1);
 
                 Point prevPoint = null;
@@ -87,7 +86,7 @@ namespace Spatial4n.Core.Shapes.Impl
             return ctx.MakeBufferedLineString(GetPoints(), buf + distance);
         }
 
-        public virtual /*ShapeCollection<BufferedLine>*/ ShapeCollection GetSegments()
+        public virtual ShapeCollection GetSegments()
         {
             return segments;
         }
@@ -121,7 +120,7 @@ namespace Spatial4n.Core.Shapes.Impl
 
         public virtual Rectangle GetBoundingBox()
         {
-            return segments.GetBoundingBox(); 
+            return segments.GetBoundingBox();
         }
 
 

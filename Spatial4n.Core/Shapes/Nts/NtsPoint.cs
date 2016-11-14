@@ -23,31 +23,31 @@ using System.Diagnostics;
 
 namespace Spatial4n.Core.Shapes.Nts
 {
-	/// <summary>
-	/// Wraps a <see cref="NetTopologySuite.Geometries.Point"/> {@link com.vividsolutions.jts.geom.Point}.
-	/// </summary>
-	public class NtsPoint : Point
-	{
+    /// <summary>
+    /// Wraps a <see cref="NetTopologySuite.Geometries.Point"/> {@link com.vividsolutions.jts.geom.Point}.
+    /// </summary>
+    public class NtsPoint : Point
+    {
         private readonly SpatialContext ctx;
         private readonly GeoAPI.Geometries.IPoint pointGeom;
         private readonly bool empty;//cached
 
-	    /// <summary>
-	    /// A simple constructor without normalization / validation.
-	    /// </summary>
-	    /// <param name="pointGeom"></param>
-	    /// <param name="ctx"> </param>
-	    public NtsPoint(GeoAPI.Geometries.IPoint pointGeom, SpatialContext ctx)
-	    {
+        /// <summary>
+        /// A simple constructor without normalization / validation.
+        /// </summary>
+        /// <param name="pointGeom"></param>
+        /// <param name="ctx"> </param>
+        public NtsPoint(GeoAPI.Geometries.IPoint pointGeom, SpatialContext ctx)
+        {
             this.ctx = ctx;
             this.pointGeom = pointGeom;
             this.empty = pointGeom.IsEmpty;
         }
 
-	    public virtual GeoAPI.Geometries.IPoint GetGeom()
-		{
-			return pointGeom;
-		}
+        public virtual GeoAPI.Geometries.IPoint GetGeom()
+        {
+            return pointGeom;
+        }
 
         public virtual bool IsEmpty
         {
@@ -55,73 +55,72 @@ namespace Spatial4n.Core.Shapes.Nts
         }
 
         public virtual Spatial4n.Core.Shapes.Point GetCenter()
-		{
-			return this;
-		}
+        {
+            return this;
+        }
 
-		public virtual bool HasArea()
-		{
-			return false;
-		}
+        public virtual bool HasArea()
+        {
+            return false;
+        }
 
-		public virtual double GetArea(SpatialContext ctx)
-		{
-			return 0;
-		}
+        public virtual double GetArea(SpatialContext ctx)
+        {
+            return 0;
+        }
 
-		public virtual Rectangle GetBoundingBox()
-		{
+        public virtual Rectangle GetBoundingBox()
+        {
             return ctx.MakeRectangle(this, this);
-		}
+        }
 
-        public virtual /*Circle*/ Shape GetBuffered(double distance, SpatialContext ctx)
+        public virtual Shape GetBuffered(double distance, SpatialContext ctx)
         {
             return ctx.MakeCircle(this, distance);
         }
 
         public virtual SpatialRelation Relate(Shape other)
-		{
+        {
             // ** NOTE ** the overall order of logic is kept consistent here with simple.PointImpl.
             if (IsEmpty || other.IsEmpty)
                 return SpatialRelation.DISJOINT;
             if (other is Spatial4n.Core.Shapes.Point)
-				return this.Equals(other) ? SpatialRelation.INTERSECTS : SpatialRelation.DISJOINT;
-			return other.Relate(this).Transpose();
-		}
+                return this.Equals(other) ? SpatialRelation.INTERSECTS : SpatialRelation.DISJOINT;
+            return other.Relate(this).Transpose();
+        }
 
-		public virtual double GetX()
-		{
+        public virtual double GetX()
+        {
             return IsEmpty ? double.NaN : pointGeom.X;
         }
 
-		public virtual double GetY()
-		{
+        public virtual double GetY()
+        {
             return IsEmpty ? double.NaN : pointGeom.Y;
-		}
+        }
 
-	    public virtual void Reset(double x, double y)
-	    {
+        public virtual void Reset(double x, double y)
+        {
             Debug.Assert(!IsEmpty);
             var cSeq = pointGeom.CoordinateSequence;
             cSeq.SetOrdinate(0, Ordinate.X, x);
             cSeq.SetOrdinate(0, Ordinate.Y, y);
-	    }
+        }
 
 
-	    public override string ToString()
-		{
-			return string.Format("Pt(x={0:0.0#############},y={1:0.0#############})", GetX(), GetY());
-		}
+        public override string ToString()
+        {
+            return string.Format("Pt(x={0:0.0#############},y={1:0.0#############})", GetX(), GetY());
+        }
 
-		public override bool Equals(object o)
-		{
-			return PointImpl.Equals(this, o);
-		}
+        public override bool Equals(object o)
+        {
+            return PointImpl.Equals(this, o);
+        }
 
-		public override int GetHashCode()
-		{
-			return PointImpl.GetHashCode(this);
-		}
-	}
-
+        public override int GetHashCode()
+        {
+            return PointImpl.GetHashCode(this);
+        }
+    }
 }

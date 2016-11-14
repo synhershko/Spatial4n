@@ -17,7 +17,6 @@ namespace Spatial4n.Tests.shape
         private readonly SpatialContext ctx = new SpatialContextFactory()
         { geo = false, worldBounds = new RectangleImpl(-100, 100, -50, 50, null) }.NewSpatialContext();
 
-        // TODO: What is this for?
         //      @Rule
         //public TestLog testLog = TestLog.instance;
         //SpatialContext.GEO ;//
@@ -177,33 +176,6 @@ namespace Spatial4n.Tests.shape
         public virtual void TestRectIntersect()
         {
             new RectIntersectionAnonymousHelper(this, ctx).TestRelateWithRectangle();
-
-            //        new RectIntersectionTestHelper/*<BufferedLine>*/(ctx) {
-
-            //  @Override
-            //  protected BufferedLine generateRandomShape(Point nearP)
-            //    {
-            //        Rectangle nearR = randomRectangle(nearP);
-            //        ArrayList<Point> corners = quadrantCorners(nearR);
-            //        int r4 = randomInt(3);//0..3
-            //        Point pA = corners.get(r4);
-            //        Point pB = corners.get((r4 + 2) % 4);
-            //        double maxBuf = Math.max(nearR.getWidth(), nearR.getHeight());
-            //        double buf = Math.abs(randomGaussian()) * maxBuf / 4;
-            //        buf = randomInt((int)divisible(buf));
-            //        return new BufferedLine(pA, pB, buf, ctx);
-            //    }
-
-            //    protected Point randomPointInEmptyShape(BufferedLine shape)
-            //    {
-            //        int r = randomInt(1);
-            //        if (r == 0) return shape.getA();
-            //        //if (r == 1)
-            //        return shape.getB();
-            //        //        Point c = shape.getCenter();
-            //        //        if (shape.contains(c));
-            //    }
-            //}.testRelateWithRectangle();
         }
 
         private BufferedLine NewBufLine(int x1, int y1, int x2, int y2, int buf)

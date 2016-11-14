@@ -274,16 +274,16 @@ namespace Spatial4n.Core.Shapes.Impl
 		public override string ToString()
 		{
             double distKm = DistanceUtils.Degrees2Dist(radiusDEG, DistanceUtils.EARTH_MEAN_RADIUS_KM);
-			String dStr = String.Format("{0:0.0}\u00B0 {1:0.00}km", radiusDEG, distKm);
+			string dStr = string.Format("{0:0.0}\u00B0 {1:0.00}km", radiusDEG, distKm);
 			return "Circle(" + point + ", d=" + dStr + ')';
 		}
 
 		private static double Ulp(double value)
 		{
-			if (Double.IsNaN(value)) return Double.NaN;
-			if (Double.IsInfinity(value)) return Double.PositiveInfinity;
-			if (value == +0.0d || value == -0.0d) return Double.MinValue;
-			if (value == Double.MaxValue) return Math.Pow(2, 971);
+			if (double.IsNaN(value)) return double.NaN;
+			if (double.IsInfinity(value)) return double.PositiveInfinity;
+			if (value == +0.0d || value == -0.0d) return double.MinValue;
+			if (value == double.MaxValue) return Math.Pow(2, 971);
 
 
 			long bits = BitConverter.DoubleToInt64Bits(value);

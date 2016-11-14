@@ -22,35 +22,35 @@ using Spatial4n.Core.Distance;
 
 namespace Spatial4n.Core.Shapes.Impl
 {
-	/// <summary>
-	/// A simple Rectangle implementation that also supports a longitudinal
-	/// wrap-around. When minX > maxX, this will assume it is world coordinates that
-	/// cross the date line using degrees. Immutable & threadsafe.
-	/// </summary>
-	public class RectangleImpl : Rectangle
-	{
+    /// <summary>
+    /// A simple Rectangle implementation that also supports a longitudinal
+    /// wrap-around. When minX > maxX, this will assume it is world coordinates that
+    /// cross the date line using degrees. Immutable & threadsafe.
+    /// </summary>
+    public class RectangleImpl : Rectangle
+    {
         private readonly SpatialContext ctx;
-		private double minX;
-		private double maxX;
-		private double minY;
-		private double maxY;
+        private double minX;
+        private double maxX;
+        private double minY;
+        private double maxY;
 
         public RectangleImpl(double minX, double maxX, double minY, double maxY, SpatialContext ctx)
-		{
+        {
             //TODO change to West South East North to be more consistent with OGC?
             this.ctx = ctx;
             Reset(minX, maxX, minY, maxY);
-		}
+        }
 
         public RectangleImpl(Point lowerLeft, Point upperRight, SpatialContext ctx)
             : this(lowerLeft.GetX(), upperRight.GetX(), lowerLeft.GetY(), upperRight.GetY(), ctx)
-		{
-		}
+        {
+        }
 
         public RectangleImpl(Rectangle r, SpatialContext ctx)
             : this(r.GetMinX(), r.GetMaxX(), r.GetMinY(), r.GetMaxY(), ctx)
-		{
-		}
+        {
+        }
 
         public void Reset(double minX, double maxX, double minY, double maxY)
         {
@@ -172,146 +172,148 @@ namespace Spatial4n.Core.Shapes.Impl
         }
 
         public virtual SpatialRelation Relate(Shape other)
-		{
+        {
             if (IsEmpty || other.IsEmpty)
                 return SpatialRelation.DISJOINT;
             var point = other as Point;
-			if (point != null)
-			{
-				return Relate(point);
-			}
-			var rectangle = other as Rectangle;
-			if (rectangle != null)
-			{
-				return Relate(rectangle);
-			}
-			return other.Relate(this).Transpose();
-		}
+            if (point != null)
+            {
+                return Relate(point);
+            }
+            var rectangle = other as Rectangle;
+            if (rectangle != null)
+            {
+                return Relate(rectangle);
+            }
+            return other.Relate(this).Transpose();
+        }
 
-		public virtual SpatialRelation Relate(Point point)
-		{
-			if (point.GetY() > GetMaxY() || point.GetY() < GetMinY())
-				return SpatialRelation.DISJOINT;
-			//  all the below logic is rather unfortunate but some dateline cases demand it
-			double minX = this.minX;
-			double maxX = this.maxX;
-			double pX = point.GetX();
-			if (ctx.IsGeo())
-			{
-				//unwrap dateline and normalize +180 to become -180
-				double rawWidth = maxX - minX;
-				if (rawWidth < 0)
-				{
-					maxX = minX + (rawWidth + 360);
-				}
-				//shift to potentially overlap
-				if (pX < minX)
-				{
-					pX += 360;
-				}
-				else if (pX > maxX)
-				{
-					pX -= 360;
-				} else {
-					return SpatialRelation.CONTAINS; //short-circuit
-				}
-			}
-			if (pX < minX || pX > maxX)
-				return SpatialRelation.DISJOINT;
-			return SpatialRelation.CONTAINS;
-		}
+        public virtual SpatialRelation Relate(Point point)
+        {
+            if (point.GetY() > GetMaxY() || point.GetY() < GetMinY())
+                return SpatialRelation.DISJOINT;
+            //  all the below logic is rather unfortunate but some dateline cases demand it
+            double minX = this.minX;
+            double maxX = this.maxX;
+            double pX = point.GetX();
+            if (ctx.IsGeo())
+            {
+                //unwrap dateline and normalize +180 to become -180
+                double rawWidth = maxX - minX;
+                if (rawWidth < 0)
+                {
+                    maxX = minX + (rawWidth + 360);
+                }
+                //shift to potentially overlap
+                if (pX < minX)
+                {
+                    pX += 360;
+                }
+                else if (pX > maxX)
+                {
+                    pX -= 360;
+                }
+                else
+                {
+                    return SpatialRelation.CONTAINS; //short-circuit
+                }
+            }
+            if (pX < minX || pX > maxX)
+                return SpatialRelation.DISJOINT;
+            return SpatialRelation.CONTAINS;
+        }
 
-		public virtual SpatialRelation Relate(Rectangle rect)
-		{
-			SpatialRelation yIntersect = RelateYRange(rect.GetMinY(), rect.GetMaxY());
-			if (yIntersect == SpatialRelation.DISJOINT)
-				return SpatialRelation.DISJOINT;
+        public virtual SpatialRelation Relate(Rectangle rect)
+        {
+            SpatialRelation yIntersect = RelateYRange(rect.GetMinY(), rect.GetMaxY());
+            if (yIntersect == SpatialRelation.DISJOINT)
+                return SpatialRelation.DISJOINT;
 
-			SpatialRelation xIntersect = RelateXRange(rect.GetMinX(), rect.GetMaxX());
-			if (xIntersect == SpatialRelation.DISJOINT)
-				return SpatialRelation.DISJOINT;
+            SpatialRelation xIntersect = RelateXRange(rect.GetMinX(), rect.GetMaxX());
+            if (xIntersect == SpatialRelation.DISJOINT)
+                return SpatialRelation.DISJOINT;
 
-			if (xIntersect == yIntersect)//in agreement
-				return xIntersect;
+            if (xIntersect == yIntersect)//in agreement
+                return xIntersect;
 
-			//if one side is equal, return the other
-			if (GetMinX() == rect.GetMinX() && GetMaxX() == rect.GetMaxX())
-				return yIntersect;
-			if (GetMinY() == rect.GetMinY() && GetMaxY() == rect.GetMaxY())
-				return xIntersect;
+            //if one side is equal, return the other
+            if (GetMinX() == rect.GetMinX() && GetMaxX() == rect.GetMaxX())
+                return yIntersect;
+            if (GetMinY() == rect.GetMinY() && GetMaxY() == rect.GetMaxY())
+                return xIntersect;
 
-			return SpatialRelation.INTERSECTS;
-		}
+            return SpatialRelation.INTERSECTS;
+        }
 
-		private static SpatialRelation Relate_Range(double int_min, double int_max, double ext_min, double ext_max)
-		{
-			if (ext_min > int_max || ext_max < int_min)
-			{
-				return SpatialRelation.DISJOINT;
-			}
+        private static SpatialRelation Relate_Range(double int_min, double int_max, double ext_min, double ext_max)
+        {
+            if (ext_min > int_max || ext_max < int_min)
+            {
+                return SpatialRelation.DISJOINT;
+            }
 
-			if (ext_min >= int_min && ext_max <= int_max)
-			{
-				return SpatialRelation.CONTAINS;
-			}
+            if (ext_min >= int_min && ext_max <= int_max)
+            {
+                return SpatialRelation.CONTAINS;
+            }
 
-			if (ext_min <= int_min && ext_max >= int_max)
-			{
-				return SpatialRelation.WITHIN;
-			}
+            if (ext_min <= int_min && ext_max >= int_max)
+            {
+                return SpatialRelation.WITHIN;
+            }
 
-			return SpatialRelation.INTERSECTS;
-		}
+            return SpatialRelation.INTERSECTS;
+        }
 
-		public SpatialRelation RelateYRange(double ext_minY, double ext_maxY)
-		{
-			return Relate_Range(minY, maxY, ext_minY, ext_maxY);
-		}
+        public SpatialRelation RelateYRange(double ext_minY, double ext_maxY)
+        {
+            return Relate_Range(minY, maxY, ext_minY, ext_maxY);
+        }
 
-		public SpatialRelation RelateXRange(double ext_minX, double ext_maxX)
-		{
-			//For ext & this we have local minX and maxX variable pairs. We rotate them so that minX <= maxX
-			double minX = this.minX;
-			double maxX = this.maxX;
-			if (ctx.IsGeo())
-			{
-				//unwrap dateline, plus do world-wrap short circuit
-				double rawWidth = maxX - minX;
-				if (rawWidth == 360)
-					return SpatialRelation.CONTAINS;
-				if (rawWidth < 0)
-				{
-					maxX = minX + (rawWidth + 360);
-				}
+        public SpatialRelation RelateXRange(double ext_minX, double ext_maxX)
+        {
+            //For ext & this we have local minX and maxX variable pairs. We rotate them so that minX <= maxX
+            double minX = this.minX;
+            double maxX = this.maxX;
+            if (ctx.IsGeo())
+            {
+                //unwrap dateline, plus do world-wrap short circuit
+                double rawWidth = maxX - minX;
+                if (rawWidth == 360)
+                    return SpatialRelation.CONTAINS;
+                if (rawWidth < 0)
+                {
+                    maxX = minX + (rawWidth + 360);
+                }
 
-				double ext_rawWidth = ext_maxX - ext_minX;
-				if (ext_rawWidth == 360)
-					return SpatialRelation.WITHIN;
-				if (ext_rawWidth < 0)
-				{
-					ext_maxX = ext_minX + (ext_rawWidth + 360);
-				}
+                double ext_rawWidth = ext_maxX - ext_minX;
+                if (ext_rawWidth == 360)
+                    return SpatialRelation.WITHIN;
+                if (ext_rawWidth < 0)
+                {
+                    ext_maxX = ext_minX + (ext_rawWidth + 360);
+                }
 
-				//shift to potentially overlap
-				if (maxX < ext_minX)
-				{
-					minX += 360;
-					maxX += 360;
-				}
-				else if (ext_maxX < minX)
-				{
-					ext_minX += 360;
-					ext_maxX += 360;
-				}
-			}
+                //shift to potentially overlap
+                if (maxX < ext_minX)
+                {
+                    minX += 360;
+                    maxX += 360;
+                }
+                else if (ext_maxX < minX)
+                {
+                    ext_minX += 360;
+                    ext_maxX += 360;
+                }
+            }
 
-			return Relate_Range(minX, maxX, ext_minX, ext_maxX);
-		}
+            return Relate_Range(minX, maxX, ext_minX, ext_maxX);
+        }
 
-		public override string ToString()
-		{
-			return "Rect(minX=" + minX + ",maxX=" + maxX + ",minY=" + minY + ",maxY=" + maxY + ")";
-		}
+        public override string ToString()
+        {
+            return "Rect(minX=" + minX + ",maxX=" + maxX + ",minY=" + minY + ",maxY=" + maxY + ")";
+        }
 
         public virtual Point GetCenter()
         {
@@ -325,49 +327,49 @@ namespace Spatial4n.Core.Shapes.Impl
         }
 
         public override bool Equals(object obj)
-		{
-			return Equals(this, obj);
-		}
+        {
+            return Equals(this, obj);
+        }
 
-		/// <summary>
-		/// All {@link Rectangle} implementations should use this definition of {@link Object#equals(Object)}.
-		/// </summary>
-		/// <param name="thiz"></param>
-		/// <param name="o"></param>
-		/// <returns></returns>
-		public static bool Equals(Rectangle thiz, object o)
-		{
-			if (thiz == null)
-				throw new ArgumentNullException("thiz");
+        /// <summary>
+        /// All {@link Rectangle} implementations should use this definition of {@link Object#equals(Object)}.
+        /// </summary>
+        /// <param name="thiz"></param>
+        /// <param name="o"></param>
+        /// <returns></returns>
+        public static bool Equals(Rectangle thiz, object o)
+        {
+            if (thiz == null)
+                throw new ArgumentNullException("thiz");
 
-			if (thiz == o) return true;
+            if (thiz == o) return true;
 
-			var rectangle = o as Rectangle;
-			if (rectangle == null) return false;
+            var rectangle = o as Rectangle;
+            if (rectangle == null) return false;
 
-			return thiz.GetMaxX().Equals(rectangle.GetMaxX()) && thiz.GetMinX().Equals(rectangle.GetMinX()) &&
-			       thiz.GetMaxY().Equals(rectangle.GetMaxY()) && thiz.GetMinY().Equals(rectangle.GetMinY());
-		}
+            return thiz.GetMaxX().Equals(rectangle.GetMaxX()) && thiz.GetMinX().Equals(rectangle.GetMinX()) &&
+                   thiz.GetMaxY().Equals(rectangle.GetMaxY()) && thiz.GetMinY().Equals(rectangle.GetMinY());
+        }
 
-		public override int GetHashCode()
-		{
-			return GetHashCode(this);
-		}
+        public override int GetHashCode()
+        {
+            return GetHashCode(this);
+        }
 
-		public static int GetHashCode(Rectangle thiz)
-		{
-			if (thiz == null)
-				throw new ArgumentNullException("thiz");
+        public static int GetHashCode(Rectangle thiz)
+        {
+            if (thiz == null)
+                throw new ArgumentNullException("thiz");
 
-			long temp = thiz.GetMinX() != +0.0d ? BitConverter.DoubleToInt64Bits(thiz.GetMinX()) : 0L;
-			int result = (int)(temp ^ ((uint)temp >> 32));
-			temp = thiz.GetMaxX() != +0.0d ? BitConverter.DoubleToInt64Bits(thiz.GetMaxX()) : 0L;
-			result = 31 * result + (int)(temp ^ ((uint)temp >> 32));
-			temp = thiz.GetMinY() != +0.0d ? BitConverter.DoubleToInt64Bits(thiz.GetMinY()) : 0L;
-			result = 31 * result + (int)(temp ^ ((uint)temp >> 32));
-			temp = thiz.GetMaxY() != +0.0d ? BitConverter.DoubleToInt64Bits(thiz.GetMaxY()) : 0L;
-			result = 31*result + (int) (temp ^ ((uint)temp >> 32));
-			return result;
-		}
-	}
+            long temp = thiz.GetMinX() != +0.0d ? BitConverter.DoubleToInt64Bits(thiz.GetMinX()) : 0L;
+            int result = (int)(temp ^ ((uint)temp >> 32));
+            temp = thiz.GetMaxX() != +0.0d ? BitConverter.DoubleToInt64Bits(thiz.GetMaxX()) : 0L;
+            result = 31 * result + (int)(temp ^ ((uint)temp >> 32));
+            temp = thiz.GetMinY() != +0.0d ? BitConverter.DoubleToInt64Bits(thiz.GetMinY()) : 0L;
+            result = 31 * result + (int)(temp ^ ((uint)temp >> 32));
+            temp = thiz.GetMaxY() != +0.0d ? BitConverter.DoubleToInt64Bits(thiz.GetMaxY()) : 0L;
+            result = 31 * result + (int)(temp ^ ((uint)temp >> 32));
+            return result;
+        }
+    }
 }

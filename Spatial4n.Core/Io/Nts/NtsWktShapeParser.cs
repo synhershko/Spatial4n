@@ -84,7 +84,7 @@ namespace Spatial4n.Core.Io.Nts
             if (state.NextIfEmptyAndSkipZM())
                 return ctx.MakeLineString(new List<Shapes.IPoint>());
 
-            GeometryFactory geometryFactory = ctx.GetGeometryFactory();
+            GeometryFactory geometryFactory = ctx.GeometryFactory;
 
             Coordinate[] coordinates = CoordinateSequence(state);
             return MakeShapeFromGeometry(geometryFactory.CreateLineString(coordinates));
@@ -102,7 +102,7 @@ namespace Spatial4n.Core.Io.Nts
             IGeometry geometry;
             if (state.NextIfEmptyAndSkipZM())
             {
-                GeometryFactory geometryFactory = ctx.GetGeometryFactory();
+                GeometryFactory geometryFactory = ctx.GeometryFactory;
                 geometry = geometryFactory.CreatePolygon(geometryFactory.CreateLinearRing(
                     new Coordinate[] { }), null);
             }
@@ -146,7 +146,7 @@ namespace Spatial4n.Core.Io.Nts
          */
         protected IPolygon Polygon(WktShapeParser.State state)
         {
-            GeometryFactory geometryFactory = ctx.GetGeometryFactory();
+            GeometryFactory geometryFactory = ctx.GeometryFactory;
 
             List<Coordinate[]> coordinateSequenceList = CoordinateSequenceList(state);
 
@@ -241,7 +241,7 @@ namespace Spatial4n.Core.Io.Nts
 
         protected override double NormDist(double v)
         {
-            return ctx.GetGeometryFactory().PrecisionModel.MakePrecise(v);
+            return ctx.GeometryFactory.PrecisionModel.MakePrecise(v);
         }
 
         /** Creates the NtsGeometry, potentially validating, repairing, and preparing. */

@@ -62,7 +62,7 @@ namespace Spatial4n.Tests.io
         {
             //a circle
             NtsSpatialContext ctx = (NtsSpatialContext)base.ctx;
-            GeometricShapeFactory gsf = new GeometricShapeFactory(ctx.GetGeometryFactory());
+            GeometricShapeFactory gsf = new GeometricShapeFactory(ctx.GeometryFactory);
             gsf.Centre = (new Coordinate(0, 0));
             gsf.Size = (180);//diameter
             gsf.NumPoints = (points);

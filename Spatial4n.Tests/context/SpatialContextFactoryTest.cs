@@ -70,7 +70,7 @@ namespace Spatial4n.Tests.context
                 "validationRule", "repairConvexHull",
                 "autoIndex", "true");
             Assert.True(ctx.IsNormWrapLongitude());
-            CustomAssert.EqualWithDelta(2.0, ctx.GetGeometryFactory().PrecisionModel.Scale, 0.0);
+            CustomAssert.EqualWithDelta(2.0, ctx.GeometryFactory.PrecisionModel.Scale, 0.0);
             Assert.True(CustomWktShapeParser.once);//cheap way to test it was created
             Assert.Equal(NtsWktShapeParser.DatelineRule.ccwRect,
                 ((NtsWktShapeParser)ctx.GetWktShapeParser()).GetDatelineRule());

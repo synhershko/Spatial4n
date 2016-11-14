@@ -205,7 +205,7 @@ namespace Spatial4n.Core.Shapes.Nts
         public virtual IPoint GetCenter()
         {
             if (IsEmpty) //geom.getCentroid == null
-                return new NtsPoint(ctx.GetGeometryFactory().CreatePoint((Coordinate)null), ctx);
+                return new NtsPoint(ctx.GeometryFactory.CreatePoint((Coordinate)null), ctx);
             return new NtsPoint((NetTopologySuite.Geometries.Point)geom.Centroid, ctx);
         }
 
@@ -232,7 +232,7 @@ namespace Spatial4n.Core.Shapes.Nts
             if (pt is NtsPoint)
                 ptGeom = ((NtsPoint)pt).GetGeom();
             else
-                ptGeom = ctx.GetGeometryFactory().CreatePoint(new Coordinate(pt.GetX(), pt.GetY()));
+                ptGeom = ctx.GeometryFactory.CreatePoint(new Coordinate(pt.GetX(), pt.GetY()));
             return Relate(ptGeom);//is point-optimized
         }
 

@@ -63,7 +63,7 @@ namespace Spatial4n.Tests.io
                 .Build();
             AssertParses("POLYGON ((100 0, 101 0, 101 1, 100 1, 100 0), (100.2 0.2, 100.8 0.2, 100.8 0.8, 100.2 0.8, 100.2 0.2))", polygonWithHoles);
 
-            GeometryFactory gf = ctx.GetGeometryFactory();
+            GeometryFactory gf = ctx.GeometryFactory;
             AssertParses("POLYGON EMPTY", ctx.MakeShape(
                 gf.CreatePolygon(gf.CreateLinearRing(new Coordinate[] { }), null)
             ));

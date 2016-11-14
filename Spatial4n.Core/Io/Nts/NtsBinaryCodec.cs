@@ -155,7 +155,7 @@ namespace Spatial4n.Core.Io.Nts
         public IShape ReadNtsGeom(/*DataInput*/BinaryReader dataInput)
         {
             NtsSpatialContext ctx = (NtsSpatialContext)base.ctx;
-            WKBReader reader = new WKBReader(ctx.GetGeometryFactory());
+            WKBReader reader = new WKBReader(ctx.GeometryFactory);
             try
             {
                 Stream inStream = new InputStreamAnonymousHelper(dataInput);

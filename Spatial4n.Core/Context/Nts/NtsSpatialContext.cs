@@ -47,11 +47,11 @@ namespace Spatial4n.Core.Context.Nts
             GEO = new NtsSpatialContext(factory);
         }
 
-        protected readonly GeometryFactory geometryFactory;
+        protected readonly GeometryFactory m_geometryFactory;
 
-        protected readonly bool allowMultiOverlap;
-        protected readonly bool useNtsPoint;
-        protected readonly bool useNtsLineString;
+        protected readonly bool m_allowMultiOverlap;
+        protected readonly bool m_useNtsPoint;
+        protected readonly bool m_useNtsLineString;
 
         /// <summary>
         /// Called by <see cref="NtsSpatialContextFactory.NewSpatialContext()"/>.
@@ -60,11 +60,11 @@ namespace Spatial4n.Core.Context.Nts
         public NtsSpatialContext(NtsSpatialContextFactory factory)
             : base(factory)
         {
-            this.geometryFactory = factory.GetGeometryFactory();
+            this.m_geometryFactory = factory.GetGeometryFactory();
 
-            this.allowMultiOverlap = factory.allowMultiOverlap;
-            this.useNtsPoint = factory.useNtsPoint;
-            this.useNtsLineString = factory.useNtsLineString;
+            this.m_allowMultiOverlap = factory.allowMultiOverlap;
+            this.m_useNtsPoint = factory.useNtsPoint;
+            this.m_useNtsLineString = factory.useNtsLineString;
         }
 
         /// <summary>
@@ -76,7 +76,7 @@ namespace Spatial4n.Core.Context.Nts
         /// </summary>
         public virtual bool IsAllowMultiOverlap
         {
-            get { return allowMultiOverlap; }
+            get { return m_allowMultiOverlap; }
         }
 
         ////      protected override ShapeReadWriter MakeShapeReadWriter()
@@ -87,13 +87,13 @@ namespace Spatial4n.Core.Context.Nts
         public override double NormX(double x)
         {
             x = base.NormX(x);
-            return geometryFactory.PrecisionModel.MakePrecise(x);
+            return m_geometryFactory.PrecisionModel.MakePrecise(x);
         }
 
         public override double NormY(double y)
         {
             y = base.NormY(y);
-            return geometryFactory.PrecisionModel.MakePrecise(y);
+            return m_geometryFactory.PrecisionModel.MakePrecise(y);
         }
 
         public override string ToString(IShape shape)
@@ -128,7 +128,7 @@ namespace Spatial4n.Core.Context.Nts
             var point = shape as Shapes.IPoint;
             if (point != null)
             {
-                return geometryFactory.CreatePoint(new Coordinate(point.GetX(), point.GetY()));
+                return m_geometryFactory.CreatePoint(new Coordinate(point.GetX(), point.GetY()));
             }
 
             var r = shape as IRectangle;
@@ -139,16 +139,16 @@ namespace Spatial4n.Core.Context.Nts
                 {
                     var pair = new List<IGeometry>(2)
                        {
-                           geometryFactory.ToGeometry(new Envelope(
+                           m_geometryFactory.ToGeometry(new Envelope(
                                                           r.GetMinX(), GetWorldBounds().GetMaxX(), r.GetMinY(), r.GetMaxY())),
-                           geometryFactory.ToGeometry(new Envelope(
+                           m_geometryFactory.ToGeometry(new Envelope(
                                                           GetWorldBounds().GetMinX(), r.GetMaxX(), r.GetMinY(), r.GetMaxY()))
                        };
-                    return geometryFactory.BuildGeometry(pair);//a MultiPolygon or MultiLineString
+                    return m_geometryFactory.BuildGeometry(pair);//a MultiPolygon or MultiLineString
                 }
                 else
                 {
-                    return geometryFactory.ToGeometry(new Envelope(r.GetMinX(), r.GetMaxX(), r.GetMinY(), r.GetMaxY()));
+                    return m_geometryFactory.ToGeometry(new Envelope(r.GetMinX(), r.GetMaxX(), r.GetMinY(), r.GetMaxY()));
                 }
             }
 
@@ -163,7 +163,7 @@ namespace Spatial4n.Core.Context.Nts
 
                 if (circle.GetBoundingBox().GetCrossesDateLine())
                     throw new ArgumentException("Doesn't support dateline cross yet: " + circle);//TODO
-                var gsf = new GeometricShapeFactory(geometryFactory)
+                var gsf = new GeometricShapeFactory(m_geometryFactory)
                 {
                     Size = circle.GetBoundingBox().GetWidth() / 2.0f,
                     NumPoints = 4 * 25,//multiple of 4 is best
@@ -177,7 +177,7 @@ namespace Spatial4n.Core.Context.Nts
         // Should {@link #makePoint(double, double)} return {@link NtsPoint}?
         public virtual bool UseNtsPoint
         {
-            get { return useNtsPoint; }
+            get { return m_useNtsPoint; }
         }
 
         public override IPoint MakePoint(double x, double y)
@@ -188,7 +188,7 @@ namespace Spatial4n.Core.Context.Nts
             VerifyX(x);
             VerifyY(y);
             Coordinate coord = double.IsNaN(x) ? null : new Coordinate(x, y);
-            return new NtsPoint(geometryFactory.CreatePoint(coord), this);
+            return new NtsPoint(m_geometryFactory.CreatePoint(coord), this);
         }
 
         /** Should {@link #makeLineString(java.util.List)} return {@link NtsGeometry}? */
@@ -198,13 +198,13 @@ namespace Spatial4n.Core.Context.Nts
             {
                 //BufferedLineString doesn't yet do dateline cross, and can't yet be relate()'ed with a
                 // NTS geometry
-                return useNtsLineString;
+                return m_useNtsLineString;
             }
         }
 
         public override IShape MakeLineString(IList<IPoint> points)
         {
-            if (!useNtsLineString)
+            if (!m_useNtsLineString)
                 return base.MakeLineString(points);
             //convert List<Point> to Coordinate[]
             Coordinate[] coords = new Coordinate[points.Count];
@@ -221,7 +221,7 @@ namespace Spatial4n.Core.Context.Nts
                     coords[i] = new Coordinate(p.GetX(), p.GetY());
                 }
             }
-            ILineString lineString = geometryFactory.CreateLineString(coords);
+            ILineString lineString = m_geometryFactory.CreateLineString(coords);
             return MakeShape(lineString);
         }
 
@@ -248,12 +248,12 @@ namespace Spatial4n.Core.Context.Nts
          */
         public virtual NtsGeometry MakeShape(IGeometry geom)
         {
-            return MakeShape(geom, true/*dateline180Check*/, allowMultiOverlap);
+            return MakeShape(geom, true/*dateline180Check*/, m_allowMultiOverlap);
         }
 
-        public virtual GeometryFactory GetGeometryFactory()
+        public virtual GeometryFactory GeometryFactory
         {
-            return geometryFactory;
+            get { return m_geometryFactory; }
         }
 
         public override string ToString()

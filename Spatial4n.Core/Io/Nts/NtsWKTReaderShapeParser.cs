@@ -24,7 +24,7 @@ namespace Spatial4n.Core.Io.Nts
 
         public override IShape ParseIfSupported(string wktString)
         {
-            return ParseIfSupported(wktString, new WKTReader(ctx.GetGeometryFactory()));
+            return ParseIfSupported(wktString, new WKTReader(ctx.GeometryFactory));
         }
 
         /**

@@ -76,9 +76,9 @@ namespace Spatial4n.Tests.io
          */
         public virtual IPolygon ToPolygon()
         {
-            ILinearRing ring = ctx.GetGeometryFactory().CreateLinearRing(points.ToArray(/*new Coordinate[points.Count]*/));
+            ILinearRing ring = ctx.GeometryFactory.CreateLinearRing(points.ToArray(/*new Coordinate[points.Count]*/));
             ILinearRing[] holes = !this.holes.Any() ? null : this.holes.ToArray(/*new LinearRing[this.holes.Count]*/);
-            return ctx.GetGeometryFactory().CreatePolygon(ring, holes);
+            return ctx.GeometryFactory.CreatePolygon(ring, holes);
         }
 
         /**
@@ -121,7 +121,7 @@ namespace Spatial4n.Tests.io
              */
             public virtual PolygonBuilder EndHole()
             {
-                return polygonBuilder.AddHole(polygonBuilder.ctx.GetGeometryFactory().CreateLinearRing(points.ToArray(/*new Coordinate[points.size()]*/)));
+                return polygonBuilder.AddHole(polygonBuilder.ctx.GeometryFactory.CreateLinearRing(points.ToArray(/*new Coordinate[points.size()]*/)));
             }
         }
     }

@@ -100,7 +100,7 @@ namespace Spatial4n.Tests.shape
                 Rectangle br = (Rectangle)r.GetBuffered(buf, ctx);
                 AssertRelation(null, SpatialRelation.CONTAINS, br, r);
                 if (r.GetWidth() + 2 * buf >= 360)
-                    Assert.Equal(360, br.GetWidth(), (int)0.0);
+                    CustomAssert.EqualWithDelta(360, br.GetWidth(), 0.0);
                 else
                     Assert.True(br.GetWidth() - r.GetWidth() >= 2 * buf);
                 //TODO test more thoroughly; we don't check that we over-buf

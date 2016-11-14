@@ -141,13 +141,13 @@ namespace Spatial4n.Tests.shape
             Rectangle r = RandomRectangle(20);
             NtsSpatialContext ctxNts = (NtsSpatialContext)ctx;
             NtsGeometry rPoly = ctxNts.MakeShape(ctxNts.GetGeometryFrom(r), false, false);
-            Assert.Equal(r.GetArea(null), rPoly.GetArea(null), (int)0.0);
-            Assert.Equal(r.GetArea(ctx), rPoly.GetArea(ctx), (int)0.000001);//same since fills 100%
+            CustomAssert.EqualWithDelta(r.GetArea(null), rPoly.GetArea(null), 0.0);
+            CustomAssert.EqualWithDelta(r.GetArea(ctx), rPoly.GetArea(ctx), 0.000001);//same since fills 100%
 
-            Assert.Equal(1300, POLY_SHAPE.GetArea(null), (int)0.0);
+            CustomAssert.EqualWithDelta(1300, POLY_SHAPE.GetArea(null), 0.0);
 
             //fills 27%
-            Assert.Equal(0.27, POLY_SHAPE.GetArea(ctx) / POLY_SHAPE.GetBoundingBox().GetArea(ctx), (int)0.009);
+            CustomAssert.EqualWithDelta(0.27, POLY_SHAPE.GetArea(ctx) / POLY_SHAPE.GetBoundingBox().GetArea(ctx), 0.009);
             Assert.True(POLY_SHAPE.GetBoundingBox().GetArea(ctx) > POLY_SHAPE.GetArea(ctx));
         }
 
@@ -174,11 +174,11 @@ namespace Spatial4n.Tests.shape
         {
             //does NOT cross the dateline but is a wide shape >180
             NtsGeometry ntsGeo = (NtsGeometry)ctx.ReadShapeFromWkt("POLYGON((-161 49, 0 49, 20 49, 20 89.1, 0 89.1, -161 89.2, -161 49))");
-            Assert.Equal(161 + 20, ntsGeo.GetBoundingBox().GetWidth(), (int)0.001);
+            CustomAssert.EqualWithDelta(161 + 20, ntsGeo.GetBoundingBox().GetWidth(), 0.001);
 
             //shift it to cross the dateline and check that it's still good
             ntsGeo = ShiftPoly(ntsGeo, 180);
-            Assert.Equal(161 + 20, ntsGeo.GetBoundingBox().GetWidth(), (int)0.001);
+            CustomAssert.EqualWithDelta(161 + 20, ntsGeo.GetBoundingBox().GetWidth(), 0.001);
         }
 
         private void AssertNtsConsistentRelate(Shape shape)

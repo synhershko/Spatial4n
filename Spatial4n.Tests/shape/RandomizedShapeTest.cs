@@ -219,7 +219,7 @@ namespace Spatial4n.Tests.shape
             double delta = Math.Abs(actual - expected);
             double @base = Math.Min(actual, expected);
             double deltaRatio = @base == 0 ? delta : Math.Min(delta, delta / @base);
-            Assert.Equal(/*msg,*/ 0, deltaRatio, (int)EPS);
+            CustomAssert.EqualWithDelta(/*msg,*/ 0, deltaRatio, EPS);
         }
 
         protected virtual int RandomIntBetweenDivisible(int start, int end)

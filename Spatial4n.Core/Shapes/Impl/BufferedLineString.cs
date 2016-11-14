@@ -12,7 +12,7 @@ namespace Spatial4n.Core.Shapes.Impl
     /// resulting in what some call a "Track" or "Polyline" (ESRI terminology).
     /// The buffer can be 0.  Note that BufferedLine isn't yet aware of geodesics (e.g. the dateline).
     /// </summary>
-    public class BufferedLineString : Shape
+    public class BufferedLineString : IShape
     {
         //TODO add some geospatial awareness like:
         // segment that spans at the dateline (split it at DL?).
@@ -24,7 +24,7 @@ namespace Spatial4n.Core.Shapes.Impl
          * Needs at least 1 point, usually more than that.  If just one then it's
          * internally treated like 2 points.
          */
-        public BufferedLineString(IList<Point> points, double buf, SpatialContext ctx)
+        public BufferedLineString(IList<IPoint> points, double buf, SpatialContext ctx)
             : this(points, buf, false, ctx)
         {
         }
@@ -39,21 +39,21 @@ namespace Spatial4n.Core.Shapes.Impl
          *                                  is computed.
          * @param ctx
          */
-        public BufferedLineString(IList<Point> points, double buf, bool expandBufForLongitudeSkew,
+        public BufferedLineString(IList<IPoint> points, double buf, bool expandBufForLongitudeSkew,
                                   SpatialContext ctx)
         {
             this.buf = buf;
 
             if (!points.Any())
             {
-                this.segments = ctx.MakeCollection(new List<Shape>());
+                this.segments = ctx.MakeCollection(new List<IShape>());
             }
             else
             {
-                List<Shape> segments = new List<Shape>(points.Count - 1);
+                List<IShape> segments = new List<IShape>(points.Count - 1);
 
-                Point prevPoint = null;
-                foreach (Point point in points)
+                IPoint prevPoint = null;
+                foreach (IPoint point in points)
                 {
                     if (prevPoint != null)
                     {
@@ -81,7 +81,7 @@ namespace Spatial4n.Core.Shapes.Impl
             get { return segments.IsEmpty; }
         }
 
-        public virtual Shape GetBuffered(double distance, SpatialContext ctx)
+        public virtual IShape GetBuffered(double distance, SpatialContext ctx)
         {
             return ctx.MakeBufferedLineString(GetPoints(), buf + distance);
         }
@@ -101,7 +101,7 @@ namespace Spatial4n.Core.Shapes.Impl
             return segments.GetArea(ctx);
         }
 
-        public virtual SpatialRelation Relate(Shape other)
+        public virtual SpatialRelation Relate(IShape other)
         {
             return segments.Relate(other);
         }
@@ -112,13 +112,13 @@ namespace Spatial4n.Core.Shapes.Impl
         }
 
 
-        public virtual Point GetCenter()
+        public virtual IPoint GetCenter()
         {
             return segments.GetCenter();
         }
 
 
-        public virtual Rectangle GetBoundingBox()
+        public virtual IRectangle GetBoundingBox()
         {
             return segments.GetBoundingBox();
         }
@@ -129,7 +129,7 @@ namespace Spatial4n.Core.Shapes.Impl
             StringBuilder str = new StringBuilder(100);
             str.Append("BufferedLineString(buf=").Append(buf).Append(" pts=");
             bool first = true;
-            foreach (Point point in GetPoints())
+            foreach (IPoint point in GetPoints())
             {
                 if (first)
                 {
@@ -145,12 +145,12 @@ namespace Spatial4n.Core.Shapes.Impl
             return str.ToString();
         }
 
-        public virtual IList<Point> GetPoints()
+        public virtual IList<IPoint> GetPoints()
         {
             if (!segments.Any())
-                return new List<Point>();
-            IList<Shape> shapes = segments.GetShapes();
-            IList<Point> points = new List<Point>(); ;
+                return new List<IPoint>();
+            IList<IShape> shapes = segments.GetShapes();
+            IList<IPoint> points = new List<IPoint>(); ;
 
             foreach (var shape in shapes)
             {

@@ -22,12 +22,12 @@ namespace Spatial4n.Tests.shape
             {
             }
 
-            protected override Shape GenerateRandomShape(Core.Shapes.Point nearP)
+            protected override IShape GenerateRandomShape(Core.Shapes.IPoint nearP)
             {
-                Rectangle nearR = RandomRectangle(nearP);
+                IRectangle nearR = RandomRectangle(nearP);
                 int numPoints = 2 + random.Next(3 + 1);//2-5 points
 
-                List<Core.Shapes.Point> points = new List<Core.Shapes.Point>(numPoints);
+                List<Core.Shapes.IPoint> points = new List<Core.Shapes.IPoint>(numPoints);
                 while (points.Count < numPoints)
                 {
                     points.Add(RandomPointIn(nearR));
@@ -38,9 +38,9 @@ namespace Spatial4n.Tests.shape
                 return new BufferedLineString(points, buf, ctx);
             }
 
-            protected override Core.Shapes.Point RandomPointInEmptyShape(Shape shape)
+            protected override Core.Shapes.IPoint RandomPointInEmptyShape(IShape shape)
             {
-                IList<Core.Shapes.Point> points = ((BufferedLineString)shape).GetPoints();
+                IList<Core.Shapes.IPoint> points = ((BufferedLineString)shape).GetPoints();
                 return points.Count == 0 ? null : points[random.Next(points.Count/* - 1*/)];
             }
         }

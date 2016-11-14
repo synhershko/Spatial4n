@@ -19,8 +19,8 @@ namespace Spatial4n.Tests.shape
 			{
                 //TODO ENABLE LawOfCosines WHEN WORKING
                 //DistanceCalculator distCalcL = new GeodesicSphereDistCalc.Haversine(units.earthRadius());//default
-                DistanceCalculator distCalcH = new GeodesicSphereDistCalc.Haversine();
-				DistanceCalculator distCalcV = new GeodesicSphereDistCalc.Vincenty();
+                IDistanceCalculator distCalcH = new GeodesicSphereDistCalc.Haversine();
+				IDistanceCalculator distCalcV = new GeodesicSphereDistCalc.Vincenty();
 
 			    yield return new object[] { new SpatialContextFactory() { geo = true, distCalc = new RoundingDistCalc(distCalcH) }.NewSpatialContext() };
 			    yield return new object[] { new SpatialContextFactory() { geo = true, distCalc = new RoundingDistCalc(distCalcV) }.NewSpatialContext() };
@@ -95,9 +95,9 @@ namespace Spatial4n.Tests.shape
             AssertEquals(ctx.MakeRectangle(-10, 10, -10, 10), ctx.MakeRectangle(0, 0, 0, 0).GetBuffered(10, ctx));
             for (int i = 0; i < AtLeast(100); i++)
             {
-                Rectangle r = RandomRectangle(1);
+                IRectangle r = RandomRectangle(1);
                 int buf = random.Next(0, 90 +1);
-                Rectangle br = (Rectangle)r.GetBuffered(buf, ctx);
+                IRectangle br = (IRectangle)r.GetBuffered(buf, ctx);
                 AssertRelation(null, SpatialRelation.CONTAINS, br, r);
                 if (r.GetWidth() + 2 * buf >= 360)
                     CustomAssert.EqualWithDelta(360, br.GetWidth(), 0.0);

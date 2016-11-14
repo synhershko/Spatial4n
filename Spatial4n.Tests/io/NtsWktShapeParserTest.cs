@@ -33,7 +33,7 @@ namespace Spatial4n.Tests.io
         {
             
 
-            Shape polygonNoHoles = new PolygonBuilder(ctx)
+            IShape polygonNoHoles = new PolygonBuilder(ctx)
         .Point(100, 0)
         .Point(101, 0)
         .Point(101, 1)
@@ -45,9 +45,9 @@ namespace Spatial4n.Tests.io
             AssertParses("POLYGON((100 0,101 0,101 1,100 2,100 0))", polygonNoHoles);
 
             AssertParses("GEOMETRYCOLLECTION ( " + polygonNoHolesSTR + ")",
-                ctx.MakeCollection(new List<Shape>(new Shape[] { polygonNoHoles })));
+                ctx.MakeCollection(new List<IShape>(new IShape[] { polygonNoHoles })));
 
-            Shape polygonWithHoles = new PolygonBuilder(ctx)
+            IShape polygonWithHoles = new PolygonBuilder(ctx)
                 .Point(100, 0)
                 .Point(101, 0)
                 .Point(101, 1)
@@ -80,7 +80,7 @@ namespace Spatial4n.Tests.io
         public virtual void PolyToRect180Rule()
         {
             //crosses dateline
-            Rectangle expected = ctx.MakeRectangle(160, -170, 0, 10);
+            IRectangle expected = ctx.MakeRectangle(160, -170, 0, 10);
             //counter-clockwise
             AssertParses("POLYGON((160 0, -170 0, -170 10, 160 10, 160 0))", expected);
             //clockwise
@@ -102,36 +102,36 @@ namespace Spatial4n.Tests.io
         [Fact]
         public virtual void TestParseMultiPolygon()
         {
-            Shape p1 = new PolygonBuilder(ctx)
+            IShape p1 = new PolygonBuilder(ctx)
                 .Point(100, 0)
                 .Point(101, 0)//101
                 .Point(101, 2)//101
                 .Point(100, 1)
                 .Point(100, 0)
                 .Build();
-            Shape p2 = new PolygonBuilder(ctx)
+            IShape p2 = new PolygonBuilder(ctx)
                 .Point(100, 0)
                 .Point(102, 0)//102
                 .Point(102, 2)//102
                 .Point(100, 1)
                 .Point(100, 0)
                 .Build();
-            Shape s = ctx.MakeCollection(
-                (new Shape[] { p1, p2 }).ToList()
+            IShape s = ctx.MakeCollection(
+                (new IShape[] { p1, p2 }).ToList()
             );
             AssertParses("MULTIPOLYGON(" +
                 "((100 0, 101 0, 101 2, 100 1, 100 0))" + ',' +
                 "((100 0, 102 0, 102 2, 100 1, 100 0))" +
                 ")", s);
 
-            AssertParses("MULTIPOLYGON EMPTY", ctx.MakeCollection(new List<Shape>()));
+            AssertParses("MULTIPOLYGON EMPTY", ctx.MakeCollection(new List<IShape>()));
         }
 
         [Fact]
         public virtual void TestLineStringDateline()
         {
             //works because we use NTS (NtsGeometry); BufferedLineString doesn't yet do DL wrap.
-            Shape s = ctx.ReadShapeFromWkt("LINESTRING(160 10, -170 15)");
+            IShape s = ctx.ReadShapeFromWkt("LINESTRING(160 10, -170 15)");
             CustomAssert.EqualWithDelta(30, s.GetBoundingBox().GetWidth(), 0.0);
         }
 
@@ -175,13 +175,13 @@ namespace Spatial4n.Tests.io
             NtsSpatialContextFactory factory = new NtsSpatialContextFactory();
             factory.validationRule = NtsWktShapeParser.ValidationRule.repairBuffer0;
             NtsSpatialContext ctx = (NtsSpatialContext)factory.NewSpatialContext(); // TODO: Can we remove this cast?
-            Shape buffer0 = ctx.ReadShapeFromWkt(wkt);
+            IShape buffer0 = ctx.ReadShapeFromWkt(wkt);
             Assert.True(buffer0.GetArea(ctx) > 0);
 
             factory = new NtsSpatialContextFactory();
             factory.validationRule = NtsWktShapeParser.ValidationRule.repairConvexHull;
             ctx = (NtsSpatialContext)factory.NewSpatialContext();
-            Shape cvxHull = ctx.ReadShapeFromWkt(wkt);
+            IShape cvxHull = ctx.ReadShapeFromWkt(wkt);
             Assert.True(cvxHull.GetArea(ctx) > 0);
 
             Assert.Equal(SpatialRelation.CONTAINS, cvxHull.Relate(buffer0));

@@ -26,7 +26,7 @@ namespace Spatial4n.Core.Shapes.Impl
 
         private readonly double distDenomInv;//cached: 1 / Math.sqrt(slope * slope + 1)
 
-        internal InfBufLine(double slope, Point point, double buf)
+        internal InfBufLine(double slope, IPoint point, double buf)
         {
             Debug.Assert(!double.IsNaN(slope));
             this.slope = slope;
@@ -43,19 +43,19 @@ namespace Spatial4n.Core.Shapes.Impl
             this.buf = buf;
         }
 
-        internal virtual SpatialRelation Relate(Rectangle r, Point prC, Point scratch)
+        internal virtual SpatialRelation Relate(IRectangle r, IPoint prC, IPoint scratch)
         {
             Debug.Assert(r.GetCenter().Equals(prC));
 
             int cQuad = Quadrant(prC);
 
-            Point nearestP = scratch;
+            IPoint nearestP = scratch;
             CornerByQuadrant(r, oppositeQuad[cQuad], nearestP);
             bool nearestContains = Contains(nearestP);
 
             if (nearestContains)
             {
-                Point farthestP = scratch;
+                IPoint farthestP = scratch;
                 nearestP = null;//just to be safe (same scratch object)
                 CornerByQuadrant(r, cQuad, farthestP);
                 bool farthestContains = Contains(farthestP);
@@ -71,13 +71,13 @@ namespace Spatial4n.Core.Shapes.Impl
             }
         }
 
-        internal virtual bool Contains(Point p)
+        internal virtual bool Contains(IPoint p)
         {
             return (DistanceUnbuffered(p) <= buf);
         }
 
         /** INTERNAL AKA lineToPointDistance */
-        public virtual double DistanceUnbuffered(Point c)
+        public virtual double DistanceUnbuffered(IPoint c)
         {
             if (double.IsInfinity(slope))
                 return Math.Abs(c.GetX() - intercept);
@@ -100,7 +100,7 @@ namespace Spatial4n.Core.Shapes.Impl
         //  }
 
         /** INTERNAL: AKA lineToPointQuadrant */
-        public virtual int Quadrant(Point c)
+        public virtual int Quadrant(IPoint c)
         {
             //check vertical line case 1st
             if (double.IsInfinity(slope))
@@ -129,7 +129,7 @@ namespace Spatial4n.Core.Shapes.Impl
         /* quadrants 1-4: NE, NW, SW, SE. */
         private static readonly int[] oppositeQuad = { -1, 3, 4, 1, 2 };
 
-        public static void CornerByQuadrant(Rectangle r, int cornerQuad, Point output)
+        public static void CornerByQuadrant(IRectangle r, int cornerQuad, IPoint output)
         {
             double x = (cornerQuad == 1 || cornerQuad == 4) ? r.GetMaxX() : r.GetMinX();
             double y = (cornerQuad == 1 || cornerQuad == 2) ? r.GetMaxY() : r.GetMinY();

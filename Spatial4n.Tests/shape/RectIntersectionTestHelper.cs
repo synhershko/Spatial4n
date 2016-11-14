@@ -18,15 +18,15 @@ namespace Spatial4n.Tests.shape
         {
         }
 
-        protected abstract Shape GenerateRandomShape(Core.Shapes.Point nearP);
+        protected abstract IShape GenerateRandomShape(Core.Shapes.IPoint nearP);
 
-        protected abstract Core.Shapes.Point RandomPointInEmptyShape(Shape shape);
+        protected abstract Core.Shapes.IPoint RandomPointInEmptyShape(IShape shape);
 
 
-        protected override Core.Shapes.Point RandomPointIn(Shape shape)
+        protected override Core.Shapes.IPoint RandomPointIn(IShape shape)
         {
             if (!shape.HasArea())
-                return RandomPointInEmptyShape((Shape)shape);
+                return RandomPointInEmptyShape((IShape)shape);
             return base.RandomPointIn(shape);
         }
 
@@ -43,11 +43,11 @@ namespace Spatial4n.Tests.shape
 
                 //TestLog.Clear();
 
-                Core.Shapes.Point nearP = RandomPointIn(ctx.GetWorldBounds());
+                Core.Shapes.IPoint nearP = RandomPointIn(ctx.GetWorldBounds());
 
-                Shape s = GenerateRandomShape(nearP);
+                IShape s = GenerateRandomShape(nearP);
 
-                Rectangle r = RandomRectangle(s.GetBoundingBox().GetCenter());
+                IRectangle r = RandomRectangle(s.GetBoundingBox().GetCenter());
 
                 SpatialRelation ic = s.Relate(r);
 
@@ -61,7 +61,7 @@ namespace Spatial4n.Tests.shape
                             i_C++;
                             for (int j = 0; j < AtLeast(10); j++)
                             {
-                                Core.Shapes.Point p = RandomPointIn(r);
+                                Core.Shapes.IPoint p = RandomPointIn(r);
                                 AssertRelation(null, SpatialRelation.CONTAINS, s, p);
                             }
                             break;
@@ -70,7 +70,7 @@ namespace Spatial4n.Tests.shape
                             i_W++;
                             for (int j = 0; j < AtLeast(10); j++)
                             {
-                                Core.Shapes.Point p = RandomPointIn(s);
+                                Core.Shapes.IPoint p = RandomPointIn(s);
                                 AssertRelation(null, SpatialRelation.CONTAINS, r, p);
                             }
                             break;
@@ -88,7 +88,7 @@ namespace Spatial4n.Tests.shape
                             }
                             for (int j = 0; j < AtLeast(10); j++)
                             {
-                                Core.Shapes.Point p = RandomPointIn(r);
+                                Core.Shapes.IPoint p = RandomPointIn(r);
                                 AssertRelation(null, SpatialRelation.DISJOINT, s, p);
                             }
                             break;
@@ -96,11 +96,11 @@ namespace Spatial4n.Tests.shape
                         case SpatialRelation.INTERSECTS:
                             i_I++;
                             SpatialRelation? pointR = null;//set once
-                            Rectangle randomPointSpace = null;
+                            IRectangle randomPointSpace = null;
                             int MAX_TRIES = 1000;
                             for (int j = 0; j < MAX_TRIES; j++)
                             {
-                                Core.Shapes.Point p;
+                                Core.Shapes.IPoint p;
                                 if (j < 4)
                                 {
                                     p = new PointImpl(0, 0, ctx);
@@ -156,12 +156,12 @@ namespace Spatial4n.Tests.shape
             Console.WriteLine("Laps: " + laps + " CWIDbD: " + i_C + "," + i_W + "," + i_I + "," + i_D + "," + i_bboxD);
         }
 
-        protected virtual void OnAssertFail(/*AssertionError*/Exception e, Shape s, Rectangle r, SpatialRelation ic)
+        protected virtual void OnAssertFail(/*AssertionError*/Exception e, IShape s, IRectangle r, SpatialRelation ic)
         {
             throw e;
         }
 
-        private Rectangle IntersectRects(Rectangle r1, Rectangle r2)
+        private IRectangle IntersectRects(IRectangle r1, IRectangle r2)
         {
             Debug.Assert(r1.Relate(r2).Intersects());
             double minX, maxX;

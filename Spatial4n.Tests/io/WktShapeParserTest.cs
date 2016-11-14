@@ -25,7 +25,7 @@ namespace Spatial4n.Tests.io
 
         }
 
-        protected virtual void AssertParses(string wkt, Shape expected)
+        protected virtual void AssertParses(string wkt, IShape expected)
         {
             Assert.Equal(ctx.ReadShapeFromWkt(wkt), expected);
         }
@@ -61,7 +61,7 @@ namespace Spatial4n.Tests.io
             AssertParses("POINT ( 100 90 )", ctx.MakePoint(100, 90));//inner spaces
             AssertParses("POINT(100 90)", ctx.MakePoint(100, 90));
             AssertParses("POINT (-45 90 )", ctx.MakePoint(-45, 90));
-            Point expected = ctx.MakePoint(-45.3, 80.4);
+            IPoint expected = ctx.MakePoint(-45.3, 80.4);
             AssertParses("POINT (-45.3 80.4 )", expected);
             AssertParses("POINT (-45.3 +80.4 )", expected);
             AssertParses("POINT (-45.3 8.04e1 )", expected);
@@ -95,22 +95,22 @@ namespace Spatial4n.Tests.io
         [Fact]
         public virtual void TestParseMultiPoint()
         {
-            Shape s1 = ctx.MakeCollection(new Shape[] { ctx.MakePoint(10, 40) });
+            IShape s1 = ctx.MakeCollection(new IShape[] { ctx.MakePoint(10, 40) });
             AssertParses("MULTIPOINT (10 40)", s1);
 
-            Shape s4 = ctx.MakeCollection(new Shape[] {
+            IShape s4 = ctx.MakeCollection(new IShape[] {
                 ctx.MakePoint(10, 40), ctx.MakePoint(40, 30),
                 ctx.MakePoint(20, 20), ctx.MakePoint(30, 10) });
             AssertParses("MULTIPOINT ((10 40), (40 30), (20 20), (30 10))", s4);
             AssertParses("MULTIPOINT (10 40, 40 30, 20 20, 30 10)", s4);
 
-            AssertParses("MULTIPOINT Z EMPTY", ctx.MakeCollection(new Shape[0]));
+            AssertParses("MULTIPOINT Z EMPTY", ctx.MakeCollection(new IShape[0]));
         }
 
         [Fact]
         public virtual void TestParseEnvelope()
         {
-            Rectangle r = ctx.MakeRectangle(ctx.MakePoint(10, 25), ctx.MakePoint(30, 45));
+            IRectangle r = ctx.MakeRectangle(ctx.MakePoint(10, 25), ctx.MakePoint(30, 45));
             AssertParses(" ENVELOPE ( 10 , 30 , 45 , 25 ) ", r);
             AssertParses("ENVELOPE(10,30,45,25) ", r);
             AssertFails("ENVELOPE (10 30 45 25)");
@@ -119,44 +119,44 @@ namespace Spatial4n.Tests.io
         [Fact]
         public virtual void TestLineStringShape()
         {
-            Point p1 = ctx.MakePoint(1, 10);
-            Point p2 = ctx.MakePoint(2, 20);
-            Point p3 = ctx.MakePoint(3, 30);
-            Shape ls = ctx.MakeLineString(new Point[] { p1, p2, p3 });
+            IPoint p1 = ctx.MakePoint(1, 10);
+            IPoint p2 = ctx.MakePoint(2, 20);
+            IPoint p3 = ctx.MakePoint(3, 30);
+            IShape ls = ctx.MakeLineString(new IPoint[] { p1, p2, p3 });
             AssertParses("LINESTRING (1 10, 2 20, 3 30)", ls);
 
-            AssertParses("LINESTRING EMPTY", ctx.MakeLineString(new Point[0]));
+            AssertParses("LINESTRING EMPTY", ctx.MakeLineString(new IPoint[0]));
         }
 
         [Fact]
         public virtual void TestMultiLineStringShape()
         {
-            Shape s = ctx.MakeCollection(new Shape[] {
-                ctx.MakeLineString(new Point[] {
+            IShape s = ctx.MakeCollection(new IShape[] {
+                ctx.MakeLineString(new IPoint[] {
                     ctx.MakePoint(10, 10), ctx.MakePoint(20, 20), ctx.MakePoint(10, 40) }),
-                ctx.MakeLineString(new Point[] {
+                ctx.MakeLineString(new IPoint[] {
                     ctx.MakePoint(40, 40), ctx.MakePoint(30, 30), ctx.MakePoint(40, 20), ctx.MakePoint(30, 10) }) }
             );
             AssertParses("MULTILINESTRING ((10 10, 20 20, 10 40),\n" +
                 "(40 40, 30 30, 40 20, 30 10))", s);
 
-            AssertParses("MULTILINESTRING M EMPTY", ctx.MakeCollection(new Shape[0]));
+            AssertParses("MULTILINESTRING M EMPTY", ctx.MakeCollection(new IShape[0]));
         }
 
         [Fact]
         public virtual void TestGeomCollection()
         {
-            Shape s1 = ctx.MakeCollection(new Shape[] { ctx.MakePoint(1, 2) });
-            Shape s2 = ctx.MakeCollection(new Shape[] {
+            IShape s1 = ctx.MakeCollection(new IShape[] { ctx.MakePoint(1, 2) });
+            IShape s2 = ctx.MakeCollection(new IShape[] {
                 ctx.MakeRectangle(1, 2, 3, 4),
                 ctx.MakePoint(-1, -2) });
             AssertParses("GEOMETRYCOLLECTION (POINT (1 2) )", s1);
             AssertParses("GEOMETRYCOLLECTION ( ENVELOPE(1,2,4,3), POINT(-1 -2)) ", s2);
 
-            AssertParses("GEOMETRYCOLLECTION EMPTY", ctx.MakeCollection(new Shape[0]));
+            AssertParses("GEOMETRYCOLLECTION EMPTY", ctx.MakeCollection(new IShape[0]));
 
             AssertParses("GEOMETRYCOLLECTION ( POINT EMPTY )",
-            ctx.MakeCollection(new Shape[] { ctx.MakePoint(double.NaN, double.NaN) }));
+            ctx.MakeCollection(new IShape[] { ctx.MakePoint(double.NaN, double.NaN) }));
         }
 
         [Fact]

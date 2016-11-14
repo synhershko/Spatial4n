@@ -20,7 +20,7 @@ namespace Spatial4n.Core.Shapes
     /// <summary>
     /// A circle, also known as a point-radius since that is what it is comprised of.
     /// </summary>
-    public interface Circle : Shape
+    public interface ICircle : IShape
     {
         /// <summary>
         /// Expert: Resets the state of this shape given the arguments. This is a

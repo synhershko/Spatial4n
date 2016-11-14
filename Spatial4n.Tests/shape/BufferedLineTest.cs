@@ -21,7 +21,7 @@ namespace Spatial4n.Tests.shape
         //public TestLog testLog = TestLog.instance;
         //SpatialContext.GEO ;//
 
-        public static void LogShapes(BufferedLine line, Rectangle rect)
+        public static void LogShapes(BufferedLine line, IRectangle rect)
         {
             string lineWKT =
                 "LINESTRING(" + line.GetA().GetX() + " " + line.GetA().GetY() + "," +
@@ -34,7 +34,7 @@ namespace Spatial4n.Tests.shape
             Console.WriteLine(rectWKT);
         }
 
-        static private string RectToWkt(Rectangle rect)
+        static private string RectToWkt(IRectangle rect)
         {
             return "POLYGON((" + rect.GetMinX() + " " + rect.GetMinY() + "," +
                 rect.GetMaxX() + " " + rect.GetMinY() + "," +
@@ -60,7 +60,7 @@ namespace Spatial4n.Tests.shape
                 ctx.MakePoint(4, 3), 1.0);
         }
 
-        private void TestDistToPoint(Point pA, Point pB, Point pC, double dist)
+        private void TestDistToPoint(IPoint pA, IPoint pB, IPoint pC, double dist)
         {
             if (dist > 0)
             {
@@ -78,7 +78,7 @@ namespace Spatial4n.Tests.shape
         public virtual void Misc()
         {
             //pa == pb
-            Point pt = ctx.MakePoint(10, 1);
+            IPoint pt = ctx.MakePoint(10, 1);
             BufferedLine line = new BufferedLine(pt, pt, 3, ctx);
             Assert.True(line.Contains(ctx.MakePoint(10, 1 + 3 - 0.1)));
             Assert.False(line.Contains(ctx.MakePoint(10, 1 + 3 + 0.1)));
@@ -92,15 +92,15 @@ namespace Spatial4n.Tests.shape
             BufferedLine line = NewRandomLine();
             //    if (line.getA().equals(line.getB()))
             //      return;//this test doesn't work
-            Rectangle rect = NewRandomLine().GetBoundingBox();
+            IRectangle rect = NewRandomLine().GetBoundingBox();
             //logShapes(line, rect);
             //compute closest corner brute force
-            List<Point> corners = QuadrantCorners(rect);
+            List<IPoint> corners = QuadrantCorners(rect);
             // a collection instead of 1 value due to ties
             List<int?> farthestDistanceQuads = new List<int?>();
             double farthestDistance = -1;
             int quad = 1;
-            foreach (Point corner in corners)
+            foreach (IPoint corner in corners)
             {
                 double d = line.GetLinePrimary().DistanceUnbuffered(corner);
                 if (Math.Abs(d - farthestDistance) < 0.000001)
@@ -122,15 +122,15 @@ namespace Spatial4n.Tests.shape
 
         private BufferedLine NewRandomLine()
         {
-            Point pA = new PointImpl(random.Next(9 + 1), random.Next(9 + 1), ctx);
-            Point pB = new PointImpl(random.Next(9 + 1), random.Next(9 + 1), ctx);
+            IPoint pA = new PointImpl(random.Next(9 + 1), random.Next(9 + 1), ctx);
+            IPoint pB = new PointImpl(random.Next(9 + 1), random.Next(9 + 1), ctx);
             int buf = random.Next(5 + 1);
             return new BufferedLine(pA, pB, buf, ctx);
         }
 
-        private List<Point> QuadrantCorners(Rectangle rect)
+        private List<IPoint> QuadrantCorners(IRectangle rect)
         {
-            List<Point> corners = new List<Point>(4);
+            List<IPoint> corners = new List<IPoint>(4);
             corners.Add(ctx.MakePoint(rect.GetMaxX(), rect.GetMaxY()));
             corners.Add(ctx.MakePoint(rect.GetMinX(), rect.GetMaxY()));
             corners.Add(ctx.MakePoint(rect.GetMinX(), rect.GetMinY()));
@@ -148,20 +148,20 @@ namespace Spatial4n.Tests.shape
                 this.outerInstance = outerInstance;
             }
 
-            protected override Shape GenerateRandomShape(Point nearP)
+            protected override IShape GenerateRandomShape(IPoint nearP)
             {
-                Rectangle nearR = RandomRectangle(nearP);
-                List<Point> corners = outerInstance.QuadrantCorners(nearR);
+                IRectangle nearR = RandomRectangle(nearP);
+                List<IPoint> corners = outerInstance.QuadrantCorners(nearR);
                 int r4 = outerInstance.random.Next(3 + 1);//0..3
-                Point pA = corners[r4];
-                Point pB = corners[(r4 + 2) % 4];
+                IPoint pA = corners[r4];
+                IPoint pB = corners[(r4 + 2) % 4];
                 double maxBuf = Math.Max(nearR.GetWidth(), nearR.GetHeight());
                 double buf = Math.Abs(RandomGaussian()) * maxBuf / 4;
                 buf = outerInstance.random.Next((int)Divisible(buf) + 1);
                 return new BufferedLine(pA, pB, buf, ctx);
             }
 
-            protected override Point RandomPointInEmptyShape(Shape shape)
+            protected override IPoint RandomPointInEmptyShape(IShape shape)
             {
                 int r = outerInstance.random.Next(1 + 1);
                 if (r == 0) return ((BufferedLine)shape).GetA();
@@ -180,8 +180,8 @@ namespace Spatial4n.Tests.shape
 
         private BufferedLine NewBufLine(int x1, int y1, int x2, int y2, int buf)
         {
-            Point pA = ctx.MakePoint(x1, y1);
-            Point pB = ctx.MakePoint(x2, y2);
+            IPoint pA = ctx.MakePoint(x1, y1);
+            IPoint pB = ctx.MakePoint(x2, y2);
             if (random.Next(100) % 2 == 0)
             {
                 return new BufferedLine(pB, pA, buf, ctx);

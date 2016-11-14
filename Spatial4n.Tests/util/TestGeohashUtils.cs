@@ -33,7 +33,7 @@ namespace Spatial4n.Tests.util
         {
             string hash = GeohashUtils.EncodeLatLon(52.3738007, 4.8909347);
 
-            Point point = GeohashUtils.Decode(hash, ctx);
+            IPoint point = GeohashUtils.Decode(hash, ctx);
 
             CustomAssert.EqualWithDelta(52.3738007, point.GetY(), 0.00001D);
             CustomAssert.EqualWithDelta(4.8909347, point.GetX(), 0.00001D);
@@ -48,7 +48,7 @@ namespace Spatial4n.Tests.util
         {
             string hash = GeohashUtils.EncodeLatLon(84.6, 10.5);
 
-            Point point = GeohashUtils.Decode(hash, ctx);
+            IPoint point = GeohashUtils.Decode(hash, ctx);
 
             CustomAssert.EqualWithDelta(84.6, point.GetY(), 0.00001D);
             CustomAssert.EqualWithDelta(10.5, point.GetX(), 0.00001D);
@@ -62,7 +62,7 @@ namespace Spatial4n.Tests.util
         {
             string geoHash = "u173zq37x014";
             Assert.Equal(geoHash, GeohashUtils.EncodeLatLon(52.3738007, 4.8909347));
-            Point point = GeohashUtils.Decode(geoHash, ctx);
+            IPoint point = GeohashUtils.Decode(geoHash, ctx);
             CustomAssert.EqualWithDelta(52.37380061d, point.GetY(), 0.000001d);
             CustomAssert.EqualWithDelta(4.8909343d, point.GetX(), 0.000001d);
 
@@ -71,7 +71,7 @@ namespace Spatial4n.Tests.util
             geoHash = "u173";
             point = GeohashUtils.Decode("u173", ctx);
             geoHash = GeohashUtils.EncodeLatLon(point.GetY(), point.GetX());
-            Point point2 = GeohashUtils.Decode(geoHash, ctx);
+            IPoint point2 = GeohashUtils.Decode(geoHash, ctx);
             CustomAssert.EqualWithDelta(point.GetY(), point2.GetY(), 0.000001d);
             CustomAssert.EqualWithDelta(point.GetX(), point2.GetX(), 0.000001d);
         }

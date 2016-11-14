@@ -20,7 +20,7 @@ namespace Spatial4n.Tests.io
 			}
 		}
 
-		private T WriteThenRead<T>(T s, SpatialContext ctx) where T : Shape
+		private T WriteThenRead<T>(T s, SpatialContext ctx) where T : IShape
 		{
 			string buff = ctx.ToString(s);
 			return (T)ctx.ReadShape(buff);
@@ -30,7 +30,7 @@ namespace Spatial4n.Tests.io
 		[PropertyData("Contexts")]
 		public virtual void TestPoint(SpatialContext ctx)
 		{
-			Shape s = ctx.ReadShape("10 20");
+			IShape s = ctx.ReadShape("10 20");
 			Assert.Equal(ctx.MakePoint(10, 20), s);
 			Assert.Equal(s, WriteThenRead(s, ctx));
 			Assert.Equal(s, ctx.ReadShape("20,10"));//check comma for y,x format
@@ -42,7 +42,7 @@ namespace Spatial4n.Tests.io
 		[PropertyData("Contexts")]
 		public virtual void TestRectangle(SpatialContext ctx)
 		{
-			Shape s = ctx.ReadShape("-10 -20 10 20");
+			IShape s = ctx.ReadShape("-10 -20 10 20");
 			Assert.Equal(ctx.MakeRectangle(-10, 10, -20, 20), s);
 			Assert.Equal(s, WriteThenRead(s, ctx));
 			Assert.True(s.HasArea());
@@ -52,7 +52,7 @@ namespace Spatial4n.Tests.io
 		[PropertyData("Contexts")]
 		public virtual void TestCircle(SpatialContext ctx)
 		{
-			Shape s = ctx.ReadShape("Circle(1.23 4.56 distance=7.89)");
+			IShape s = ctx.ReadShape("Circle(1.23 4.56 distance=7.89)");
 			Assert.Equal(ctx.MakeCircle(1.23, 4.56, 7.89), s);
 			Assert.Equal(s, WriteThenRead(s, ctx));
 			Assert.Equal(s, ctx.ReadShape("CIRCLE( 4.56,1.23 d=7.89 )")); // use lat,lon and use 'd' abbreviation
@@ -65,7 +65,7 @@ namespace Spatial4n.Tests.io
         {
             using (new TemporaryCulture(new CultureInfo("de-DE")))
             {
-                Shape s = ctx.ReadShape("Circle(1.23 4.56 distance=7.89)");
+                IShape s = ctx.ReadShape("Circle(1.23 4.56 distance=7.89)");
                 Assert.Equal(ctx.MakeCircle(1.23, 4.56, 7.89), s);
                 Assert.Equal(s, WriteThenRead(s, ctx));
                 Assert.Equal(s, ctx.ReadShape("CIRCLE( 4.56,1.23 d=7.89 )")); // use lat,lon and use 'd' abbreviation

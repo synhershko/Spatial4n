@@ -40,23 +40,23 @@ namespace Spatial4n.Core.Io
             this.ctx = ctx;
         }
 
-        public virtual Shape ReadShape(BinaryReader dataInput)
+        public virtual IShape ReadShape(BinaryReader dataInput)
         {
             byte type = dataInput.ReadByte();
-            Shape s = ReadShapeByTypeIfSupported(dataInput, (ShapeType)type);
+            IShape s = ReadShapeByTypeIfSupported(dataInput, (ShapeType)type);
             if (s == null)
                 throw new ArgumentException("Unsupported shape byte " + type);
             return s;
         }
 
-        public virtual void WriteShape(BinaryWriter dataOutput, Shape s)
+        public virtual void WriteShape(BinaryWriter dataOutput, IShape s)
         {
             bool written = WriteShapeByTypeIfSupported(dataOutput, s);
             if (!written)
                 throw new ArgumentException("Unsupported shape " + s.GetType());
         }
 
-        protected virtual Shape ReadShapeByTypeIfSupported(BinaryReader dataInput, ShapeType type)
+        protected virtual IShape ReadShapeByTypeIfSupported(BinaryReader dataInput, ShapeType type)
         {
             switch (type)
             {
@@ -69,7 +69,7 @@ namespace Spatial4n.Core.Io
         }
 
         /** Note: writes the type byte even if not supported */
-        protected virtual bool WriteShapeByTypeIfSupported(BinaryWriter dataOutput, Shape s)
+        protected virtual bool WriteShapeByTypeIfSupported(BinaryWriter dataOutput, IShape s)
         {
             ShapeType type = TypeForShape(s);
             dataOutput.Write((byte)type);
@@ -77,13 +77,13 @@ namespace Spatial4n.Core.Io
             //dataOutput.position(dataOutput.position() - 1);//reset putting type
         }
 
-        protected virtual bool WriteShapeByTypeIfSupported(BinaryWriter dataOutput, Shape s, ShapeType type)
+        protected virtual bool WriteShapeByTypeIfSupported(BinaryWriter dataOutput, IShape s, ShapeType type)
         {
             switch (type)
             {
-                case ShapeType.TYPE_POINT: WritePoint(dataOutput, (Point)s); break;
-                case ShapeType.TYPE_RECT: WriteRect(dataOutput, (Rectangle)s); break;
-                case ShapeType.TYPE_CIRCLE: WriteCircle(dataOutput, (Circle)s); break;
+                case ShapeType.TYPE_POINT: WritePoint(dataOutput, (IPoint)s); break;
+                case ShapeType.TYPE_RECT: WriteRect(dataOutput, (IRectangle)s); break;
+                case ShapeType.TYPE_CIRCLE: WriteCircle(dataOutput, (ICircle)s); break;
                 case ShapeType.TYPE_COLL: WriteCollection(dataOutput, (ShapeCollection)s); break;
                 default:
                     return false;
@@ -91,17 +91,17 @@ namespace Spatial4n.Core.Io
             return true;
         }
 
-        protected virtual ShapeType TypeForShape(Shape s)
+        protected virtual ShapeType TypeForShape(IShape s)
         {
-            if (s is Point)
+            if (s is IPoint)
             {
                 return ShapeType.TYPE_POINT;
             }
-            else if (s is Rectangle)
+            else if (s is IRectangle)
             {
                 return ShapeType.TYPE_RECT;
             }
-            else if (s is Circle)
+            else if (s is ICircle)
             {
                 return ShapeType.TYPE_CIRCLE;
             }
@@ -125,23 +125,23 @@ namespace Spatial4n.Core.Io
             dataOutput.Write(v);
         }
 
-        public virtual Point ReadPoint(BinaryReader dataInput)
+        public virtual IPoint ReadPoint(BinaryReader dataInput)
         {
             return ctx.MakePoint(ReadDim(dataInput), ReadDim(dataInput));
         }
 
-        public virtual void WritePoint(BinaryWriter dataOutput, Point pt)
+        public virtual void WritePoint(BinaryWriter dataOutput, IPoint pt)
         {
             WriteDim(dataOutput, pt.GetX());
             WriteDim(dataOutput, pt.GetY());
         }
 
-        public virtual Rectangle ReadRect(BinaryReader dataInput)
+        public virtual IRectangle ReadRect(BinaryReader dataInput)
         {
             return ctx.MakeRectangle(ReadDim(dataInput), ReadDim(dataInput), ReadDim(dataInput), ReadDim(dataInput));
         }
 
-        public virtual void WriteRect(BinaryWriter dataOutput, Rectangle r)
+        public virtual void WriteRect(BinaryWriter dataOutput, IRectangle r)
         {
             WriteDim(dataOutput, r.GetMinX());
             WriteDim(dataOutput, r.GetMaxX());
@@ -149,12 +149,12 @@ namespace Spatial4n.Core.Io
             WriteDim(dataOutput, r.GetMaxY());
         }
 
-        public virtual Circle ReadCircle(BinaryReader dataInput)
+        public virtual ICircle ReadCircle(BinaryReader dataInput)
         {
             return ctx.MakeCircle(ReadPoint(dataInput), ReadDim(dataInput));
         }
 
-        public void WriteCircle(BinaryWriter dataOutput, Circle c)
+        public void WriteCircle(BinaryWriter dataOutput, ICircle c)
         {
             WritePoint(dataOutput, c.GetCenter());
             WriteDim(dataOutput, c.GetRadius());
@@ -164,7 +164,7 @@ namespace Spatial4n.Core.Io
         {
             byte type = dataInput.ReadByte();
             int size = dataInput.ReadInt32();
-            List<Shape> shapes = new List<Shape>(size);
+            List<IShape> shapes = new List<IShape>(size);
             for (int i = 0; i < size; i++)
             {
                 if (type == 0)
@@ -173,7 +173,7 @@ namespace Spatial4n.Core.Io
                 }
                 else
                 {
-                    Shape s = ReadShapeByTypeIfSupported(dataInput, (ShapeType)type);
+                    IShape s = ReadShapeByTypeIfSupported(dataInput, (ShapeType)type);
                     if (s == null)
                         throw new InvalidShapeException("Unsupported shape byte " + type);
                     shapes.Add(s);
@@ -189,7 +189,7 @@ namespace Spatial4n.Core.Io
             dataOutput.Write(col.Count);
             for (int i = 0; i < col.Count; i++)
             {
-                Shape s = col[i];
+                IShape s = col[i];
                 if (type == 0)
                 {
                     WriteShape(dataOutput, s);

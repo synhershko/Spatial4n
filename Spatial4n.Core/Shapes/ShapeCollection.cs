@@ -15,7 +15,7 @@ namespace Spatial4n.Core.Shapes
     /// retained if an application requires it, although logically it's treated as an
     /// unordered Set, mostly.
     /// <para>
-    /// Ideally, <see cref="ShapeCollection{S}.Relate(Shapes.Shape)"/> should return the same result no matter what
+    /// Ideally, <see cref="ShapeCollection{S}.Relate(Shapes.IShape)"/> should return the same result no matter what
     /// the shape order is, although the default implementation can be order
     /// dependent when the shapes overlap; see <see cref="RelateContainsShortCircuits()"/>.
     /// To improve performance slightly, the caller could order the shapes by
@@ -31,18 +31,18 @@ namespace Spatial4n.Core.Shapes
     /// </para>
     /// </summary>
     /// <typeparam name="Shape"></typeparam>
-    public class ShapeCollection : ICollection<Shape>, Shape
+    public class ShapeCollection : ICollection<IShape>, IShape
     //where S : Shape
     {
-        protected readonly IList<Shape> shapes;
-        protected readonly Rectangle bbox;
+        protected readonly IList<IShape> shapes;
+        protected readonly IRectangle bbox;
 
         /**
          * WARNING: {@code shapes} is copied by reference.
          * @param shapes Copied by reference! (make a defensive copy if caller modifies)
          * @param ctx
          */
-        public ShapeCollection(IList<Shape> shapes, SpatialContext ctx)
+        public ShapeCollection(IList<IShape> shapes, SpatialContext ctx)
         {
             // TODO: Work out if there is a way to mimic this behavior (create a custom IRandomAccess?)
             //if (!(shapes is RandomAccess))
@@ -51,16 +51,16 @@ namespace Spatial4n.Core.Shapes
             this.bbox = ComputeBoundingBox(shapes, ctx);
         }
 
-        protected virtual Rectangle ComputeBoundingBox(ICollection<Shapes.Shape> shapes, SpatialContext ctx)
+        protected virtual IRectangle ComputeBoundingBox(ICollection<Shapes.IShape> shapes, SpatialContext ctx)
         {
             if (!shapes.Any())
                 return ctx.MakeRectangle(double.NaN, double.NaN, double.NaN, double.NaN);
             Range xRange = null;
             double minY = double.PositiveInfinity;
             double maxY = double.NegativeInfinity;
-            foreach (Shapes.Shape geom in shapes)
+            foreach (Shapes.IShape geom in shapes)
             {
-                Rectangle r = geom.GetBoundingBox();
+                IRectangle r = geom.GetBoundingBox();
 
                 Range xRange2 = Range.XRange(r, ctx);
                 if (xRange == null)
@@ -77,12 +77,12 @@ namespace Spatial4n.Core.Shapes
             return ctx.MakeRectangle(xRange.GetMin(), xRange.GetMax(), minY, maxY);
         }
 
-        public virtual IList<Shape> GetShapes()
+        public virtual IList<IShape> GetShapes()
         {
             return shapes;
         }
 
-        public Shape this[int index]
+        public IShape this[int index]
         {
             get
             {
@@ -95,12 +95,12 @@ namespace Spatial4n.Core.Shapes
             get { return shapes.Count; }
         }
 
-        public virtual Rectangle GetBoundingBox()
+        public virtual IRectangle GetBoundingBox()
         {
             return bbox;
         }
 
-        public virtual Point GetCenter()
+        public virtual IPoint GetCenter()
         {
             return bbox.GetCenter();
         }
@@ -108,7 +108,7 @@ namespace Spatial4n.Core.Shapes
 
         public virtual bool HasArea()
         {
-            foreach (Shapes.Shape geom in shapes)
+            foreach (Shapes.IShape geom in shapes)
             {
                 if (geom.HasArea())
                 {
@@ -119,10 +119,10 @@ namespace Spatial4n.Core.Shapes
         }
 
 
-        public virtual Shape GetBuffered(double distance, SpatialContext ctx)
+        public virtual IShape GetBuffered(double distance, SpatialContext ctx)
         {
-            List<Shapes.Shape> bufColl = new List<Shapes.Shape>(Count);
-            foreach (Shapes.Shape shape in shapes)
+            List<Shapes.IShape> bufColl = new List<Shapes.IShape>(Count);
+            foreach (Shapes.IShape shape in shapes)
             {
                 bufColl.Add(shape.GetBuffered(distance, ctx));
             }
@@ -130,16 +130,16 @@ namespace Spatial4n.Core.Shapes
         }
 
 
-        public virtual SpatialRelation Relate(Shape other)
+        public virtual SpatialRelation Relate(IShape other)
         {
             SpatialRelation bboxSect = bbox.Relate(other);
             if (bboxSect == SpatialRelation.DISJOINT || bboxSect == SpatialRelation.WITHIN)
                 return bboxSect;
 
-            bool containsWillShortCircuit = (other is Point) ||
+            bool containsWillShortCircuit = (other is IPoint) ||
                 RelateContainsShortCircuits();
             SpatialRelation? sect = null;
-            foreach (Shapes.Shape shape in shapes)
+            foreach (Shapes.IShape shape in shapes)
             {
                 SpatialRelation nextSect = shape.Relate(other);
 
@@ -189,16 +189,16 @@ namespace Spatial4n.Core.Shapes
          * assuming non-disjoint if shapes.size() > 10 or something.  And if all shapes
          * are a Point then the result of this method doesn't ultimately matter.
          */
-        protected static bool ComputeMutualDisjoint(IList<Shape> shapes)
+        protected static bool ComputeMutualDisjoint(IList<IShape> shapes)
         {
             //WARNING: this is an O(n^2) algorithm.
             //loop through each shape and see if it intersects any shape before it
             for (int i = 1; i < shapes.Count; i++)
             {
-                Shape shapeI = shapes[i];
+                IShape shapeI = shapes[i];
                 for (int j = 0; j < i; j++)
                 {
-                    Shape shapeJ = shapes[j];
+                    IShape shapeJ = shapes[j];
                     if (shapeJ.Relate(shapeI).Intersects())
                         return false;
                 }
@@ -210,7 +210,7 @@ namespace Spatial4n.Core.Shapes
         {
             double MAX_AREA = bbox.GetArea(ctx);
             double sum = 0;
-            foreach (Shapes.Shape geom in shapes)
+            foreach (Shapes.IShape geom in shapes)
             {
                 sum += geom.GetArea(ctx);
                 if (sum >= MAX_AREA)
@@ -226,7 +226,7 @@ namespace Spatial4n.Core.Shapes
             StringBuilder buf = new StringBuilder(100);
             buf.Append("ShapeCollection(");
             int i = 0;
-            foreach (Shape shape in shapes)
+            foreach (IShape shape in shapes)
             {
                 if (i++ > 0)
                     buf.Append(", ");
@@ -259,7 +259,7 @@ namespace Spatial4n.Core.Shapes
         private bool ValueEquals(ShapeCollection other)
         {
             var iter = other.GetEnumerator();
-            foreach (Shape value in this)
+            foreach (IShape value in this)
             {
                 iter.MoveNext();
                 if (!value.Equals(iter.Current))
@@ -275,7 +275,7 @@ namespace Spatial4n.Core.Shapes
             // Spatial4n NOTE: This was modified from the original implementation
             // to act like the collections of Java, which compare values rather than references.
             int hashCode = 31;
-            foreach (Shape value in this)
+            foreach (IShape value in this)
             {
                 if (value != null)
                 {
@@ -292,7 +292,7 @@ namespace Spatial4n.Core.Shapes
 
         #region ICollection<T>
 
-        public void Add(Shape item)
+        public void Add(IShape item)
         {
             shapes.Add(item);
         }
@@ -302,22 +302,22 @@ namespace Spatial4n.Core.Shapes
             shapes.Clear();
         }
 
-        public bool Contains(Shape item)
+        public bool Contains(IShape item)
         {
             return shapes.Contains(item);
         }
 
-        public void CopyTo(Shape[] array, int arrayIndex)
+        public void CopyTo(IShape[] array, int arrayIndex)
         {
             shapes.CopyTo(array, arrayIndex);
         }
 
-        public bool Remove(Shape item)
+        public bool Remove(IShape item)
         {
             return shapes.Remove(item);
         }
 
-        public IEnumerator<Shape> GetEnumerator()
+        public IEnumerator<IShape> GetEnumerator()
         {
             return shapes.GetEnumerator();
         }

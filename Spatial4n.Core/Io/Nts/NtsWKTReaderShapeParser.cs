@@ -22,7 +22,7 @@ namespace Spatial4n.Core.Io.Nts
         {
         }
 
-        public override Shape ParseIfSupported(string wktString)
+        public override IShape ParseIfSupported(string wktString)
         {
             return ParseIfSupported(wktString, new WKTReader(ctx.GetGeometryFactory()));
         }
@@ -33,7 +33,7 @@ namespace Spatial4n.Core.Io.Nts
          * @param reader <pre>new WKTReader(ctx.getGeometryFactory()))</pre>
          * @return Non-Null
          */
-        protected Shape ParseIfSupported(string str, WKTReader reader)
+        protected IShape ParseIfSupported(string str, WKTReader reader)
         {
             try
             {

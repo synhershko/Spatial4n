@@ -95,7 +95,7 @@ namespace Spatial4n.Tests.shape
             //within base: differs from base by one point is within
             NtsGeometry polyW = (NtsGeometry)ctx.ReadShapeFromWkt("POLYGON((0 0, 9 0, 5 5, 0 0))");
             //a boundary point of base
-            Point pointB = ctx.MakePoint(0, 0);
+            Core.Shapes.IPoint pointB = ctx.MakePoint(0, 0);
             //a shared boundary line of base
             NtsGeometry lineB = (NtsGeometry)ctx.ReadShapeFromWkt("LINESTRING(0 0, 10 0)");
             //a line sharing only one point with base
@@ -116,7 +116,7 @@ namespace Spatial4n.Tests.shape
         [Fact]
         public virtual void TestEmpty()
         {
-            Shape emptyGeom = ctx.ReadShapeFromWkt("POLYGON EMPTY");
+            IShape emptyGeom = ctx.ReadShapeFromWkt("POLYGON EMPTY");
             TestEmptiness(emptyGeom);
             AssertRelation("EMPTY", SpatialRelation.DISJOINT, emptyGeom, POLY_SHAPE);
         }
@@ -125,7 +125,7 @@ namespace Spatial4n.Tests.shape
         public virtual void TestArea()
         {
             //simple bbox
-            Rectangle r = RandomRectangle(20);
+            IRectangle r = RandomRectangle(20);
             NtsSpatialContext ctxNts = (NtsSpatialContext)ctx;
             NtsGeometry rPoly = ctxNts.MakeShape(ctxNts.GetGeometryFrom(r), false, false);
             CustomAssert.EqualWithDelta(r.GetArea(null), rPoly.GetArea(null), 0.0);
@@ -142,7 +142,7 @@ namespace Spatial4n.Tests.shape
         [RepeatTest(100)]
         public virtual void TestPointAndRectIntersect()
         {
-            Rectangle r = RandomRectangle(5);
+            IRectangle r = RandomRectangle(5);
 
             AssertNtsConsistentRelate(r);
             AssertNtsConsistentRelate(r.GetCenter());
@@ -168,28 +168,28 @@ namespace Spatial4n.Tests.shape
             CustomAssert.EqualWithDelta(161 + 20, ntsGeo.GetBoundingBox().GetWidth(), 0.001);
         }
 
-        private void AssertNtsConsistentRelate(Shape shape)
+        private void AssertNtsConsistentRelate(IShape shape)
         {
             IntersectionMatrix expectedM = POLY_SHAPE.GetGeom().Relate(((NtsSpatialContext)ctx).GetGeometryFrom(shape));
             SpatialRelation expectedSR = NtsGeometry.IntersectionMatrixToSpatialRelation(expectedM);
             //NTS considers a point on a boundary INTERSECTS, not CONTAINS
-            if (expectedSR == SpatialRelation.INTERSECTS && shape is Point)
+            if (expectedSR == SpatialRelation.INTERSECTS && shape is Core.Shapes.IPoint)
                 expectedSR = SpatialRelation.CONTAINS;
             AssertRelation(null, expectedSR, POLY_SHAPE, shape);
 
             if (ctx.IsGeo())
             {
                 //shift shape, set to shape2
-                Shape shape2;
-                if (shape is Rectangle)
+                IShape shape2;
+                if (shape is IRectangle)
                 {
-                    Rectangle r = (Rectangle)shape;
+                    IRectangle r = (IRectangle)shape;
                     shape2 = MakeNormRect(r.GetMinX() + DL_SHIFT, r.GetMaxX() + DL_SHIFT, r.GetMinY(), r.GetMaxY());
                 }
-                else if (shape is Point)
+                else if (shape is Core.Shapes.IPoint)
                 {
-                    Point p = (Point)shape;
-                    shape2 = ctx.MakePoint(NormX(p.GetX() + DL_SHIFT), p.GetY());
+                    Core.Shapes.IPoint p = (Core.Shapes.IPoint)shape;
+                    shape2 = ctx.MakePoint(base.NormX(p.GetX() + DL_SHIFT), p.GetY());
                 }
                 else
                 {
@@ -222,7 +222,7 @@ namespace Spatial4n.Tests.shape
 
             NtsSpatialContext ctx = (NtsSpatialContext)factory.NewSpatialContext();
 
-            Shape shape = ctx.ReadShapeFromWkt(wktStr);
+            IShape shape = ctx.ReadShapeFromWkt(wktStr);
             //System.out.println("Russia Area: "+shape.getArea(ctx));
         }
 
@@ -236,7 +236,7 @@ namespace Spatial4n.Tests.shape
             factory.normWrapLongitude = true;
             NtsSpatialContext ctx = (NtsSpatialContext)factory.NewSpatialContext();
 
-            Shape shape = ctx.ReadShapeFromWkt(wktStr);
+            IShape shape = ctx.ReadShapeFromWkt(wktStr);
 
             AssertRelation(null, SpatialRelation.CONTAINS, shape,
                     ctx.MakePoint(-179.99, -16.9));

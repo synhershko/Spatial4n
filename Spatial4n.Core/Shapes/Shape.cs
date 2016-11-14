@@ -30,7 +30,7 @@ namespace Spatial4n.Core.Shapes
     /// mutable. Mutating shape state is considered expert and should be done with care.
     /// </para>
     /// </summary>
-    public interface Shape
+    public interface IShape
     {
         /// <summary>
         /// Describe the relationship between the two objects.  For example
@@ -49,7 +49,7 @@ namespace Spatial4n.Core.Shapes
         /// </summary>
         /// <param name="other"></param>
         /// <returns></returns>
-        SpatialRelation Relate(Shape other);
+        SpatialRelation Relate(IShape other);
 
         /// <summary>
         /// Get the bounding box for this Shape. This means the shape is within the
@@ -58,7 +58,7 @@ namespace Spatial4n.Core.Shapes
         /// Postcondition: <code>this.getBoundingBox().relate(this) == CONTAINS</code>
         /// </summary>
         /// <returns></returns>
-        Rectangle GetBoundingBox(); // TODO: Make into property
+        IRectangle GetBoundingBox(); // TODO: Make into property
 
         /// <summary>
         /// Does the shape have area?  This will be false for points and lines. It will
@@ -85,7 +85,7 @@ namespace Spatial4n.Core.Shapes
         /// Postcondition: <code>this.relate(this.getCenter()) == CONTAINS</code>
         /// </summary>
         /// <returns></returns>
-        Point GetCenter();
+        IPoint GetCenter();
 
         /// <summary>
         /// Returns a buffered version of this shape.  The buffer is usually a
@@ -95,7 +95,7 @@ namespace Spatial4n.Core.Shapes
         /// <param name="distance"></param>
         /// <param name="ctx"></param>
         /// <returns>Not null, and the returned shape should contain the current shape.</returns>
-        Shape GetBuffered(double distance, SpatialContext ctx);
+        IShape GetBuffered(double distance, SpatialContext ctx);
 
         /// <summary>
         /// Shapes can be "empty", which is to say it exists nowhere. The underlying coordinates are

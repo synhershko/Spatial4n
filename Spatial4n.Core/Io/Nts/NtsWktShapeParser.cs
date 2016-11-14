@@ -60,7 +60,7 @@ namespace Spatial4n.Core.Io.Nts
             return datelineRule;
         }
 
-        protected internal override Shape ParseShapeByType(WktShapeParser.State state, string shapeType)
+        protected internal override IShape ParseShapeByType(WktShapeParser.State state, string shapeType)
         {
             if (shapeType.Equals("POLYGON", StringComparison.OrdinalIgnoreCase))
             {
@@ -76,13 +76,13 @@ namespace Spatial4n.Core.Io.Nts
         /** Bypasses {@link NtsSpatialContext#makeLineString(java.util.List)} so that we can more
          * efficiently get the LineString without creating a {@code List<Point>}.
          */
-        protected override Shape ParseLineStringShape(WktShapeParser.State state)
+        protected override IShape ParseLineStringShape(WktShapeParser.State state)
         {
             if (!ctx.UseNtsLineString)
                 return base.ParseLineStringShape(state);
 
             if (state.NextIfEmptyAndSkipZM())
-                return ctx.MakeLineString(new List<Shapes.Point>());
+                return ctx.MakeLineString(new List<Shapes.IPoint>());
 
             GeometryFactory geometryFactory = ctx.GetGeometryFactory();
 
@@ -97,7 +97,7 @@ namespace Spatial4n.Core.Io.Nts
          *   coordinateSequenceList
          * </pre>
          */
-        protected virtual Shape ParsePolygonShape(WktShapeParser.State state)
+        protected virtual IShape ParsePolygonShape(WktShapeParser.State state)
         {
             IGeometry geometry;
             if (state.NextIfEmptyAndSkipZM())
@@ -118,7 +118,7 @@ namespace Spatial4n.Core.Io.Nts
             return MakeShapeFromGeometry(geometry);
         }
 
-        protected Rectangle MakeRectFromPoly(IGeometry geometry)
+        protected IRectangle MakeRectFromPoly(IGeometry geometry)
         {
             Debug.Assert(geometry.IsRectangle);
             Envelope env = geometry.EnvelopeInternal;
@@ -171,12 +171,12 @@ namespace Spatial4n.Core.Io.Nts
          *   '(' polygon (',' polygon )* ')'
          * </pre>
          */
-        protected Shape ParseMulitPolygonShape(WktShapeParser.State state)
+        protected IShape ParseMulitPolygonShape(WktShapeParser.State state)
         {
             if (state.NextIfEmptyAndSkipZM())
-                return ctx.MakeCollection(new List<Shape>());
+                return ctx.MakeCollection(new List<IShape>());
 
-            List<Shape> polygons = new List<Shape>();
+            List<IShape> polygons = new List<IShape>();
             state.NextExpect('(');
             do
             {

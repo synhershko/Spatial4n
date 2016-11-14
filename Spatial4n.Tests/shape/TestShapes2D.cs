@@ -18,7 +18,7 @@ namespace Spatial4n.Tests.shape
 		{
 			get
 			{
-                Rectangle WB = new RectangleImpl(-2000, 2000, -300, 300, null);//whatever
+                IRectangle WB = new RectangleImpl(-2000, 2000, -300, 300, null);//whatever
 				yield return new object[] { new SpatialContextFactory() { geo = false, worldBounds = WB }.NewSpatialContext() };
 				yield return new object[] { new NtsSpatialContextFactory() { geo = false, worldBounds = WB }.NewSpatialContext() };
 			}
@@ -38,17 +38,17 @@ namespace Spatial4n.Tests.shape
 		    Assert.Throws<InvalidShapeException>(() => ctx.MakePoint(2001, 0));
 		    Assert.Throws<InvalidShapeException>(() => ctx.MakePoint(0, -301));
 
-			Point pt = ctx.MakePoint(0, 0);
+			IPoint pt = ctx.MakePoint(0, 0);
 			string msg = pt.ToString();
 
 			//test equals & hashcode
-			Point pt2 = ctx.MakePoint(0, 0);
+			IPoint pt2 = ctx.MakePoint(0, 0);
 			Assert.Equal(/*msg,*/ pt, pt2);
 			Assert.Equal(/*msg,*/ pt.GetHashCode(), pt2.GetHashCode());
 
 			Assert.False(pt.HasArea(), msg);
 			Assert.Equal(/*msg,*/ pt.GetCenter(), pt);
-			Rectangle bbox = pt.GetBoundingBox();
+			IRectangle bbox = pt.GetBoundingBox();
 			Assert.False(bbox.HasArea(), msg);
 			
 			var center = bbox.GetCenter();
@@ -94,7 +94,7 @@ namespace Spatial4n.Tests.shape
 				}
 			}
 
-            Rectangle r = ctx.MakeRectangle(0, 0, 0, 0);
+            IRectangle r = ctx.MakeRectangle(0, 0, 0, 0);
             r.Reset(1, 2, 3, 4);
             Assert.Equal(ctx.MakeRectangle(1, 2, 3, 4), r);
 
@@ -140,8 +140,8 @@ namespace Spatial4n.Tests.shape
 
         public static void TestCircleReset(SpatialContext ctx)
         {
-            Circle c = ctx.MakeCircle(3, 4, 5);
-            Circle c2 = ctx.MakeCircle(5, 6, 7);
+            ICircle c = ctx.MakeCircle(3, 4, 5);
+            ICircle c2 = ctx.MakeCircle(5, 6, 7);
             c2.Reset(3, 4, 5); // to c1
             Assert.Equal(c, c2);
             Assert.Equal(c.GetBoundingBox(), c2.GetBoundingBox());
@@ -155,7 +155,7 @@ namespace Spatial4n.Tests.shape
 
             //see BufferedLineStringTest & BufferedLineTest for more
 
-            TestEmptiness(ctx.MakeBufferedLineString(new List<Point>(), random.Next(3+1)));
+            TestEmptiness(ctx.MakeBufferedLineString(new List<IPoint>(), random.Next(3+1)));
         }
 
         [Fact]

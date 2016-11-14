@@ -26,7 +26,7 @@ namespace Spatial4n.Tests.io
         [Fact]
         public virtual void WktGeoPt()
         {
-            Shape s = ctx.ReadShape("Point(-160 30)");
+            IShape s = ctx.ReadShape("Point(-160 30)");
             Assert.Equal(ctx.MakePoint(-160, 30), s);
         }
 
@@ -39,13 +39,13 @@ namespace Spatial4n.Tests.io
             // In these two tests, we give the same set of points, one that does not cross the dateline, and the 2nd does. The
             // order is counter-clockwise in both cases as it should be.
 
-            Shape sNoDL = ctx.ReadShape("Polygon((-170 30, -170 15,  160 15,  160 30, -170 30))");
-            Rectangle expectedNoDL = ctx.MakeRectangle(-170, 160, 15, 30);
+            IShape sNoDL = ctx.ReadShape("Polygon((-170 30, -170 15,  160 15,  160 30, -170 30))");
+            IRectangle expectedNoDL = ctx.MakeRectangle(-170, 160, 15, 30);
             Assert.True(!expectedNoDL.GetCrossesDateLine());
             Assert.Equal(expectedNoDL, sNoDL);
 
-            Shape sYesDL = ctx.ReadShape("Polygon(( 160 30,  160 15, -170 15, -170 30,  160 30))");
-            Rectangle expectedYesDL = ctx.MakeRectangle(160, -170, 15, 30);
+            IShape sYesDL = ctx.ReadShape("Polygon(( 160 30,  160 15, -170 15, -170 30,  160 30))");
+            IRectangle expectedYesDL = ctx.MakeRectangle(160, -170, 15, 30);
             Assert.True(expectedYesDL.GetCrossesDateLine());
             Assert.Equal(expectedYesDL, sYesDL);
 

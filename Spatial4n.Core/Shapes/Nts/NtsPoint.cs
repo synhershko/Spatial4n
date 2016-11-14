@@ -26,7 +26,7 @@ namespace Spatial4n.Core.Shapes.Nts
     /// <summary>
     /// Wraps a <see cref="NetTopologySuite.Geometries.Point"/> {@link com.vividsolutions.jts.geom.Point}.
     /// </summary>
-    public class NtsPoint : Point
+    public class NtsPoint : IPoint
     {
         private readonly SpatialContext ctx;
         private readonly GeoAPI.Geometries.IPoint pointGeom;
@@ -54,7 +54,7 @@ namespace Spatial4n.Core.Shapes.Nts
             get { return empty; }
         }
 
-        public virtual Spatial4n.Core.Shapes.Point GetCenter()
+        public virtual Spatial4n.Core.Shapes.IPoint GetCenter()
         {
             return this;
         }
@@ -69,22 +69,22 @@ namespace Spatial4n.Core.Shapes.Nts
             return 0;
         }
 
-        public virtual Rectangle GetBoundingBox()
+        public virtual IRectangle GetBoundingBox()
         {
             return ctx.MakeRectangle(this, this);
         }
 
-        public virtual Shape GetBuffered(double distance, SpatialContext ctx)
+        public virtual IShape GetBuffered(double distance, SpatialContext ctx)
         {
             return ctx.MakeCircle(this, distance);
         }
 
-        public virtual SpatialRelation Relate(Shape other)
+        public virtual SpatialRelation Relate(IShape other)
         {
             // ** NOTE ** the overall order of logic is kept consistent here with simple.PointImpl.
             if (IsEmpty || other.IsEmpty)
                 return SpatialRelation.DISJOINT;
-            if (other is Spatial4n.Core.Shapes.Point)
+            if (other is Spatial4n.Core.Shapes.IPoint)
                 return this.Equals(other) ? SpatialRelation.INTERSECTS : SpatialRelation.DISJOINT;
             return other.Relate(this).Transpose();
         }

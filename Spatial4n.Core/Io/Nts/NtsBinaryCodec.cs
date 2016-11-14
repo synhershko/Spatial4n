@@ -41,7 +41,7 @@ namespace Spatial4n.Core.Io.Nts
                 base.WriteDim(dataOutput, v);
         }
 
-        protected override ShapeType TypeForShape(Shape s)
+        protected override ShapeType TypeForShape(IShape s)
         {
             ShapeType type = base.TypeForShape(s);
             if (type == 0)
@@ -51,14 +51,14 @@ namespace Spatial4n.Core.Io.Nts
             return type;
         }
 
-        protected override Shape ReadShapeByTypeIfSupported(/*DataInput*/BinaryReader dataInput, /*byte*/ShapeType type)
+        protected override IShape ReadShapeByTypeIfSupported(/*DataInput*/BinaryReader dataInput, /*byte*/ShapeType type)
         {
             if (type != ShapeType.TYPE_GEOM)
                 return base.ReadShapeByTypeIfSupported(dataInput, type);
             return ReadNtsGeom(dataInput);
         }
 
-        protected override bool WriteShapeByTypeIfSupported(/*DataOutput*/BinaryWriter dataOutput, Shape s, /*byte*/ShapeType type)
+        protected override bool WriteShapeByTypeIfSupported(/*DataOutput*/BinaryWriter dataOutput, IShape s, /*byte*/ShapeType type)
         {
             if (type != ShapeType.TYPE_GEOM)
                 return base.WriteShapeByTypeIfSupported(dataOutput, s, type);
@@ -152,7 +152,7 @@ namespace Spatial4n.Core.Io.Nts
             }
         }
 
-        public Shape ReadNtsGeom(/*DataInput*/BinaryReader dataInput)
+        public IShape ReadNtsGeom(/*DataInput*/BinaryReader dataInput)
         {
             NtsSpatialContext ctx = (NtsSpatialContext)base.ctx;
             WKBReader reader = new WKBReader(ctx.GetGeometryFactory());
@@ -254,7 +254,7 @@ namespace Spatial4n.Core.Io.Nts
             }
         }
 
-        public void WriteNtsGeom(/*DataOutput*/BinaryWriter dataOutput, Shape s)
+        public void WriteNtsGeom(/*DataOutput*/BinaryWriter dataOutput, IShape s)
         {
             NtsSpatialContext ctx = (NtsSpatialContext)base.ctx;
             IGeometry geom = ctx.GetGeometryFrom(s);//might even translate it

@@ -168,7 +168,7 @@ namespace Spatial4n.Core.Distance
 		 * @param result A preallocated array to hold the results.  If null, a new one is constructed.
 		 * @return The destination point, in radians.  First entry is latitude, second is longitude
 		 */
-        public static Point PointOnBearingRAD(double startLat, double startLon, double distanceRAD, double bearingRAD, SpatialContext ctx, Point reuse)
+        public static IPoint PointOnBearingRAD(double startLat, double startLon, double distanceRAD, double bearingRAD, SpatialContext ctx, IPoint reuse)
         {
             /*
                lat2 = asin(sin(lat1)*cos(d/R) + cos(lat1)*sin(d/R)*cos(θ))
@@ -262,7 +262,7 @@ namespace Spatial4n.Core.Distance
             return (off <= 180 ? off : 360 - off) - 90;
         }
 
-        public static Rectangle CalcBoxByDistFromPtDEG(double lat, double lon, double distDEG, SpatialContext ctx, Rectangle reuse)
+        public static IRectangle CalcBoxByDistFromPtDEG(double lat, double lon, double distDEG, SpatialContext ctx, IRectangle reuse)
         {
             //See http://janmatuschek.de/LatitudeLongitudeBoundingCoordinates Section 3.1, 3.2 and 3.3
             double minX;

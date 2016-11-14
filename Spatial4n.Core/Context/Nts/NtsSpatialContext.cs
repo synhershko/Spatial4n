@@ -25,7 +25,7 @@ using Spatial4n.Core.Exceptions;
 using Spatial4n.Core.Io;
 using Spatial4n.Core.Shapes;
 using Spatial4n.Core.Shapes.Nts;
-using Point = Spatial4n.Core.Shapes.Point;
+using IPoint = Spatial4n.Core.Shapes.IPoint;
 
 namespace Spatial4n.Core.Context.Nts
 {
@@ -96,7 +96,7 @@ namespace Spatial4n.Core.Context.Nts
             return geometryFactory.PrecisionModel.MakePrecise(y);
         }
 
-        public override string ToString(Shape shape)
+        public override string ToString(IShape shape)
         {
             //Note: this logic is from the defunct NtsShapeReadWriter
             if (shape is NtsGeometry)
@@ -109,12 +109,12 @@ namespace Spatial4n.Core.Context.Nts
         }
 
         /// <summary>
-        /// Gets a NTS <see cref="Geometry"/> for the given <see cref="Shape"/>. Some shapes hold a
+        /// Gets a NTS <see cref="Geometry"/> for the given <see cref="IShape"/>. Some shapes hold a
         /// NTS geometry whereas new ones must be created for the rest.
         /// </summary>
         /// <param name="shape">Not null</param>
         /// <returns>Not null</returns>
-        public virtual IGeometry GetGeometryFrom(Shape shape)
+        public virtual IGeometry GetGeometryFrom(IShape shape)
         {
             if (shape is NtsGeometry)
             {
@@ -125,13 +125,13 @@ namespace Spatial4n.Core.Context.Nts
                 return ((NtsPoint)shape).GetGeom();
             }
 
-            var point = shape as Shapes.Point;
+            var point = shape as Shapes.IPoint;
             if (point != null)
             {
                 return geometryFactory.CreatePoint(new Coordinate(point.GetX(), point.GetY()));
             }
 
-            var r = shape as Rectangle;
+            var r = shape as IRectangle;
             if (r != null)
             {
 
@@ -152,7 +152,7 @@ namespace Spatial4n.Core.Context.Nts
                 }
             }
 
-            var circle = shape as Circle;
+            var circle = shape as ICircle;
             if (circle != null)
             {
                 // TODO, this should maybe pick a bunch of points
@@ -180,7 +180,7 @@ namespace Spatial4n.Core.Context.Nts
             get { return useNtsPoint; }
         }
 
-        public override Point MakePoint(double x, double y)
+        public override IPoint MakePoint(double x, double y)
         {
             if (!UseNtsPoint)
                 return base.MakePoint(x, y);
@@ -202,7 +202,7 @@ namespace Spatial4n.Core.Context.Nts
             }
         }
 
-        public override Shape MakeLineString(IList<Point> points)
+        public override IShape MakeLineString(IList<IPoint> points)
         {
             if (!useNtsLineString)
                 return base.MakeLineString(points);
@@ -210,7 +210,7 @@ namespace Spatial4n.Core.Context.Nts
             Coordinate[] coords = new Coordinate[points.Count];
             for (int i = 0; i < coords.Length; i++)
             {
-                Shapes.Point p = points[i];
+                Shapes.IPoint p = points[i];
                 if (p is NtsPoint)
                 {
                     NtsPoint ntsPoint = (NtsPoint)p;

@@ -14,11 +14,11 @@ namespace Spatial4n.Core.Shapes.Impl
     /// a point. BufferedLine isn't yet aware of geodesics (e.g. the dateline); it operates in Euclidean
     /// space.
     /// </summary>
-    public class BufferedLine : Shape
+    public class BufferedLine : IShape
     {
-        private readonly Point pA, pB;
+        private readonly IPoint pA, pB;
         private readonly double buf;
-        private readonly Rectangle bbox;
+        private readonly IRectangle bbox;
         /**
          * the primary line; passes through pA & pB
          */
@@ -38,7 +38,7 @@ namespace Spatial4n.Core.Shapes.Impl
          * @param buf the buffer distance in degrees
          * @param ctx
          */
-        public BufferedLine(Point pA, Point pB, double buf, SpatialContext ctx)
+        public BufferedLine(IPoint pA, IPoint pB, double buf, SpatialContext ctx)
         {
             Debug.Assert(buf >= 0);//TODO support buf=0 via another class ?
 
@@ -130,7 +130,7 @@ namespace Spatial4n.Core.Shapes.Impl
                 }
 
             }
-            Rectangle bounds = ctx.GetWorldBounds();
+            IRectangle bounds = ctx.GetWorldBounds();
 
             bbox = ctx.MakeRectangle(
                 Math.Max(bounds.GetMinX(), minX),
@@ -145,7 +145,7 @@ namespace Spatial4n.Core.Shapes.Impl
         }
 
 
-        public virtual Shape GetBuffered(double distance, SpatialContext ctx)
+        public virtual IShape GetBuffered(double distance, SpatialContext ctx)
         {
             return new BufferedLine(pA, pB, buf + distance, ctx);
         }
@@ -155,7 +155,7 @@ namespace Spatial4n.Core.Shapes.Impl
          * whichever is farthest. It's useful to expand a buffer of a line segment when used in
          * a geospatial context to cover the desired area.
          */
-        public static double ExpandBufForLongitudeSkew(Point pA, Point pB,
+        public static double ExpandBufForLongitudeSkew(IPoint pA, IPoint pB,
                                                        double buf)
         {
             double absA = Math.Abs(pA.GetY());
@@ -170,16 +170,16 @@ namespace Spatial4n.Core.Shapes.Impl
         }
 
 
-        public virtual SpatialRelation Relate(Shape other)
+        public virtual SpatialRelation Relate(IShape other)
         {
-            if (other is Point)
-                return Contains((Point)other) ? SpatialRelation.CONTAINS : SpatialRelation.DISJOINT;
-            if (other is Rectangle)
-                return Relate((Rectangle)other);
+            if (other is IPoint)
+                return Contains((IPoint)other) ? SpatialRelation.CONTAINS : SpatialRelation.DISJOINT;
+            if (other is IRectangle)
+                return Relate((IRectangle)other);
             throw new NotSupportedException();
         }
 
-        public virtual SpatialRelation Relate(Rectangle r)
+        public virtual SpatialRelation Relate(IRectangle r)
         {
             //Check BBox for disjoint & within.
             SpatialRelation bboxR = bbox.Relate(r);
@@ -187,8 +187,8 @@ namespace Spatial4n.Core.Shapes.Impl
                 return bboxR;
             //Either CONTAINS, INTERSECTS, or DISJOINT
 
-            Point scratch = new PointImpl(0, 0, null);
-            Point prC = r.GetCenter();
+            IPoint scratch = new PointImpl(0, 0, null);
+            IPoint prC = r.GetCenter();
             SpatialRelation result = linePrimary.Relate(r, prC, scratch);
             if (result == SpatialRelation.DISJOINT)
                 return SpatialRelation.DISJOINT;
@@ -200,13 +200,13 @@ namespace Spatial4n.Core.Shapes.Impl
             return SpatialRelation.INTERSECTS;
         }
 
-        public virtual bool Contains(Point p)
+        public virtual bool Contains(IPoint p)
         {
             //TODO check bbox 1st?
             return linePrimary.Contains(p) && linePerp.Contains(p);
         }
 
-        public virtual Rectangle GetBoundingBox()
+        public virtual IRectangle GetBoundingBox()
         {
             return bbox;
         }
@@ -224,17 +224,17 @@ namespace Spatial4n.Core.Shapes.Impl
         }
 
 
-        public virtual Point GetCenter()
+        public virtual IPoint GetCenter()
         {
             return GetBoundingBox().GetCenter();
         }
 
-        public virtual Point GetA()
+        public virtual IPoint GetA()
         {
             return pA;
         }
 
-        public virtual Point GetB()
+        public virtual IPoint GetB()
         {
             return pB;
         }

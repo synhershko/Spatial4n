@@ -20,14 +20,14 @@ using Spatial4n.Core.Shapes;
 
 namespace Spatial4n.Core.Distance
 {
-    public abstract class AbstractDistanceCalculator : DistanceCalculator
+    public abstract class AbstractDistanceCalculator : IDistanceCalculator
     {
-        public double Distance(Point @from, Point to)
+        public double Distance(IPoint @from, IPoint to)
         {
             return Distance(from, to.GetX(), to.GetY());
         }
 
-        public virtual bool Within(Point from, double toX, double toY, double distance)
+        public virtual bool Within(IPoint from, double toX, double toY, double distance)
         {
             return Distance(from, toX, toY) <= distance;
         }
@@ -37,11 +37,11 @@ namespace Spatial4n.Core.Distance
             return GetType().Name;
         }
 
-        public abstract double Distance(Point from, double toX, double toY);
-        public abstract Point PointOnBearing(Point from, double distDEG, double bearingDEG, SpatialContext ctx, Point reuse);
-        public abstract Rectangle CalcBoxByDistFromPt(Point from, double distDEG, SpatialContext ctx, Rectangle reuse);
-        public abstract double CalcBoxByDistFromPt_yHorizAxisDEG(Point from, double distDEG, SpatialContext ctx);
-        public abstract double Area(Rectangle rect);
-        public abstract double Area(Circle circle);
+        public abstract double Distance(IPoint from, double toX, double toY);
+        public abstract IPoint PointOnBearing(IPoint from, double distDEG, double bearingDEG, SpatialContext ctx, IPoint reuse);
+        public abstract IRectangle CalcBoxByDistFromPt(IPoint from, double distDEG, SpatialContext ctx, IRectangle reuse);
+        public abstract double CalcBoxByDistFromPt_yHorizAxisDEG(IPoint from, double distDEG, SpatialContext ctx);
+        public abstract double Area(IRectangle rect);
+        public abstract double Area(ICircle circle);
     }
 }

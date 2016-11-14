@@ -22,7 +22,7 @@ namespace Spatial4n.Tests.distance
             EPS = 10e-4;
         }
 
-        private DistanceCalculator Dc()
+        private IDistanceCalculator Dc()
         {
             return ctx.GetDistCalc();
         }
@@ -31,7 +31,7 @@ namespace Spatial4n.Tests.distance
         public virtual void TestSomeDistances()
         {
             //See to verify: from http://www.movable-type.co.uk/scripts/latlong.html
-            Point ctr = PLL(0, 100);
+            IPoint ctr = PLL(0, 100);
             CustomAssert.EqualWithDelta(11100, Dc().Distance(ctr, PLL(10, 0)) * DistanceUtils.DEG_TO_KM, 3);
             double deg = Dc().Distance(ctr, PLL(10, -160));
             CustomAssert.EqualWithDelta(11100, deg * DistanceUtils.DEG_TO_KM, 3);
@@ -45,11 +45,11 @@ namespace Spatial4n.Tests.distance
             //first test regression
             {
                 double d = 6894.1 * DistanceUtils.KM_TO_DEG;
-                Point pCtr = PLL(-20, 84);
-                Point pTgt = PLL(-42, 15);
+                IPoint pCtr = PLL(-20, 84);
+                IPoint pTgt = PLL(-42, 15);
                 Assert.True(Dc().Distance(pCtr, pTgt) < d);
                 //since the pairwise distance is less than d, a bounding box from ctr with d should contain pTgt.
-                Rectangle r = Dc().CalcBoxByDistFromPt(pCtr, d, ctx, null);
+                IRectangle r = Dc().CalcBoxByDistFromPt(pCtr, d, ctx, null);
                 Assert.Equal(SpatialRelation.CONTAINS, r.Relate(pTgt));
                 CheckBBox(pCtr, d);
             }
@@ -74,19 +74,19 @@ namespace Spatial4n.Tests.distance
             {
                 double lat = -90 + random.NextDouble() * 180;
                 double lon = -180 + random.NextDouble() * 360;
-                Point ctr = ctx.MakePoint(lon, lat);
+                IPoint ctr = ctx.MakePoint(lon, lat);
                 double dist = MAXDIST * random.NextDouble();
                 CheckBBox(ctr, dist);
             }
         }
 
 
-        private void CheckBBox(Point ctr, double distKm)
+        private void CheckBBox(IPoint ctr, double distKm)
         {
             string msg = "ctr: " + ctr + " distKm: " + distKm;
             double dist = distKm * DistanceUtils.KM_TO_DEG;
 
-            Rectangle r = Dc().CalcBoxByDistFromPt(ctr, dist, ctx, null);
+            IRectangle r = Dc().CalcBoxByDistFromPt(ctr, dist, ctx, null);
             double horizAxisLat = Dc().CalcBoxByDistFromPt_yHorizAxisDEG(ctr, dist, ctx);
             if (!double.IsNaN(horizAxisLat))
                 Assert.True(r.RelateYRange(horizAxisLat, horizAxisLat).Intersects());
@@ -101,7 +101,7 @@ namespace Spatial4n.Tests.distance
             }
             else
             {
-                Point tPt = FindClosestPointOnVertToPoint(r.GetMinX(), r.GetMinY(), r.GetMaxY(), ctr);
+                IPoint tPt = FindClosestPointOnVertToPoint(r.GetMinX(), r.GetMinY(), r.GetMaxY(), ctr);
                 double calcDistKm = Dc().Distance(ctr, tPt) * DistanceUtils.DEG_TO_KM;
                 CustomAssert.EqualWithDelta(/*msg,*/ distKm, calcDistKm, EPS);
                 CustomAssert.EqualWithDelta(/*msg,*/ tPt.GetY(), horizAxisLat, EPS);
@@ -120,7 +120,7 @@ namespace Spatial4n.Tests.distance
                 CustomAssert.EqualWithDelta(/*msg,*/ distKm, botDistKm, EPS);
         }
 
-        private Point FindClosestPointOnVertToPoint(double lon, double lowLat, double highLat, Point ctr)
+        private IPoint FindClosestPointOnVertToPoint(double lon, double lowLat, double highLat, IPoint ctr)
         {
             //A binary search algorithm to find the point along the vertical lon between lowLat & highLat that is closest
             // to ctr, and returns the distance.
@@ -192,12 +192,12 @@ namespace Spatial4n.Tests.distance
         {
             for (int angDEG = 0; angDEG < 360; angDEG += random.Next(1, 20 + 1))
             {
-                Point c = ctx.MakePoint(
+                IPoint c = ctx.MakePoint(
                     DistanceUtils.NormLonDEG(random.Next(359 + 1)),
                     random.Next(-90, 90 + 1));
 
                 //0 distance means same point
-                Point p2 = Dc().PointOnBearing(c, 0, angDEG, ctx, null);
+                IPoint p2 = Dc().PointOnBearing(c, 0, angDEG, ctx, null);
                 Assert.Equal(c, p2);
 
                 p2 = Dc().PointOnBearing(c, distKm * DistanceUtils.KM_TO_DEG, angDEG, ctx, null);
@@ -300,7 +300,7 @@ namespace Spatial4n.Tests.distance
                 distRAD, 10e-5);
         }
 
-        private Point PLL(double lat, double lon)
+        private IPoint PLL(double lat, double lon)
         {
             return ctx.MakePoint(lon, lat);
         }
@@ -312,31 +312,31 @@ namespace Spatial4n.Tests.distance
             //surface of a sphere is 4 * pi * r^2
             double earthArea = 4 * Math.PI * radius * radius;
 
-            Circle c = ctx.MakeCircle(random.Next(-180, 180), random.Next(-90, 90),
+            ICircle c = ctx.MakeCircle(random.Next(-180, 180), random.Next(-90, 90),
                                       180); //180 means whole earth
             CustomAssert.EqualWithDelta(earthArea, c.GetArea(ctx), 1.0);
 
             CustomAssert.EqualWithDelta(earthArea, ctx.GetWorldBounds().GetArea(ctx), 1.0);
 
             //now check half earth
-            Circle cHalf = ctx.MakeCircle(c.GetCenter(), 90);
+            ICircle cHalf = ctx.MakeCircle(c.GetCenter(), 90);
             CustomAssert.EqualWithDelta(earthArea / 2, cHalf.GetArea(ctx), 1.0);
 
             //circle with same radius at +20 lat with one at -20 lat should have same area as well as bbox with same area
-            Circle c2 = ctx.MakeCircle(c.GetCenter(), 30);
-            Circle c3 = ctx.MakeCircle(c.GetCenter().GetX(), 20, 30);
+            ICircle c2 = ctx.MakeCircle(c.GetCenter(), 30);
+            ICircle c3 = ctx.MakeCircle(c.GetCenter().GetX(), 20, 30);
             CustomAssert.EqualWithDelta(c2.GetArea(ctx), c3.GetArea(ctx), 0.01);
-            Circle c3Opposite = ctx.MakeCircle(c.GetCenter().GetX(), -20, 30);
+            ICircle c3Opposite = ctx.MakeCircle(c.GetCenter().GetX(), -20, 30);
             CustomAssert.EqualWithDelta(c3.GetArea(ctx), c3Opposite.GetArea(ctx), 0.01);
             CustomAssert.EqualWithDelta(c3.GetBoundingBox().GetArea(ctx), c3Opposite.GetBoundingBox().GetArea(ctx), 0.01);
 
             //small shapes near the equator should have similar areas to euclidean rectangle
-            Rectangle smallRect = ctx.MakeRectangle(0, 1, 0, 1);
+            IRectangle smallRect = ctx.MakeRectangle(0, 1, 0, 1);
             CustomAssert.EqualWithDelta(1.0, smallRect.GetArea(null), 0.0);
             double smallDelta = smallRect.GetArea(null) - smallRect.GetArea(ctx);
             Assert.True(smallDelta > 0 && smallDelta < 0.0001);
 
-            Circle smallCircle = ctx.MakeCircle(0, 0, 1);
+            ICircle smallCircle = ctx.MakeCircle(0, 0, 1);
             smallDelta = smallCircle.GetArea(null) - smallCircle.GetArea(ctx);
             Assert.True(smallDelta > 0 && smallDelta < 0.0001);
 

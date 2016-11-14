@@ -45,7 +45,7 @@ namespace Spatial4n.Tests.io
             ctx.MakeShape(RandomGeometry(random.Next(3, 20)), false, false);
         }
 
-        protected override Shape RandomShape()
+        protected override IShape RandomShape()
         {
             if (random.Next(3) == 0)
             {

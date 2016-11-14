@@ -16,7 +16,7 @@ namespace Spatial4n.Core.Shapes.Impl
     {
         protected readonly double min, max;
 
-        public static Range XRange(Rectangle rect, SpatialContext ctx)
+        public static Range XRange(IRectangle rect, SpatialContext ctx)
         {
             if (ctx.IsGeo())
                 return new LongitudeRange(rect.GetMinX(), rect.GetMaxX());
@@ -24,7 +24,7 @@ namespace Spatial4n.Core.Shapes.Impl
                 return new Range(rect.GetMinX(), rect.GetMaxX());
         }
 
-        public static Range YRange(Rectangle rect, SpatialContext ctx)
+        public static Range YRange(IRectangle rect, SpatialContext ctx)
         {
             return new Range(rect.GetMinY(), rect.GetMaxY());
         }
@@ -112,7 +112,7 @@ namespace Spatial4n.Core.Shapes.Impl
             {
             }
 
-            public LongitudeRange(Rectangle r)
+            public LongitudeRange(IRectangle r)
                     : base(r.GetMinX(), r.GetMaxX())
             {
             }

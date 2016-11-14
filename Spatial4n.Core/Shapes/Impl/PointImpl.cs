@@ -24,7 +24,7 @@ namespace Spatial4n.Core.Shapes.Impl
     /// <summary>
     /// A basic 2D implementation of a Point.
     /// </summary>
-    public class PointImpl : Point
+    public class PointImpl : IPoint
     {
         private readonly SpatialContext ctx;
         private double x;
@@ -64,26 +64,26 @@ namespace Spatial4n.Core.Shapes.Impl
             return y;
         }
 
-        public virtual Rectangle GetBoundingBox()
+        public virtual IRectangle GetBoundingBox()
         {
             return ctx.MakeRectangle(this, this);
         }
 
-        public virtual Point GetCenter()
+        public virtual IPoint GetCenter()
         {
             return this;
         }
 
-        public virtual Shape GetBuffered(double distance, SpatialContext ctx)
+        public virtual IShape GetBuffered(double distance, SpatialContext ctx)
         {
             return ctx.MakeCircle(this, distance);
         }
 
-        public virtual SpatialRelation Relate(Shape other)
+        public virtual SpatialRelation Relate(IShape other)
         {
             if (IsEmpty || other.IsEmpty)
                 return SpatialRelation.DISJOINT;
-            if (other is Point)
+            if (other is IPoint)
                 return this.Equals(other) ? SpatialRelation.INTERSECTS : SpatialRelation.DISJOINT;
             return other.Relate(this).Transpose();
         }
@@ -114,14 +114,14 @@ namespace Spatial4n.Core.Shapes.Impl
         /// <param name="thiz"></param>
         /// <param name="o"></param>
         /// <returns></returns>
-        public static bool Equals(Point thiz, Object o)
+        public static bool Equals(IPoint thiz, Object o)
         {
             if (thiz == null)
                 throw new ArgumentNullException("thiz");
 
             if (thiz == o) return true;
 
-            var point = o as Point;
+            var point = o as IPoint;
             if (point == null) return false;
 
             return thiz.GetX().Equals(point.GetX()) && thiz.GetY().Equals(point.GetY());
@@ -137,7 +137,7 @@ namespace Spatial4n.Core.Shapes.Impl
         /// </summary>
         /// <param name="thiz"></param>
         /// <returns></returns>
-        public static int GetHashCode(Point thiz)
+        public static int GetHashCode(IPoint thiz)
         {
             if (thiz == null)
                 throw new ArgumentNullException("thiz");

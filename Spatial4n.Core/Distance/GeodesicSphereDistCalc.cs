@@ -28,7 +28,7 @@ namespace Spatial4n.Core.Distance
 	{
 		private readonly double radiusDEG = DistanceUtils.ToDegrees(1);//in degrees
 
-		public override Point PointOnBearing(Point @from, double distDEG, double bearingDEG, SpatialContext ctx, Point reuse)
+		public override IPoint PointOnBearing(IPoint @from, double distDEG, double bearingDEG, SpatialContext ctx, IPoint reuse)
 		{
             if (distDEG == 0)
             {
@@ -37,7 +37,7 @@ namespace Spatial4n.Core.Distance
                 reuse.Reset(from.GetX(), from.GetY());
                 return reuse;
             }
-            Point result = DistanceUtils.PointOnBearingRAD(
+            IPoint result = DistanceUtils.PointOnBearingRAD(
                 DistanceUtils.ToRadians(from.GetY()), DistanceUtils.ToRadians(from.GetX()),
                 DistanceUtils.ToRadians(distDEG),
                 DistanceUtils.ToRadians(bearingDEG), ctx, reuse);//output result is in radians
@@ -45,17 +45,17 @@ namespace Spatial4n.Core.Distance
             return result;
 		}
 
-		public override Rectangle CalcBoxByDistFromPt(Point from, double distDEG, SpatialContext ctx, Rectangle reuse)
+		public override IRectangle CalcBoxByDistFromPt(IPoint from, double distDEG, SpatialContext ctx, IRectangle reuse)
 		{
             return DistanceUtils.CalcBoxByDistFromPtDEG(from.GetY(), from.GetX(), distDEG, ctx, reuse);
 		}
 
-		public override double CalcBoxByDistFromPt_yHorizAxisDEG(Point from, double distDEG, SpatialContext ctx)
+		public override double CalcBoxByDistFromPt_yHorizAxisDEG(IPoint from, double distDEG, SpatialContext ctx)
 		{
 			return DistanceUtils.CalcBoxByDistFromPt_latHorizAxisDEG(from.GetY(), from.GetX(), distDEG);
 		}
 
-		public override double Area(Rectangle rect)
+		public override double Area(IRectangle rect)
 		{
 			//From http://mathforum.org/library/drmath/view/63767.html
 			double lat1 = DistanceUtils.ToRadians(rect.GetMinY());
@@ -65,7 +65,7 @@ namespace Spatial4n.Core.Distance
 					rect.GetWidth();
 		}
 
-		public override double Area(Circle circle)
+		public override double Area(ICircle circle)
 		{
 			//formula is a simplified case of area(rect).
 			double lat = DistanceUtils.ToRadians(90 - circle.GetRadius());
@@ -83,7 +83,7 @@ namespace Spatial4n.Core.Distance
 			return GetType().GetHashCode();
 		}
 
-		public override double Distance(Point @from, double toX, double toY)
+		public override double Distance(IPoint @from, double toX, double toY)
 		{
 			return DistanceUtils.ToDegrees(DistanceLatLonRAD(DistanceUtils.ToRadians(from.GetY()),
 				DistanceUtils.ToRadians(from.GetX()), DistanceUtils.ToRadians(toY), DistanceUtils.ToRadians(toX)));

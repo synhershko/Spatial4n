@@ -20,7 +20,7 @@ namespace Spatial4n.Core.Shapes
     /// <summary>
     /// A Point with X & Y coordinates.
     /// </summary>
-    public interface Point : Shape
+    public interface IPoint : IShape
     {
         /// <summary>
         /// Expert: Resets the state of this point given the arguments. This is a performance

@@ -27,7 +27,7 @@ namespace Spatial4n.Core.Shapes.Impl
     /// wrap-around. When minX > maxX, this will assume it is world coordinates that
     /// cross the date line using degrees. Immutable & threadsafe.
     /// </summary>
-    public class RectangleImpl : Rectangle
+    public class RectangleImpl : IRectangle
     {
         private readonly SpatialContext ctx;
         private double minX;
@@ -42,12 +42,12 @@ namespace Spatial4n.Core.Shapes.Impl
             Reset(minX, maxX, minY, maxY);
         }
 
-        public RectangleImpl(Point lowerLeft, Point upperRight, SpatialContext ctx)
+        public RectangleImpl(IPoint lowerLeft, IPoint upperRight, SpatialContext ctx)
             : this(lowerLeft.GetX(), upperRight.GetX(), lowerLeft.GetY(), upperRight.GetY(), ctx)
         {
         }
 
-        public RectangleImpl(Rectangle r, SpatialContext ctx)
+        public RectangleImpl(IRectangle r, SpatialContext ctx)
             : this(r.GetMinX(), r.GetMaxX(), r.GetMinY(), r.GetMaxY(), ctx)
         {
         }
@@ -67,7 +67,7 @@ namespace Spatial4n.Core.Shapes.Impl
             get { return double.IsNaN(minX); }
         }
 
-        public virtual /*Rectangle*/ Shape GetBuffered(double distance, SpatialContext ctx)
+        public virtual /*Rectangle*/ IShape GetBuffered(double distance, SpatialContext ctx)
         {
             if (ctx.IsGeo())
             {
@@ -98,7 +98,7 @@ namespace Spatial4n.Core.Shapes.Impl
             }
             else
             {
-                Rectangle worldBounds = ctx.GetWorldBounds();
+                IRectangle worldBounds = ctx.GetWorldBounds();
                 double newMinX = Math.Max(worldBounds.GetMinX(), minX - distance);
                 double newMaxX = Math.Min(worldBounds.GetMaxX(), maxX + distance);
                 double newMinY = Math.Max(worldBounds.GetMinY(), minY - distance);
@@ -166,21 +166,21 @@ namespace Spatial4n.Core.Shapes.Impl
             return minY;
         }
 
-        public virtual Rectangle GetBoundingBox()
+        public virtual IRectangle GetBoundingBox()
         {
             return this;
         }
 
-        public virtual SpatialRelation Relate(Shape other)
+        public virtual SpatialRelation Relate(IShape other)
         {
             if (IsEmpty || other.IsEmpty)
                 return SpatialRelation.DISJOINT;
-            var point = other as Point;
+            var point = other as IPoint;
             if (point != null)
             {
                 return Relate(point);
             }
-            var rectangle = other as Rectangle;
+            var rectangle = other as IRectangle;
             if (rectangle != null)
             {
                 return Relate(rectangle);
@@ -188,7 +188,7 @@ namespace Spatial4n.Core.Shapes.Impl
             return other.Relate(this).Transpose();
         }
 
-        public virtual SpatialRelation Relate(Point point)
+        public virtual SpatialRelation Relate(IPoint point)
         {
             if (point.GetY() > GetMaxY() || point.GetY() < GetMinY())
                 return SpatialRelation.DISJOINT;
@@ -223,7 +223,7 @@ namespace Spatial4n.Core.Shapes.Impl
             return SpatialRelation.CONTAINS;
         }
 
-        public virtual SpatialRelation Relate(Rectangle rect)
+        public virtual SpatialRelation Relate(IRectangle rect)
         {
             SpatialRelation yIntersect = RelateYRange(rect.GetMinY(), rect.GetMaxY());
             if (yIntersect == SpatialRelation.DISJOINT)
@@ -315,7 +315,7 @@ namespace Spatial4n.Core.Shapes.Impl
             return "Rect(minX=" + minX + ",maxX=" + maxX + ",minY=" + minY + ",maxY=" + maxY + ")";
         }
 
-        public virtual Point GetCenter()
+        public virtual IPoint GetCenter()
         {
             if (double.IsNaN(minX))
                 return ctx.MakePoint(double.NaN, double.NaN);
@@ -337,14 +337,14 @@ namespace Spatial4n.Core.Shapes.Impl
         /// <param name="thiz"></param>
         /// <param name="o"></param>
         /// <returns></returns>
-        public static bool Equals(Rectangle thiz, object o)
+        public static bool Equals(IRectangle thiz, object o)
         {
             if (thiz == null)
                 throw new ArgumentNullException("thiz");
 
             if (thiz == o) return true;
 
-            var rectangle = o as Rectangle;
+            var rectangle = o as IRectangle;
             if (rectangle == null) return false;
 
             return thiz.GetMaxX().Equals(rectangle.GetMaxX()) && thiz.GetMinX().Equals(rectangle.GetMinX()) &&
@@ -356,7 +356,7 @@ namespace Spatial4n.Core.Shapes.Impl
             return GetHashCode(this);
         }
 
-        public static int GetHashCode(Rectangle thiz)
+        public static int GetHashCode(IRectangle thiz)
         {
             if (thiz == null)
                 throw new ArgumentNullException("thiz");

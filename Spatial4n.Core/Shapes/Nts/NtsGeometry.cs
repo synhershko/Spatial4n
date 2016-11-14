@@ -37,14 +37,14 @@ namespace Spatial4n.Core.Shapes.Nts
     /// NTS's does a great deal of the hard work, but there is work here in handling
     /// dateline wrap.
     /// </summary>
-    public class NtsGeometry : Shape
+    public class NtsGeometry : IShape
     {
         /** System property boolean that can disable auto validation in an assert. */
         public static readonly string SYSPROP_ASSERT_VALIDATE = "spatial4n.NtsGeometry.assertValidate";
 
         private readonly IGeometry geom;//cannot be a direct instance of GeometryCollection as it doesn't support relate()
         private readonly bool _hasArea;
-        private readonly Rectangle bbox;
+        private readonly IRectangle bbox;
         protected readonly NtsSpatialContext ctx;
         protected IPreparedGeometry preparedGeometry;
         protected bool validated = false;
@@ -138,7 +138,7 @@ namespace Spatial4n.Core.Shapes.Nts
         /** Given {@code geoms} which has already been checked for being in world
         * bounds, return the minimal longitude range of the bounding box.
         */
-        protected Rectangle ComputeGeoBBox(IGeometry geoms)
+        protected IRectangle ComputeGeoBBox(IGeometry geoms)
         {
             if (geoms.IsEmpty)
                 return new RectangleImpl(double.NaN, double.NaN, double.NaN, double.NaN, ctx);
@@ -171,7 +171,7 @@ namespace Spatial4n.Core.Shapes.Nts
             }
         }
 
-        public virtual Shape GetBuffered(double distance, SpatialContext ctx)
+        public virtual IShape GetBuffered(double distance, SpatialContext ctx)
         {
             //TODO doesn't work correctly across the dateline. The buffering needs to happen
             // when it's transiently unrolled, prior to being sliced.
@@ -197,26 +197,26 @@ namespace Spatial4n.Core.Shapes.Nts
             //  estimate)
         }
 
-        public virtual Rectangle GetBoundingBox()
+        public virtual IRectangle GetBoundingBox()
         {
             return bbox;
         }
 
-        public virtual Point GetCenter()
+        public virtual IPoint GetCenter()
         {
             if (IsEmpty) //geom.getCentroid == null
                 return new NtsPoint(ctx.GetGeometryFactory().CreatePoint((Coordinate)null), ctx);
             return new NtsPoint((NetTopologySuite.Geometries.Point)geom.Centroid, ctx);
         }
 
-        public virtual SpatialRelation Relate(Shape other)
+        public virtual SpatialRelation Relate(IShape other)
         {
-            if (other is Point)
-                return Relate((Point)other);
-            else if (other is Rectangle)
-                return Relate((Rectangle)other);
-            else if (other is Circle)
-                return Relate((Circle)other);
+            if (other is IPoint)
+                return Relate((IPoint)other);
+            else if (other is IRectangle)
+                return Relate((IRectangle)other);
+            else if (other is ICircle)
+                return Relate((ICircle)other);
             else if (other is NtsGeometry)
                 return Relate((NtsGeometry)other);
             else if (other is BufferedLineString)
@@ -224,7 +224,7 @@ namespace Spatial4n.Core.Shapes.Nts
             return other.Relate(this).Transpose();
         }
 
-        public virtual SpatialRelation Relate(Point pt)
+        public virtual SpatialRelation Relate(IPoint pt)
         {
             if (!GetBoundingBox().Relate(pt).Intersects())
                 return SpatialRelation.DISJOINT;
@@ -236,7 +236,7 @@ namespace Spatial4n.Core.Shapes.Nts
             return Relate(ptGeom);//is point-optimized
         }
 
-        public virtual SpatialRelation Relate(Rectangle rectangle)
+        public virtual SpatialRelation Relate(IRectangle rectangle)
         {
             SpatialRelation bboxR = bbox.Relate(rectangle);
             if (bboxR == SpatialRelation.WITHIN || bboxR == SpatialRelation.DISJOINT)
@@ -245,7 +245,7 @@ namespace Spatial4n.Core.Shapes.Nts
             return Relate(ctx.GetGeometryFrom(rectangle));
         }
 
-        public virtual SpatialRelation Relate(Circle circle)
+        public virtual SpatialRelation Relate(ICircle circle)
         {
             SpatialRelation bboxR = bbox.Relate(circle);
             if (bboxR == SpatialRelation.WITHIN || bboxR == SpatialRelation.DISJOINT)

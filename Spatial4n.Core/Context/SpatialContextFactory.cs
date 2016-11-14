@@ -37,8 +37,8 @@ namespace Spatial4n.Core.Context
 
         /* These fields are public to make it easy to set them without bothering with setters. */
         public bool geo = true;
-        public DistanceCalculator distCalc;//defaults in SpatialContext c'tor based on geo
-        public Rectangle worldBounds;//defaults in SpatialContext c'tor based on geo
+        public IDistanceCalculator distCalc;//defaults in SpatialContext c'tor based on geo
+        public IRectangle worldBounds;//defaults in SpatialContext c'tor based on geo
 
         public bool normWrapLongitude = false;
 
@@ -180,7 +180,7 @@ namespace Spatial4n.Core.Context
 
             //kinda ugly we do this just to read a rectangle.  TODO refactor
             var ctx = NewSpatialContext();
-            worldBounds = (Rectangle)ctx.ReadShape(worldBoundsStr);//TODO use readShapeFromWkt
+            worldBounds = (IRectangle)ctx.ReadShape(worldBoundsStr);//TODO use readShapeFromWkt
         }
 
         /** Subclasses should simply construct the instance from the initialized configuration. */

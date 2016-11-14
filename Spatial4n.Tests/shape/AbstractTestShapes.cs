@@ -41,10 +41,10 @@ namespace Spatial4n.Tests.shape
             minX = NormX(minX);
             maxX = NormX(maxX);
 
-            Rectangle r = ctx.MakeRectangle(minX, maxX, minY, maxY);
+            IRectangle r = ctx.MakeRectangle(minX, maxX, minY, maxY);
 
             //test equals & hashcode of duplicate
-            Rectangle r2 = ctx.MakeRectangle(minX, maxX, minY, maxY);
+            IRectangle r2 = ctx.MakeRectangle(minX, maxX, minY, maxY);
             Assert.Equal(r, r2);
             Assert.Equal(r.GetHashCode(), r2.GetHashCode());
 
@@ -61,12 +61,12 @@ namespace Spatial4n.Tests.shape
 
             AssertEqualsRatio(msg, height, r.GetHeight());
             AssertEqualsRatio(msg, width, r.GetWidth());
-            Point center = r.GetCenter();
+            IPoint center = r.GetCenter();
             msg += " ctr:" + center;
             //System.out.println(msg);
             AssertRelation(msg, SpatialRelation.CONTAINS, r, center);
 
-            DistanceCalculator dc = ctx.GetDistCalc();
+            IDistanceCalculator dc = ctx.GetDistCalc();
             double dUR = dc.Distance(center, r.GetMaxX(), r.GetMaxY());
             double dLR = dc.Distance(center, r.GetMaxX(), r.GetMinY());
             double dUL = dc.Distance(center, r.GetMinX(), r.GetMaxY());
@@ -91,14 +91,14 @@ namespace Spatial4n.Tests.shape
             {
                 for (double right = left; right - left <= 360; right += INCR)
                 {
-                    Rectangle r = MakeNormRect(left, right, -Y, Y);
+                    IRectangle r = MakeNormRect(left, right, -Y, Y);
 
                     //test contains (which also tests within)
                     for (double left2 = left; left2 <= right; left2 += INCR)
                     {
                         for (double right2 = left2; right2 <= right; right2 += INCR)
                         {
-                            Rectangle r2 = MakeNormRect(left2, right2, -Y, Y);
+                            IRectangle r2 = MakeNormRect(left2, right2, -Y, Y);
                             AssertRelation(null, SpatialRelation.CONTAINS, r, r2);
 
                             //test point contains
@@ -115,7 +115,7 @@ namespace Spatial4n.Tests.shape
 
                         for (double right2 = left2; right2 - left < 360; right2 += INCR)
                         {
-                            Rectangle r2 = MakeNormRect(left2, right2, -Y, Y);
+                            IRectangle r2 = MakeNormRect(left2, right2, -Y, Y);
                             AssertRelation(null, SpatialRelation.DISJOINT, r, r2);
                         }
                     }
@@ -124,7 +124,7 @@ namespace Spatial4n.Tests.shape
                     {
                         for (double right2 = right + INCR; right2 - left < 360; right2 += INCR)
                         {
-                            Rectangle r2 = MakeNormRect(left2, right2, -Y, Y);
+                            IRectangle r2 = MakeNormRect(left2, right2, -Y, Y);
                             AssertRelation(null, SpatialRelation.INTERSECTS, r, r2);
                         }
                     }
@@ -135,16 +135,16 @@ namespace Spatial4n.Tests.shape
 
         protected virtual void TestCircle(double x, double y, double dist)
         {
-            Circle c = ctx.MakeCircle(x, y, dist);
+            ICircle c = ctx.MakeCircle(x, y, dist);
             String msg = c.ToString();
-            Circle c2 = ctx.MakeCircle(ctx.MakePoint(x, y), dist);
+            ICircle c2 = ctx.MakeCircle(ctx.MakePoint(x, y), dist);
             Assert.Equal(c, c2);
             Assert.Equal(c.GetHashCode(), c2.GetHashCode());
 
             Assert.Equal( /*msg,*/ dist > 0, c.HasArea());
             double area = c.GetArea(ctx);
             Assert.True(/*msg,*/ c.HasArea() == (area > 0.0));
-            Rectangle bbox = c.GetBoundingBox();
+            IRectangle bbox = c.GetBoundingBox();
             Assert.Equal( /*msg,*/ dist > 0, bbox.GetArea(ctx) > 0);
             Assert.True(area <= bbox.GetArea(ctx));
             if (!ctx.IsGeo())
@@ -163,7 +163,7 @@ namespace Spatial4n.Tests.shape
                 : base(ctx)
             { }
 
-            protected override Shape GenerateRandomShape(Point nearP)
+            protected override IShape GenerateRandomShape(IPoint nearP)
             {
                 double cX = RandomIntBetweenDivisible(-180, 179);
                 double cY = RandomIntBetweenDivisible(-90, 90);
@@ -171,21 +171,21 @@ namespace Spatial4n.Tests.shape
                 return ctx.MakeCircle(cX, cY, cR_dist);
             }
 
-            protected override Point RandomPointInEmptyShape(Shape shape)
+            protected override IPoint RandomPointInEmptyShape(IShape shape)
             {
                 return shape.GetCenter();
             }
 
-            protected override void OnAssertFail(/*AssertionError*/Exception e, /*Circle*/Shape shape, Rectangle r, SpatialRelation ic)
+            protected override void OnAssertFail(/*AssertionError*/Exception e, /*Circle*/IShape shape, IRectangle r, SpatialRelation ic)
             {
-                Circle s = shape as Circle;
+                ICircle s = shape as ICircle;
                 //Check if the circle's edge appears to coincide with the shape.
                 double radius = s.GetRadius();
                 if (radius == 180)
                     throw e;//if this happens, then probably a bug
                 if (radius == 0)
                 {
-                    Point p = s.GetCenter();
+                    IPoint p = s.GetCenter();
                     //if touches a side then don't throw
                     if (p.GetX() == r.GetMinX() || p.GetX() == r.GetMaxX()
                       || p.GetY() == r.GetMinY() || p.GetY() == r.GetMaxY())
@@ -224,12 +224,12 @@ namespace Spatial4n.Tests.shape
                 ctx.MakeRectangle(ctx.MakePoint(1, 2), ctx.MakePoint(3, 4)));
         }
 
-        protected virtual void TestEmptiness(Shape emptyShape)
+        protected virtual void TestEmptiness(IShape emptyShape)
         {
             Assert.True(emptyShape.IsEmpty);
-            Point emptyPt = emptyShape.GetCenter();
+            IPoint emptyPt = emptyShape.GetCenter();
             Assert.True(emptyPt.IsEmpty);
-            Rectangle emptyRect = emptyShape.GetBoundingBox();
+            IRectangle emptyRect = emptyShape.GetBoundingBox();
             Assert.True(emptyRect.IsEmpty);
             AssertEquals(emptyRect, emptyShape.GetBoundingBox());
             AssertEquals(emptyPt, emptyShape.GetCenter());

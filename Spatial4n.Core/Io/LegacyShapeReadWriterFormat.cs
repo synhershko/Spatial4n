@@ -41,30 +41,30 @@ namespace Spatial4n.Core.Io
          * @param shape Not null.
          * @return Not null.
          */
-        public static string WriteShape(Shape shape)
+        public static string WriteShape(IShape shape)
         {
             return WriteShape(shape, "0.000000");
         }
 
         /** Overloaded to provide a number format. */
-        public static string WriteShape(Shape shape, string numberFormat)
+        public static string WriteShape(IShape shape, string numberFormat)
         {
-            if (shape is Point)
+            if (shape is IPoint)
             {
-                Point point = (Point)shape;
+                IPoint point = (IPoint)shape;
                 return point.GetX().ToString(numberFormat, CultureInfo.InvariantCulture) + " " + point.GetY().ToString(numberFormat, CultureInfo.InvariantCulture);
             }
-            else if (shape is Rectangle)
+            else if (shape is IRectangle)
             {
-                Rectangle rect = (Rectangle)shape;
+                IRectangle rect = (IRectangle)shape;
                 return rect.GetMinX().ToString(numberFormat, CultureInfo.InvariantCulture) + " " +
                     rect.GetMinY().ToString(numberFormat, CultureInfo.InvariantCulture) + " " +
                     rect.GetMaxX().ToString(numberFormat, CultureInfo.InvariantCulture) + " " +
                     rect.GetMaxY().ToString(numberFormat, CultureInfo.InvariantCulture);
             }
-            else if (shape is Circle)
+            else if (shape is ICircle)
             {
-                Circle c = (Circle)shape;
+                ICircle c = (ICircle)shape;
                 return "Circle(" +
                     c.GetCenter().GetX().ToString(numberFormat, CultureInfo.InvariantCulture) + " " +
                     c.GetCenter().GetY().ToString(numberFormat, CultureInfo.InvariantCulture) + " " +
@@ -80,7 +80,7 @@ namespace Spatial4n.Core.Io
          * If the first character is not a letter then it's assumed to be a point or rectangle. If that
          * doesn't work out then an {@link com.spatial4j.core.exception.InvalidShapeException} is thrown.
          */
-        public static Shape ReadShapeOrNull(string str, SpatialContext ctx)
+        public static IShape ReadShapeOrNull(string str, SpatialContext ctx)
         {
             if (str == null || str.Length == 0)
             {
@@ -102,7 +102,7 @@ namespace Spatial4n.Core.Io
                         tokens = body.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
                         nextToken = 0;
                         string token = tokens[nextToken];
-                        Point pt;
+                        IPoint pt;
                         if (token.IndexOf(',') != -1)
                         {
                             pt = ReadLatCommaLonPoint(token, ctx);
@@ -169,7 +169,7 @@ namespace Spatial4n.Core.Io
         }
 
         /** Reads geospatial latitude then a comma then longitude. */
-        private static Point ReadLatCommaLonPoint(string value, SpatialContext ctx)
+        private static IPoint ReadLatCommaLonPoint(string value, SpatialContext ctx)
         {
             double[]
             latLon = ParseUtils.ParseLatitudeLongitude(value);

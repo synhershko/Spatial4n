@@ -36,9 +36,9 @@ namespace Spatial4n.Core.Io
          * @return Non-null Shape defined in the String
          * @throws ParseException Thrown if there is an error in the Shape definition
          */
-        public virtual Shape Parse(string wktString)
+        public virtual IShape Parse(string wktString)
         {
-            Shape shape = ParseIfSupported(wktString);//sets rawString & offset
+            IShape shape = ParseIfSupported(wktString);//sets rawString & offset
             if (shape != null)
                 return shape;
             string shortenedString = (wktString.Length <= 128 ? wktString : wktString.Substring(0, (128 - 3) - 0) + "...");
@@ -55,7 +55,7 @@ namespace Spatial4n.Core.Io
          * @return Shape, null if unknown / unsupported shape.
          * @throws ParseException Thrown if there is an error in the Shape definition
          */
-        public virtual Shape ParseIfSupported(string wktString)
+        public virtual IShape ParseIfSupported(string wktString)
         {
             State state = NewState(wktString);
             state.NextIfWhitespace();//leading
@@ -65,7 +65,7 @@ namespace Spatial4n.Core.Io
             if (!char.IsLetter(state.rawString[state.offset]))
                 return null;
             string shapeType = state.NextWord();
-            Shape result = null;
+            IShape result = null;
             try
             {
                 result = ParseShapeByType(state, shapeType);
@@ -115,7 +115,7 @@ namespace Spatial4n.Core.Io
          * @param shapeType Non-Null string; could have mixed case. The first character is a letter.
          * @return The shape or null if not supported / unknown.
          */
-        protected internal virtual Shape ParseShapeByType(State state, string shapeType)
+        protected internal virtual IShape ParseShapeByType(State state, string shapeType)
         {
             Debug.Assert(char.IsLetter(shapeType[0]), "Shape must start with letter: " + shapeType);
 
@@ -160,10 +160,10 @@ namespace Spatial4n.Core.Io
          * </pre>
          * Whereas 'number' is the distance to buffer the shape by.
          */
-        protected virtual Shape ParseBufferShape(State state)
+        protected virtual IShape ParseBufferShape(State state)
         {
             state.NextExpect('(');
-            Shape shape = Shape(state);
+            IShape shape = Shape(state);
             state.NextExpect(',');
             double distance = NormDist(state.NextDouble());
             state.NextExpect(')');
@@ -186,12 +186,12 @@ namespace Spatial4n.Core.Io
          *
          * @see #point(WktShapeParser.State)
          */
-        protected virtual Shape ParsePointShape(State state)
+        protected virtual IShape ParsePointShape(State state)
         {
             if (state.NextIfEmptyAndSkipZM())
                 return ctx.MakePoint(double.NaN, double.NaN);
             state.NextExpect('(');
-            Point coordinate = Point(state);
+            IPoint coordinate = Point(state);
             state.NextExpect(')');
             return coordinate;
         }
@@ -205,16 +205,16 @@ namespace Spatial4n.Core.Io
          *
          * @see #point(WktShapeParser.State)
          */
-        protected virtual Shape ParseMultiPointShape(State state)
+        protected virtual IShape ParseMultiPointShape(State state)
         {
             if (state.NextIfEmptyAndSkipZM())
-                return ctx.MakeCollection(new List<Shape>());
-            List<Shape> shapes = new List<Shape>();
+                return ctx.MakeCollection(new List<IShape>());
+            List<IShape> shapes = new List<IShape>();
             state.NextExpect('(');
             do
             {
                 bool openParen = state.NextIf('(');
-                Point coordinate = Point(state);
+                IPoint coordinate = Point(state);
                 if (openParen)
                     state.NextExpect(')');
                 shapes.Add(coordinate);
@@ -232,7 +232,7 @@ namespace Spatial4n.Core.Io
          *   '(' x1 ',' x2 ',' y2 ',' y1 ')'
          * </pre>
          */
-        protected virtual Shape ParseEnvelopeShape(State state)
+        protected virtual IShape ParseEnvelopeShape(State state)
         {
             //FYI no dimension or EMPTY
             state.NextExpect('(');
@@ -255,11 +255,11 @@ namespace Spatial4n.Core.Io
          *
          * @see #pointList(WktShapeParser.State)
          */
-        protected virtual Shape ParseLineStringShape(State state)
+        protected virtual IShape ParseLineStringShape(State state)
         {
             if (state.NextIfEmptyAndSkipZM())
-                return ctx.MakeLineString(new List<Point>());
-            List<Point> points = PointList(state);
+                return ctx.MakeLineString(new List<IPoint>());
+            List<IPoint> points = PointList(state);
             return ctx.MakeLineString(points);
         }
 
@@ -271,11 +271,11 @@ namespace Spatial4n.Core.Io
          *
          * @see #parseLineStringShape(com.spatial4j.core.io.WktShapeParser.State)
          */
-        protected virtual Shape ParseMultiLineStringShape(State state)
+        protected virtual IShape ParseMultiLineStringShape(State state)
         {
             if (state.NextIfEmptyAndSkipZM())
-                return ctx.MakeCollection(new List<Shape>());
-            List<Shape> shapes = new List<Shape>();
+                return ctx.MakeCollection(new List<IShape>());
+            List<IShape> shapes = new List<IShape>();
             state.NextExpect('(');
             do
             {
@@ -291,11 +291,11 @@ namespace Spatial4n.Core.Io
          *   '(' shape (',' shape )* ')'
          * </pre>
          */
-        protected virtual Shape ParseGeometryCollectionShape(State state)
+        protected virtual IShape ParseGeometryCollectionShape(State state)
         {
             if (state.NextIfEmptyAndSkipZM())
-                return ctx.MakeCollection(new List<Shape>());
-            List<Shape> shapes = new List<Shape>();
+                return ctx.MakeCollection(new List<IShape>());
+            List<IShape> shapes = new List<IShape>();
             state.NextExpect('(');
             do
             {
@@ -308,10 +308,10 @@ namespace Spatial4n.Core.Io
         /** Reads a shape from the current position, starting with the name of the shape. It
          * calls {@link #parseShapeByType(com.spatial4j.core.io.WktShapeParser.State, String)}
          * and throws an exception if the shape wasn't supported. */
-        protected virtual Shape Shape(State state)
+        protected virtual IShape Shape(State state)
         {
             string type = state.NextWord();
-            Shape shape = ParseShapeByType(state, type);
+            IShape shape = ParseShapeByType(state, type);
             if (shape == null)
                 throw new ParseException("Shape of type " + type + " is unknown", state.offset);
             return shape;
@@ -325,9 +325,9 @@ namespace Spatial4n.Core.Io
          *
          * @see #point(WktShapeParser.State)
          */
-        protected virtual List<Point> PointList(State state)
+        protected virtual List<IPoint> PointList(State state)
         {
-            List<Point> sequence = new List<Point>();
+            List<IPoint> sequence = new List<IPoint>();
             state.NextExpect('(');
             do
             {
@@ -344,7 +344,7 @@ namespace Spatial4n.Core.Io
          *   number number number*
          * </pre>
          */
-        protected virtual Point Point(State state)
+        protected virtual IPoint Point(State state)
         {
             double x = state.NextDouble();
             double y = state.NextDouble();

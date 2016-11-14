@@ -64,7 +64,7 @@ namespace Spatial4n.Tests.io
          *
          * @return Built polygon
          */
-        public virtual Shape Build()
+        public virtual IShape Build()
         {
             return new NtsGeometry(ToPolygon(), ctx, true, true);
         }

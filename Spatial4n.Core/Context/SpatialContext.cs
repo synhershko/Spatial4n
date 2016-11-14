@@ -47,8 +47,8 @@ namespace Spatial4n.Core.Context
 
         //These are non-null
         private readonly bool geo;
-        private readonly DistanceCalculator calculator;
-        private readonly Rectangle worldBounds;
+        private readonly IDistanceCalculator calculator;
+        private readonly IRectangle worldBounds;
 
         private readonly WktShapeParser wktShapeParser;
         private readonly BinaryCodec binaryCodec;
@@ -65,13 +65,13 @@ namespace Spatial4n.Core.Context
         /// <param name="calculator">Optional; defaults to Haversine or cartesian depending on units.</param>
         /// <param name="worldBounds">Optional; defaults to GEO_WORLDBOUNDS or MAX_WORLDBOUNDS depending on units.</param> 
         [Obsolete]
-        public SpatialContext(bool geo, DistanceCalculator calculator, Rectangle worldBounds)
+        public SpatialContext(bool geo, IDistanceCalculator calculator, IRectangle worldBounds)
             : this(InitFromLegacyConstructor(geo, calculator, worldBounds))
         { }
 
         private static SpatialContextFactory InitFromLegacyConstructor(bool geo,
-                                                                 DistanceCalculator calculator,
-                                                                 Rectangle worldBounds)
+                                                                 IDistanceCalculator calculator,
+                                                                 IRectangle worldBounds)
         {
             SpatialContextFactory factory = new SpatialContextFactory();
             factory.geo = geo;
@@ -95,7 +95,7 @@ namespace Spatial4n.Core.Context
             if (factory.distCalc == null)
             {
                 this.calculator = IsGeo()
-                        ? (DistanceCalculator)new GeodesicSphereDistCalc.Haversine()
+                        ? (IDistanceCalculator)new GeodesicSphereDistCalc.Haversine()
                         : new CartesianDistCalc();
             }
             else
@@ -104,7 +104,7 @@ namespace Spatial4n.Core.Context
             }
 
             //TODO remove worldBounds from Spatial4j: see Issue #55
-            Rectangle bounds = factory.worldBounds;
+            IRectangle bounds = factory.worldBounds;
             if (bounds == null)
             {
                 this.worldBounds = IsGeo()
@@ -129,19 +129,19 @@ namespace Spatial4n.Core.Context
             this.binaryCodec = factory.MakeBinaryCodec(this);
         }
 
-        public virtual DistanceCalculator GetDistCalc()
+        public virtual IDistanceCalculator GetDistCalc()
         {
             return calculator;
         }
 
         /** Convenience that uses {@link #getDistCalc()} */
-        public virtual double CalcDistance(Point p, double x2, double y2)
+        public virtual double CalcDistance(IPoint p, double x2, double y2)
         {
             return GetDistCalc().Distance(p, x2, y2);
         }
 
         /** Convenience that uses {@link #getDistCalc()} */
-        public virtual double CalcDistance(Point p, Point p2)
+        public virtual double CalcDistance(IPoint p, IPoint p2)
         {
             return GetDistCalc().Distance(p, p2);
         }
@@ -151,7 +151,7 @@ namespace Spatial4n.Core.Context
         /// Do *NOT* invoke reset() on this return type.
         /// </summary>
         /// <returns></returns>
-		public virtual Rectangle GetWorldBounds()
+		public virtual IRectangle GetWorldBounds()
         {
             return worldBounds;
         }
@@ -191,7 +191,7 @@ namespace Spatial4n.Core.Context
         /// <param name="x"></param>
         public virtual void VerifyX(double x)
         {
-            Rectangle bounds = GetWorldBounds();
+            IRectangle bounds = GetWorldBounds();
             if (x < bounds.GetMinX() || x > bounds.GetMaxX()) //NaN will pass
                 throw new InvalidShapeException("Bad X value " + x + " is not in boundary " + bounds);
         }
@@ -202,7 +202,7 @@ namespace Spatial4n.Core.Context
         /// <param name="y"></param>
         public virtual void VerifyY(double y)
         {
-            Rectangle bounds = GetWorldBounds();
+            IRectangle bounds = GetWorldBounds();
             if (y < bounds.GetMinY() || y > bounds.GetMaxY()) //NaN will pass
                 throw new InvalidShapeException("Bad Y value " + y + " is not in boundary " + bounds);
         }
@@ -213,7 +213,7 @@ namespace Spatial4n.Core.Context
         /// <param name="x"></param>
         /// <param name="y"></param>
         /// <returns></returns>
-        public virtual Point MakePoint(double x, double y)
+        public virtual IPoint MakePoint(double x, double y)
         {
             VerifyX(x);
             VerifyY(y);
@@ -226,7 +226,7 @@ namespace Spatial4n.Core.Context
         /// <param name="lowerLeft"></param>
         /// <param name="upperRight"></param>
         /// <returns></returns>
-        public virtual Rectangle MakeRectangle(Point lowerLeft, Point upperRight)
+        public virtual IRectangle MakeRectangle(IPoint lowerLeft, IPoint upperRight)
         {
             return MakeRectangle(lowerLeft.GetX(), upperRight.GetX(),
                             lowerLeft.GetY(), upperRight.GetY());
@@ -242,9 +242,9 @@ namespace Spatial4n.Core.Context
         /// <param name="minY"></param>
         /// <param name="maxY"></param>
         /// <returns></returns>
-        public virtual Rectangle MakeRectangle(double minX, double maxX, double minY, double maxY)
+        public virtual IRectangle MakeRectangle(double minX, double maxX, double minY, double maxY)
         {
-            Rectangle bounds = GetWorldBounds();
+            IRectangle bounds = GetWorldBounds();
             // Y
             if (minY < bounds.GetMinY() || maxY > bounds.GetMaxY()) //NaN will fail
                 throw new InvalidShapeException("Y values [" + minY + " to " + maxY + "] not in boundary " + bounds);
@@ -285,7 +285,7 @@ namespace Spatial4n.Core.Context
         /// <param name="y"></param>
         /// <param name="distance"></param>
         /// <returns></returns>
-        public virtual Circle MakeCircle(double x, double y, double distance)
+        public virtual ICircle MakeCircle(double x, double y, double distance)
         {
             return MakeCircle(MakePoint(x, y), distance);
         }
@@ -296,7 +296,7 @@ namespace Spatial4n.Core.Context
         /// <param name="point"></param>
         /// <param name="distance"></param>
         /// <returns></returns>
-        public virtual Circle MakeCircle(Point point, double distance)
+        public virtual ICircle MakeCircle(IPoint point, double distance)
         {
             if (distance < 0)
                 throw new InvalidShapeException("distance must be >= 0; got " + distance);
@@ -318,7 +318,7 @@ namespace Spatial4n.Core.Context
 
         /** Constructs a line string. It's an ordered sequence of connected vertexes. There
    * is no official shape/interface for it yet so we just return Shape. */
-        public virtual Shape MakeLineString(IList<Point> points)
+        public virtual IShape MakeLineString(IList<IPoint> points)
         {
             return new BufferedLineString(points, 0, false, this);
         }
@@ -326,13 +326,13 @@ namespace Spatial4n.Core.Context
         /** Constructs a buffered line string. It's an ordered sequence of connected vertexes,
          * with a buffer distance along the line in all directions. There
          * is no official shape/interface for it so we just return Shape. */
-        public virtual Shape MakeBufferedLineString(IList<Point> points, double buf)
+        public virtual IShape MakeBufferedLineString(IList<IPoint> points, double buf)
         {
             return new BufferedLineString(points, buf, IsGeo(), this);
         }
 
         /** Construct a ShapeCollection, analogous to an OGC GeometryCollection. */
-        public virtual ShapeCollection MakeCollection(IList<Shape> coll) //where S : Shape
+        public virtual ShapeCollection MakeCollection(IList<IShape> coll) //where S : Shape
         {
             return new ShapeCollection(coll, this);
         }
@@ -349,7 +349,7 @@ namespace Spatial4n.Core.Context
    * @return non-null
    * @throws ParseException if it failed to parse.
    */
-        public virtual Shape ReadShapeFromWkt(string wkt)
+        public virtual IShape ReadShapeFromWkt(string wkt)
         {
             return wktShapeParser.Parse(wkt);
         }
@@ -360,9 +360,9 @@ namespace Spatial4n.Core.Context
         }
 
         [Obsolete]
-        public virtual Shape ReadShape(string value)
+        public virtual IShape ReadShape(string value)
         {
-            Shape s = LegacyShapeReadWriterFormat.ReadShapeOrNull(value, this);
+            IShape s = LegacyShapeReadWriterFormat.ReadShapeOrNull(value, this);
             if (s == null)
             {
                 try
@@ -380,7 +380,7 @@ namespace Spatial4n.Core.Context
         }
 
         [Obsolete]
-        public virtual string ToString(Shape shape)
+        public virtual string ToString(IShape shape)
         {
             return LegacyShapeReadWriterFormat.WriteShape(shape);
         }

@@ -101,7 +101,7 @@ namespace Spatial4n.Tests.shape
             return ctx.IsGeo() ? DistanceUtils.NormLatDEG(y) : y;
         }
 
-        protected virtual Rectangle MakeNormRect(double minX, double maxX, double minY, double maxY)
+        protected virtual IRectangle MakeNormRect(double minX, double maxX, double minY, double maxY)
         {
             if (ctx.IsGeo())
             {
@@ -152,21 +152,21 @@ namespace Spatial4n.Tests.shape
         /** reset()'s p, and confines to world bounds. Might not be divisible if
          * the world bound isn't divisible too.
          */
-        protected virtual Point Divisible(Point p)
+        protected virtual IPoint Divisible(IPoint p)
         {
-            Rectangle bounds = ctx.GetWorldBounds();
+            IRectangle bounds = ctx.GetWorldBounds();
             double newX = BoundX(Divisible(p.GetX()), bounds);
             double newY = BoundY(Divisible(p.GetY()), bounds);
             p.Reset(newX, newY);
             return p;
         }
 
-        static double BoundX(double i, Rectangle bounds)
+        static double BoundX(double i, IRectangle bounds)
         {
             return Bound(i, bounds.GetMinX(), bounds.GetMaxX());
         }
 
-        static double BoundY(double i, Rectangle bounds)
+        static double BoundY(double i, IRectangle bounds)
         {
             return Bound(i, bounds.GetMinY(), bounds.GetMaxY());
         }
@@ -178,19 +178,19 @@ namespace Spatial4n.Tests.shape
             return i;
         }
 
-        protected virtual void AssertRelation(SpatialRelation expected, Shape a, Shape b)
+        protected virtual void AssertRelation(SpatialRelation expected, IShape a, IShape b)
         {
             AssertRelation(null, expected, a, b);
         }
 
-        protected virtual void AssertRelation(string msg, SpatialRelation expected, Shape a, Shape b)
+        protected virtual void AssertRelation(string msg, SpatialRelation expected, IShape a, IShape b)
         {
             AssertIntersect(msg, expected, a, b);
             //check flipped a & b w/ transpose(), while we're at it
             AssertIntersect(msg, expected.Transpose(), b, a);
         }
 
-        private void AssertIntersect(string msg, SpatialRelation expected, Shape a, Shape b)
+        private void AssertIntersect(string msg, SpatialRelation expected, IShape a, IShape b)
         {
             SpatialRelation sect = a.Relate(b);
             if (sect == expected)
@@ -206,8 +206,8 @@ namespace Spatial4n.Tests.shape
                     Assert.True(!a.HasArea(), msg);
                     Assert.True(!b.HasArea(), msg);
 
-                    Rectangle aBBox = a.GetBoundingBox();
-                    Rectangle bBBox = b.GetBoundingBox();
+                    IRectangle aBBox = a.GetBoundingBox();
+                    IRectangle bBBox = b.GetBoundingBox();
                     if (aBBox.GetHeight() == 0 && bBBox.GetHeight() == 0
                         && (aBBox.GetMaxY() == 90 && bBBox.GetMaxY() == 90
                       || aBBox.GetMinY() == -90 && bBBox.GetMinY() == -90))
@@ -249,9 +249,9 @@ namespace Spatial4n.Tests.shape
             return (r - 2 + divisStart) * divisible;
         }
 
-        protected virtual Rectangle RandomRectangle(Point nearP)
+        protected virtual IRectangle RandomRectangle(IPoint nearP)
         {
-            Rectangle bounds = ctx.GetWorldBounds();
+            IRectangle bounds = ctx.GetWorldBounds();
             if (nearP == null)
                 nearP = RandomPointIn(bounds);
 
@@ -285,7 +285,7 @@ namespace Spatial4n.Tests.shape
             return r;
         }
 
-        protected virtual Rectangle RandomRectangle(int divisible)
+        protected virtual IRectangle RandomRectangle(int divisible)
         {
             double rX = RandomIntBetweenDivisible(-180, 180, divisible);
             double rW = RandomIntBetweenDivisible(0, 360, divisible);
@@ -298,37 +298,37 @@ namespace Spatial4n.Tests.shape
             return MakeNormRect(rX, rX + rW, rYmin, rYmax);
         }
 
-        protected virtual Point RandomPoint()
+        protected virtual IPoint RandomPoint()
         {
             return RandomPointIn(ctx.GetWorldBounds());
         }
 
-        protected virtual Point RandomPointIn(Circle c)
+        protected virtual IPoint RandomPointIn(ICircle c)
         {
             double d = c.GetRadius() * random.NextDouble();
             double angleDEG = 360 * random.NextDouble();
-            Point p = ctx.GetDistCalc().PointOnBearing(c.GetCenter(), d, angleDEG, ctx, null);
+            IPoint p = ctx.GetDistCalc().PointOnBearing(c.GetCenter(), d, angleDEG, ctx, null);
             Assert.Equal(SpatialRelation.CONTAINS, c.Relate(p));
             return p;
         }
 
-        protected virtual Point RandomPointIn(Rectangle r)
+        protected virtual IPoint RandomPointIn(IRectangle r)
         {
             double x = r.GetMinX() + random.NextDouble() * r.GetWidth();
             double y = r.GetMinY() + random.NextDouble() * r.GetHeight();
             x = NormX(x);
             y = NormY(y);
-            Point p = ctx.MakePoint(x, y);
+            IPoint p = ctx.MakePoint(x, y);
             Assert.Equal(SpatialRelation.CONTAINS, r.Relate(p));
             return p;
         }
 
-        protected virtual Point RandomPointIn(Shape shape)
+        protected virtual IPoint RandomPointIn(IShape shape)
         {
             if (!shape.HasArea())// or try the center?
                 throw new InvalidOperationException("Need area to define shape!");
-            Rectangle bbox = shape.GetBoundingBox();
-            Point p;
+            IRectangle bbox = shape.GetBoundingBox();
+            IPoint p;
             do
             {
                 p = RandomPointIn(bbox);

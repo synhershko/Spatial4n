@@ -7,9 +7,9 @@ namespace Spatial4n.Tests.shape
 {
     public class RoundingDistCalc : AbstractDistanceCalculator 
     {
-        private readonly DistanceCalculator _delegate;
+        private readonly IDistanceCalculator _delegate;
 
-        public RoundingDistCalc(DistanceCalculator _delegate)
+        public RoundingDistCalc(IDistanceCalculator _delegate)
         {
             this._delegate = _delegate;
         }
@@ -20,32 +20,32 @@ namespace Spatial4n.Tests.shape
             return Math.Round(val*scale)/scale;
         }
 
-        public override double Distance(Point @from, double toX, double toY)
+        public override double Distance(IPoint @from, double toX, double toY)
         {
             return Round(_delegate.Distance(from, toX, toY));
         }
 
-        public override Point PointOnBearing(Point @from, double distDEG, double bearingDEG, SpatialContext ctx, Point reuse)
+        public override IPoint PointOnBearing(IPoint @from, double distDEG, double bearingDEG, SpatialContext ctx, IPoint reuse)
         {
             return _delegate.PointOnBearing(from, distDEG, bearingDEG, ctx, reuse);
         }
 
-        public override Rectangle CalcBoxByDistFromPt(Point @from, double distDEG, SpatialContext ctx, Rectangle reuse)
+        public override IRectangle CalcBoxByDistFromPt(IPoint @from, double distDEG, SpatialContext ctx, IRectangle reuse)
         {
             return _delegate.CalcBoxByDistFromPt(from, distDEG, ctx, reuse);
         }
 
-        public override double CalcBoxByDistFromPt_yHorizAxisDEG(Point @from, double distDEG, SpatialContext ctx)
+        public override double CalcBoxByDistFromPt_yHorizAxisDEG(IPoint @from, double distDEG, SpatialContext ctx)
         {
             return _delegate.CalcBoxByDistFromPt_yHorizAxisDEG(from, distDEG, ctx);
         }
 
-        public override double Area(Rectangle rect)
+        public override double Area(IRectangle rect)
         {
             return _delegate.Area(rect);
         }
 
-        public override double Area(Circle circle)
+        public override double Area(ICircle circle)
         {
             return _delegate.Area(circle);
         }

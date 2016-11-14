@@ -54,7 +54,7 @@ namespace Spatial4n.Tests.io
         public virtual void TestCollection()
         {
             ShapeCollection s = ctx.MakeCollection(
-                (new Shape[]
+                (new IShape[]
                 {
                 RandomShape(),
                 RandomShape(),
@@ -64,7 +64,7 @@ namespace Spatial4n.Tests.io
             AssertRoundTrip(s);
         }
 
-        protected virtual Shape Wkt(string wkt)
+        protected virtual IShape Wkt(string wkt)
         {
             try
             {
@@ -76,7 +76,7 @@ namespace Spatial4n.Tests.io
             }
         }
 
-        protected virtual Shape RandomShape()
+        protected virtual IShape RandomShape()
         {
             switch (random.Next(2))
             {//inclusive
@@ -87,7 +87,7 @@ namespace Spatial4n.Tests.io
             }
         }
 
-        protected virtual void AssertRoundTrip(Shape shape)
+        protected virtual void AssertRoundTrip(IShape shape)
         {
             try
             {

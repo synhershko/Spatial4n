@@ -27,14 +27,14 @@ namespace Spatial4n.Tests.shape
         private void ValidateWorld(double r1MinX, double r1MaxX, double r2MinX, double r2MaxX)
         {
             ctx = SpatialContext.GEO;
-            Rectangle r1 = ctx.MakeRectangle(r1MinX, r1MaxX, -10, 10);
-            Rectangle r2 = ctx.MakeRectangle(r2MinX, r2MaxX, -10, 10);
+            IRectangle r1 = ctx.MakeRectangle(r1MinX, r1MaxX, -10, 10);
+            IRectangle r2 = ctx.MakeRectangle(r2MinX, r2MaxX, -10, 10);
 
-            ShapeCollection/*<Rectangle>*/ s = new ShapeCollection/*<Rectangle>*/(new Shape[] { r1, r2 }, ctx);
+            ShapeCollection/*<Rectangle>*/ s = new ShapeCollection/*<Rectangle>*/(new IShape[] { r1, r2 }, ctx);
             Assert.Equal(Range.LongitudeRange.WORLD_180E180W, new Range.LongitudeRange(s.GetBoundingBox()));
 
             //flip r1, r2 order
-            s = new ShapeCollection/*<Rectangle>*/(new Shape[] { r2, r1 }, ctx);
+            s = new ShapeCollection/*<Rectangle>*/(new IShape[] { r2, r1 }, ctx);
             Assert.Equal(Range.LongitudeRange.WORLD_180E180W, new Range.LongitudeRange(s.GetBoundingBox()));
         }
 
@@ -62,10 +62,10 @@ namespace Spatial4n.Tests.shape
             {
             }
 
-            protected override /*ShapeCollection*/ Shape GenerateRandomShape(Point nearP)
+            protected override /*ShapeCollection*/ IShape GenerateRandomShape(IPoint nearP)
             {
                 //testLog.log("Break on nearP.toString(): {}", nearP);
-                List<Shape> shapes = new List<Shape>();
+                List<IShape> shapes = new List<IShape>();
                 int count = random.Next(1, 4 + 1);
                 for (int i = 0; i < count; i++)
                 {
@@ -75,14 +75,14 @@ namespace Spatial4n.Tests.shape
                 ShapeCollection shapeCollection = new ShapeCollection/*<Rectangle>*/(shapes, ctx);
 
                 //test shapeCollection.getBoundingBox();
-                Rectangle msBbox = shapeCollection.GetBoundingBox();
+                IRectangle msBbox = shapeCollection.GetBoundingBox();
                 if (shapes.Count == 1)
                 {
                     Assert.Equal(shapes[0], msBbox.GetBoundingBox());
                 }
                 else
                 {
-                    foreach (Rectangle shape in shapes)
+                    foreach (IRectangle shape in shapes)
                     {
                         AssertRelation("bbox contains shape", SpatialRelation.CONTAINS, msBbox, shape);
                     }
@@ -90,9 +90,9 @@ namespace Spatial4n.Tests.shape
                 return shapeCollection;
             }
 
-            protected override Point RandomPointInEmptyShape(/*ShapeCollection*/ Shape shape)
+            protected override IPoint RandomPointInEmptyShape(/*ShapeCollection*/ IShape shape)
             {
-                Rectangle r = (Rectangle)((ShapeCollection)shape).GetShapes()[0];
+                IRectangle r = (IRectangle)((ShapeCollection)shape).GetShapes()[0];
                 return RandomPointIn(r);
             }
         }

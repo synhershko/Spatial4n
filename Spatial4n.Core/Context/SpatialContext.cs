@@ -192,7 +192,7 @@ namespace Spatial4n.Core.Context
         public virtual void VerifyX(double x)
         {
             Rectangle bounds = GetWorldBounds();
-            if (x < bounds.GetMinX() || x > bounds.GetMaxX()) //NaN will fail
+            if (x < bounds.GetMinX() || x > bounds.GetMaxX()) //NaN will pass
                 throw new InvalidShapeException("Bad X value " + x + " is not in boundary " + bounds);
         }
 
@@ -203,7 +203,7 @@ namespace Spatial4n.Core.Context
         public virtual void VerifyY(double y)
         {
             Rectangle bounds = GetWorldBounds();
-            if (y < bounds.GetMinY() || y > bounds.GetMaxY()) //NaN will fail
+            if (y < bounds.GetMinY() || y > bounds.GetMaxY()) //NaN will pass
                 throw new InvalidShapeException("Bad Y value " + y + " is not in boundary " + bounds);
         }
 

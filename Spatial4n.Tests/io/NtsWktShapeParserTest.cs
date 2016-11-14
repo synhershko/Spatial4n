@@ -29,7 +29,7 @@ namespace Spatial4n.Tests.io
         }
 
         [Fact]
-        public void testParsePolygon()
+        public virtual void TestParsePolygon()
         {
             
 

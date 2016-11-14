@@ -110,7 +110,7 @@ namespace Spatial4n.Core.Shapes.Nts
 
 	    public override string ToString()
 		{
-			return string.Format("Pt(x={0:0.0},y={1:0.0})", GetX(), GetY());
+			return string.Format("Pt(x={0:0.0#############},y={1:0.0#############})", GetX(), GetY());
 		}
 
 		public override bool Equals(object o)

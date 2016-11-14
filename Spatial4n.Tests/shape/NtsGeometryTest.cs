@@ -44,7 +44,7 @@ namespace Spatial4n.Tests.shape
             if (ctx.IsGeo)
             {
                 POLY_SHAPE_DL = ShiftPoly(POLY_SHAPE, DL_SHIFT);
-                Assert.True(POLY_SHAPE_DL.GetBoundingBox().GetCrossesDateLine());
+                Assert.True(POLY_SHAPE_DL.BoundingBox.CrossesDateLine);
             }
         }
 
@@ -69,7 +69,7 @@ namespace Spatial4n.Tests.shape
 
         private NtsGeometry ShiftPoly(NtsGeometry poly, int lon_shift)
         {
-            IGeometry pGeom = poly.GetGeom();
+            IGeometry pGeom = poly.Geometry;
             Assert.True(pGeom.IsValid);
             //shift 180 to the right
             pGeom = (IGeometry)pGeom.Clone();
@@ -134,8 +134,8 @@ namespace Spatial4n.Tests.shape
             CustomAssert.EqualWithDelta(1300, POLY_SHAPE.GetArea(null), 0.0);
 
             //fills 27%
-            CustomAssert.EqualWithDelta(0.27, POLY_SHAPE.GetArea(ctx) / POLY_SHAPE.GetBoundingBox().GetArea(ctx), 0.009);
-            Assert.True(POLY_SHAPE.GetBoundingBox().GetArea(ctx) > POLY_SHAPE.GetArea(ctx));
+            CustomAssert.EqualWithDelta(0.27, POLY_SHAPE.GetArea(ctx) / POLY_SHAPE.BoundingBox.GetArea(ctx), 0.009);
+            Assert.True(POLY_SHAPE.BoundingBox.GetArea(ctx) > POLY_SHAPE.GetArea(ctx));
         }
 
         [Fact]
@@ -145,14 +145,14 @@ namespace Spatial4n.Tests.shape
             IRectangle r = RandomRectangle(5);
 
             AssertNtsConsistentRelate(r);
-            AssertNtsConsistentRelate(r.GetCenter());
+            AssertNtsConsistentRelate(r.Center);
         }
 
         [Fact]
         public virtual void TestRegressions()
         {
-            AssertNtsConsistentRelate(new PointImpl(-10, 4, ctx));//PointImpl not NtsPoint, and CONTAINS
-            AssertNtsConsistentRelate(new PointImpl(-15, -10, ctx));//point on boundary
+            AssertNtsConsistentRelate(new Point(-10, 4, ctx));//PointImpl not NtsPoint, and CONTAINS
+            AssertNtsConsistentRelate(new Point(-15, -10, ctx));//point on boundary
             AssertNtsConsistentRelate(ctx.MakeRectangle(135, 180, -10, 10));//180 edge-case
         }
 
@@ -161,16 +161,16 @@ namespace Spatial4n.Tests.shape
         {
             //does NOT cross the dateline but is a wide shape >180
             NtsGeometry ntsGeo = (NtsGeometry)ctx.ReadShapeFromWkt("POLYGON((-161 49, 0 49, 20 49, 20 89.1, 0 89.1, -161 89.2, -161 49))");
-            CustomAssert.EqualWithDelta(161 + 20, ntsGeo.GetBoundingBox().GetWidth(), 0.001);
+            CustomAssert.EqualWithDelta(161 + 20, ntsGeo.BoundingBox.Width, 0.001);
 
             //shift it to cross the dateline and check that it's still good
             ntsGeo = ShiftPoly(ntsGeo, 180);
-            CustomAssert.EqualWithDelta(161 + 20, ntsGeo.GetBoundingBox().GetWidth(), 0.001);
+            CustomAssert.EqualWithDelta(161 + 20, ntsGeo.BoundingBox.Width, 0.001);
         }
 
         private void AssertNtsConsistentRelate(IShape shape)
         {
-            IntersectionMatrix expectedM = POLY_SHAPE.GetGeom().Relate(((NtsSpatialContext)ctx).GetGeometryFrom(shape));
+            IntersectionMatrix expectedM = POLY_SHAPE.Geometry.Relate(((NtsSpatialContext)ctx).GetGeometryFrom(shape));
             SpatialRelation expectedSR = NtsGeometry.IntersectionMatrixToSpatialRelation(expectedM);
             //NTS considers a point on a boundary INTERSECTS, not CONTAINS
             if (expectedSR == SpatialRelation.INTERSECTS && shape is Core.Shapes.IPoint)
@@ -184,12 +184,12 @@ namespace Spatial4n.Tests.shape
                 if (shape is IRectangle)
                 {
                     IRectangle r = (IRectangle)shape;
-                    shape2 = MakeNormRect(r.GetMinX() + DL_SHIFT, r.GetMaxX() + DL_SHIFT, r.GetMinY(), r.GetMaxY());
+                    shape2 = MakeNormRect(r.MinX + DL_SHIFT, r.MaxX + DL_SHIFT, r.MinY, r.MaxY);
                 }
                 else if (shape is Core.Shapes.IPoint)
                 {
                     Core.Shapes.IPoint p = (Core.Shapes.IPoint)shape;
-                    shape2 = ctx.MakePoint(base.NormX(p.GetX() + DL_SHIFT), p.GetY());
+                    shape2 = ctx.MakePoint(base.NormX(p.X + DL_SHIFT), p.Y);
                 }
                 else
                 {
@@ -242,7 +242,7 @@ namespace Spatial4n.Tests.shape
                     ctx.MakePoint(-179.99, -16.9));
             AssertRelation(null, SpatialRelation.CONTAINS, shape,
                     ctx.MakePoint(+179.99, -16.9));
-            Assert.True(shape.GetBoundingBox().GetWidth() < 5);//smart bbox
+            Assert.True(shape.BoundingBox.Width < 5);//smart bbox
             Console.WriteLine("Fiji Area: " + shape.GetArea(ctx));
         }
 

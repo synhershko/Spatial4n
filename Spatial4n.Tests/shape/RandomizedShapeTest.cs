@@ -155,20 +155,20 @@ namespace Spatial4n.Tests.shape
         protected virtual IPoint Divisible(IPoint p)
         {
             IRectangle bounds = ctx.WorldBounds;
-            double newX = BoundX(Divisible(p.GetX()), bounds);
-            double newY = BoundY(Divisible(p.GetY()), bounds);
+            double newX = BoundX(Divisible(p.X), bounds);
+            double newY = BoundY(Divisible(p.Y), bounds);
             p.Reset(newX, newY);
             return p;
         }
 
         static double BoundX(double i, IRectangle bounds)
         {
-            return Bound(i, bounds.GetMinX(), bounds.GetMaxX());
+            return Bound(i, bounds.MinX, bounds.MaxX);
         }
 
         static double BoundY(double i, IRectangle bounds)
         {
-            return Bound(i, bounds.GetMinY(), bounds.GetMaxY());
+            return Bound(i, bounds.MinY, bounds.MaxY);
         }
 
         static double Bound(double i, double min, double max)
@@ -203,14 +203,14 @@ namespace Spatial4n.Tests.shape
                 else
                 {
                     //they are effectively points or lines that are the same location
-                    Assert.True(!a.HasArea(), msg);
-                    Assert.True(!b.HasArea(), msg);
+                    Assert.True(!a.HasArea, msg);
+                    Assert.True(!b.HasArea, msg);
 
-                    IRectangle aBBox = a.GetBoundingBox();
-                    IRectangle bBBox = b.GetBoundingBox();
-                    if (aBBox.GetHeight() == 0 && bBBox.GetHeight() == 0
-                        && (aBBox.GetMaxY() == 90 && bBBox.GetMaxY() == 90
-                      || aBBox.GetMinY() == -90 && bBBox.GetMinY() == -90))
+                    IRectangle aBBox = a.BoundingBox;
+                    IRectangle bBBox = b.BoundingBox;
+                    if (aBBox.Height == 0 && bBBox.Height == 0
+                        && (aBBox.MaxY == 90 && bBBox.MaxY == 90
+                      || aBBox.MinY == -90 && bBBox.MinY == -90))
                         ;//== a point at the pole
                     else
                         Assert.Equal(/*msg,*/ aBBox, bBBox);
@@ -255,20 +255,20 @@ namespace Spatial4n.Tests.shape
             if (nearP == null)
                 nearP = RandomPointIn(bounds);
 
-            Range xRange = RandomRange(Rarely() ? 0 : nearP.GetX(), Range.XRange(bounds, ctx));
-            Range yRange = RandomRange(Rarely() ? 0 : nearP.GetY(), Range.YRange(bounds, ctx));
+            Range xRange = RandomRange(Rarely() ? 0 : nearP.X, Range.XRange(bounds, ctx));
+            Range yRange = RandomRange(Rarely() ? 0 : nearP.Y, Range.YRange(bounds, ctx));
 
             return MakeNormRect(
-                Divisible(xRange.GetMin()),
-                Divisible(xRange.GetMax()),
-                Divisible(yRange.GetMin()),
-                Divisible(yRange.GetMax()));
+                Divisible(xRange.Min),
+                Divisible(xRange.Max),
+                Divisible(yRange.Min),
+                Divisible(yRange.Max));
         }
 
         private Range RandomRange(double near, Range bounds)
         {
-            double mid = near + RandomGaussian() * bounds.GetWidth() / 6;
-            double width = Math.Abs(RandomGaussian()) * bounds.GetWidth() / 6;//1/3rd
+            double mid = near + RandomGaussian() * bounds.Width / 6;
+            double width = Math.Abs(RandomGaussian()) * bounds.Width / 6;//1/3rd
             return new Range(mid - width / 2, mid + width / 2);
         }
 
@@ -305,17 +305,17 @@ namespace Spatial4n.Tests.shape
 
         protected virtual IPoint RandomPointIn(ICircle c)
         {
-            double d = c.GetRadius() * random.NextDouble();
+            double d = c.Radius * random.NextDouble();
             double angleDEG = 360 * random.NextDouble();
-            IPoint p = ctx.DistCalc.PointOnBearing(c.GetCenter(), d, angleDEG, ctx, null);
+            IPoint p = ctx.DistCalc.PointOnBearing(c.Center, d, angleDEG, ctx, null);
             Assert.Equal(SpatialRelation.CONTAINS, c.Relate(p));
             return p;
         }
 
         protected virtual IPoint RandomPointIn(IRectangle r)
         {
-            double x = r.GetMinX() + random.NextDouble() * r.GetWidth();
-            double y = r.GetMinY() + random.NextDouble() * r.GetHeight();
+            double x = r.MinX + random.NextDouble() * r.Width;
+            double y = r.MinY + random.NextDouble() * r.Height;
             x = NormX(x);
             y = NormY(y);
             IPoint p = ctx.MakePoint(x, y);
@@ -325,9 +325,9 @@ namespace Spatial4n.Tests.shape
 
         protected virtual IPoint RandomPointIn(IShape shape)
         {
-            if (!shape.HasArea())// or try the center?
+            if (!shape.HasArea)// or try the center?
                 throw new InvalidOperationException("Need area to define shape!");
-            IRectangle bbox = shape.GetBoundingBox();
+            IRectangle bbox = shape.BoundingBox;
             IPoint p;
             do
             {

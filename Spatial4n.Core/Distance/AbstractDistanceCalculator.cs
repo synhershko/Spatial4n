@@ -24,7 +24,7 @@ namespace Spatial4n.Core.Distance
     {
         public double Distance(IPoint @from, IPoint to)
         {
-            return Distance(from, to.GetX(), to.GetY());
+            return Distance(from, to.X, to.Y);
         }
 
         public virtual bool Within(IPoint from, double toX, double toY, double distance)

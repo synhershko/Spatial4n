@@ -143,8 +143,8 @@ namespace Spatial4n.Core.Util
         public static IPoint Decode(String geohash, SpatialContext ctx)
         {
             IRectangle rect = DecodeBoundary(geohash, ctx);
-            double latitude = (rect.GetMinY() + rect.GetMaxY()) / 2D;
-            double longitude = (rect.GetMinX() + rect.GetMaxX()) / 2D;
+            double latitude = (rect.MinY + rect.MaxY) / 2D;
+            double longitude = (rect.MinX + rect.MaxX) / 2D;
             return ctx.MakePoint(longitude, latitude);
         }
 

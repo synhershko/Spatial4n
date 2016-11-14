@@ -35,7 +35,7 @@ namespace Spatial4n.Tests.io
 			Assert.Equal(s, WriteThenRead(s, ctx));
 			Assert.Equal(s, ctx.ReadShape("20,10"));//check comma for y,x format
 			Assert.Equal(s, ctx.ReadShape("20, 10"));//test space
-			Assert.False(s.HasArea());
+			Assert.False(s.HasArea);
 		}
 
 		[Theory]
@@ -45,7 +45,7 @@ namespace Spatial4n.Tests.io
 			IShape s = ctx.ReadShape("-10 -20 10 20");
 			Assert.Equal(ctx.MakeRectangle(-10, 10, -20, 20), s);
 			Assert.Equal(s, WriteThenRead(s, ctx));
-			Assert.True(s.HasArea());
+			Assert.True(s.HasArea);
 		}
 
 		[Theory]
@@ -56,7 +56,7 @@ namespace Spatial4n.Tests.io
 			Assert.Equal(ctx.MakeCircle(1.23, 4.56, 7.89), s);
 			Assert.Equal(s, WriteThenRead(s, ctx));
 			Assert.Equal(s, ctx.ReadShape("CIRCLE( 4.56,1.23 d=7.89 )")); // use lat,lon and use 'd' abbreviation
-			Assert.True(s.HasArea());
+			Assert.True(s.HasArea);
 		}
 
         [Theory]
@@ -69,7 +69,7 @@ namespace Spatial4n.Tests.io
                 Assert.Equal(ctx.MakeCircle(1.23, 4.56, 7.89), s);
                 Assert.Equal(s, WriteThenRead(s, ctx));
                 Assert.Equal(s, ctx.ReadShape("CIRCLE( 4.56,1.23 d=7.89 )")); // use lat,lon and use 'd' abbreviation
-                Assert.True(s.HasArea());
+                Assert.True(s.HasArea);
             }
         }
 

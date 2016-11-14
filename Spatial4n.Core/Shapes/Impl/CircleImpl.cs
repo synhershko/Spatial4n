@@ -26,7 +26,7 @@ namespace Spatial4n.Core.Shapes.Impl
     /// {@link com.spatial4j.core.distance.DistanceCalculator} which does all the work. This implementation
     /// implementation should work for both cartesian 2D and geodetic sphere surfaces.
     /// </summary>
-    public class CircleImpl : ICircle
+    public class Circle : ICircle
     {
         protected readonly SpatialContext ctx;
 
@@ -38,7 +38,7 @@ namespace Spatial4n.Core.Shapes.Impl
 
         //we don't have a line shape so we use a rectangle for these axis
 
-        public CircleImpl(IPoint p, double radiusDEG, SpatialContext ctx)
+        public Circle(IPoint p, double radiusDEG, SpatialContext ctx)
         {
             //We assume any validation of params already occurred (including bounding dist)
             this.ctx = ctx;
@@ -61,14 +61,14 @@ namespace Spatial4n.Core.Shapes.Impl
             get { return point.IsEmpty; }
         }
 
-        public virtual IPoint GetCenter()
+        public virtual IPoint Center
         {
-            return point;
+            get { return point; }
         }
 
-        public virtual double GetRadius()
+        public virtual double Radius
         {
-            return radiusDEG;
+            get { return radiusDEG; }
         }
 
         public virtual double GetArea(SpatialContext ctx)
@@ -93,14 +93,14 @@ namespace Spatial4n.Core.Shapes.Impl
             return ctx.DistCalc.Distance(point, x, y) <= radiusDEG;
         }
 
-        public virtual bool HasArea()
+        public virtual bool HasArea
         {
-            return radiusDEG > 0;
+            get { return radiusDEG > 0; }
         }
 
-        public virtual IRectangle GetBoundingBox()
+        public virtual IRectangle BoundingBox
         {
-            return enclosingBox;
+            get { return enclosingBox; }
         }
 
 
@@ -132,7 +132,7 @@ namespace Spatial4n.Core.Shapes.Impl
 
         public virtual SpatialRelation Relate(IPoint point)
         {
-            return Contains(point.GetX(), point.GetY()) ? SpatialRelation.CONTAINS : SpatialRelation.DISJOINT;
+            return Contains(point.X, point.Y) ? SpatialRelation.CONTAINS : SpatialRelation.DISJOINT;
         }
 
         public virtual SpatialRelation Relate(IRectangle r)
@@ -164,39 +164,39 @@ namespace Spatial4n.Core.Shapes.Impl
             //--Quickly determine if they are DISJOINT or not.
             // Find the closest & farthest point to the circle within the rectangle
             double closestX, farthestX;
-            double xAxis = GetXAxis();
-            if (xAxis < r.GetMinX())
+            double xAxis = XAxis;
+            if (xAxis < r.MinX)
             {
-                closestX = r.GetMinX();
-                farthestX = r.GetMaxX();
+                closestX = r.MinX;
+                farthestX = r.MaxX;
             }
-            else if (xAxis > r.GetMaxX())
+            else if (xAxis > r.MaxX)
             {
-                closestX = r.GetMaxX();
-                farthestX = r.GetMinX();
+                closestX = r.MaxX;
+                farthestX = r.MinX;
             }
             else
             {
                 closestX = xAxis; //we don't really use this value but to check this condition
-                farthestX = r.GetMaxX() - xAxis > xAxis - r.GetMinX() ? r.GetMaxX() : r.GetMinX();
+                farthestX = r.MaxX - xAxis > xAxis - r.MinX ? r.MaxX : r.MinX;
             }
 
             double closestY, farthestY;
-            double yAxis = GetYAxis();
-            if (yAxis < r.GetMinY())
+            double yAxis = YAxis;
+            if (yAxis < r.MinY)
             {
-                closestY = r.GetMinY();
-                farthestY = r.GetMaxY();
+                closestY = r.MinY;
+                farthestY = r.MaxY;
             }
-            else if (yAxis > r.GetMaxY())
+            else if (yAxis > r.MaxY)
             {
-                closestY = r.GetMaxY();
-                farthestY = r.GetMinY();
+                closestY = r.MaxY;
+                farthestY = r.MinY;
             }
             else
             {
                 closestY = yAxis; //we don't really use this value but to check this condition
-                farthestY = r.GetMaxY() - yAxis > yAxis - r.GetMinY() ? r.GetMaxY() : r.GetMinY();
+                farthestY = r.MaxY - yAxis > yAxis - r.MinY ? r.MaxY : r.MinY;
             }
 
             //If r doesn't overlap an axis, then could be disjoint. Test closestXY
@@ -220,11 +220,11 @@ namespace Spatial4n.Core.Shapes.Impl
 
             //geodetic detection of farthest Y when rect crosses x axis can't be reliably determined, so
             // check other corner too, which might actually be farthest
-            if (point.GetY() != GetYAxis())
+            if (point.Y != YAxis)
             {//geodetic
                 if (yAxis == closestY)
                 {//r crosses north to south over x axis (confusing)
-                    double otherY = (farthestY == r.GetMaxY() ? r.GetMinY() : r.GetMaxY());
+                    double otherY = (farthestY == r.MaxY ? r.MinY : r.MaxY);
                     if (!Contains(farthestX, otherY))
                         return SpatialRelation.INTERSECTS;
                 }
@@ -237,24 +237,24 @@ namespace Spatial4n.Core.Shapes.Impl
         /// The <code>Y</code> coordinate of where the circle axis intersect.
         /// </summary>
         /// <returns></returns>
-        protected virtual double GetYAxis()
+        protected virtual double YAxis
         {
-            return point.GetY();
+            get { return point.Y; }
         }
 
         /// <summary>
         /// The <code>X</code> coordinate of where the circle axis intersect.
         /// </summary>
         /// <returns></returns>
-        protected virtual double GetXAxis()
+        protected virtual double XAxis
         {
-            return point.GetX();
+            get { return point.X; }
         }
 
         public virtual SpatialRelation Relate(ICircle circle)
         {
-            double crossDist = ctx.DistCalc.Distance(point, circle.GetCenter());
-            double aDist = radiusDEG, bDist = circle.GetRadius();
+            double crossDist = ctx.DistCalc.Distance(point, circle.Center);
+            double aDist = radiusDEG, bDist = circle.Radius;
             if (crossDist > aDist + bDist)
                 return SpatialRelation.DISJOINT;
             if (crossDist < aDist && crossDist + bDist <= aDist)
@@ -285,8 +285,8 @@ namespace Spatial4n.Core.Shapes.Impl
             var circle = o as ICircle;
             if (circle == null) return false;
 
-            if (!thiz.GetCenter().Equals(circle.GetCenter())) return false;
-            if (!circle.GetRadius().Equals(thiz.GetRadius())) return false;
+            if (!thiz.Center.Equals(circle.Center)) return false;
+            if (!circle.Radius.Equals(thiz.Radius)) return false;
 
             return true;
         }
@@ -306,9 +306,9 @@ namespace Spatial4n.Core.Shapes.Impl
             if (thiz == null)
                 throw new ArgumentNullException("thiz");
 
-            int result = thiz.GetCenter().GetHashCode();
-            long temp = Math.Abs(thiz.GetRadius() - +0.0d) > double.Epsilon
-                            ? BitConverter.DoubleToInt64Bits(thiz.GetRadius())
+            int result = thiz.Center.GetHashCode();
+            long temp = Math.Abs(thiz.Radius - +0.0d) > double.Epsilon
+                            ? BitConverter.DoubleToInt64Bits(thiz.Radius)
                             : 0L;
             result = 31 * result + (int)(temp ^ ((uint)temp >> 32));
             return result;

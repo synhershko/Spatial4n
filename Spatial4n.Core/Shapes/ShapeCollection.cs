@@ -34,8 +34,8 @@ namespace Spatial4n.Core.Shapes
     public class ShapeCollection : ICollection<IShape>, IShape
     //where S : Shape
     {
-        protected readonly IList<IShape> shapes;
-        protected readonly IRectangle bbox;
+        protected readonly IList<IShape> m_shapes;
+        protected readonly IRectangle m_bbox;
 
         /**
          * WARNING: {@code shapes} is copied by reference.
@@ -47,8 +47,8 @@ namespace Spatial4n.Core.Shapes
             // TODO: Work out if there is a way to mimic this behavior (create a custom IRandomAccess?)
             //if (!(shapes is RandomAccess))
             //    throw new ArgumentException("Shapes arg must implement RandomAccess: " + shapes.GetType());
-            this.shapes = shapes;
-            this.bbox = ComputeBoundingBox(shapes, ctx);
+            this.m_shapes = shapes;
+            this.m_bbox = ComputeBoundingBox(shapes, ctx);
         }
 
         protected virtual IRectangle ComputeBoundingBox(ICollection<Shapes.IShape> shapes, SpatialContext ctx)
@@ -60,7 +60,7 @@ namespace Spatial4n.Core.Shapes
             double maxY = double.NegativeInfinity;
             foreach (Shapes.IShape geom in shapes)
             {
-                IRectangle r = geom.GetBoundingBox();
+                IRectangle r = geom.BoundingBox;
 
                 Range xRange2 = Range.XRange(r, ctx);
                 if (xRange == null)
@@ -71,58 +71,61 @@ namespace Spatial4n.Core.Shapes
                 {
                     xRange = xRange.ExpandTo(xRange2);
                 }
-                minY = Math.Min(minY, r.GetMinY());
-                maxY = Math.Max(maxY, r.GetMaxY());
+                minY = Math.Min(minY, r.MinY);
+                maxY = Math.Max(maxY, r.MaxY);
             }
-            return ctx.MakeRectangle(xRange.GetMin(), xRange.GetMax(), minY, maxY);
+            return ctx.MakeRectangle(xRange.Min, xRange.Max, minY, maxY);
         }
 
-        public virtual IList<IShape> GetShapes()
+        public virtual IList<IShape> Shapes
         {
-            return shapes;
+            get { return m_shapes; }
         }
 
         public IShape this[int index]
         {
             get
             {
-                return shapes[index];
+                return m_shapes[index];
             }
         }
 
         public int Count
         {
-            get { return shapes.Count; }
+            get { return m_shapes.Count; }
         }
 
-        public virtual IRectangle GetBoundingBox()
+        public virtual IRectangle BoundingBox
         {
-            return bbox;
+            get { return m_bbox; }
         }
 
-        public virtual IPoint GetCenter()
+        public virtual IPoint Center
         {
-            return bbox.GetCenter();
+            get { return m_bbox.Center; }
         }
 
 
-        public virtual bool HasArea()
+        public virtual bool HasArea
         {
-            foreach (Shapes.IShape geom in shapes)
+            get
             {
-                if (geom.HasArea())
+                foreach (Shapes.IShape geom in m_shapes)
                 {
-                    return true;
+                    if (geom.HasArea)
+                    {
+                        return true;
+                    }
                 }
+                return false;
             }
-            return false;
         }
 
 
         public virtual IShape GetBuffered(double distance, SpatialContext ctx)
         {
             List<Shapes.IShape> bufColl = new List<Shapes.IShape>(Count);
-            foreach (Shapes.IShape shape in shapes)
+            foreach (Shapes.IShape shape in m_shapes)
             {
                 bufColl.Add(shape.GetBuffered(distance, ctx));
             }
@@ -132,14 +135,14 @@ namespace Spatial4n.Core.Shapes
 
         public virtual SpatialRelation Relate(IShape other)
         {
-            SpatialRelation bboxSect = bbox.Relate(other);
+            SpatialRelation bboxSect = m_bbox.Relate(other);
             if (bboxSect == SpatialRelation.DISJOINT || bboxSect == SpatialRelation.WITHIN)
                 return bboxSect;
 
             bool containsWillShortCircuit = (other is IPoint) ||
                 RelateContainsShortCircuits();
             SpatialRelation? sect = null;
-            foreach (Shapes.IShape shape in shapes)
+            foreach (Shapes.IShape shape in m_shapes)
             {
                 SpatialRelation nextSect = shape.Relate(other);
 
@@ -208,9 +211,9 @@ namespace Spatial4n.Core.Shapes
 
         public virtual double GetArea(SpatialContext ctx)
         {
-            double MAX_AREA = bbox.GetArea(ctx);
+            double MAX_AREA = m_bbox.GetArea(ctx);
             double sum = 0;
-            foreach (Shapes.IShape geom in shapes)
+            foreach (Shapes.IShape geom in m_shapes)
             {
                 sum += geom.GetArea(ctx);
                 if (sum >= MAX_AREA)
@@ -226,14 +229,14 @@ namespace Spatial4n.Core.Shapes
             StringBuilder buf = new StringBuilder(100);
             buf.Append("ShapeCollection(");
             int i = 0;
-            foreach (IShape shape in shapes)
+            foreach (IShape shape in m_shapes)
             {
                 if (i++ > 0)
                     buf.Append(", ");
                 buf.Append(shape);
                 if (buf.Length > 150)
                 {
-                    buf.Append(" ...").Append(shapes.Count);
+                    buf.Append(" ...").Append(m_shapes.Count);
                     break;
                 }
             }
@@ -294,44 +297,44 @@ namespace Spatial4n.Core.Shapes
 
         public void Add(IShape item)
         {
-            shapes.Add(item);
+            m_shapes.Add(item);
         }
 
         public void Clear()
         {
-            shapes.Clear();
+            m_shapes.Clear();
         }
 
         public bool Contains(IShape item)
         {
-            return shapes.Contains(item);
+            return m_shapes.Contains(item);
         }
 
         public void CopyTo(IShape[] array, int arrayIndex)
         {
-            shapes.CopyTo(array, arrayIndex);
+            m_shapes.CopyTo(array, arrayIndex);
         }
 
         public bool Remove(IShape item)
         {
-            return shapes.Remove(item);
+            return m_shapes.Remove(item);
         }
 
         public IEnumerator<IShape> GetEnumerator()
         {
-            return shapes.GetEnumerator();
+            return m_shapes.GetEnumerator();
         }
 
         IEnumerator IEnumerable.GetEnumerator()
         {
-            return shapes.GetEnumerator();
+            return m_shapes.GetEnumerator();
         }
 
         public bool IsReadOnly
         {
             get
             {
-                return shapes.IsReadOnly;
+                return m_shapes.IsReadOnly;
             }
         }
 
@@ -341,7 +344,7 @@ namespace Spatial4n.Core.Shapes
 
         public virtual bool IsEmpty
         {
-            get { return !shapes.Any(); }
+            get { return !m_shapes.Any(); }
         }
 
         #endregion

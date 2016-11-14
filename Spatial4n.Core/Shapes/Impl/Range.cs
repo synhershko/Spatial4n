@@ -14,35 +14,35 @@ namespace Spatial4n.Core.Shapes.Impl
     /// </summary>
     public class Range
     {
-        protected readonly double min, max;
+        protected readonly double m_min, m_max;
 
         public static Range XRange(IRectangle rect, SpatialContext ctx)
         {
             if (ctx.IsGeo)
-                return new LongitudeRange(rect.GetMinX(), rect.GetMaxX());
+                return new LongitudeRange(rect.MinX, rect.MaxX);
             else
-                return new Range(rect.GetMinX(), rect.GetMaxX());
+                return new Range(rect.MinX, rect.MaxX);
         }
 
         public static Range YRange(IRectangle rect, SpatialContext ctx)
         {
-            return new Range(rect.GetMinY(), rect.GetMaxY());
+            return new Range(rect.MinY, rect.MaxY);
         }
 
         public Range(double min, double max)
         {
-            this.min = min;
-            this.max = max;
+            this.m_min = min;
+            this.m_max = max;
         }
 
-        public virtual double GetMin()
+        public virtual double Min
         {
-            return min;
+            get { return m_min; }
         }
 
-        public virtual double GetMax()
+        public virtual double Max
         {
-            return max;
+            get { return m_max; }
         }
 
         public override bool Equals(object o)
@@ -52,8 +52,8 @@ namespace Spatial4n.Core.Shapes.Impl
 
             Range range = (Range)o;
 
-            if (range.max.CompareTo(max) != 0) return false;
-            if (range.min.CompareTo(min) != 0) return false;
+            if (range.m_max.CompareTo(m_max) != 0) return false;
+            if (range.m_min.CompareTo(m_min) != 0) return false;
 
             return true;
         }
@@ -62,43 +62,43 @@ namespace Spatial4n.Core.Shapes.Impl
         {
             int result;
             long temp;
-            temp = min != +0.0d ? BitConverter.DoubleToInt64Bits(min) : 0L;
+            temp = m_min != +0.0d ? BitConverter.DoubleToInt64Bits(m_min) : 0L;
             result = (int)(temp ^ (long)((ulong)temp >> 32));
-            temp = max != +0.0d ? BitConverter.DoubleToInt64Bits(max) : 0L;
+            temp = m_max != +0.0d ? BitConverter.DoubleToInt64Bits(m_max) : 0L;
             result = 31 * result + (int)(temp ^ (long)((ulong)temp >> 32));
             return result;
         }
 
         public override string ToString()
         {
-            return "Range{" + min + " TO " + max + '}';
+            return "Range{" + m_min + " TO " + m_max + '}';
         }
 
-        public virtual double GetWidth()
+        public virtual double Width
         {
-            return max - min;
+            get { return m_max - m_min; }
         }
 
         public virtual bool Contains(double v)
         {
-            return v >= min && v <= max;
+            return v >= m_min && v <= m_max;
         }
 
-        public virtual double GetCenter()
+        public virtual double Center
         {
-            return min + GetWidth() / 2;
+            get { return m_min + Width / 2; }
         }
 
         public virtual Range ExpandTo(Range other)
         {
             Debug.Assert(this.GetType() == other.GetType());
-            return new Range(Math.Min(min, other.min), Math.Max(max, other.max));
+            return new Range(Math.Min(m_min, other.m_min), Math.Max(m_max, other.m_max));
         }
 
         public virtual double DeltaLen(Range other)
         {
-            double min3 = Math.Max(min, other.min);
-            double max3 = Math.Min(max, other.max);
+            double min3 = Math.Max(m_min, other.m_min);
+            double max3 = Math.Min(m_max, other.m_max);
             return max3 - min3;
         }
 
@@ -113,42 +113,48 @@ namespace Spatial4n.Core.Shapes.Impl
             }
 
             public LongitudeRange(IRectangle r)
-                    : base(r.GetMinX(), r.GetMaxX())
+                    : base(r.MinX, r.MaxX)
             {
             }
 
-            public override double GetWidth()
+            public override double Width
             {
-                double w = base.GetWidth();
-                if (w < 0)
-                    w += 360;
-                return w;
+                get
+                {
+                    double w = base.Width;
+                    if (w < 0)
+                        w += 360;
+                    return w;
+                }
             }
 
 
             public override bool Contains(double v)
             {
-                if (!CrossesDateline())
+                if (!CrossesDateline)
                     return base.Contains(v);
-                return v >= min || v <= max;// the OR is the distinction from non-dateline cross
+                return v >= m_min || v <= m_max;// the OR is the distinction from non-dateline cross
             }
 
-            public virtual bool CrossesDateline()
+            public virtual bool CrossesDateline
             {
-                return min > max;
+                get { return m_min > m_max; }
             }
 
-            public override double GetCenter()
+            public override double Center
             {
-                double ctr = base.GetCenter();
-                if (ctr > 180)
-                    ctr -= 360;
-                return ctr;
+                get
+                {
+                    double ctr = base.Center;
+                    if (ctr > 180)
+                        ctr -= 360;
+                    return ctr;
+                }
             }
 
             public double CompareTo(LongitudeRange b)
             {
-                return Diff(GetCenter(), b.GetCenter());
+                return Diff(Center, b.Center);
             }
 
             /** a - b (compareTo order).  < 0 if a < b */
@@ -185,13 +191,13 @@ namespace Spatial4n.Core.Shapes.Impl
                     a = other;
                     b = this;
                 }
-                LongitudeRange newMin = b.Contains(a.min) ? b : a;//usually 'a'
-                LongitudeRange newMax = a.Contains(b.max) ? a : b;//usually 'b'
+                LongitudeRange newMin = b.Contains(a.m_min) ? b : a;//usually 'a'
+                LongitudeRange newMax = a.Contains(b.m_max) ? a : b;//usually 'b'
                 if (newMin == newMax)
                     return newMin;
                 if (newMin == b && newMax == a)
                     return WORLD_180E180W;
-                return new LongitudeRange(newMin.min, newMax.max);
+                return new LongitudeRange(newMin.m_min, newMax.m_max);
             }
         }
     }

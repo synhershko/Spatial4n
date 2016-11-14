@@ -132,8 +132,8 @@ namespace Spatial4n.Core.Io
 
         public virtual void WritePoint(BinaryWriter dataOutput, IPoint pt)
         {
-            WriteDim(dataOutput, pt.GetX());
-            WriteDim(dataOutput, pt.GetY());
+            WriteDim(dataOutput, pt.X);
+            WriteDim(dataOutput, pt.Y);
         }
 
         public virtual IRectangle ReadRect(BinaryReader dataInput)
@@ -143,10 +143,10 @@ namespace Spatial4n.Core.Io
 
         public virtual void WriteRect(BinaryWriter dataOutput, IRectangle r)
         {
-            WriteDim(dataOutput, r.GetMinX());
-            WriteDim(dataOutput, r.GetMaxX());
-            WriteDim(dataOutput, r.GetMinY());
-            WriteDim(dataOutput, r.GetMaxY());
+            WriteDim(dataOutput, r.MinX);
+            WriteDim(dataOutput, r.MaxX);
+            WriteDim(dataOutput, r.MinY);
+            WriteDim(dataOutput, r.MaxY);
         }
 
         public virtual ICircle ReadCircle(BinaryReader dataInput)
@@ -156,8 +156,8 @@ namespace Spatial4n.Core.Io
 
         public void WriteCircle(BinaryWriter dataOutput, ICircle c)
         {
-            WritePoint(dataOutput, c.GetCenter());
-            WriteDim(dataOutput, c.GetRadius());
+            WritePoint(dataOutput, c.Center);
+            WriteDim(dataOutput, c.Radius);
         }
 
         public virtual ShapeCollection ReadCollection(BinaryReader dataInput)

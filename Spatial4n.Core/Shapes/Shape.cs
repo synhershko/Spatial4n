@@ -58,7 +58,7 @@ namespace Spatial4n.Core.Shapes
         /// Postcondition: <code>this.getBoundingBox().relate(this) == CONTAINS</code>
         /// </summary>
         /// <returns></returns>
-        IRectangle GetBoundingBox(); // TODO: Make into property
+        IRectangle BoundingBox { get; }
 
         /// <summary>
         /// Does the shape have area?  This will be false for points and lines. It will
@@ -67,7 +67,7 @@ namespace Spatial4n.Core.Shapes
         /// rectangle with no height or no width).
         /// </summary>
         /// <returns></returns>
-        bool HasArea();// TODO: Make into property
+        bool HasArea { get; }
 
         /// <summary>
         /// Calculates the area of the shape in the units of {@link
@@ -85,7 +85,7 @@ namespace Spatial4n.Core.Shapes
         /// Postcondition: <code>this.relate(this.getCenter()) == CONTAINS</code>
         /// </summary>
         /// <returns></returns>
-        IPoint GetCenter();
+        IPoint Center { get; }
 
         /// <summary>
         /// Returns a buffered version of this shape.  The buffer is usually a

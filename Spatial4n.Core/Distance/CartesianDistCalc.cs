@@ -48,8 +48,8 @@ namespace Spatial4n.Core.Distance
 
         public override double Distance(IPoint from, double toX, double toY)
         {
-            double deltaX = from.GetX() - toX;
-            double deltaY = from.GetY() - toY;
+            double deltaX = from.X - toX;
+            double deltaY = from.Y - toY;
             double xSquaredPlusYSquared = deltaX * deltaX + deltaY * deltaY;
 
             if (squared)
@@ -60,8 +60,8 @@ namespace Spatial4n.Core.Distance
 
         public override bool Within(IPoint from, double toX, double toY, double distance)
         {
-            double deltaX = from.GetX() - toX;
-            double deltaY = from.GetY() - toY;
+            double deltaX = from.X - toX;
+            double deltaY = from.Y - toY;
             return deltaX * deltaX + deltaY * deltaY <= distance * distance;
         }
 
@@ -71,12 +71,12 @@ namespace Spatial4n.Core.Distance
             {
                 if (reuse == null)
                     return from;
-                reuse.Reset(from.GetX(), from.GetY());
+                reuse.Reset(from.X, from.Y);
                 return reuse;
             }
             double bearingRAD = DistanceUtils.ToRadians(bearingDEG);
-            double x = from.GetX() + Math.Sin(bearingRAD) * distDEG;
-            double y = from.GetY() + Math.Cos(bearingRAD) * distDEG;
+            double x = from.X + Math.Sin(bearingRAD) * distDEG;
+            double y = from.Y + Math.Cos(bearingRAD) * distDEG;
             if (reuse == null)
             {
                 return ctx.MakePoint(x, y);
@@ -90,10 +90,10 @@ namespace Spatial4n.Core.Distance
 
         public override IRectangle CalcBoxByDistFromPt(IPoint from, double distDEG, SpatialContext ctx, IRectangle reuse)
         {
-            double minX = from.GetX() - distDEG;
-            double maxX = from.GetX() + distDEG;
-            double minY = from.GetY() - distDEG;
-            double maxY = from.GetY() + distDEG;
+            double minX = from.X - distDEG;
+            double maxX = from.X + distDEG;
+            double minY = from.Y - distDEG;
+            double maxY = from.Y + distDEG;
             if (reuse == null)
             {
                 return ctx.MakeRectangle(minX, maxX, minY, maxY);
@@ -107,7 +107,7 @@ namespace Spatial4n.Core.Distance
 
         public override double CalcBoxByDistFromPt_yHorizAxisDEG(IPoint from, double distDEG, SpatialContext ctx)
         {
-            return from.GetY();
+            return from.Y;
         }
 
         public override double Area(IRectangle rect)

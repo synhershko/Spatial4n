@@ -21,19 +21,19 @@ namespace Spatial4n.Core.Shapes
 {
     public interface IRectangle : IShape
     {
-        double GetWidth();
-        double GetHeight();
+        double Width { get; }
+        double Height { get; }
 
-        double GetMinX();
-        double GetMinY();
-        double GetMaxX();
-        double GetMaxY();
+        double MinX { get; }
+        double MinY { get; }
+        double MaxX { get; }
+        double MaxY { get; }
 
         /// <summary>
         /// Only meaningful for geospatial contexts.
         /// </summary>
         /// <returns></returns>
-        bool GetCrossesDateLine();
+        bool CrossesDateLine { get; }
 
         /// <summary>
         /// Expert: Resets the state of this shape given the arguments. This is a

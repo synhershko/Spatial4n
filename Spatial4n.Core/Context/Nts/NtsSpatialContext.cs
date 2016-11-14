@@ -102,7 +102,7 @@ namespace Spatial4n.Core.Context.Nts
             if (shape is NtsGeometry)
             {
                 NtsGeometry ntsGeom = (NtsGeometry)shape;
-                return ntsGeom.GetGeom().AsText();
+                return ntsGeom.Geometry.AsText();
             }
             //Note: doesn't handle ShapeCollection or BufferedLineString
             return base.ToString(shape);
@@ -118,37 +118,37 @@ namespace Spatial4n.Core.Context.Nts
         {
             if (shape is NtsGeometry)
             {
-                return ((NtsGeometry)shape).GetGeom();
+                return ((NtsGeometry)shape).Geometry;
             }
             if (shape is NtsPoint)
             {
-                return ((NtsPoint)shape).GetGeom();
+                return ((NtsPoint)shape).Geometry;
             }
 
             var point = shape as Shapes.IPoint;
             if (point != null)
             {
-                return m_geometryFactory.CreatePoint(new Coordinate(point.GetX(), point.GetY()));
+                return m_geometryFactory.CreatePoint(new Coordinate(point.X, point.Y));
             }
 
             var r = shape as IRectangle;
             if (r != null)
             {
 
-                if (r.GetCrossesDateLine())
+                if (r.CrossesDateLine)
                 {
                     var pair = new List<IGeometry>(2)
                        {
                            m_geometryFactory.ToGeometry(new Envelope(
-                                                          r.GetMinX(), WorldBounds.GetMaxX(), r.GetMinY(), r.GetMaxY())),
+                                                          r.MinX, WorldBounds.MaxX, r.MinY, r.MaxY)),
                            m_geometryFactory.ToGeometry(new Envelope(
-                                                          WorldBounds.GetMinX(), r.GetMaxX(), r.GetMinY(), r.GetMaxY()))
+                                                          WorldBounds.MinX, r.MaxX, r.MinY, r.MaxY))
                        };
                     return m_geometryFactory.BuildGeometry(pair);//a MultiPolygon or MultiLineString
                 }
                 else
                 {
-                    return m_geometryFactory.ToGeometry(new Envelope(r.GetMinX(), r.GetMaxX(), r.GetMinY(), r.GetMaxY()));
+                    return m_geometryFactory.ToGeometry(new Envelope(r.MinX, r.MaxX, r.MinY, r.MaxY));
                 }
             }
 
@@ -161,13 +161,13 @@ namespace Spatial4n.Core.Context.Nts
                 // If this crosses the dateline, it could make two parts
                 // is there an existing utility that does this?
 
-                if (circle.GetBoundingBox().GetCrossesDateLine())
+                if (circle.BoundingBox.CrossesDateLine)
                     throw new ArgumentException("Doesn't support dateline cross yet: " + circle);//TODO
                 var gsf = new GeometricShapeFactory(m_geometryFactory)
                 {
-                    Size = circle.GetBoundingBox().GetWidth() / 2.0f,
+                    Size = circle.BoundingBox.Width / 2.0f,
                     NumPoints = 4 * 25,//multiple of 4 is best
-                    Centre = new Coordinate(circle.GetCenter().GetX(), circle.GetCenter().GetY())
+                    Centre = new Coordinate(circle.Center.X, circle.Center.Y)
                 };
                 return gsf.CreateCircle();
             }
@@ -214,11 +214,11 @@ namespace Spatial4n.Core.Context.Nts
                 if (p is NtsPoint)
                 {
                     NtsPoint ntsPoint = (NtsPoint)p;
-                    coords[i] = ntsPoint.GetGeom().Coordinate;
+                    coords[i] = ntsPoint.Geometry.Coordinate;
                 }
                 else
                 {
-                    coords[i] = new Coordinate(p.GetX(), p.GetY());
+                    coords[i] = new Coordinate(p.X, p.Y);
                 }
             }
             ILineString lineString = m_geometryFactory.CreateLineString(coords);

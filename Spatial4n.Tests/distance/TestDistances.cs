@@ -92,29 +92,29 @@ namespace Spatial4n.Tests.distance
                 Assert.True(r.RelateYRange(horizAxisLat, horizAxisLat).Intersects());
 
             //horizontal
-            if (r.GetWidth() >= 180)
+            if (r.Width >= 180)
             {
-                double deg = Dc().Distance(ctr, r.GetMinX(), r.GetMaxY() == 90 ? 90 : -90);
+                double deg = Dc().Distance(ctr, r.MinX, r.MaxY == 90 ? 90 : -90);
                 double calcDistKm = deg * DistanceUtils.DEG_TO_KM;
                 Assert.True(/*msg,*/ calcDistKm <= distKm + EPS);
                 //horizAxisLat is meaningless in this context
             }
             else
             {
-                IPoint tPt = FindClosestPointOnVertToPoint(r.GetMinX(), r.GetMinY(), r.GetMaxY(), ctr);
+                IPoint tPt = FindClosestPointOnVertToPoint(r.MinX, r.MinY, r.MaxY, ctr);
                 double calcDistKm = Dc().Distance(ctr, tPt) * DistanceUtils.DEG_TO_KM;
                 CustomAssert.EqualWithDelta(/*msg,*/ distKm, calcDistKm, EPS);
-                CustomAssert.EqualWithDelta(/*msg,*/ tPt.GetY(), horizAxisLat, EPS);
+                CustomAssert.EqualWithDelta(/*msg,*/ tPt.Y, horizAxisLat, EPS);
             }
 
             //vertical
-            double topDistKm = Dc().Distance(ctr, ctr.GetX(), r.GetMaxY()) * DistanceUtils.DEG_TO_KM;
-            if (r.GetMaxY() == 90)
+            double topDistKm = Dc().Distance(ctr, ctr.X, r.MaxY) * DistanceUtils.DEG_TO_KM;
+            if (r.MaxY == 90)
                 Assert.True(/*msg,*/ topDistKm <= distKm + EPS);
             else
                 CustomAssert.EqualWithDelta(msg, distKm, topDistKm, EPS);
-            double botDistKm = Dc().Distance(ctr, ctr.GetX(), r.GetMinY()) * DistanceUtils.DEG_TO_KM;
-            if (r.GetMinY() == -90)
+            double botDistKm = Dc().Distance(ctr, ctr.X, r.MinY) * DistanceUtils.DEG_TO_KM;
+            if (r.MinY == -90)
                 Assert.True(/*msg,*/ botDistKm <= distKm + EPS);
             else
                 CustomAssert.EqualWithDelta(/*msg,*/ distKm, botDistKm, EPS);
@@ -296,7 +296,7 @@ namespace Spatial4n.Tests.distance
             //test point on bearing
             CustomAssert.EqualWithDelta(
                 DistanceUtils.PointOnBearingRAD(0, 0, DistanceUtils.Dist2Radians(dist, radius),
-                    DistanceUtils.DEG_90_AS_RADS, ctx, new PointImpl(0, 0, ctx)).GetX(),
+                    DistanceUtils.DEG_90_AS_RADS, ctx, new Point(0, 0, ctx)).X,
                 distRAD, 10e-5);
         }
 
@@ -319,16 +319,16 @@ namespace Spatial4n.Tests.distance
             CustomAssert.EqualWithDelta(earthArea, ctx.WorldBounds.GetArea(ctx), 1.0);
 
             //now check half earth
-            ICircle cHalf = ctx.MakeCircle(c.GetCenter(), 90);
+            ICircle cHalf = ctx.MakeCircle(c.Center, 90);
             CustomAssert.EqualWithDelta(earthArea / 2, cHalf.GetArea(ctx), 1.0);
 
             //circle with same radius at +20 lat with one at -20 lat should have same area as well as bbox with same area
-            ICircle c2 = ctx.MakeCircle(c.GetCenter(), 30);
-            ICircle c3 = ctx.MakeCircle(c.GetCenter().GetX(), 20, 30);
+            ICircle c2 = ctx.MakeCircle(c.Center, 30);
+            ICircle c3 = ctx.MakeCircle(c.Center.X, 20, 30);
             CustomAssert.EqualWithDelta(c2.GetArea(ctx), c3.GetArea(ctx), 0.01);
-            ICircle c3Opposite = ctx.MakeCircle(c.GetCenter().GetX(), -20, 30);
+            ICircle c3Opposite = ctx.MakeCircle(c.Center.X, -20, 30);
             CustomAssert.EqualWithDelta(c3.GetArea(ctx), c3Opposite.GetArea(ctx), 0.01);
-            CustomAssert.EqualWithDelta(c3.GetBoundingBox().GetArea(ctx), c3Opposite.GetBoundingBox().GetArea(ctx), 0.01);
+            CustomAssert.EqualWithDelta(c3.BoundingBox.GetArea(ctx), c3Opposite.BoundingBox.GetArea(ctx), 0.01);
 
             //small shapes near the equator should have similar areas to euclidean rectangle
             IRectangle smallRect = ctx.MakeRectangle(0, 1, 0, 1);

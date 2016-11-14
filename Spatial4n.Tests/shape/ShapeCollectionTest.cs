@@ -31,18 +31,18 @@ namespace Spatial4n.Tests.shape
             IRectangle r2 = ctx.MakeRectangle(r2MinX, r2MaxX, -10, 10);
 
             ShapeCollection/*<Rectangle>*/ s = new ShapeCollection/*<Rectangle>*/(new IShape[] { r1, r2 }, ctx);
-            Assert.Equal(Range.LongitudeRange.WORLD_180E180W, new Range.LongitudeRange(s.GetBoundingBox()));
+            Assert.Equal(Range.LongitudeRange.WORLD_180E180W, new Range.LongitudeRange(s.BoundingBox));
 
             //flip r1, r2 order
             s = new ShapeCollection/*<Rectangle>*/(new IShape[] { r2, r1 }, ctx);
-            Assert.Equal(Range.LongitudeRange.WORLD_180E180W, new Range.LongitudeRange(s.GetBoundingBox()));
+            Assert.Equal(Range.LongitudeRange.WORLD_180E180W, new Range.LongitudeRange(s.BoundingBox));
         }
 
         [Fact]
         public virtual void TestRectIntersect()
         {
             SpatialContext ctx = new SpatialContextFactory()
-            { geo = false, worldBounds = new RectangleImpl(-100, 100, -50, 50, null) }.NewSpatialContext();
+            { geo = false, worldBounds = new Rectangle(-100, 100, -50, 50, null) }.NewSpatialContext();
 
             new ShapeCollectionRectIntersectionTestHelper(ctx).TestRelateWithRectangle();
         }
@@ -75,10 +75,10 @@ namespace Spatial4n.Tests.shape
                 ShapeCollection shapeCollection = new ShapeCollection/*<Rectangle>*/(shapes, ctx);
 
                 //test shapeCollection.getBoundingBox();
-                IRectangle msBbox = shapeCollection.GetBoundingBox();
+                IRectangle msBbox = shapeCollection.BoundingBox;
                 if (shapes.Count == 1)
                 {
-                    Assert.Equal(shapes[0], msBbox.GetBoundingBox());
+                    Assert.Equal(shapes[0], msBbox.BoundingBox);
                 }
                 else
                 {
@@ -92,7 +92,7 @@ namespace Spatial4n.Tests.shape
 
             protected override IPoint RandomPointInEmptyShape(/*ShapeCollection*/ IShape shape)
             {
-                IRectangle r = (IRectangle)((ShapeCollection)shape).GetShapes()[0];
+                IRectangle r = (IRectangle)((ShapeCollection)shape).Shapes[0];
                 return RandomPointIn(r);
             }
         }

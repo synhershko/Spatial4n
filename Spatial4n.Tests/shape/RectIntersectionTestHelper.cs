@@ -25,7 +25,7 @@ namespace Spatial4n.Tests.shape
 
         protected override Core.Shapes.IPoint RandomPointIn(IShape shape)
         {
-            if (!shape.HasArea())
+            if (!shape.HasArea)
                 return RandomPointInEmptyShape((IShape)shape);
             return base.RandomPointIn(shape);
         }
@@ -47,7 +47,7 @@ namespace Spatial4n.Tests.shape
 
                 IShape s = GenerateRandomShape(nearP);
 
-                IRectangle r = RandomRectangle(s.GetBoundingBox().GetCenter());
+                IRectangle r = RandomRectangle(s.BoundingBox.Center);
 
                 SpatialRelation ic = s.Relate(r);
 
@@ -76,7 +76,7 @@ namespace Spatial4n.Tests.shape
                             break;
 
                         case SpatialRelation.DISJOINT:
-                            if (!s.GetBoundingBox().Relate(r).Intersects())
+                            if (!s.BoundingBox.Relate(r).Intersects())
                             {//bboxes are disjoint
                                 i_bboxD++;
                                 if (i_bboxD > MINLAPSPERCASE)
@@ -103,7 +103,7 @@ namespace Spatial4n.Tests.shape
                                 Core.Shapes.IPoint p;
                                 if (j < 4)
                                 {
-                                    p = new PointImpl(0, 0, ctx);
+                                    p = new Core.Shapes.Impl.Point(0, 0, ctx);
                                     InfBufLine.CornerByQuadrant(r, j + 1, p);
                                 }
                                 else
@@ -112,7 +112,7 @@ namespace Spatial4n.Tests.shape
                                     {
                                         if (pointR == SpatialRelation.DISJOINT)
                                         {
-                                            randomPointSpace = IntersectRects(r, s.GetBoundingBox());
+                                            randomPointSpace = IntersectRects(r, s.BoundingBox);
                                         }
                                         else
                                         {//CONTAINS
@@ -165,38 +165,38 @@ namespace Spatial4n.Tests.shape
         {
             Debug.Assert(r1.Relate(r2).Intersects());
             double minX, maxX;
-            if (r1.RelateXRange(r2.GetMinX(), r2.GetMinX()).Intersects())
+            if (r1.RelateXRange(r2.MinX, r2.MinX).Intersects())
             {
-                minX = r2.GetMinX();
+                minX = r2.MinX;
             }
             else
             {
-                minX = r1.GetMinX();
+                minX = r1.MinX;
             }
-            if (r1.RelateXRange(r2.GetMaxX(), r2.GetMaxX()).Intersects())
+            if (r1.RelateXRange(r2.MaxX, r2.MaxX).Intersects())
             {
-                maxX = r2.GetMaxX();
+                maxX = r2.MaxX;
             }
             else
             {
-                maxX = r1.GetMaxX();
+                maxX = r1.MaxX;
             }
             double minY, maxY;
-            if (r1.RelateYRange(r2.GetMinY(), r2.GetMinY()).Intersects())
+            if (r1.RelateYRange(r2.MinY, r2.MinY).Intersects())
             {
-                minY = r2.GetMinY();
+                minY = r2.MinY;
             }
             else
             {
-                minY = r1.GetMinY();
+                minY = r1.MinY;
             }
-            if (r1.RelateYRange(r2.GetMaxY(), r2.GetMaxY()).Intersects())
+            if (r1.RelateYRange(r2.MaxY, r2.MaxY).Intersects())
             {
-                maxY = r2.GetMaxY();
+                maxY = r2.MaxY;
             }
             else
             {
-                maxY = r1.GetMaxY();
+                maxY = r1.MaxY;
             }
             return ctx.MakeRectangle(minX, maxX, minY, maxY);
         }

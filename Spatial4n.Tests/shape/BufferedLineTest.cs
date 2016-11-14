@@ -15,7 +15,7 @@ namespace Spatial4n.Tests.shape
         protected readonly Random random = new Random(RandomSeed.Seed());
 
         private readonly SpatialContext ctx = new SpatialContextFactory()
-        { geo = false, worldBounds = new RectangleImpl(-100, 100, -50, 50, null) }.NewSpatialContext();
+        { geo = false, worldBounds = new Rectangle(-100, 100, -50, 50, null) }.NewSpatialContext();
 
         //      @Rule
         //public TestLog testLog = TestLog.instance;
@@ -24,11 +24,11 @@ namespace Spatial4n.Tests.shape
         public static void LogShapes(BufferedLine line, IRectangle rect)
         {
             string lineWKT =
-                "LINESTRING(" + line.GetA().GetX() + " " + line.GetA().GetY() + "," +
-                    line.GetB().GetX() + " " + line.GetB().GetY() + ")";
+                "LINESTRING(" + line.A.X + " " + line.A.Y + "," +
+                    line.B.X + " " + line.B.Y + ")";
             Console.WriteLine(
-                "GEOMETRYCOLLECTION(" + lineWKT + "," + RectToWkt(line.GetBoundingBox
-                    ()) + ")");
+                "GEOMETRYCOLLECTION(" + lineWKT + "," + RectToWkt(line.BoundingBox
+                    ) + ")");
 
             string rectWKT = RectToWkt(rect);
             Console.WriteLine(rectWKT);
@@ -36,11 +36,11 @@ namespace Spatial4n.Tests.shape
 
         static private string RectToWkt(IRectangle rect)
         {
-            return "POLYGON((" + rect.GetMinX() + " " + rect.GetMinY() + "," +
-                rect.GetMaxX() + " " + rect.GetMinY() + "," +
-                rect.GetMaxX() + " " + rect.GetMinY() + "," +
-                rect.GetMinX() + " " + rect.GetMinY() + "," +
-                rect.GetMinX() + " " + rect.GetMinY() + "))";
+            return "POLYGON((" + rect.MinX + " " + rect.MinY + "," +
+                rect.MaxX + " " + rect.MinY + "," +
+                rect.MaxX + " " + rect.MinY + "," +
+                rect.MinX + " " + rect.MinY + "," +
+                rect.MinX + " " + rect.MinY + "))";
         }
 
         [Fact]
@@ -92,7 +92,7 @@ namespace Spatial4n.Tests.shape
             BufferedLine line = NewRandomLine();
             //    if (line.getA().equals(line.getB()))
             //      return;//this test doesn't work
-            IRectangle rect = NewRandomLine().GetBoundingBox();
+            IRectangle rect = NewRandomLine().BoundingBox;
             //logShapes(line, rect);
             //compute closest corner brute force
             List<IPoint> corners = QuadrantCorners(rect);
@@ -102,7 +102,7 @@ namespace Spatial4n.Tests.shape
             int quad = 1;
             foreach (IPoint corner in corners)
             {
-                double d = line.GetLinePrimary().DistanceUnbuffered(corner);
+                double d = line.LinePrimary.DistanceUnbuffered(corner);
                 if (Math.Abs(d - farthestDistance) < 0.000001)
                 {//about equal
                     farthestDistanceQuads.Add(quad);
@@ -116,14 +116,14 @@ namespace Spatial4n.Tests.shape
                 quad++;
             }
             //compare results
-            int calcClosestQuad = line.GetLinePrimary().Quadrant(rect.GetCenter());
+            int calcClosestQuad = line.LinePrimary.Quadrant(rect.Center);
             Assert.True(farthestDistanceQuads.Contains(calcClosestQuad));
         }
 
         private BufferedLine NewRandomLine()
         {
-            IPoint pA = new PointImpl(random.Next(9 + 1), random.Next(9 + 1), ctx);
-            IPoint pB = new PointImpl(random.Next(9 + 1), random.Next(9 + 1), ctx);
+            IPoint pA = new Point(random.Next(9 + 1), random.Next(9 + 1), ctx);
+            IPoint pB = new Point(random.Next(9 + 1), random.Next(9 + 1), ctx);
             int buf = random.Next(5 + 1);
             return new BufferedLine(pA, pB, buf, ctx);
         }
@@ -131,10 +131,10 @@ namespace Spatial4n.Tests.shape
         private List<IPoint> QuadrantCorners(IRectangle rect)
         {
             List<IPoint> corners = new List<IPoint>(4);
-            corners.Add(ctx.MakePoint(rect.GetMaxX(), rect.GetMaxY()));
-            corners.Add(ctx.MakePoint(rect.GetMinX(), rect.GetMaxY()));
-            corners.Add(ctx.MakePoint(rect.GetMinX(), rect.GetMinY()));
-            corners.Add(ctx.MakePoint(rect.GetMaxX(), rect.GetMinY()));
+            corners.Add(ctx.MakePoint(rect.MaxX, rect.MaxY));
+            corners.Add(ctx.MakePoint(rect.MinX, rect.MaxY));
+            corners.Add(ctx.MakePoint(rect.MinX, rect.MinY));
+            corners.Add(ctx.MakePoint(rect.MaxX, rect.MinY));
             return corners;
         }
 
@@ -155,7 +155,7 @@ namespace Spatial4n.Tests.shape
                 int r4 = outerInstance.random.Next(3 + 1);//0..3
                 IPoint pA = corners[r4];
                 IPoint pB = corners[(r4 + 2) % 4];
-                double maxBuf = Math.Max(nearR.GetWidth(), nearR.GetHeight());
+                double maxBuf = Math.Max(nearR.Width, nearR.Height);
                 double buf = Math.Abs(RandomGaussian()) * maxBuf / 4;
                 buf = outerInstance.random.Next((int)Divisible(buf) + 1);
                 return new BufferedLine(pA, pB, buf, ctx);
@@ -164,9 +164,9 @@ namespace Spatial4n.Tests.shape
             protected override IPoint RandomPointInEmptyShape(IShape shape)
             {
                 int r = outerInstance.random.Next(1 + 1);
-                if (r == 0) return ((BufferedLine)shape).GetA();
+                if (r == 0) return ((BufferedLine)shape).A;
                 //if (r == 1)
-                return ((BufferedLine)shape).GetB();
+                return ((BufferedLine)shape).B;
                 //        Point c = shape.getCenter();
                 //        if (shape.contains(c));
             }

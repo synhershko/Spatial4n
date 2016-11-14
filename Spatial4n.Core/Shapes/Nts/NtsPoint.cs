@@ -44,9 +44,9 @@ namespace Spatial4n.Core.Shapes.Nts
             this.empty = pointGeom.IsEmpty;
         }
 
-        public virtual GeoAPI.Geometries.IPoint GetGeom()
+        public virtual GeoAPI.Geometries.IPoint Geometry
         {
-            return pointGeom;
+            get { return pointGeom; }
         }
 
         public virtual bool IsEmpty
@@ -54,14 +54,14 @@ namespace Spatial4n.Core.Shapes.Nts
             get { return empty; }
         }
 
-        public virtual Spatial4n.Core.Shapes.IPoint GetCenter()
+        public virtual Spatial4n.Core.Shapes.IPoint Center
         {
-            return this;
+            get { return this; }
         }
 
-        public virtual bool HasArea()
+        public virtual bool HasArea
         {
-            return false;
+            get { return false; }
         }
 
         public virtual double GetArea(SpatialContext ctx)
@@ -69,9 +69,9 @@ namespace Spatial4n.Core.Shapes.Nts
             return 0;
         }
 
-        public virtual IRectangle GetBoundingBox()
+        public virtual IRectangle BoundingBox
         {
-            return ctx.MakeRectangle(this, this);
+            get { return ctx.MakeRectangle(this, this); }
         }
 
         public virtual IShape GetBuffered(double distance, SpatialContext ctx)
@@ -89,14 +89,14 @@ namespace Spatial4n.Core.Shapes.Nts
             return other.Relate(this).Transpose();
         }
 
-        public virtual double GetX()
+        public virtual double X
         {
-            return IsEmpty ? double.NaN : pointGeom.X;
+            get { return IsEmpty ? double.NaN : pointGeom.X; }
         }
 
-        public virtual double GetY()
+        public virtual double Y
         {
-            return IsEmpty ? double.NaN : pointGeom.Y;
+            get { return IsEmpty ? double.NaN : pointGeom.Y; }
         }
 
         public virtual void Reset(double x, double y)
@@ -110,17 +110,17 @@ namespace Spatial4n.Core.Shapes.Nts
 
         public override string ToString()
         {
-            return string.Format("Pt(x={0:0.0#############},y={1:0.0#############})", GetX(), GetY());
+            return string.Format("Pt(x={0:0.0#############},y={1:0.0#############})", X, Y);
         }
 
         public override bool Equals(object o)
         {
-            return PointImpl.Equals(this, o);
+            return Point.Equals(this, o);
         }
 
         public override int GetHashCode()
         {
-            return PointImpl.GetHashCode(this);
+            return Point.GetHashCode(this);
         }
     }
 }

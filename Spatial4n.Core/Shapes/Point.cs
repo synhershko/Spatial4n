@@ -35,12 +35,12 @@ namespace Spatial4n.Core.Shapes
         /// The X coordinate, or Longitude in geospatial contexts.
         /// </summary>
         /// <returns></returns>
-        double GetX();
+        double X { get; }
 
         /// <summary>
         /// The Y coordinate, or Latitude in geospatial contexts.
         /// </summary>
         /// <returns></returns>
-        double GetY();
+        double Y { get; }
     }
 }

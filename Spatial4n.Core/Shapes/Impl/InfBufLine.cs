@@ -32,12 +32,12 @@ namespace Spatial4n.Core.Shapes.Impl
             this.slope = slope;
             if (double.IsInfinity(slope))
             {
-                intercept = point.GetX();
+                intercept = point.X;
                 distDenomInv = double.NaN;
             }
             else
             {
-                intercept = point.GetY() - slope * point.GetX();
+                intercept = point.Y - slope * point.X;
                 distDenomInv = 1 / Math.Sqrt(slope * slope + 1);
             }
             this.buf = buf;
@@ -45,7 +45,7 @@ namespace Spatial4n.Core.Shapes.Impl
 
         internal virtual SpatialRelation Relate(IRectangle r, IPoint prC, IPoint scratch)
         {
-            Debug.Assert(r.GetCenter().Equals(prC));
+            Debug.Assert(r.Center.Equals(prC));
 
             int cQuad = Quadrant(prC);
 
@@ -80,9 +80,9 @@ namespace Spatial4n.Core.Shapes.Impl
         public virtual double DistanceUnbuffered(IPoint c)
         {
             if (double.IsInfinity(slope))
-                return Math.Abs(c.GetX() - intercept);
+                return Math.Abs(c.X - intercept);
             // http://math.ucsd.edu/~wgarner/math4c/derivations/distance/distptline.htm
-            double num = Math.Abs(c.GetY() - slope * c.GetX() - intercept);
+            double num = Math.Abs(c.Y - slope * c.X - intercept);
             return num * distDenomInv;
         }
 
@@ -106,12 +106,12 @@ namespace Spatial4n.Core.Shapes.Impl
             if (double.IsInfinity(slope))
             {
                 //when slope is infinite, intercept is x intercept instead of y
-                return c.GetX() > intercept ? 1 : 2; //4 : 3 would work too
+                return c.X > intercept ? 1 : 2; //4 : 3 would work too
             }
             //(below will work for slope==0 horizontal line too)
             //is c above or below the line
-            double yAtCinLine = slope * c.GetX() + intercept;
-            bool above = c.GetY() >= yAtCinLine;
+            double yAtCinLine = slope * c.X + intercept;
+            bool above = c.Y >= yAtCinLine;
             if (slope > 0)
             {
                 //if slope is a forward slash, then result is 2 | 4
@@ -131,30 +131,30 @@ namespace Spatial4n.Core.Shapes.Impl
 
         public static void CornerByQuadrant(IRectangle r, int cornerQuad, IPoint output)
         {
-            double x = (cornerQuad == 1 || cornerQuad == 4) ? r.GetMaxX() : r.GetMinX();
-            double y = (cornerQuad == 1 || cornerQuad == 2) ? r.GetMaxY() : r.GetMinY();
+            double x = (cornerQuad == 1 || cornerQuad == 4) ? r.MaxX : r.MinX;
+            double y = (cornerQuad == 1 || cornerQuad == 2) ? r.MaxY : r.MinY;
             output.Reset(x, y);
         }
 
-        public virtual double GetSlope()
+        public virtual double Slope
         {
-            return slope;
+            get { return slope; }
         }
 
-        public virtual double GetIntercept()
+        public virtual double Intercept
         {
-            return intercept;
+            get { return intercept; }
         }
 
-        public virtual double GetBuf()
+        public virtual double Buf
         {
-            return buf;
+            get { return buf; }
         }
 
         /** 1 / Math.sqrt(slope * slope + 1) */
-        public virtual double GetDistDenomInv()
+        public virtual double DistDenomInv
         {
-            return distDenomInv;
+            get { return distDenomInv; }
         }
 
 

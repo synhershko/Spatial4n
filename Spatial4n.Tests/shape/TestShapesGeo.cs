@@ -99,13 +99,13 @@ namespace Spatial4n.Tests.shape
                 int buf = random.Next(0, 90 +1);
                 IRectangle br = (IRectangle)r.GetBuffered(buf, ctx);
                 AssertRelation(null, SpatialRelation.CONTAINS, br, r);
-                if (r.GetWidth() + 2 * buf >= 360)
-                    CustomAssert.EqualWithDelta(360, br.GetWidth(), 0.0);
+                if (r.Width + 2 * buf >= 360)
+                    CustomAssert.EqualWithDelta(360, br.Width, 0.0);
                 else
-                    Assert.True(br.GetWidth() - r.GetWidth() >= 2 * buf);
+                    Assert.True(br.Width - r.Width >= 2 * buf);
                 //TODO test more thoroughly; we don't check that we over-buf
             }
-            Assert.True(ctx.MakeRectangle(0, 10, 0, 89).GetBuffered(0.5, ctx).GetBoundingBox().GetWidth()
+            Assert.True(ctx.MakeRectangle(0, 10, 0, 89).GetBuffered(0.5, ctx).BoundingBox.Width
                 > 11);
         }
 
@@ -193,7 +193,7 @@ namespace Spatial4n.Tests.shape
                 ctx.MakeCircle(-64, 32, 180).Relate(ctx.MakeRectangle(47, 47, -14, 90)));
 
             //--Now proceed with systematic testing:
-            AssertEquals(ctx.WorldBounds, ctx.MakeCircle(0, 0, 180).GetBoundingBox());
+            AssertEquals(ctx.WorldBounds, ctx.MakeCircle(0, 0, 180).BoundingBox);
             //assertEquals(ctx.makeCircle(0,0,distToOpposeSide/2 - 500).getBoundingBox());
 
             double[] theXs = new double[] { -180, -45, 90 };

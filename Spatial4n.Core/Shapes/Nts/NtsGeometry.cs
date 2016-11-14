@@ -80,7 +80,7 @@ namespace Spatial4n.Core.Shapes.Nts
                 if (allowMultiOverlap)
                     geom = UnionGeometryCollection(geom);//returns same or new geom
                 Envelope env = geom.EnvelopeInternal;
-                bbox = new RectangleImpl(env.MinX, env.MaxX, env.MinY, env.MaxY, ctx);
+                bbox = new Rectangle(env.MinX, env.MaxX, env.MinY, env.MaxY, ctx);
             }
             var _ = geom.EnvelopeInternal;//ensure envelope is cached internally, which is lazy evaluated. Keeps this thread-safe.
 
@@ -141,7 +141,7 @@ namespace Spatial4n.Core.Shapes.Nts
         protected IRectangle ComputeGeoBBox(IGeometry geoms)
         {
             if (geoms.IsEmpty)
-                return new RectangleImpl(double.NaN, double.NaN, double.NaN, double.NaN, ctx);
+                return new Rectangle(double.NaN, double.NaN, double.NaN, double.NaN, ctx);
             Envelope env = geoms.EnvelopeInternal;//for minY & maxY (simple)
             if (env.Width > 180 && geoms.NumGeometries > 1)
             {
@@ -163,11 +163,11 @@ namespace Spatial4n.Core.Shapes.Nts
                         break; // can't grow any bigger
                 }
                 // TODO: Inconsistent API between this and GeoAPI
-                return new RectangleImpl(xRange.GetMin(), xRange.GetMax(), env.MinY, env.MaxY, ctx);
+                return new Rectangle(xRange.Min, xRange.Max, env.MinY, env.MaxY, ctx);
             }
             else
             {
-                return new RectangleImpl(env.MinX, env.MaxX, env.MinY, env.MaxY, ctx);
+                return new Rectangle(env.MinX, env.MaxX, env.MinY, env.MaxY, ctx);
             }
         }
 
@@ -178,9 +178,9 @@ namespace Spatial4n.Core.Shapes.Nts
             return this.ctx.MakeShape(geom.Buffer(distance), true, true);
         }
 
-        public virtual bool HasArea()
+        public virtual bool HasArea
         {
-            return _hasArea;
+            get { return _hasArea; }
         }
 
         public virtual double GetArea(SpatialContext ctx)
@@ -189,24 +189,27 @@ namespace Spatial4n.Core.Shapes.Nts
             if (ctx == null || geomArea == 0)
                 return geomArea;
             //Use the area proportional to how filled the bbox is.
-            double bboxArea = GetBoundingBox().GetArea(null);//plain 2d area
+            double bboxArea = BoundingBox.GetArea(null);//plain 2d area
             Debug.Assert(bboxArea >= geomArea);
             double filledRatio = geomArea / bboxArea;
-            return GetBoundingBox().GetArea(ctx) * filledRatio;
+            return BoundingBox.GetArea(ctx) * filledRatio;
             // (Future: if we know we use an equal-area projection then we don't need to
             //  estimate)
         }
 
-        public virtual IRectangle GetBoundingBox()
+        public virtual IRectangle BoundingBox
         {
-            return bbox;
+            get { return bbox; }
         }
 
-        public virtual IPoint GetCenter()
+        public virtual IPoint Center
         {
-            if (IsEmpty) //geom.getCentroid == null
-                return new NtsPoint(ctx.GeometryFactory.CreatePoint((Coordinate)null), ctx);
-            return new NtsPoint((NetTopologySuite.Geometries.Point)geom.Centroid, ctx);
+            get
+            {
+                if (IsEmpty) //geom.getCentroid == null
+                    return new NtsPoint(ctx.GeometryFactory.CreatePoint((Coordinate)null), ctx);
+                return new NtsPoint((NetTopologySuite.Geometries.Point)geom.Centroid, ctx);
+            }
         }
 
         public virtual SpatialRelation Relate(IShape other)
@@ -226,13 +229,13 @@ namespace Spatial4n.Core.Shapes.Nts
 
         public virtual SpatialRelation Relate(IPoint pt)
         {
-            if (!GetBoundingBox().Relate(pt).Intersects())
+            if (!BoundingBox.Relate(pt).Intersects())
                 return SpatialRelation.DISJOINT;
             IGeometry ptGeom;
             if (pt is NtsPoint)
-                ptGeom = ((NtsPoint)pt).GetGeom();
+                ptGeom = ((NtsPoint)pt).Geometry;
             else
-                ptGeom = ctx.GeometryFactory.CreatePoint(new Coordinate(pt.GetX(), pt.GetY()));
+                ptGeom = ctx.GeometryFactory.CreatePoint(new Coordinate(pt.X, pt.Y));
             return Relate(ptGeom);//is point-optimized
         }
 
@@ -259,7 +262,7 @@ namespace Spatial4n.Core.Shapes.Nts
             foreach (Coordinate coord in coords)
             {
                 i++;
-                SpatialRelation sect = circle.Relate(new PointImpl(coord.X, coord.Y, ctx));
+                SpatialRelation sect = circle.Relate(new Impl.Point(coord.X, coord.Y, ctx));
                 if (sect == SpatialRelation.DISJOINT)
                     outside++;
                 if (i != outside && outside != 0)//short circuit: partially outside, partially inside
@@ -267,7 +270,7 @@ namespace Spatial4n.Core.Shapes.Nts
             }
             if (i == outside)
             {
-                return (Relate(circle.GetCenter()) == SpatialRelation.DISJOINT)
+                return (Relate(circle.Center) == SpatialRelation.DISJOINT)
                     ? SpatialRelation.DISJOINT : SpatialRelation.CONTAINS;
             }
             Debug.Assert(outside == 0);
@@ -333,9 +336,9 @@ namespace Spatial4n.Core.Shapes.Nts
             return geom.EnvelopeInternal.GetHashCode();
         }
 
-        public IGeometry GetGeom()
+        public virtual IGeometry Geometry
         {
-            return geom;
+            get { return geom; }
         }
 
         private class S4nGeometryFilter : IGeometryFilter

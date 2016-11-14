@@ -38,6 +38,6 @@ namespace Spatial4n.Core.Shapes
         /// {@link com.spatial4j.core.distance.DistanceUnits}.
         /// </summary>
         /// <returns></returns>
-        double GetRadius();
+        double Radius { get; }
     }
 }

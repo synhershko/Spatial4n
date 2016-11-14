@@ -48,7 +48,7 @@ namespace Spatial4n.Tests.context
                       "distCalculator", "cartesian^2",
                       "worldBounds", "ENVELOPE(-100, 75, 200, 0)");//xMin, xMax, yMax, yMin
             Assert.Equal(new CartesianDistCalc(true), ctx.DistCalc);
-            Assert.Equal(new RectangleImpl(-100, 75, 0, 200, ctx), ctx.WorldBounds);
+            Assert.Equal(new Rectangle(-100, 75, 0, 200, ctx), ctx.WorldBounds);
 
             ctx = Call("geo", "true",
                       "distCalculator", "lawOfCosines");
@@ -88,7 +88,7 @@ namespace Spatial4n.Tests.context
                 "datelineRule", "ccwRect",
                 "validationRule", "repairConvexHull",
                 "autoIndex", "true");
-            CustomAssert.EqualWithDelta(300, ctx.WorldBounds.GetMaxY(), 0.0);
+            CustomAssert.EqualWithDelta(300, ctx.WorldBounds.MaxY, 0.0);
         }
 
         [Fact]

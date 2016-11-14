@@ -24,7 +24,7 @@ namespace Spatial4n.Core.Shapes.Impl
     /// <summary>
     /// A basic 2D implementation of a Point.
     /// </summary>
-    public class PointImpl : IPoint
+    public class Point : IPoint
     {
         private readonly SpatialContext ctx;
         private double x;
@@ -36,7 +36,7 @@ namespace Spatial4n.Core.Shapes.Impl
         /// <param name="x"></param>
         /// <param name="y"></param>
         /// <param name="ctx"></param>
-        public PointImpl(double x, double y, SpatialContext ctx)
+        public Point(double x, double y, SpatialContext ctx)
         {
             this.ctx = ctx;
             Reset(x, y);
@@ -54,24 +54,24 @@ namespace Spatial4n.Core.Shapes.Impl
             this.y = y;
         }
 
-        public virtual double GetX()
+        public virtual double X
         {
-            return x;
+            get { return x; }
         }
 
-        public virtual double GetY()
+        public virtual double Y
         {
-            return y;
+            get { return y; }
         }
 
-        public virtual IRectangle GetBoundingBox()
+        public virtual IRectangle BoundingBox
         {
-            return ctx.MakeRectangle(this, this);
+            get { return ctx.MakeRectangle(this, this); }
         }
 
-        public virtual IPoint GetCenter()
+        public virtual IPoint Center
         {
-            return this;
+            get { return this; }
         }
 
         public virtual IShape GetBuffered(double distance, SpatialContext ctx)
@@ -88,9 +88,9 @@ namespace Spatial4n.Core.Shapes.Impl
             return other.Relate(this).Transpose();
         }
 
-        public virtual bool HasArea()
+        public virtual bool HasArea
         {
-            return false;
+            get { return false; }
         }
 
         public virtual double GetArea(SpatialContext ctx)
@@ -124,7 +124,7 @@ namespace Spatial4n.Core.Shapes.Impl
             var point = o as IPoint;
             if (point == null) return false;
 
-            return thiz.GetX().Equals(point.GetX()) && thiz.GetY().Equals(point.GetY());
+            return thiz.X.Equals(point.X) && thiz.Y.Equals(point.Y);
         }
 
         public override int GetHashCode()
@@ -142,9 +142,9 @@ namespace Spatial4n.Core.Shapes.Impl
             if (thiz == null)
                 throw new ArgumentNullException("thiz");
 
-            long temp = thiz.GetX() != +0.0d ? BitConverter.DoubleToInt64Bits(thiz.GetX()) : 0L;
+            long temp = thiz.X != +0.0d ? BitConverter.DoubleToInt64Bits(thiz.X) : 0L;
             int result = (int)(temp ^ ((uint)temp >> 32));
-            temp = thiz.GetY() != +0.0d ? BitConverter.DoubleToInt64Bits(thiz.GetY()) : 0L;
+            temp = thiz.Y != +0.0d ? BitConverter.DoubleToInt64Bits(thiz.Y) : 0L;
             result = 31 * result + (int)(temp ^ ((uint)temp >> 32));
             return result;
         }

@@ -132,7 +132,7 @@ namespace Spatial4n.Tests.io
         {
             //works because we use NTS (NtsGeometry); BufferedLineString doesn't yet do DL wrap.
             IShape s = ctx.ReadShapeFromWkt("LINESTRING(160 10, -170 15)");
-            CustomAssert.EqualWithDelta(30, s.GetBoundingBox().GetWidth(), 0.0);
+            CustomAssert.EqualWithDelta(30, s.BoundingBox.Width, 0.0);
         }
 
         [Fact]

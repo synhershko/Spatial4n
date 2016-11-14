@@ -53,11 +53,11 @@ namespace Spatial4n.Core.Shapes.Impl
             this.pB = pB;
             this.buf = buf;
 
-            double deltaY = pB.GetY() - pA.GetY();
-            double deltaX = pB.GetX() - pA.GetX();
+            double deltaY = pB.Y - pA.Y;
+            double deltaX = pB.X - pA.X;
 
-            PointImpl center = new PointImpl(pA.GetX() + deltaX / 2,
-                pA.GetY() + deltaY / 2, null);
+            Point center = new Point(pA.X + deltaX / 2,
+                pA.Y + deltaY / 2, null);
 
             double perpExtent = bufExtend ? buf : 0;
 
@@ -78,18 +78,18 @@ namespace Spatial4n.Core.Shapes.Impl
             double minX, maxX;
             if (deltaX == 0)
             { // vertical
-                if (pA.GetY() <= pB.GetY())
+                if (pA.Y <= pB.Y)
                 {
-                    minY = pA.GetY();
-                    maxY = pB.GetY();
+                    minY = pA.Y;
+                    maxY = pB.Y;
                 }
                 else
                 {
-                    minY = pB.GetY();
-                    maxY = pA.GetY();
+                    minY = pB.Y;
+                    maxY = pA.Y;
                 }
-                minX = pA.GetX() - buf;
-                maxX = pA.GetX() + buf;
+                minX = pA.X - buf;
+                maxX = pA.X + buf;
                 minY = minY - perpExtent;
                 maxY = maxY + perpExtent;
 
@@ -104,39 +104,39 @@ namespace Spatial4n.Core.Shapes.Impl
 
                 //Given a right triangle of A, B, C sides, C (hypotenuse) ==
                 // buf, and A + B == the bounding box offset from pA & pB in x & y.
-                double bboxBuf = buf * (1 + Math.Abs(linePrimary.GetSlope()))
-                    * linePrimary.GetDistDenomInv();
+                double bboxBuf = buf * (1 + Math.Abs(linePrimary.Slope))
+                    * linePrimary.DistDenomInv;
                 Debug.Assert(bboxBuf >= buf && bboxBuf <= buf * 1.5);
 
-                if (pA.GetX() <= pB.GetX())
+                if (pA.X <= pB.X)
                 {
-                    minX = pA.GetX() - bboxBuf;
-                    maxX = pB.GetX() + bboxBuf;
+                    minX = pA.X - bboxBuf;
+                    maxX = pB.X + bboxBuf;
                 }
                 else
                 {
-                    minX = pB.GetX() - bboxBuf;
-                    maxX = pA.GetX() + bboxBuf;
+                    minX = pB.X - bboxBuf;
+                    maxX = pA.X + bboxBuf;
                 }
-                if (pA.GetY() <= pB.GetY())
+                if (pA.Y <= pB.Y)
                 {
-                    minY = pA.GetY() - bboxBuf;
-                    maxY = pB.GetY() + bboxBuf;
+                    minY = pA.Y - bboxBuf;
+                    maxY = pB.Y + bboxBuf;
                 }
                 else
                 {
-                    minY = pB.GetY() - bboxBuf;
-                    maxY = pA.GetY() + bboxBuf;
+                    minY = pB.Y - bboxBuf;
+                    maxY = pA.Y + bboxBuf;
                 }
 
             }
             IRectangle bounds = ctx.WorldBounds;
 
             bbox = ctx.MakeRectangle(
-                Math.Max(bounds.GetMinX(), minX),
-                Math.Min(bounds.GetMaxX(), maxX),
-                Math.Max(bounds.GetMinY(), minY),
-                Math.Min(bounds.GetMaxY(), maxY));
+                Math.Max(bounds.MinX, minX),
+                Math.Min(bounds.MaxX, maxX),
+                Math.Max(bounds.MinY, minY),
+                Math.Min(bounds.MaxY, maxY));
         }
 
         public virtual bool IsEmpty
@@ -158,8 +158,8 @@ namespace Spatial4n.Core.Shapes.Impl
         public static double ExpandBufForLongitudeSkew(IPoint pA, IPoint pB,
                                                        double buf)
         {
-            double absA = Math.Abs(pA.GetY());
-            double absB = Math.Abs(pB.GetY());
+            double absA = Math.Abs(pA.Y);
+            double absB = Math.Abs(pB.Y);
             double maxLat = Math.Max(absA, absB);
             double newBuf = DistanceUtils.CalcLonDegreesAtLat(maxLat, buf);
             //    if (newBuf + maxLat >= 90) {
@@ -187,8 +187,8 @@ namespace Spatial4n.Core.Shapes.Impl
                 return bboxR;
             //Either CONTAINS, INTERSECTS, or DISJOINT
 
-            IPoint scratch = new PointImpl(0, 0, null);
-            IPoint prC = r.GetCenter();
+            IPoint scratch = new Point(0, 0, null);
+            IPoint prC = r.Center;
             SpatialRelation result = linePrimary.Relate(r, prC, scratch);
             if (result == SpatialRelation.DISJOINT)
                 return SpatialRelation.DISJOINT;
@@ -206,58 +206,58 @@ namespace Spatial4n.Core.Shapes.Impl
             return linePrimary.Contains(p) && linePerp.Contains(p);
         }
 
-        public virtual IRectangle GetBoundingBox()
+        public virtual IRectangle BoundingBox
         {
-            return bbox;
+            get { return bbox; }
         }
 
 
-        public virtual bool HasArea()
+        public virtual bool HasArea
         {
-            return buf > 0;
+            get { return buf > 0; }
         }
 
 
         public virtual double GetArea(SpatialContext ctx)
         {
-            return linePrimary.GetBuf() * linePerp.GetBuf() * 4;
+            return linePrimary.Buf * linePerp.Buf * 4;
         }
 
 
-        public virtual IPoint GetCenter()
+        public virtual IPoint Center
         {
-            return GetBoundingBox().GetCenter();
+            get { return BoundingBox.Center; }
         }
 
-        public virtual IPoint GetA()
+        public virtual IPoint A
         {
-            return pA;
+            get { return pA; }
         }
 
-        public virtual IPoint GetB()
+        public virtual IPoint B
         {
-            return pB;
+            get { return pB; }
         }
 
-        public virtual double GetBuf()
+        public virtual double Buf
         {
-            return buf;
-        }
-
-        /**
-         * INTERNAL
-         */
-        public virtual InfBufLine GetLinePrimary()
-        {
-            return linePrimary;
+            get { return buf; }
         }
 
         /**
          * INTERNAL
          */
-        public virtual InfBufLine GetLinePerp()
+        public virtual InfBufLine LinePrimary
         {
-            return linePerp;
+            get { return linePrimary; }
+        }
+
+        /**
+         * INTERNAL
+         */
+        public virtual InfBufLine LinePerp
+        {
+            get { return linePerp; }
         }
 
 

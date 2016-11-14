@@ -83,17 +83,17 @@ namespace Spatial4n.Core.Shapes.Impl
 
         public virtual IShape GetBuffered(double distance, SpatialContext ctx)
         {
-            return ctx.MakeBufferedLineString(GetPoints(), buf + distance);
+            return ctx.MakeBufferedLineString(Points, buf + distance);
         }
 
-        public virtual ShapeCollection GetSegments()
+        public virtual ShapeCollection Segments
         {
-            return segments;
+            get { return segments; }
         }
 
-        public double GetBuf()
+        public virtual double Buf
         {
-            return buf;
+            get { return buf; }
         }
 
         public virtual double GetArea(SpatialContext ctx)
@@ -106,21 +106,21 @@ namespace Spatial4n.Core.Shapes.Impl
             return segments.Relate(other);
         }
 
-        public virtual bool HasArea()
+        public virtual bool HasArea
         {
-            return segments.HasArea();
+            get { return segments.HasArea; }
         }
 
 
-        public virtual IPoint GetCenter()
+        public virtual IPoint Center
         {
-            return segments.GetCenter();
+            get { return segments.Center; }
         }
 
 
-        public virtual IRectangle GetBoundingBox()
+        public virtual IRectangle BoundingBox
         {
-            return segments.GetBoundingBox();
+            get { return segments.BoundingBox; }
         }
 
 
@@ -129,7 +129,7 @@ namespace Spatial4n.Core.Shapes.Impl
             StringBuilder str = new StringBuilder(100);
             str.Append("BufferedLineString(buf=").Append(buf).Append(" pts=");
             bool first = true;
-            foreach (IPoint point in GetPoints())
+            foreach (IPoint point in Points)
             {
                 if (first)
                 {
@@ -139,31 +139,34 @@ namespace Spatial4n.Core.Shapes.Impl
                 {
                     str.Append(", ");
                 }
-                str.Append(point.GetX()).Append(' ').Append(point.GetY());
+                str.Append(point.X).Append(' ').Append(point.Y);
             }
             str.Append(')');
             return str.ToString();
         }
 
-        public virtual IList<IPoint> GetPoints()
+        public virtual IList<IPoint> Points
         {
-            if (!segments.Any())
-                return new List<IPoint>();
-            IList<IShape> shapes = segments.GetShapes();
-            IList<IPoint> points = new List<IPoint>(); ;
-
-            foreach (var shape in shapes)
+            get
             {
-                if (!(shape is BufferedLine))
-                    continue;
+                if (!segments.Any())
+                    return new List<IPoint>();
+                IList<IShape> shapes = segments.Shapes;
+                IList<IPoint> points = new List<IPoint>(); ;
 
-                BufferedLine line = shape as BufferedLine;
+                foreach (var shape in shapes)
+                {
+                    if (!(shape is BufferedLine))
+                        continue;
 
-                points.Add(line.GetA());
-                points.Add(line.GetB());
+                    BufferedLine line = shape as BufferedLine;
+
+                    points.Add(line.A);
+                    points.Add(line.B);
+                }
+
+                return points;
             }
-
-            return points;
         }
 
 

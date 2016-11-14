@@ -13,7 +13,7 @@ namespace Spatial4n.Tests.shape
     public class BufferedLineStringTest
     {
         private readonly SpatialContext ctx = new SpatialContextFactory()
-            { geo = false, worldBounds = new RectangleImpl(-100, 100, -50, 50, null) }.NewSpatialContext();
+            { geo = false, worldBounds = new Rectangle(-100, 100, -50, 50, null) }.NewSpatialContext();
 
         private class RectIntersectionAnonymousHelper : RectIntersectionTestHelper
         {
@@ -32,7 +32,7 @@ namespace Spatial4n.Tests.shape
                 {
                     points.Add(RandomPointIn(nearR));
                 }
-                double maxBuf = Math.Max(nearR.GetWidth(), nearR.GetHeight());
+                double maxBuf = Math.Max(nearR.Width, nearR.Height);
                 double buf = Math.Abs(RandomGaussian()) * maxBuf / 4;
                 buf = random.Next((int)Divisible(buf));
                 return new BufferedLineString(points, buf, ctx);
@@ -40,7 +40,7 @@ namespace Spatial4n.Tests.shape
 
             protected override Core.Shapes.IPoint RandomPointInEmptyShape(IShape shape)
             {
-                IList<Core.Shapes.IPoint> points = ((BufferedLineString)shape).GetPoints();
+                IList<Core.Shapes.IPoint> points = ((BufferedLineString)shape).Points;
                 return points.Count == 0 ? null : points[random.Next(points.Count/* - 1*/)];
             }
         }

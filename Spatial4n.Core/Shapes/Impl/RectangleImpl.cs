@@ -27,7 +27,7 @@ namespace Spatial4n.Core.Shapes.Impl
     /// wrap-around. When minX > maxX, this will assume it is world coordinates that
     /// cross the date line using degrees. Immutable & threadsafe.
     /// </summary>
-    public class RectangleImpl : IRectangle
+    public class Rectangle : IRectangle
     {
         private readonly SpatialContext ctx;
         private double minX;
@@ -35,20 +35,20 @@ namespace Spatial4n.Core.Shapes.Impl
         private double minY;
         private double maxY;
 
-        public RectangleImpl(double minX, double maxX, double minY, double maxY, SpatialContext ctx)
+        public Rectangle(double minX, double maxX, double minY, double maxY, SpatialContext ctx)
         {
             //TODO change to West South East North to be more consistent with OGC?
             this.ctx = ctx;
             Reset(minX, maxX, minY, maxY);
         }
 
-        public RectangleImpl(IPoint lowerLeft, IPoint upperRight, SpatialContext ctx)
-            : this(lowerLeft.GetX(), upperRight.GetX(), lowerLeft.GetY(), upperRight.GetY(), ctx)
+        public Rectangle(IPoint lowerLeft, IPoint upperRight, SpatialContext ctx)
+            : this(lowerLeft.X, upperRight.X, lowerLeft.Y, upperRight.Y, ctx)
         {
         }
 
-        public RectangleImpl(IRectangle r, SpatialContext ctx)
-            : this(r.GetMinX(), r.GetMaxX(), r.GetMinY(), r.GetMaxY(), ctx)
+        public Rectangle(IRectangle r, SpatialContext ctx)
+            : this(r.MinX, r.MaxX, r.MinY, r.MaxY, ctx)
         {
         }
 
@@ -88,7 +88,7 @@ namespace Spatial4n.Core.Shapes.Impl
                     double lonDistance = DistanceUtils.CalcBoxByDistFromPt_deltaLonDEG(
                         closestToPoleY, minX, distance);//lat,lon order
                                                         //could still wrap the world though...
-                    if (lonDistance * 2 + GetWidth() >= 360)
+                    if (lonDistance * 2 + Width >= 360)
                         return ctx.MakeRectangle(-180, 180, minY - latDistance, maxY + latDistance);
                     return ctx.MakeRectangle(
                         DistanceUtils.NormLonDEG(minX - lonDistance),
@@ -99,24 +99,24 @@ namespace Spatial4n.Core.Shapes.Impl
             else
             {
                 IRectangle worldBounds = ctx.WorldBounds;
-                double newMinX = Math.Max(worldBounds.GetMinX(), minX - distance);
-                double newMaxX = Math.Min(worldBounds.GetMaxX(), maxX + distance);
-                double newMinY = Math.Max(worldBounds.GetMinY(), minY - distance);
-                double newMaxY = Math.Min(worldBounds.GetMaxY(), maxY + distance);
+                double newMinX = Math.Max(worldBounds.MinX, minX - distance);
+                double newMaxX = Math.Min(worldBounds.MaxX, maxX + distance);
+                double newMinY = Math.Max(worldBounds.MinY, minY - distance);
+                double newMaxY = Math.Min(worldBounds.MaxY, maxY + distance);
                 return ctx.MakeRectangle(newMinX, newMaxX, newMinY, newMaxY);
             }
         }
 
-        public virtual bool HasArea()
+        public virtual bool HasArea
         {
-            return maxX != minX && maxY != minY;
+            get { return maxX != minX && maxY != minY; }
         }
 
         public virtual double GetArea(SpatialContext ctx)
         {
             if (ctx == null)
             {
-                return GetWidth() * GetHeight();
+                return Width * Height;
             }
             else
             {
@@ -124,51 +124,54 @@ namespace Spatial4n.Core.Shapes.Impl
             }
         }
 
-        public virtual bool GetCrossesDateLine()
+        public virtual bool CrossesDateLine
         {
-            return (minX > maxX);
+            get { return (minX > maxX); }
         }
 
-        public virtual double GetHeight()
+        public virtual double Height
         {
-            return maxY - minY;
+            get { return maxY - minY; }
         }
 
-        public virtual double GetWidth()
+        public virtual double Width
         {
-            double w = maxX - minX;
-            if (w < 0)
+            get
             {
-                //only true when minX > maxX (WGS84 assumed)
-                w += 360;
-                Debug.Assert(w >= 0);
+                double w = maxX - minX;
+                if (w < 0)
+                {
+                    //only true when minX > maxX (WGS84 assumed)
+                    w += 360;
+                    Debug.Assert(w >= 0);
+                }
+                return w;
             }
-            return w;
         }
 
-        public virtual double GetMaxX()
+        public virtual double MaxX
         {
-            return maxX;
+            get { return maxX; }
         }
 
-        public virtual double GetMaxY()
+        public virtual double MaxY
         {
-            return maxY;
+            get { return maxY; }
         }
 
-        public virtual double GetMinX()
+        public virtual double MinX
         {
-            return minX;
+            get { return minX; }
         }
 
-        public virtual double GetMinY()
+        public virtual double MinY
         {
-            return minY;
+            get { return minY; }
         }
 
-        public virtual IRectangle GetBoundingBox()
+        public virtual IRectangle BoundingBox
         {
-            return this;
+            get { return this; }
         }
 
         public virtual SpatialRelation Relate(IShape other)
@@ -190,12 +193,12 @@ namespace Spatial4n.Core.Shapes.Impl
 
         public virtual SpatialRelation Relate(IPoint point)
         {
-            if (point.GetY() > GetMaxY() || point.GetY() < GetMinY())
+            if (point.Y > MaxY || point.Y < MinY)
                 return SpatialRelation.DISJOINT;
             //  all the below logic is rather unfortunate but some dateline cases demand it
             double minX = this.minX;
             double maxX = this.maxX;
-            double pX = point.GetX();
+            double pX = point.X;
             if (ctx.IsGeo)
             {
                 //unwrap dateline and normalize +180 to become -180
@@ -225,11 +228,11 @@ namespace Spatial4n.Core.Shapes.Impl
 
         public virtual SpatialRelation Relate(IRectangle rect)
         {
-            SpatialRelation yIntersect = RelateYRange(rect.GetMinY(), rect.GetMaxY());
+            SpatialRelation yIntersect = RelateYRange(rect.MinY, rect.MaxY);
             if (yIntersect == SpatialRelation.DISJOINT)
                 return SpatialRelation.DISJOINT;
 
-            SpatialRelation xIntersect = RelateXRange(rect.GetMinX(), rect.GetMaxX());
+            SpatialRelation xIntersect = RelateXRange(rect.MinX, rect.MaxX);
             if (xIntersect == SpatialRelation.DISJOINT)
                 return SpatialRelation.DISJOINT;
 
@@ -237,9 +240,9 @@ namespace Spatial4n.Core.Shapes.Impl
                 return xIntersect;
 
             //if one side is equal, return the other
-            if (GetMinX() == rect.GetMinX() && GetMaxX() == rect.GetMaxX())
+            if (MinX == rect.MinX && MaxX == rect.MaxX)
                 return yIntersect;
-            if (GetMinY() == rect.GetMinY() && GetMaxY() == rect.GetMaxY())
+            if (MinY == rect.MinY && MaxY == rect.MaxY)
                 return xIntersect;
 
             return SpatialRelation.INTERSECTS;
@@ -315,15 +318,18 @@ namespace Spatial4n.Core.Shapes.Impl
             return "Rect(minX=" + minX + ",maxX=" + maxX + ",minY=" + minY + ",maxY=" + maxY + ")";
         }
 
-        public virtual IPoint GetCenter()
+        public virtual IPoint Center
         {
-            if (double.IsNaN(minX))
-                return ctx.MakePoint(double.NaN, double.NaN);
-            double y = GetHeight() / 2 + minY;
-            double x = GetWidth() / 2 + minX;
-            if (minX > maxX)//WGS84
-                x = DistanceUtils.NormLonDEG(x); //in case falls outside the standard range
-            return new PointImpl(x, y, ctx);
+            get
+            {
+                if (double.IsNaN(minX))
+                    return ctx.MakePoint(double.NaN, double.NaN);
+                double y = Height / 2 + minY;
+                double x = Width / 2 + minX;
+                if (minX > maxX)//WGS84
+                    x = DistanceUtils.NormLonDEG(x); //in case falls outside the standard range
+                return new Point(x, y, ctx);
+            }
         }
 
         public override bool Equals(object obj)
@@ -347,8 +353,8 @@ namespace Spatial4n.Core.Shapes.Impl
             var rectangle = o as IRectangle;
             if (rectangle == null) return false;
 
-            return thiz.GetMaxX().Equals(rectangle.GetMaxX()) && thiz.GetMinX().Equals(rectangle.GetMinX()) &&
-                   thiz.GetMaxY().Equals(rectangle.GetMaxY()) && thiz.GetMinY().Equals(rectangle.GetMinY());
+            return thiz.MaxX.Equals(rectangle.MaxX) && thiz.MinX.Equals(rectangle.MinX) &&
+                   thiz.MaxY.Equals(rectangle.MaxY) && thiz.MinY.Equals(rectangle.MinY);
         }
 
         public override int GetHashCode()
@@ -361,13 +367,13 @@ namespace Spatial4n.Core.Shapes.Impl
             if (thiz == null)
                 throw new ArgumentNullException("thiz");
 
-            long temp = thiz.GetMinX() != +0.0d ? BitConverter.DoubleToInt64Bits(thiz.GetMinX()) : 0L;
+            long temp = thiz.MinX != +0.0d ? BitConverter.DoubleToInt64Bits(thiz.MinX) : 0L;
             int result = (int)(temp ^ ((uint)temp >> 32));
-            temp = thiz.GetMaxX() != +0.0d ? BitConverter.DoubleToInt64Bits(thiz.GetMaxX()) : 0L;
+            temp = thiz.MaxX != +0.0d ? BitConverter.DoubleToInt64Bits(thiz.MaxX) : 0L;
             result = 31 * result + (int)(temp ^ ((uint)temp >> 32));
-            temp = thiz.GetMinY() != +0.0d ? BitConverter.DoubleToInt64Bits(thiz.GetMinY()) : 0L;
+            temp = thiz.MinY != +0.0d ? BitConverter.DoubleToInt64Bits(thiz.MinY) : 0L;
             result = 31 * result + (int)(temp ^ ((uint)temp >> 32));
-            temp = thiz.GetMaxY() != +0.0d ? BitConverter.DoubleToInt64Bits(thiz.GetMaxY()) : 0L;
+            temp = thiz.MaxY != +0.0d ? BitConverter.DoubleToInt64Bits(thiz.MaxY) : 0L;
             result = 31 * result + (int)(temp ^ ((uint)temp >> 32));
             return result;
         }

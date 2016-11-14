@@ -18,7 +18,7 @@ namespace Spatial4n.Tests.shape
 		{
 			get
 			{
-                IRectangle WB = new RectangleImpl(-2000, 2000, -300, 300, null);//whatever
+                IRectangle WB = new Rectangle(-2000, 2000, -300, 300, null);//whatever
 				yield return new object[] { new SpatialContextFactory() { geo = false, worldBounds = WB }.NewSpatialContext() };
 				yield return new object[] { new NtsSpatialContextFactory() { geo = false, worldBounds = WB }.NewSpatialContext() };
 			}
@@ -46,12 +46,12 @@ namespace Spatial4n.Tests.shape
 			Assert.Equal(/*msg,*/ pt, pt2);
 			Assert.Equal(/*msg,*/ pt.GetHashCode(), pt2.GetHashCode());
 
-			Assert.False(pt.HasArea(), msg);
-			Assert.Equal(/*msg,*/ pt.GetCenter(), pt);
-			IRectangle bbox = pt.GetBoundingBox();
-			Assert.False(bbox.HasArea(), msg);
+			Assert.False(pt.HasArea, msg);
+			Assert.Equal(/*msg,*/ pt.Center, pt);
+			IRectangle bbox = pt.BoundingBox;
+			Assert.False(bbox.HasArea, msg);
 			
-			var center = bbox.GetCenter();
+			var center = bbox.Center;
 			Assert.True(pt.Equals(center));
 			//Assert.Equal(/*msg,*/ pt, center);
 
@@ -144,7 +144,7 @@ namespace Spatial4n.Tests.shape
             ICircle c2 = ctx.MakeCircle(5, 6, 7);
             c2.Reset(3, 4, 5); // to c1
             Assert.Equal(c, c2);
-            Assert.Equal(c.GetBoundingBox(), c2.GetBoundingBox());
+            Assert.Equal(c.BoundingBox, c2.BoundingBox);
         }
 
         [Theory]
@@ -163,10 +163,10 @@ namespace Spatial4n.Tests.shape
         {
             CheckShapesImplementEquals(new[]
                                     {
-                                        typeof(PointImpl),
-                                        typeof(CircleImpl),
+                                        typeof(Point),
+                                        typeof(Circle),
 										//GeoCircle.class  no: its fields are caches, not part of its identity
-                                        typeof(RectangleImpl),
+                                        typeof(Rectangle),
                                         typeof(ShapeCollection),
                                         typeof(BufferedLineString),
                                         typeof(BufferedLine)

@@ -12,7 +12,7 @@ namespace Spatial4n.Tests.io
 {
     public class WktCustomShapeParserTest : WktShapeParserTest
     {
-        internal class CustomShape : PointImpl
+        internal class CustomShape : Point
         {
 
             internal readonly string name;

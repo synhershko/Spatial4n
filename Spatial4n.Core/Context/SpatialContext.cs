@@ -109,20 +109,20 @@ namespace Spatial4n.Core.Context
             if (bounds == null)
             {
                 this.worldBounds = IsGeo
-                        ? new RectangleImpl(-180, 180, -90, 90, this)
-                        : new RectangleImpl(-double.MaxValue, double.MaxValue,
+                        ? new Rectangle(-180, 180, -90, 90, this)
+                        : new Rectangle(-double.MaxValue, double.MaxValue,
                         -double.MaxValue, double.MaxValue, this);
             }
             else
             {
-                if (IsGeo && !bounds.Equals(new RectangleImpl(-180, 180, -90, 90, this)))
+                if (IsGeo && !bounds.Equals(new Rectangle(-180, 180, -90, 90, this)))
                     throw new ArgumentException("for geo (lat/lon), bounds must be " + GEO.WorldBounds);
-                if (bounds.GetMinX() > bounds.GetMaxX())
+                if (bounds.MinX > bounds.MaxX)
                     throw new ArgumentException("worldBounds minX should be <= maxX: " + bounds);
-                if (bounds.GetMinY() > bounds.GetMaxY())
+                if (bounds.MinY > bounds.MaxY)
                     throw new ArgumentException("worldBounds minY should be <= maxY: " + bounds);
                 //hopefully worldBounds' rect implementation is compatible
-                this.worldBounds = new RectangleImpl(bounds, this);
+                this.worldBounds = new Rectangle(bounds, this);
             }
 
             this.normWrapLongitude = factory.normWrapLongitude && this.IsGeo;
@@ -203,7 +203,7 @@ namespace Spatial4n.Core.Context
         public virtual void VerifyX(double x)
         {
             IRectangle bounds = WorldBounds;
-            if (x < bounds.GetMinX() || x > bounds.GetMaxX()) //NaN will pass
+            if (x < bounds.MinX || x > bounds.MaxX) //NaN will pass
                 throw new InvalidShapeException("Bad X value " + x + " is not in boundary " + bounds);
         }
 
@@ -214,7 +214,7 @@ namespace Spatial4n.Core.Context
         public virtual void VerifyY(double y)
         {
             IRectangle bounds = WorldBounds;
-            if (y < bounds.GetMinY() || y > bounds.GetMaxY()) //NaN will pass
+            if (y < bounds.MinY || y > bounds.MaxY) //NaN will pass
                 throw new InvalidShapeException("Bad Y value " + y + " is not in boundary " + bounds);
         }
 
@@ -228,7 +228,7 @@ namespace Spatial4n.Core.Context
         {
             VerifyX(x);
             VerifyY(y);
-            return new PointImpl(x, y, this);
+            return new Point(x, y, this);
         }
 
         /// <summary>
@@ -239,8 +239,8 @@ namespace Spatial4n.Core.Context
         /// <returns></returns>
         public virtual IRectangle MakeRectangle(IPoint lowerLeft, IPoint upperRight)
         {
-            return MakeRectangle(lowerLeft.GetX(), upperRight.GetX(),
-                            lowerLeft.GetY(), upperRight.GetY());
+            return MakeRectangle(lowerLeft.X, upperRight.X,
+                            lowerLeft.Y, upperRight.Y);
         }
 
         /// <summary>
@@ -257,7 +257,7 @@ namespace Spatial4n.Core.Context
         {
             IRectangle bounds = WorldBounds;
             // Y
-            if (minY < bounds.GetMinY() || maxY > bounds.GetMaxY()) //NaN will fail
+            if (minY < bounds.MinY || maxY > bounds.MaxY) //NaN will fail
                 throw new InvalidShapeException("Y values [" + minY + " to " + maxY + "] not in boundary " + bounds);
             if (minY > maxY)
                 throw new InvalidShapeException("maxY must be >= minY: " + minY + " to " + maxY);
@@ -281,12 +281,12 @@ namespace Spatial4n.Core.Context
             }
             else
             {
-                if (minX < bounds.GetMinX() || maxX > bounds.GetMaxX()) //NaN will fail
+                if (minX < bounds.MinX || maxX > bounds.MaxX) //NaN will fail
                     throw new InvalidShapeException("X values [" + minX + " to " + maxX + "] not in boundary " + bounds);
                 if (minX > maxX)
                     throw new InvalidShapeException("maxX must be >= minX: " + minX + " to " + maxX);
             }
-            return new RectangleImpl(minX, maxX, minY, maxY, this);
+            return new Rectangle(minX, maxX, minY, maxY, this);
         }
 
         /// <summary>
@@ -323,7 +323,7 @@ namespace Spatial4n.Core.Context
             }
             else
             {
-                return new CircleImpl(point, distance, this);
+                return new Circle(point, distance, this);
             }
         }
 

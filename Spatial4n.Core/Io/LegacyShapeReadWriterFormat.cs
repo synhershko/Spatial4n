@@ -52,23 +52,23 @@ namespace Spatial4n.Core.Io
             if (shape is IPoint)
             {
                 IPoint point = (IPoint)shape;
-                return point.GetX().ToString(numberFormat, CultureInfo.InvariantCulture) + " " + point.GetY().ToString(numberFormat, CultureInfo.InvariantCulture);
+                return point.X.ToString(numberFormat, CultureInfo.InvariantCulture) + " " + point.Y.ToString(numberFormat, CultureInfo.InvariantCulture);
             }
             else if (shape is IRectangle)
             {
                 IRectangle rect = (IRectangle)shape;
-                return rect.GetMinX().ToString(numberFormat, CultureInfo.InvariantCulture) + " " +
-                    rect.GetMinY().ToString(numberFormat, CultureInfo.InvariantCulture) + " " +
-                    rect.GetMaxX().ToString(numberFormat, CultureInfo.InvariantCulture) + " " +
-                    rect.GetMaxY().ToString(numberFormat, CultureInfo.InvariantCulture);
+                return rect.MinX.ToString(numberFormat, CultureInfo.InvariantCulture) + " " +
+                    rect.MinY.ToString(numberFormat, CultureInfo.InvariantCulture) + " " +
+                    rect.MaxX.ToString(numberFormat, CultureInfo.InvariantCulture) + " " +
+                    rect.MaxY.ToString(numberFormat, CultureInfo.InvariantCulture);
             }
             else if (shape is ICircle)
             {
                 ICircle c = (ICircle)shape;
                 return "Circle(" +
-                    c.GetCenter().GetX().ToString(numberFormat, CultureInfo.InvariantCulture) + " " +
-                    c.GetCenter().GetY().ToString(numberFormat, CultureInfo.InvariantCulture) + " " +
-                    "d=" + c.GetRadius().ToString(numberFormat, CultureInfo.InvariantCulture) +
+                    c.Center.X.ToString(numberFormat, CultureInfo.InvariantCulture) + " " +
+                    c.Center.Y.ToString(numberFormat, CultureInfo.InvariantCulture) + " " +
+                    "d=" + c.Radius.ToString(numberFormat, CultureInfo.InvariantCulture) +
                     ")";
             }
             return shape.ToString();

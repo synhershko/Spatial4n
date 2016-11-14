@@ -41,12 +41,12 @@ namespace Spatial4n.Tests.io
 
             IShape sNoDL = ctx.ReadShape("Polygon((-170 30, -170 15,  160 15,  160 30, -170 30))");
             IRectangle expectedNoDL = ctx.MakeRectangle(-170, 160, 15, 30);
-            Assert.True(!expectedNoDL.GetCrossesDateLine());
+            Assert.True(!expectedNoDL.CrossesDateLine);
             Assert.Equal(expectedNoDL, sNoDL);
 
             IShape sYesDL = ctx.ReadShape("Polygon(( 160 30,  160 15, -170 15, -170 30,  160 30))");
             IRectangle expectedYesDL = ctx.MakeRectangle(160, -170, 15, 30);
-            Assert.True(expectedYesDL.GetCrossesDateLine());
+            Assert.True(expectedYesDL.CrossesDateLine);
             Assert.Equal(expectedYesDL, sYesDL);
 
         }

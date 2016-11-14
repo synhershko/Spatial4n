@@ -100,7 +100,7 @@ namespace Spatial4n.Tests.shape
 
 			TestRectIntersect();
 
-            if (!ctx.IsGeo())
+            if (!ctx.IsGeo)
                 AssertEquals(ctx.MakeRectangle(0.9, 2.1, 2.9, 4.1), ctx.MakeRectangle(1, 2, 3, 4).GetBuffered(0.1, ctx));
 
             TestEmptiness(ctx.MakeRectangle(double.NaN, double.NaN, double.NaN, double.NaN));

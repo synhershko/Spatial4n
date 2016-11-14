@@ -67,9 +67,9 @@ namespace Spatial4n.Core.Shapes.Impl
             get { return double.IsNaN(minX); }
         }
 
-        public virtual /*Rectangle*/ IShape GetBuffered(double distance, SpatialContext ctx)
+        public virtual IShape GetBuffered(double distance, SpatialContext ctx)
         {
-            if (ctx.IsGeo())
+            if (ctx.IsGeo)
             {
                 //first check pole touching, triggering a world-wrap rect
                 if (maxY + distance >= 90)
@@ -98,7 +98,7 @@ namespace Spatial4n.Core.Shapes.Impl
             }
             else
             {
-                IRectangle worldBounds = ctx.GetWorldBounds();
+                IRectangle worldBounds = ctx.WorldBounds;
                 double newMinX = Math.Max(worldBounds.GetMinX(), minX - distance);
                 double newMaxX = Math.Min(worldBounds.GetMaxX(), maxX + distance);
                 double newMinY = Math.Max(worldBounds.GetMinY(), minY - distance);
@@ -120,7 +120,7 @@ namespace Spatial4n.Core.Shapes.Impl
             }
             else
             {
-                return ctx.GetDistCalc().Area(this);
+                return ctx.DistCalc.Area(this);
             }
         }
 
@@ -196,7 +196,7 @@ namespace Spatial4n.Core.Shapes.Impl
             double minX = this.minX;
             double maxX = this.maxX;
             double pX = point.GetX();
-            if (ctx.IsGeo())
+            if (ctx.IsGeo)
             {
                 //unwrap dateline and normalize +180 to become -180
                 double rawWidth = maxX - minX;
@@ -275,7 +275,7 @@ namespace Spatial4n.Core.Shapes.Impl
             //For ext & this we have local minX and maxX variable pairs. We rotate them so that minX <= maxX
             double minX = this.minX;
             double maxX = this.maxX;
-            if (ctx.IsGeo())
+            if (ctx.IsGeo)
             {
                 //unwrap dateline, plus do world-wrap short circuit
                 double rawWidth = maxX - minX;

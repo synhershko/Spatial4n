@@ -88,7 +88,7 @@ namespace Spatial4n.Core.Io.Nts
                 //Note: we don't simply call ctx.normX & normY because
                 //  those methods use the precisionModel, but WKTReader already
                 //  used the precisionModel. It's be nice to turn that off somehow but alas.
-                if (outerInstance.ctx.IsGeo() && outerInstance.ctx.IsNormWrapLongitude())
+                if (outerInstance.ctx.IsGeo && outerInstance.ctx.IsNormWrapLongitude)
                 {
                     double xNorm = DistanceUtils.NormLonDEG(x);
                     if (x.CompareTo(xNorm) != 0)

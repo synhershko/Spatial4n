@@ -58,7 +58,7 @@ namespace Spatial4n.Core.Shapes.Nts
                 throw new ArgumentException("NtsGeometry does not support GeometryCollection but does support its subclasses.");
 
             //NOTE: All this logic is fairly expensive. There are some short-circuit checks though.
-            if (ctx.IsGeo())
+            if (ctx.IsGeo)
             {
                 //Unwraps the geometry across the dateline so it exceeds the standard geo bounds (-180 to +180).
                 if (dateline180Check)

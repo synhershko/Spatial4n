@@ -33,7 +33,7 @@ namespace Spatial4n.Core.Shapes.Impl
         public GeoCircle(IPoint p, double radiusDEG, SpatialContext ctx)
             : base(p, radiusDEG, ctx)
         {
-            Debug.Assert(ctx.IsGeo());
+            Debug.Assert(ctx.IsGeo);
             Init();
         }
 
@@ -77,7 +77,7 @@ namespace Spatial4n.Core.Shapes.Impl
             else
             {
                 inverseCircle = null;
-                double _horizAxisY = ctx.GetDistCalc().CalcBoxByDistFromPt_yHorizAxisDEG(GetCenter(), radiusDEG, ctx);
+                double _horizAxisY = ctx.DistCalc.CalcBoxByDistFromPt_yHorizAxisDEG(GetCenter(), radiusDEG, ctx);
                 //some rare numeric conditioning cases can cause this to be barely beyond the box
                 if (_horizAxisY > enclosingBox.GetMaxY())
                 {

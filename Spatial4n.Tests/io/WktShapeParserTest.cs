@@ -45,7 +45,7 @@ namespace Spatial4n.Tests.io
         [Fact]
         public virtual void TestNoOp()
         {
-            WktShapeParser wktShapeParser = ctx.GetWktShapeParser();
+            WktShapeParser wktShapeParser = ctx.WktShapeParser;
             Assert.Null(wktShapeParser.ParseIfSupported(""));
             Assert.Null(wktShapeParser.ParseIfSupported("  "));
             Assert.Null(wktShapeParser.ParseIfSupported("BogusShape()"));

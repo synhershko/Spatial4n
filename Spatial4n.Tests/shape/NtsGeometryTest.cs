@@ -41,7 +41,7 @@ namespace Spatial4n.Tests.shape
         {
             POLY_SHAPE = (NtsGeometry)ctx.ReadShapeFromWkt(POLY_STR);
 
-            if (ctx.IsGeo())
+            if (ctx.IsGeo)
             {
                 POLY_SHAPE_DL = ShiftPoly(POLY_SHAPE, DL_SHIFT);
                 Assert.True(POLY_SHAPE_DL.GetBoundingBox().GetCrossesDateLine());
@@ -62,7 +62,7 @@ namespace Spatial4n.Tests.shape
             public void Filter(Coordinate coord)
             {
                 coord.X = outerInstance.NormX(coord.X + lon_shift);
-                if (outerInstance.ctx.IsGeo() && Math.Abs(coord.X) == 180 && outerInstance.random.nextBoolean())
+                if (outerInstance.ctx.IsGeo && Math.Abs(coord.X) == 180 && outerInstance.random.nextBoolean())
                     coord.X = -coord.X;//invert sign of dateline boundary some of the time
             }
         }
@@ -87,7 +87,7 @@ namespace Spatial4n.Tests.shape
         }
         public virtual void TestRelationsImpl(bool prepare)
         {
-            Debug.Assert(!((NtsWktShapeParser)ctx.GetWktShapeParser()).IsAutoIndex);
+            Debug.Assert(!((NtsWktShapeParser)ctx.WktShapeParser).IsAutoIndex);
             //base polygon
             NtsGeometry @base = (NtsGeometry)ctx.ReadShapeFromWkt("POLYGON((0 0, 10 0, 5 5, 0 0))");
             //shares only "10 0" with base
@@ -177,7 +177,7 @@ namespace Spatial4n.Tests.shape
                 expectedSR = SpatialRelation.CONTAINS;
             AssertRelation(null, expectedSR, POLY_SHAPE, shape);
 
-            if (ctx.IsGeo())
+            if (ctx.IsGeo)
             {
                 //shift shape, set to shape2
                 IShape shape2;

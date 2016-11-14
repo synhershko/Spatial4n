@@ -93,17 +93,17 @@ namespace Spatial4n.Tests.shape
 
         protected virtual double NormX(double x)
         {
-            return ctx.IsGeo() ? DistanceUtils.NormLonDEG(x) : x;
+            return ctx.IsGeo ? DistanceUtils.NormLonDEG(x) : x;
         }
 
         protected virtual double NormY(double y)
         {
-            return ctx.IsGeo() ? DistanceUtils.NormLatDEG(y) : y;
+            return ctx.IsGeo ? DistanceUtils.NormLatDEG(y) : y;
         }
 
         protected virtual IRectangle MakeNormRect(double minX, double maxX, double minY, double maxY)
         {
-            if (ctx.IsGeo())
+            if (ctx.IsGeo)
             {
                 if (Math.Abs(maxX - minX) >= 360)
                 {
@@ -125,8 +125,8 @@ namespace Spatial4n.Tests.shape
                     minX = maxX;
                     maxX = t;
                 }
-                minX = BoundX(minX, ctx.GetWorldBounds());
-                maxX = BoundX(maxX, ctx.GetWorldBounds());
+                minX = BoundX(minX, ctx.WorldBounds);
+                maxX = BoundX(maxX, ctx.WorldBounds);
             }
             if (maxY < minY)
             {
@@ -134,8 +134,8 @@ namespace Spatial4n.Tests.shape
                 minY = maxY;
                 maxY = t;
             }
-            minY = BoundY(minY, ctx.GetWorldBounds());
-            maxY = BoundY(maxY, ctx.GetWorldBounds());
+            minY = BoundY(minY, ctx.WorldBounds);
+            maxY = BoundY(maxY, ctx.WorldBounds);
             return ctx.MakeRectangle(minX, maxX, minY, maxY);
         }
 
@@ -154,7 +154,7 @@ namespace Spatial4n.Tests.shape
          */
         protected virtual IPoint Divisible(IPoint p)
         {
-            IRectangle bounds = ctx.GetWorldBounds();
+            IRectangle bounds = ctx.WorldBounds;
             double newX = BoundX(Divisible(p.GetX()), bounds);
             double newY = BoundY(Divisible(p.GetY()), bounds);
             p.Reset(newX, newY);
@@ -251,7 +251,7 @@ namespace Spatial4n.Tests.shape
 
         protected virtual IRectangle RandomRectangle(IPoint nearP)
         {
-            IRectangle bounds = ctx.GetWorldBounds();
+            IRectangle bounds = ctx.WorldBounds;
             if (nearP == null)
                 nearP = RandomPointIn(bounds);
 
@@ -300,14 +300,14 @@ namespace Spatial4n.Tests.shape
 
         protected virtual IPoint RandomPoint()
         {
-            return RandomPointIn(ctx.GetWorldBounds());
+            return RandomPointIn(ctx.WorldBounds);
         }
 
         protected virtual IPoint RandomPointIn(ICircle c)
         {
             double d = c.GetRadius() * random.NextDouble();
             double angleDEG = 360 * random.NextDouble();
-            IPoint p = ctx.GetDistCalc().PointOnBearing(c.GetCenter(), d, angleDEG, ctx, null);
+            IPoint p = ctx.DistCalc.PointOnBearing(c.GetCenter(), d, angleDEG, ctx, null);
             Assert.Equal(SpatialRelation.CONTAINS, c.Relate(p));
             return p;
         }

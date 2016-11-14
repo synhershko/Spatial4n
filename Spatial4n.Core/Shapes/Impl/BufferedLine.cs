@@ -130,7 +130,7 @@ namespace Spatial4n.Core.Shapes.Impl
                 }
 
             }
-            IRectangle bounds = ctx.GetWorldBounds();
+            IRectangle bounds = ctx.WorldBounds;
 
             bbox = ctx.MakeRectangle(
                 Math.Max(bounds.GetMinX(), minX),

@@ -32,29 +32,29 @@ namespace Spatial4n.Tests.context
             SpatialContext ctx = SpatialContext.GEO;
             SpatialContext ctx2 = Call();//default
             Assert.Equal(ctx.GetType(), ctx2.GetType());
-            Assert.Equal(ctx.IsGeo(), ctx2.IsGeo());
-            Assert.Equal(ctx.GetDistCalc(), ctx2.GetDistCalc());
-            Assert.Equal(ctx.GetWorldBounds(), ctx2.GetWorldBounds());
+            Assert.Equal(ctx.IsGeo, ctx2.IsGeo);
+            Assert.Equal(ctx.DistCalc, ctx2.DistCalc);
+            Assert.Equal(ctx.WorldBounds, ctx2.WorldBounds);
         }
 
         [Fact]
         public void TestCustom()
         {
             SpatialContext ctx = Call("geo", "false");
-            Assert.True(!ctx.IsGeo());
-            Assert.Equal(new CartesianDistCalc(), ctx.GetDistCalc());
+            Assert.True(!ctx.IsGeo);
+            Assert.Equal(new CartesianDistCalc(), ctx.DistCalc);
 
             ctx = Call("geo", "false",
                       "distCalculator", "cartesian^2",
                       "worldBounds", "ENVELOPE(-100, 75, 200, 0)");//xMin, xMax, yMax, yMin
-            Assert.Equal(new CartesianDistCalc(true), ctx.GetDistCalc());
-            Assert.Equal(new RectangleImpl(-100, 75, 0, 200, ctx), ctx.GetWorldBounds());
+            Assert.Equal(new CartesianDistCalc(true), ctx.DistCalc);
+            Assert.Equal(new RectangleImpl(-100, 75, 0, 200, ctx), ctx.WorldBounds);
 
             ctx = Call("geo", "true",
                       "distCalculator", "lawOfCosines");
-            Assert.True(ctx.IsGeo());
+            Assert.True(ctx.IsGeo);
             var test = new GeodesicSphereDistCalc.LawOfCosines();
-            Assert.Equal(test, ctx.GetDistCalc());
+            Assert.Equal(test, ctx.DistCalc);
         }
 
         [Fact]
@@ -69,13 +69,13 @@ namespace Spatial4n.Tests.context
                 "datelineRule", "ccwRect",
                 "validationRule", "repairConvexHull",
                 "autoIndex", "true");
-            Assert.True(ctx.IsNormWrapLongitude());
+            Assert.True(ctx.IsNormWrapLongitude);
             CustomAssert.EqualWithDelta(2.0, ctx.GeometryFactory.PrecisionModel.Scale, 0.0);
             Assert.True(CustomWktShapeParser.once);//cheap way to test it was created
             Assert.Equal(NtsWktShapeParser.DatelineRule.ccwRect,
-                ((NtsWktShapeParser)ctx.GetWktShapeParser()).GetDatelineRule());
+                ((NtsWktShapeParser)ctx.WktShapeParser).GetDatelineRule());
             Assert.Equal(NtsWktShapeParser.ValidationRule.repairConvexHull,
-                ((NtsWktShapeParser)ctx.GetWktShapeParser()).GetValidationRule());
+                ((NtsWktShapeParser)ctx.WktShapeParser).GetValidationRule());
 
             //ensure geo=false with worldbounds works -- fixes #72
             ctx = (NtsSpatialContext)Call(
@@ -88,14 +88,14 @@ namespace Spatial4n.Tests.context
                 "datelineRule", "ccwRect",
                 "validationRule", "repairConvexHull",
                 "autoIndex", "true");
-            CustomAssert.EqualWithDelta(300, ctx.GetWorldBounds().GetMaxY(), 0.0);
+            CustomAssert.EqualWithDelta(300, ctx.WorldBounds.GetMaxY(), 0.0);
         }
 
         [Fact]
         public void TestSystemPropertyLookup()
         {
             var customInstance = Call("spatialContextFactory", typeof(DSCF).AssemblyQualifiedName);
-            Assert.True(!customInstance.IsGeo());//DSCF returns this
+            Assert.True(!customInstance.IsGeo);//DSCF returns this
         }
 
         public class DSCF : SpatialContextFactory

@@ -50,7 +50,7 @@ namespace Spatial4n.Tests.io
         public virtual void TestNextSubShapeString()
         {
 
-            WktShapeParser.State state = ctx.GetWktShapeParser().NewState("OUTER(INNER(3, 5))");
+            WktShapeParser.State state = ctx.WktShapeParser.NewState("OUTER(INNER(3, 5))");
             state.offset = 0;
 
             Assert.Equal("OUTER(INNER(3, 5))", state.NextSubShapeString());

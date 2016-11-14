@@ -18,7 +18,7 @@ namespace Spatial4n.Core.Shapes.Impl
 
         public static Range XRange(IRectangle rect, SpatialContext ctx)
         {
-            if (ctx.IsGeo())
+            if (ctx.IsGeo)
                 return new LongitudeRange(rect.GetMinX(), rect.GetMaxX());
             else
                 return new Range(rect.GetMinX(), rect.GetMaxX());

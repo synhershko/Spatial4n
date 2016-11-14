@@ -123,7 +123,7 @@ namespace Spatial4n.Core.Io.Nts
             Debug.Assert(geometry.IsRectangle);
             Envelope env = geometry.EnvelopeInternal;
             bool crossesDateline = false;
-            if (ctx.IsGeo() && datelineRule != DatelineRule.none)
+            if (ctx.IsGeo && datelineRule != DatelineRule.none)
             {
                 if (datelineRule == DatelineRule.ccwRect)
                 {

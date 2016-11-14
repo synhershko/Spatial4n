@@ -140,9 +140,9 @@ namespace Spatial4n.Core.Context.Nts
                     var pair = new List<IGeometry>(2)
                        {
                            m_geometryFactory.ToGeometry(new Envelope(
-                                                          r.GetMinX(), GetWorldBounds().GetMaxX(), r.GetMinY(), r.GetMaxY())),
+                                                          r.GetMinX(), WorldBounds.GetMaxX(), r.GetMinY(), r.GetMaxY())),
                            m_geometryFactory.ToGeometry(new Envelope(
-                                                          GetWorldBounds().GetMinX(), r.GetMaxX(), r.GetMinY(), r.GetMaxY()))
+                                                          WorldBounds.GetMinX(), r.GetMaxX(), r.GetMinY(), r.GetMaxY()))
                        };
                     return m_geometryFactory.BuildGeometry(pair);//a MultiPolygon or MultiLineString
                 }

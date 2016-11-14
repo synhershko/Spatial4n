@@ -52,7 +52,7 @@ namespace Spatial4n.Tests.shape
 
             Assert.Equal( /*msg,*/ width != 0 && height != 0, r.HasArea());
             Assert.Equal( /*msg,*/ width != 0 && height != 0, r.GetArea(ctx) > 0);
-            if (ctx.IsGeo() && r.GetWidth() == 360 && r.GetHeight() == 180)
+            if (ctx.IsGeo && r.GetWidth() == 360 && r.GetHeight() == 180)
             {
                 //whole globe
                 double earthRadius = DistanceUtils.ToDegrees(1);
@@ -66,7 +66,7 @@ namespace Spatial4n.Tests.shape
             //System.out.println(msg);
             AssertRelation(msg, SpatialRelation.CONTAINS, r, center);
 
-            IDistanceCalculator dc = ctx.GetDistCalc();
+            IDistanceCalculator dc = ctx.DistCalc;
             double dUR = dc.Distance(center, r.GetMaxX(), r.GetMaxY());
             double dLR = dc.Distance(center, r.GetMaxX(), r.GetMinY());
             double dUL = dc.Distance(center, r.GetMinX(), r.GetMaxY());
@@ -77,7 +77,7 @@ namespace Spatial4n.Tests.shape
                 Assert.True(dUR > 0 && dLL > 0);
             AssertEqualsRatio(msg, dUR, dUL);
             AssertEqualsRatio(msg, dLR, dLL);
-            if (!ctx.IsGeo() || center.GetY() == 0)
+            if (!ctx.IsGeo || center.GetY() == 0)
                 AssertEqualsRatio(msg, dUR, dLL);
         }
 
@@ -147,7 +147,7 @@ namespace Spatial4n.Tests.shape
             IRectangle bbox = c.GetBoundingBox();
             Assert.Equal( /*msg,*/ dist > 0, bbox.GetArea(ctx) > 0);
             Assert.True(area <= bbox.GetArea(ctx));
-            if (!ctx.IsGeo())
+            if (!ctx.IsGeo)
             {
                 //if not geo then units of dist == units of x,y
                 AssertEqualsRatio(msg, bbox.GetHeight(), dist * 2);

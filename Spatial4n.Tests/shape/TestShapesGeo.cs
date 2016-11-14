@@ -63,7 +63,7 @@ namespace Spatial4n.Tests.shape
 			//    opposite +/- 180
 			Assert.Equal(SpatialRelation.INTERSECTS, ctx.MakeRectangle(170, 180, 0, 0).RelateXRange(-180, -170));
 			Assert.Equal(SpatialRelation.INTERSECTS, ctx.MakeRectangle(-90, -45, 0, 0).RelateXRange(-45, -135));
-			Assert.Equal(SpatialRelation.CONTAINS, ctx.GetWorldBounds().RelateXRange(-90, -135));
+			Assert.Equal(SpatialRelation.CONTAINS, ctx.WorldBounds.RelateXRange(-90, -135));
 			//point on edge at dateline using opposite +/- 180
 			Assert.Equal(SpatialRelation.CONTAINS, ctx.MakeRectangle(170, 180, 0, 0).Relate(ctx.MakePoint(-180, 0)));
 
@@ -193,7 +193,7 @@ namespace Spatial4n.Tests.shape
                 ctx.MakeCircle(-64, 32, 180).Relate(ctx.MakeRectangle(47, 47, -14, 90)));
 
             //--Now proceed with systematic testing:
-            AssertEquals(ctx.GetWorldBounds(), ctx.MakeCircle(0, 0, 180).GetBoundingBox());
+            AssertEquals(ctx.WorldBounds, ctx.MakeCircle(0, 0, 180).GetBoundingBox());
             //assertEquals(ctx.makeCircle(0,0,distToOpposeSide/2 - 500).getBoundingBox());
 
             double[] theXs = new double[] { -180, -45, 90 };

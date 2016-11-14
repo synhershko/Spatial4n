@@ -24,7 +24,7 @@ namespace Spatial4n.Tests.distance
 
         private IDistanceCalculator Dc()
         {
-            return ctx.GetDistCalc();
+            return ctx.DistCalc;
         }
 
         [Fact]
@@ -125,12 +125,12 @@ namespace Spatial4n.Tests.distance
             //A binary search algorithm to find the point along the vertical lon between lowLat & highLat that is closest
             // to ctr, and returns the distance.
             double midLat = (highLat - lowLat) / 2 + lowLat;
-            double midLatDist = ctx.GetDistCalc().Distance(ctr, lon, midLat);
+            double midLatDist = ctx.DistCalc.Distance(ctr, lon, midLat);
             for (int L = 0; L < 100 && (highLat - lowLat > 0.001 || L < 20); L++)
             {
                 bool bottom = (midLat - lowLat > highLat - midLat);
                 double newMid = bottom ? (midLat - lowLat) / 2 + lowLat : (highLat - midLat) / 2 + midLat;
-                double newMidDist = ctx.GetDistCalc().Distance(ctr, lon, newMid);
+                double newMidDist = ctx.DistCalc.Distance(ctr, lon, newMid);
                 if (newMidDist < midLatDist)
                 {
                     if (bottom)
@@ -316,7 +316,7 @@ namespace Spatial4n.Tests.distance
                                       180); //180 means whole earth
             CustomAssert.EqualWithDelta(earthArea, c.GetArea(ctx), 1.0);
 
-            CustomAssert.EqualWithDelta(earthArea, ctx.GetWorldBounds().GetArea(ctx), 1.0);
+            CustomAssert.EqualWithDelta(earthArea, ctx.WorldBounds.GetArea(ctx), 1.0);
 
             //now check half earth
             ICircle cHalf = ctx.MakeCircle(c.GetCenter(), 90);

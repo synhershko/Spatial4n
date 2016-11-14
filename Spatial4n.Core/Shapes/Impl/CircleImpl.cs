@@ -45,7 +45,7 @@ namespace Spatial4n.Core.Shapes.Impl
             this.point = p;
             this.radiusDEG = point.IsEmpty ? double.NaN : radiusDEG;
             this.enclosingBox = point.IsEmpty ? ctx.MakeRectangle(double.NaN, double.NaN, double.NaN, double.NaN) :
-                ctx.GetDistCalc().CalcBoxByDistFromPt(point, this.radiusDEG, ctx, null);
+                ctx.DistCalc.CalcBoxByDistFromPt(point, this.radiusDEG, ctx, null);
         }
 
         public virtual void Reset(double x, double y, double radiusDEG)
@@ -53,7 +53,7 @@ namespace Spatial4n.Core.Shapes.Impl
             Debug.Assert(!IsEmpty);
             point.Reset(x, y);
             this.radiusDEG = radiusDEG;
-            this.enclosingBox = ctx.GetDistCalc().CalcBoxByDistFromPt(point, this.radiusDEG, ctx, enclosingBox);
+            this.enclosingBox = ctx.DistCalc.CalcBoxByDistFromPt(point, this.radiusDEG, ctx, enclosingBox);
         }
 
         public virtual bool IsEmpty
@@ -79,18 +79,18 @@ namespace Spatial4n.Core.Shapes.Impl
             }
             else
             {
-                return ctx.GetDistCalc().Area(this);
+                return ctx.DistCalc.Area(this);
             }
         }
 
-        public virtual /*Circle*/ IShape GetBuffered(double distance, SpatialContext ctx)
+        public virtual IShape GetBuffered(double distance, SpatialContext ctx)
         {
             return ctx.MakeCircle(point, distance + radiusDEG);
         }
 
         public virtual bool Contains(double x, double y)
         {
-            return ctx.GetDistCalc().Distance(point, x, y) <= radiusDEG;
+            return ctx.DistCalc.Distance(point, x, y) <= radiusDEG;
         }
 
         public virtual bool HasArea()
@@ -253,7 +253,7 @@ namespace Spatial4n.Core.Shapes.Impl
 
         public virtual SpatialRelation Relate(ICircle circle)
         {
-            double crossDist = ctx.GetDistCalc().Distance(point, circle.GetCenter());
+            double crossDist = ctx.DistCalc.Distance(point, circle.GetCenter());
             double aDist = radiusDEG, bDist = circle.GetRadius();
             if (crossDist > aDist + bDist)
                 return SpatialRelation.DISJOINT;

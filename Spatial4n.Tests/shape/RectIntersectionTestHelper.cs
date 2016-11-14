@@ -43,7 +43,7 @@ namespace Spatial4n.Tests.shape
 
                 //TestLog.Clear();
 
-                Core.Shapes.IPoint nearP = RandomPointIn(ctx.GetWorldBounds());
+                Core.Shapes.IPoint nearP = RandomPointIn(ctx.WorldBounds);
 
                 IShape s = GenerateRandomShape(nearP);
 

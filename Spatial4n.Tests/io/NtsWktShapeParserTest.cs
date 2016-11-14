@@ -139,7 +139,7 @@ namespace Spatial4n.Tests.io
         public virtual void TestWrapTopologyException()
         {
             //test that we can catch ParseException without having to detect TopologyException too
-            Debug.Assert(((NtsWktShapeParser)ctx.GetWktShapeParser()).IsAutoValidate);
+            Debug.Assert(((NtsWktShapeParser)ctx.WktShapeParser).IsAutoValidate);
             try
             {
                 ctx.ReadShapeFromWkt("POLYGON((0 0, 10 0, 10 20))");//doesn't connect around

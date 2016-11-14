@@ -85,16 +85,17 @@ namespace Spatial4n.Core.Context
             : this(InitFromLegacyConstructor(geo, null, null))
         { }
 
-        /**
-   * Called by {@link com.spatial4j.core.context.SpatialContextFactory#newSpatialContext()}.
-   */
+        /// <summary>
+        /// Called by <see cref="SpatialContextFactory.NewSpatialContext()"/>.
+        /// </summary>
+        /// <param name="factory"></param>
         public SpatialContext(SpatialContextFactory factory)
         {
             this.geo = factory.geo;
 
             if (factory.distCalc == null)
             {
-                this.calculator = IsGeo()
+                this.calculator = IsGeo
                         ? (IDistanceCalculator)new GeodesicSphereDistCalc.Haversine()
                         : new CartesianDistCalc();
             }
@@ -107,15 +108,15 @@ namespace Spatial4n.Core.Context
             IRectangle bounds = factory.worldBounds;
             if (bounds == null)
             {
-                this.worldBounds = IsGeo()
+                this.worldBounds = IsGeo
                         ? new RectangleImpl(-180, 180, -90, 90, this)
                         : new RectangleImpl(-double.MaxValue, double.MaxValue,
                         -double.MaxValue, double.MaxValue, this);
             }
             else
             {
-                if (IsGeo() && !bounds.Equals(new RectangleImpl(-180, 180, -90, 90, this)))
-                    throw new ArgumentException("for geo (lat/lon), bounds must be " + GEO.GetWorldBounds());
+                if (IsGeo && !bounds.Equals(new RectangleImpl(-180, 180, -90, 90, this)))
+                    throw new ArgumentException("for geo (lat/lon), bounds must be " + GEO.WorldBounds);
                 if (bounds.GetMinX() > bounds.GetMaxX())
                     throw new ArgumentException("worldBounds minX should be <= maxX: " + bounds);
                 if (bounds.GetMinY() > bounds.GetMaxY())
@@ -124,26 +125,30 @@ namespace Spatial4n.Core.Context
                 this.worldBounds = new RectangleImpl(bounds, this);
             }
 
-            this.normWrapLongitude = factory.normWrapLongitude && this.IsGeo();
+            this.normWrapLongitude = factory.normWrapLongitude && this.IsGeo;
             this.wktShapeParser = factory.MakeWktShapeParser(this);
             this.binaryCodec = factory.MakeBinaryCodec(this);
         }
 
-        public virtual IDistanceCalculator GetDistCalc()
+        public virtual IDistanceCalculator DistCalc
         {
-            return calculator;
+            get { return calculator; }
         }
 
-        /** Convenience that uses {@link #getDistCalc()} */
+        /// <summary>
+        /// Convenience that uses <see cref="DistCalc"/>
+        /// </summary>
         public virtual double CalcDistance(IPoint p, double x2, double y2)
         {
-            return GetDistCalc().Distance(p, x2, y2);
+            return DistCalc.Distance(p, x2, y2);
         }
 
-        /** Convenience that uses {@link #getDistCalc()} */
+        /// <summary>
+        /// Convenience that uses <see cref="DistCalc"/>
+        /// </summary>
         public virtual double CalcDistance(IPoint p, IPoint p2)
         {
-            return GetDistCalc().Distance(p, p2);
+            return DistCalc.Distance(p, p2);
         }
 
         /// <summary>
@@ -151,29 +156,33 @@ namespace Spatial4n.Core.Context
         /// Do *NOT* invoke reset() on this return type.
         /// </summary>
         /// <returns></returns>
-		public virtual IRectangle GetWorldBounds()
+		public virtual IRectangle WorldBounds
         {
-            return worldBounds;
+            get { return worldBounds; }
         }
 
-        /** If true then {@link #normX(double)} will wrap longitudes outside of the standard
-        * geodetic boundary into it. Example: 181 will become -179. */
-        public virtual bool IsNormWrapLongitude()
+        /// <summary>
+        /// If true then <see cref="NormX(double)"/> will wrap longitudes outside of the standard
+        /// geodetic boundary into it. Example: 181 will become -179.
+        /// </summary>
+        public virtual bool IsNormWrapLongitude
         {
-            return normWrapLongitude;
+            get { return normWrapLongitude; }
         }
 
         /// <summary>
         /// Is this a geospatial context (true) or simply 2d spatial (false).
         /// </summary>
         /// <returns></returns>
-        public virtual bool IsGeo()
+        public virtual bool IsGeo
         {
-            return geo;
+            get { return geo; }
         }
 
-        /** Normalize the 'x' dimension. Might reduce precision or wrap it to be within the bounds. This
-   * is called by {@link com.spatial4j.core.io.WktShapeParser} before creating a shape. */
+        /// <summary>
+        /// Normalize the 'x' dimension. Might reduce precision or wrap it to be within the bounds. This
+        /// is called by <see cref="Io.WktShapeParser"/> before creating a shape.
+        /// </summary>
         public virtual double NormX(double x)
         {
             if (normWrapLongitude)
@@ -181,28 +190,30 @@ namespace Spatial4n.Core.Context
             return x;
         }
 
-        /** Normalize the 'y' dimension. Might reduce precision or wrap it to be within the bounds. This
-         * is called by {@link com.spatial4j.core.io.WktShapeParser} before creating a shape. */
+        /// <summary>
+        /// Normalize the 'y' dimension. Might reduce precision or wrap it to be within the bounds. This
+        /// is called by <see cref="Io.WktShapeParser"/> before creating a shape.
+        /// </summary>
         public virtual double NormY(double y) { return y; }
 
         /// <summary>
-        /// Ensure fits in {@link #getWorldBounds()}
+        /// Ensure fits in <see cref="WorldBounds"/>
         /// </summary>
         /// <param name="x"></param>
         public virtual void VerifyX(double x)
         {
-            IRectangle bounds = GetWorldBounds();
+            IRectangle bounds = WorldBounds;
             if (x < bounds.GetMinX() || x > bounds.GetMaxX()) //NaN will pass
                 throw new InvalidShapeException("Bad X value " + x + " is not in boundary " + bounds);
         }
 
         /// <summary>
-        /// Ensure fits in {@link #getWorldBounds()}
+        /// Ensure fits in <see cref="WorldBounds"/>
         /// </summary>
         /// <param name="y"></param>
         public virtual void VerifyY(double y)
         {
-            IRectangle bounds = GetWorldBounds();
+            IRectangle bounds = WorldBounds;
             if (y < bounds.GetMinY() || y > bounds.GetMaxY()) //NaN will pass
                 throw new InvalidShapeException("Bad Y value " + y + " is not in boundary " + bounds);
         }
@@ -244,14 +255,14 @@ namespace Spatial4n.Core.Context
         /// <returns></returns>
         public virtual IRectangle MakeRectangle(double minX, double maxX, double minY, double maxY)
         {
-            IRectangle bounds = GetWorldBounds();
+            IRectangle bounds = WorldBounds;
             // Y
             if (minY < bounds.GetMinY() || maxY > bounds.GetMaxY()) //NaN will fail
                 throw new InvalidShapeException("Y values [" + minY + " to " + maxY + "] not in boundary " + bounds);
             if (minY > maxY)
                 throw new InvalidShapeException("maxY must be >= minY: " + minY + " to " + maxY);
             // X
-            if (IsGeo())
+            if (IsGeo)
             {
                 VerifyX(minX);
                 VerifyX(maxX);
@@ -300,7 +311,7 @@ namespace Spatial4n.Core.Context
         {
             if (distance < 0)
                 throw new InvalidShapeException("distance must be >= 0; got " + distance);
-            if (IsGeo())
+            if (IsGeo)
             {
                 if (distance > 180)
                 {
@@ -316,39 +327,56 @@ namespace Spatial4n.Core.Context
             }
         }
 
-        /** Constructs a line string. It's an ordered sequence of connected vertexes. There
-   * is no official shape/interface for it yet so we just return Shape. */
+        /// <summary>
+        /// Constructs a line string. It's an ordered sequence of connected vertexes. There
+        /// is no official shape/interface for it yet so we just return Shape.
+        /// </summary>
+        /// <param name="points"></param>
+        /// <returns></returns>
         public virtual IShape MakeLineString(IList<IPoint> points)
         {
             return new BufferedLineString(points, 0, false, this);
         }
 
-        /** Constructs a buffered line string. It's an ordered sequence of connected vertexes,
-         * with a buffer distance along the line in all directions. There
-         * is no official shape/interface for it so we just return Shape. */
+        /// <summary>
+        /// Constructs a buffered line string. It's an ordered sequence of connected vertexes,
+        /// with a buffer distance along the line in all directions. There
+        /// is no official shape/interface for it so we just return <see cref="IShape"/>.
+        /// </summary>
+        /// <param name="points"></param>
+        /// <param name="buf"></param>
+        /// <returns></returns>
         public virtual IShape MakeBufferedLineString(IList<IPoint> points, double buf)
         {
-            return new BufferedLineString(points, buf, IsGeo(), this);
+            return new BufferedLineString(points, buf, IsGeo, this);
         }
 
-        /** Construct a ShapeCollection, analogous to an OGC GeometryCollection. */
+        /// <summary>
+        /// Construct a ShapeCollection, analogous to an OGC GeometryCollection.
+        /// </summary>
+        /// <param name="coll"></param>
+        /// <returns></returns>
         public virtual ShapeCollection MakeCollection(IList<IShape> coll) //where S : Shape
         {
             return new ShapeCollection(coll, this);
         }
 
-        /** The {@link com.spatial4j.core.io.WktShapeParser} used by {@link #readShapeFromWkt(String)}. */
-        public virtual WktShapeParser GetWktShapeParser()
+        /// <summary>
+        /// The <see cref="Io.WktShapeParser"/> used by <see cref="ReadShapeFromWkt(string)"/>.
+        /// </summary>
+        /// <returns></returns>
+        public virtual WktShapeParser WktShapeParser
         {
-            return wktShapeParser;
+            get { return wktShapeParser; }
         }
 
-        /** Reads a shape from the string formatted in WKT.
-   * @see com.spatial4j.core.io.WktShapeParser
-   * @param wkt non-null WKT.
-   * @return non-null
-   * @throws ParseException if it failed to parse.
-   */
+        /// <summary>
+        /// Reads a shape from the string formatted in WKT.
+        /// See <see cref="Io.WktShapeParser"/>.
+        /// </summary>
+        /// <param name="wkt">non-null WKT.</param>
+        /// <returns>non-null</returns>
+        /// <exception cref="ParseException">if it failed to parse.</exception>
         public virtual IShape ReadShapeFromWkt(string wkt)
         {
             return wktShapeParser.Parse(wkt);

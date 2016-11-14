@@ -60,7 +60,7 @@ namespace Spatial4n.Core.Context.Nts
         public NtsSpatialContext(NtsSpatialContextFactory factory)
             : base(factory)
         {
-            this.m_geometryFactory = factory.GetGeometryFactory();
+            this.m_geometryFactory = factory.GeometryFactory;
 
             this.m_allowMultiOverlap = factory.allowMultiOverlap;
             this.m_useNtsPoint = factory.useNtsPoint;

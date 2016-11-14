@@ -94,11 +94,14 @@ namespace Spatial4n.Core.Context.Nts
             }
         }
 
-        public virtual GeometryFactory GetGeometryFactory()
+        public virtual GeometryFactory GeometryFactory
         {
-            if (precisionModel == null || coordinateSequenceFactory == null)
-                throw new InvalidOperationException("precision model or coord seq factory can't be null");
-            return new GeometryFactory(precisionModel, srid, coordinateSequenceFactory);
+            get
+            {
+                if (precisionModel == null || coordinateSequenceFactory == null)
+                    throw new InvalidOperationException("precision model or coord seq factory can't be null");
+                return new GeometryFactory(precisionModel, srid, coordinateSequenceFactory);
+            }
         }
 
         protected internal override SpatialContext NewSpatialContext()

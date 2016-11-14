@@ -89,7 +89,7 @@ namespace Spatial4n.Tests.io
                 {
                     state.NextExpect('(');
                     state.NextExpect(')');
-                    return new CustomShape(shapeType, ctx);
+                    return new CustomShape(shapeType, m_ctx);
                 }
                 return result;
             }

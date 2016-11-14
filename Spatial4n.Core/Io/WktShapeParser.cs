@@ -17,17 +17,17 @@ namespace Spatial4n.Core.Io
 
         //TODO should reference proposed ShapeFactory instead of ctx, which is a point of indirection that
         // might optionally do data validation & normalization
-        protected readonly SpatialContext ctx;
+        protected readonly SpatialContext m_ctx;
 
         /** This constructor is required by {@link com.spatial4j.core.context.SpatialContextFactory#makeWktShapeParser(com.spatial4j.core.context.SpatialContext)}. */
         public WktShapeParser(SpatialContext ctx, SpatialContextFactory factory)
         {
-            this.ctx = ctx;
+            this.m_ctx = ctx;
         }
 
         public virtual SpatialContext Ctx
         {
-            get { return ctx; }
+            get { return m_ctx; }
         }
 
         /**
@@ -167,7 +167,7 @@ namespace Spatial4n.Core.Io
             state.NextExpect(',');
             double distance = NormDist(state.NextDouble());
             state.NextExpect(')');
-            return shape.GetBuffered(distance, ctx);
+            return shape.GetBuffered(distance, m_ctx);
         }
 
         /** Called to normalize a value that isn't X or Y. X & Y or normalized via
@@ -189,7 +189,7 @@ namespace Spatial4n.Core.Io
         protected virtual IShape ParsePointShape(State state)
         {
             if (state.NextIfEmptyAndSkipZM())
-                return ctx.MakePoint(double.NaN, double.NaN);
+                return m_ctx.MakePoint(double.NaN, double.NaN);
             state.NextExpect('(');
             IPoint coordinate = Point(state);
             state.NextExpect(')');
@@ -208,7 +208,7 @@ namespace Spatial4n.Core.Io
         protected virtual IShape ParseMultiPointShape(State state)
         {
             if (state.NextIfEmptyAndSkipZM())
-                return ctx.MakeCollection(new List<IShape>());
+                return m_ctx.MakeCollection(new List<IShape>());
             List<IShape> shapes = new List<IShape>();
             state.NextExpect('(');
             do
@@ -220,7 +220,7 @@ namespace Spatial4n.Core.Io
                 shapes.Add(coordinate);
             } while (state.NextIf(','));
             state.NextExpect(')');
-            return ctx.MakeCollection(shapes);
+            return m_ctx.MakeCollection(shapes);
         }
 
         /**
@@ -244,7 +244,7 @@ namespace Spatial4n.Core.Io
             state.NextExpect(',');
             double y1 = state.NextDouble();
             state.NextExpect(')');
-            return ctx.MakeRectangle(ctx.NormX(x1), ctx.NormX(x2), ctx.NormY(y1), ctx.NormY(y2));
+            return m_ctx.MakeRectangle(m_ctx.NormX(x1), m_ctx.NormX(x2), m_ctx.NormY(y1), m_ctx.NormY(y2));
         }
 
         /**
@@ -258,9 +258,9 @@ namespace Spatial4n.Core.Io
         protected virtual IShape ParseLineStringShape(State state)
         {
             if (state.NextIfEmptyAndSkipZM())
-                return ctx.MakeLineString(new List<IPoint>());
+                return m_ctx.MakeLineString(new List<IPoint>());
             List<IPoint> points = PointList(state);
-            return ctx.MakeLineString(points);
+            return m_ctx.MakeLineString(points);
         }
 
         /**
@@ -274,7 +274,7 @@ namespace Spatial4n.Core.Io
         protected virtual IShape ParseMultiLineStringShape(State state)
         {
             if (state.NextIfEmptyAndSkipZM())
-                return ctx.MakeCollection(new List<IShape>());
+                return m_ctx.MakeCollection(new List<IShape>());
             List<IShape> shapes = new List<IShape>();
             state.NextExpect('(');
             do
@@ -282,7 +282,7 @@ namespace Spatial4n.Core.Io
                 shapes.Add(ParseLineStringShape(state));
             } while (state.NextIf(','));
             state.NextExpect(')');
-            return ctx.MakeCollection(shapes);
+            return m_ctx.MakeCollection(shapes);
         }
 
         /**
@@ -294,7 +294,7 @@ namespace Spatial4n.Core.Io
         protected virtual IShape ParseGeometryCollectionShape(State state)
         {
             if (state.NextIfEmptyAndSkipZM())
-                return ctx.MakeCollection(new List<IShape>());
+                return m_ctx.MakeCollection(new List<IShape>());
             List<IShape> shapes = new List<IShape>();
             state.NextExpect('(');
             do
@@ -302,7 +302,7 @@ namespace Spatial4n.Core.Io
                 shapes.Add(Shape(state));
             } while (state.NextIf(','));
             state.NextExpect(')');
-            return ctx.MakeCollection(shapes);
+            return m_ctx.MakeCollection(shapes);
         }
 
         /** Reads a shape from the current position, starting with the name of the shape. It
@@ -349,7 +349,7 @@ namespace Spatial4n.Core.Io
             double x = state.NextDouble();
             double y = state.NextDouble();
             state.SkipNextDoubles();
-            return ctx.MakePoint(ctx.NormX(x), ctx.NormY(y));
+            return m_ctx.MakePoint(m_ctx.NormX(x), m_ctx.NormY(y));
         }
 
         /** The parse state. */
@@ -374,7 +374,7 @@ namespace Spatial4n.Core.Io
 
             public virtual SpatialContext Ctx
             {
-                get { return outerInstance.ctx; }
+                get { return outerInstance.m_ctx; }
             }
 
             public virtual WktShapeParser Parser

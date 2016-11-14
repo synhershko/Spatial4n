@@ -72,10 +72,10 @@ namespace Spatial4n.Tests.context
             Assert.True(ctx.IsNormWrapLongitude);
             CustomAssert.EqualWithDelta(2.0, ctx.GeometryFactory.PrecisionModel.Scale, 0.0);
             Assert.True(CustomWktShapeParser.once);//cheap way to test it was created
-            Assert.Equal(NtsWktShapeParser.DatelineRule.ccwRect,
-                ((NtsWktShapeParser)ctx.WktShapeParser).GetDatelineRule());
-            Assert.Equal(NtsWktShapeParser.ValidationRule.repairConvexHull,
-                ((NtsWktShapeParser)ctx.WktShapeParser).GetValidationRule());
+            Assert.Equal(DatelineRule.CcwRect,
+                ((NtsWktShapeParser)ctx.WktShapeParser).DatelineRule);
+            Assert.Equal(ValidationRule.RepairConvexHull,
+                ((NtsWktShapeParser)ctx.WktShapeParser).ValidationRule);
 
             //ensure geo=false with worldbounds works -- fixes #72
             ctx = (NtsSpatialContext)Call(

@@ -35,9 +35,9 @@ namespace Spatial4n.Core.Context.Nts
         public ICoordinateSequenceFactory coordinateSequenceFactory = CoordinateArraySequenceFactory.Instance;
 
         //ignored if geo=false
-        public NtsWktShapeParser.DatelineRule datelineRule = NtsWktShapeParser.DatelineRule.width180;
+        public DatelineRule datelineRule = DatelineRule.Width180;
 
-        public NtsWktShapeParser.ValidationRule validationRule = NtsWktShapeParser.ValidationRule.error;
+        public ValidationRule validationRule = ValidationRule.Error;
         public bool autoIndex = false;
         public bool allowMultiOverlap = false;//ignored if geo=false
 

@@ -24,7 +24,7 @@ namespace Spatial4n.Core.Io.Nts
 
         public override IShape ParseIfSupported(string wktString)
         {
-            return ParseIfSupported(wktString, new WKTReader(ctx.GeometryFactory));
+            return ParseIfSupported(wktString, new WKTReader(m_ctx.GeometryFactory));
         }
 
         /**
@@ -45,10 +45,10 @@ namespace Spatial4n.Core.Io.Nts
                 if (geom is NetTopologySuite.Geometries.Point)
                 {
                     NetTopologySuite.Geometries.Point ptGeom = (NetTopologySuite.Geometries.Point)geom;
-                    if (ctx.UseNtsPoint)
-                        return new NtsPoint(ptGeom, ctx);
+                    if (m_ctx.UseNtsPoint)
+                        return new NtsPoint(ptGeom, m_ctx);
                     else
-                        return ctx.MakePoint(ptGeom.X, ptGeom.Y);
+                        return m_ctx.MakePoint(ptGeom.X, ptGeom.Y);
                 }
                 else if (geom.IsRectangle)
                 {
@@ -88,7 +88,7 @@ namespace Spatial4n.Core.Io.Nts
                 //Note: we don't simply call ctx.normX & normY because
                 //  those methods use the precisionModel, but WKTReader already
                 //  used the precisionModel. It's be nice to turn that off somehow but alas.
-                if (outerInstance.ctx.IsGeo && outerInstance.ctx.IsNormWrapLongitude)
+                if (outerInstance.m_ctx.IsGeo && outerInstance.m_ctx.IsNormWrapLongitude)
                 {
                     double xNorm = DistanceUtils.NormLonDEG(x);
                     if (x.CompareTo(xNorm) != 0)
@@ -102,8 +102,8 @@ namespace Spatial4n.Core.Io.Nts
                     //            seq.setOrdinate(i,CoordinateSequence.Y,yNorm);
                     //          }
                 }
-                outerInstance.ctx.VerifyX(x);
-                outerInstance.ctx.VerifyY(y);
+                outerInstance.m_ctx.VerifyX(x);
+                outerInstance.m_ctx.VerifyY(y);
             }
 
             public bool Done

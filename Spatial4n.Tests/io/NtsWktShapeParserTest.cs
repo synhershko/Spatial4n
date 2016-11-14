@@ -90,7 +90,7 @@ namespace Spatial4n.Tests.io
         [Fact]
         public virtual void PolyToRectCcwRule()
         {
-            NtsSpatialContext ctx = (NtsSpatialContext)new NtsSpatialContextFactory() { datelineRule = NtsWktShapeParser.DatelineRule.ccwRect }.NewSpatialContext();
+            NtsSpatialContext ctx = (NtsSpatialContext)new NtsSpatialContextFactory() { datelineRule = DatelineRule.CcwRect }.NewSpatialContext();
             //counter-clockwise
             Assert.Equal(ctx.ReadShapeFromWkt("POLYGON((160 0, -170 0, -170 10, 160 10, 160 0))"),
         ctx.MakeRectangle(160, -170, 0, 10));
@@ -173,13 +173,13 @@ namespace Spatial4n.Tests.io
             string wkt = "POLYGON((0 0, 10 0, 10 20, 5 -5, 0 20, 0 0))";//Topology self-intersect
 
             NtsSpatialContextFactory factory = new NtsSpatialContextFactory();
-            factory.validationRule = NtsWktShapeParser.ValidationRule.repairBuffer0;
+            factory.validationRule = ValidationRule.RepairBuffer0;
             NtsSpatialContext ctx = (NtsSpatialContext)factory.NewSpatialContext(); // TODO: Can we remove this cast?
             IShape buffer0 = ctx.ReadShapeFromWkt(wkt);
             Assert.True(buffer0.GetArea(ctx) > 0);
 
             factory = new NtsSpatialContextFactory();
-            factory.validationRule = NtsWktShapeParser.ValidationRule.repairConvexHull;
+            factory.validationRule = ValidationRule.RepairConvexHull;
             ctx = (NtsSpatialContext)factory.NewSpatialContext();
             IShape cvxHull = ctx.ReadShapeFromWkt(wkt);
             Assert.True(cvxHull.GetArea(ctx) > 0);
@@ -187,7 +187,7 @@ namespace Spatial4n.Tests.io
             Assert.Equal(SpatialRelation.CONTAINS, cvxHull.Relate(buffer0));
 
             factory = new NtsSpatialContextFactory();
-            factory.validationRule = NtsWktShapeParser.ValidationRule.none;
+            factory.validationRule = ValidationRule.None;
             ctx = (NtsSpatialContext)factory.NewSpatialContext();
             ctx.ReadShapeFromWkt(wkt);//doesn't throw
         }

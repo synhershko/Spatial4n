@@ -18,7 +18,7 @@ namespace Spatial4n.Tests.io
         public NtsWKTReaderShapeParserTest()
         {
             NtsSpatialContextFactory factory = new NtsSpatialContextFactory();
-            factory.datelineRule = NtsWktShapeParser.DatelineRule.ccwRect;
+            factory.datelineRule = DatelineRule.CcwRect;
             factory.wktShapeParserClass = typeof(NtsWKTReaderShapeParser);
             ctx = factory.NewSpatialContext();
         }

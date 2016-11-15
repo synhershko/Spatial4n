@@ -35,6 +35,9 @@ namespace Spatial4n.Core.Shapes.Impl
         private double minY;
         private double maxY;
 
+        /// <summary>
+        /// A simple constructor without normalization / validation.
+        /// </summary>
         public Rectangle(double minX, double maxX, double minY, double maxY, SpatialContext ctx)
         {
             //TODO change to West South East North to be more consistent with OGC?
@@ -42,11 +45,17 @@ namespace Spatial4n.Core.Shapes.Impl
             Reset(minX, maxX, minY, maxY);
         }
 
+        /// <summary>
+        /// A convenience constructor which pulls out the coordinates.
+        /// </summary>
         public Rectangle(IPoint lowerLeft, IPoint upperRight, SpatialContext ctx)
             : this(lowerLeft.X, upperRight.X, lowerLeft.Y, upperRight.Y, ctx)
         {
         }
 
+        /// <summary>
+        /// Copy constructor.
+        /// </summary>
         public Rectangle(IRectangle r, SpatialContext ctx)
             : this(r.MinX, r.MaxX, r.MinY, r.MaxY, ctx)
         {
@@ -248,6 +257,7 @@ namespace Spatial4n.Core.Shapes.Impl
             return SpatialRelation.INTERSECTS;
         }
 
+        //TODO might this utility move to SpatialRelation ?
         private static SpatialRelation Relate_Range(double int_min, double int_max, double ext_min, double ext_max)
         {
             if (ext_min > int_max || ext_max < int_min)
@@ -338,11 +348,8 @@ namespace Spatial4n.Core.Shapes.Impl
         }
 
         /// <summary>
-        /// All {@link Rectangle} implementations should use this definition of {@link Object#equals(Object)}.
+        /// All <see cref="IRectangle"/> implementations should use this definition of <see cref="object.Equals(object)"/>.
         /// </summary>
-        /// <param name="thiz"></param>
-        /// <param name="o"></param>
-        /// <returns></returns>
         public static bool Equals(IRectangle thiz, object o)
         {
             if (thiz == null)
@@ -362,6 +369,9 @@ namespace Spatial4n.Core.Shapes.Impl
             return GetHashCode(this);
         }
 
+        /// <summary>
+        /// All <see cref="IRectangle"/> implementations should use this definition of <see cref="object.GetHashCode()"/>.
+        /// </summary>
         public static int GetHashCode(IRectangle thiz)
         {
             if (thiz == null)

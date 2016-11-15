@@ -33,13 +33,16 @@ namespace Spatial4n.Core.Distance
             squared = false;
         }
 
-        /**
-   * @param squared Set to true to have {@link #distance(com.spatial4j.core.shape.Point, com.spatial4j.core.shape.Point)}
-   *                return the square of the correct answer. This is a
-   *                performance optimization used when sorting in which the
-   *                actual distance doesn't matter so long as the sort order is
-   *                consistent.
-   */
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="squared">
+        /// Set to true to have <see cref="AbstractDistanceCalculator.Distance(IPoint, IPoint)"/>
+        /// return the square of the correct answer. This is a
+        /// performance optimization used when sorting in which the
+        /// actual distance doesn't matter so long as the sort order is
+        /// consistent.
+        /// </param>
         public CartesianDistCalc(bool squared)
         {
             this.squared = squared;
@@ -122,6 +125,7 @@ namespace Spatial4n.Core.Distance
         public override bool Equals(object o)
         {
             if (this == o) return true;
+            if (o == null || GetType() != o.GetType()) return false;
 
             var that = o as CartesianDistCalc;
             if (that == null) return false;

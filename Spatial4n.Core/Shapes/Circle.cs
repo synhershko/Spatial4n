@@ -24,20 +24,16 @@ namespace Spatial4n.Core.Shapes
     {
         /// <summary>
         /// Expert: Resets the state of this shape given the arguments. This is a
-        /// performance feature to avoid excessive Shape object allocation as well as
+        /// performance feature to avoid excessive <see cref="IShape"/> object allocation as well as
         /// some argument error checking. Mutable shapes is error-prone so use with
         /// care.
         /// </summary>
-        /// <param name="x"></param>
-        /// <param name="y"></param>
-        /// <param name="radiusDEG"></param>
         void Reset(double x, double y, double radiusDEG);
 
         /// <summary>
-        /// The distance from the point's center to its edge, measured in
-        /// {@link com.spatial4j.core.distance.DistanceUnits}.
+        /// The distance from the point's center to its edge, measured in the same
+        /// units as x & y (e.g. degrees if WGS84).
         /// </summary>
-        /// <returns></returns>
         double Radius { get; }
     }
 }

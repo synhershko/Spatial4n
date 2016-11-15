@@ -107,7 +107,7 @@ namespace Spatial4n.Core.Context.Nts
         }
 
         /// <summary>
-        /// Gets a NTS <see cref="Geometry"/> for the given <see cref="IShape"/>. Some shapes hold a
+        /// Gets a NTS <see cref="IGeometry"/> for the given <see cref="IShape"/>. Some shapes hold a
         /// NTS geometry whereas new ones must be created for the rest.
         /// </summary>
         /// <param name="shape">Not null</param>
@@ -189,7 +189,7 @@ namespace Spatial4n.Core.Context.Nts
             return new NtsPoint(m_geometryFactory.CreatePoint(coord), this);
         }
 
-        /** Should {@link #makeLineString(java.util.List)} return {@link NtsGeometry}? */
+        // Should MakeLineString(IList{IPoint}) return NtsGeometry? 
         public virtual bool UseNtsLineString
         {
             get
@@ -223,27 +223,28 @@ namespace Spatial4n.Core.Context.Nts
             return MakeShape(lineString);
         }
 
-        /**
-         * INTERNAL
-         * @see #makeShape(com.vividsolutions.jts.geom.Geometry)
-         *
-         * @param geom Non-null
-         * @param dateline180Check if both this is true and {@link #isGeo()}, then NtsGeometry will check
-         *                         for adjacent coordinates greater than 180 degrees longitude apart, and
-         *                         it will do tricks to make that line segment (and the shape as a whole)
-         *                         cross the dateline even though NTS doesn't have geodetic support.
-         * @param allowMultiOverlap See {@link #isAllowMultiOverlap()}.
-         */
+        /// <summary>
+        /// INTERNAL
+        /// <see cref="MakeShape(IGeometry)"/>
+        /// </summary>
+        /// <param name="geom">Non-null</param>
+        /// <param name="dateline180Check">
+        /// if both this is true and <see cref="SpatialContextFactory.geo"/>, then NtsGeometry will check
+        /// for adjacent coordinates greater than 180 degrees longitude apart, and
+        /// it will do tricks to make that line segment (and the shape as a whole)
+        /// cross the dateline even though NTS doesn't have geodetic support.
+        /// </param>
+        /// <param name="allowMultiOverlap"><see cref="IsAllowMultiOverlap"/></param>
         public virtual NtsGeometry MakeShape(IGeometry geom, bool dateline180Check, bool allowMultiOverlap)
         {
             return new NtsGeometry(geom, this, dateline180Check, allowMultiOverlap);
         }
 
-        /**
-         * INTERNAL: Creates a {@link Shape} from a NTS {@link Geometry}. Generally, this shouldn't be
-         * called when one of the other factory methods are available, such as for points. The caller
-         * needs to have done some verification/normalization of the coordinates by now, if any.
-         */
+        /// <summary>
+        /// INTERNAL: Creates a <see cref="IShape"/> from a NTS <see cref="IGeometry"/>. Generally, this shouldn't be
+        /// called when one of the other factory methods are available, such as for points. The caller
+        /// needs to have done some verification/normalization of the coordinates by now, if any.
+        /// </summary>
         public virtual NtsGeometry MakeShape(IGeometry geom)
         {
             return MakeShape(geom, true/*dateline180Check*/, m_allowMultiOverlap);

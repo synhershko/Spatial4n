@@ -27,9 +27,12 @@ using System.Diagnostics;
 
 namespace Spatial4n.Core.Io.Nts
 {
+    /// <summary>
+    /// Extends <see cref="WktShapeParser"/> adding support for polygons, using NTS.
+    /// </summary>
     public class NtsWktShapeParser : WktShapeParser
     {
-        protected readonly NtsSpatialContext m_ctx;
+        new protected readonly NtsSpatialContext m_ctx;
 
         protected readonly DatelineRule m_datelineRule;
         protected readonly ValidationRule m_validationRule;
@@ -44,32 +47,36 @@ namespace Spatial4n.Core.Io.Nts
             this.m_autoIndex = factory.autoIndex;
         }
 
-        /** @see NtsWktShapeParser.ValidationRule */
+        /// <summary>
+        /// See <see cref="Nts.ValidationRule"/>
+        /// </summary>
         public ValidationRule ValidationRule
         {
             get { return m_validationRule; }
         }
 
-        /**
-         * NtsGeometry shapes are automatically validated when {@link #getValidationRule()} isn't
-         * {@code none}.
-         */
+        /// <summary>
+        /// NtsGeometry shapes are automatically validated when <see cref="ValidationRule"/> isn't
+        /// <c>none</c>.
+        /// </summary>
         public bool IsAutoValidate
         {
             get { return m_validationRule != Nts.ValidationRule.None; }
         }
 
-        /**
-         * If NtsGeometry shapes should be automatically prepared (i.e. optimized) when read via WKT.
-         * @see com.spatial4j.core.shape.jts.NtsGeometry#index()
-         */
+        /// <summary>
+        /// If NtsGeometry shapes should be automatically prepared (i.e. optimized) when read via WKT.
+        /// <see cref="NtsGeometry.Index()"/>
+        /// </summary>
         public bool IsAutoIndex
         {
             get { return m_autoIndex; }
         }
 
 
-        /** @see DatelineRule */
+        /// <summary>
+        /// See <see cref="Nts.DatelineRule"/>
+        /// </summary>
         public DatelineRule DatelineRule
         {
             get { return m_datelineRule; }
@@ -88,9 +95,10 @@ namespace Spatial4n.Core.Io.Nts
             return base.ParseShapeByType(state, shapeType);
         }
 
-        /** Bypasses {@link NtsSpatialContext#makeLineString(java.util.List)} so that we can more
-         * efficiently get the LineString without creating a {@code List<Point>}.
-         */
+        /// <summary>
+        /// Bypasses <see cref="NtsSpatialContext.MakeLineString(IList{Shapes.IPoint})"/> so that we can more
+        /// efficiently get the <see cref="LineString"/> without creating a <see cref="IList{Shapes.IPoint}"/>.
+        /// </summary>
         protected override IShape ParseLineStringShape(WktShapeParser.State state)
         {
             if (!m_ctx.UseNtsLineString)
@@ -105,13 +113,15 @@ namespace Spatial4n.Core.Io.Nts
             return MakeShapeFromGeometry(geometryFactory.CreateLineString(coordinates));
         }
 
-        /**
-         * Parses a POLYGON shape from the raw string. It might return a {@link com.spatial4j.core.shape.Rectangle}
-         * if the polygon is one.
-         * <pre>
-         *   coordinateSequenceList
-         * </pre>
-         */
+        /// <summary>
+        /// Parses a POLYGON shape from the raw string. It might return a <see cref="IRectangle"/>
+        /// if the polygon is one.
+        /// <code>
+        ///   coordinateSequenceList
+        /// </code>
+        /// </summary>
+        /// <param name="state"></param>
+        /// <returns></returns>
         protected virtual IShape ParsePolygonShape(WktShapeParser.State state)
         {
             IGeometry geometry;
@@ -156,9 +166,9 @@ namespace Spatial4n.Core.Io.Nts
                 return m_ctx.MakeRectangle(env.MinX, env.MaxX, env.MinY, env.MaxY);
         }
 
-        /**
-         * Reads a polygon, returning a NTS polygon.
-         */
+        /// <summary>
+        /// Reads a polygon, returning a NTS polygon.
+        /// </summary>
         protected IPolygon Polygon(WktShapeParser.State state)
         {
             GeometryFactory geometryFactory = m_ctx.GeometryFactory;
@@ -180,12 +190,12 @@ namespace Spatial4n.Core.Io.Nts
             return geometryFactory.CreatePolygon(shell, holes);
         }
 
-        /**
-         * Parses a MULTIPOLYGON shape from the raw string.
-         * <pre>
-         *   '(' polygon (',' polygon )* ')'
-         * </pre>
-         */
+        /// <summary>
+        /// Parses a MULTIPOLYGON shape from the raw string.
+        /// <code>
+        ///   '(' polygon (',' polygon )* ')'
+        /// </code>
+        /// </summary>
         protected IShape ParseMulitPolygonShape(WktShapeParser.State state)
         {
             if (state.NextIfEmptyAndSkipZM())
@@ -202,13 +212,12 @@ namespace Spatial4n.Core.Io.Nts
             return m_ctx.MakeCollection(polygons);
         }
 
-
-        /**
-         * Reads a list of NTS Coordinate sequences from the current position.
-         * <pre>
-         *   '(' coordinateSequence (',' coordinateSequence )* ')'
-         * </pre>
-         */
+        /// <summary>
+        /// Reads a list of NTS Coordinate sequences from the current position.
+        /// <code>
+        ///   '(' coordinateSequence (',' coordinateSequence )* ')'
+        /// </code>
+        /// </summary>
         protected List<Coordinate[]> CoordinateSequenceList(WktShapeParser.State state)
         {
             List<Coordinate[]> sequenceList = new List<Coordinate[]>();
@@ -221,12 +230,12 @@ namespace Spatial4n.Core.Io.Nts
             return sequenceList;
         }
 
-        /**
-         * Reads a NTS Coordinate sequence from the current position.
-         * <pre>
-         *   '(' coordinate (',' coordinate )* ')'
-         * </pre>
-         */
+        /// <summary>
+        /// Reads a NTS Coordinate sequence from the current position.
+        /// <code>
+        ///   '(' coordinate (',' coordinate )* ')'
+        /// </code>
+        /// </summary>
         protected Coordinate[] CoordinateSequence(WktShapeParser.State state)
         {
             List<Coordinate> sequence = new List<Coordinate>();
@@ -239,11 +248,13 @@ namespace Spatial4n.Core.Io.Nts
             return sequence.ToArray(/*new Coordinate[sequence.Count]*/);
         }
 
-        /**
-         * Reads a {@link com.vividsolutions.jts.geom.Coordinate} from the current position.
-         * It's akin to {@link #point(com.spatial4j.core.io.WktShapeParser.State)} but for
-         * a NTS Coordinate.  Only the first 2 numbers are parsed; any remaining are ignored.
-         */
+        /// <summary>
+        /// Reads a <see cref="GeoAPI.Geometries.Coordinate"/> from the current position.
+        /// It's akin to <see cref="WktShapeParser.State"/> but for
+        /// a NTS Coordinate.  Only the first 2 numbers are parsed; any remaining are ignored.
+        /// </summary>
+        /// <param name="state"></param>
+        /// <returns></returns>
         protected Coordinate Coordinate(WktShapeParser.State state)
         {
             double x = m_ctx.NormX(state.NextDouble());
@@ -259,7 +270,9 @@ namespace Spatial4n.Core.Io.Nts
             return m_ctx.GeometryFactory.PrecisionModel.MakePrecise(v);
         }
 
-        /** Creates the NtsGeometry, potentially validating, repairing, and preparing. */
+        /// <summary>
+        /// Creates the NtsGeometry, potentially validating, repairing, and preparing.
+        /// </summary>
         protected NtsGeometry MakeShapeFromGeometry(IGeometry geometry)
         {
             bool dateline180Check = DatelineRule != Nts.DatelineRule.None;
@@ -294,59 +307,73 @@ namespace Spatial4n.Core.Io.Nts
         }
     }
 
-    /**
-     * Indicates the algorithm used to process NTS Polygons and NTS LineStrings for detecting dateline
-     * crossings. It only applies when geo=true.
-     */
+    /// <summary>
+    /// Indicates the algorithm used to process NTS <see cref="IPolygon"/>s and NTS <see cref="ILineString"/>s for detecting dateline
+    /// crossings. It only applies when geo=true.
+    /// </summary>
     public enum DatelineRule
     {
-        /** No polygon will cross the dateline. */
+        /// <summary>
+        /// No polygon will cross the dateline.
+        /// </summary>
         None,
 
-        /** Adjacent points with an x (longitude) difference that spans more than half
-         * way around the globe will be interpreted as going the other (shorter) way, and thus cross the
-         * dateline.
-         */
+        /// <summary>
+        /// Adjacent points with an x (longitude) difference that spans more than half
+        /// way around the globe will be interpreted as going the other (shorter) way, and thus cross the
+        /// dateline.
+        /// </summary>
         Width180,//TODO is there a better name that doesn't have '180' in it?
 
-        /** For rectangular polygons, the point order is interpreted as being counter-clockwise (CCW).
-         * However, non-rectangular polygons or other shapes aren't processed this way; they use the
-         * {@link #width180} rule instead. The CCW rule is specified by OGC Simple Features
-         * Specification v. 1.2.0 section 6.1.11.1.
-         */
+        /// <summary>
+        /// For rectangular polygons, the point order is interpreted as being counter-clockwise (CCW).
+        /// However, non-rectangular polygons or other shapes aren't processed this way; they use the
+        /// <see cref="Width180"/> rule instead. The CCW rule is specified by OGC Simple Features
+        /// Specification v. 1.2.0 section 6.1.11.1.
+        /// </summary>
         CcwRect
     }
 
-    /** Indicates how NTS geometries (notably polygons but applies to other geometries too) are
-     * validated (if at all) and repaired (if at all).
-     */
+    /// <summary>
+    /// Indicates how NTS geometries (notably polygons but applies to other geometries too) are
+    /// validated (if at all) and repaired (if at all).
+    /// </summary>
     public enum ValidationRule
     {
-        /** Geometries will not be validated (because it's kinda expensive to calculate). You may or may
-         * not ultimately get an error at some point; results are undefined. However, note that
-         * coordinates will still be validated for falling within the world boundaries.
-         * @see com.vividsolutions.jts.geom.Geometry#isValid(). */
+        /// <summary>
+        /// Geometries will not be validated (because it's kinda expensive to calculate). You may or may
+        /// not ultimately get an error at some point; results are undefined. However, note that
+        /// coordinates will still be validated for falling within the world boundaries.
+        /// <see cref="Geometry.IsValid"/>.
+        /// </summary>
         None,
 
-        /** Geometries will be explicitly validated on creation, possibly resulting in an exception:
-         * {@link com.spatial4j.core.exception.InvalidShapeException}. */
+        /// <summary>
+        /// Geometries will be explicitly validated on creation, possibly resulting in an exception:
+        /// <see cref="Exceptions.InvalidShapeException"/>.
+        /// </summary>
         Error,
 
-        /** Invalid Geometries are repaired by taking the convex hull. The result will very likely be a
-         * larger shape that matches false-positives, but no false-negatives.
-         * See {@link com.vividsolutions.jts.geom.Geometry#convexHull()}. */
+        /// <summary>
+        /// Invalid Geometries are repaired by taking the convex hull. The result will very likely be a
+        /// larger shape that matches false-positives, but no false-negatives.
+        /// See <see cref="Geometry.ConvexHull"/>.
+        /// </summary>
         RepairConvexHull,
 
-        /** Invalid polygons are repaired using the {@code buffer(0)} technique. From the <a
-         * href="http://tsusiatsoftware.net/jts/jts-faq/jts-faq.html">JTS FAQ</a>:
-         * <p>The buffer operation is fairly insensitive to topological invalidity, and the act of
-         * computing the buffer can often resolve minor issues such as self-intersecting rings. However,
-         * in some situations the computed result may not be what is desired (i.e. the buffer operation
-         * may be "confused" by certain topologies, and fail to produce a result which is close to the
-         * original. An example where this can happen is a "bow-tie: or "figure-8" polygon, with one
-         * very small lobe and one large one. Depending on the orientations of the lobes, the buffer(0)
-         * operation may keep the small lobe and discard the "valid" large lobe).
-         * </p> */
+        /// <summary>
+        /// Invalid polygons are repaired using the <c>Buffer(0)</c> technique. From the <a
+        /// href="http://tsusiatsoftware.net/jts/jts-faq/jts-faq.html">JTS FAQ</a>:
+        /// <para>
+        /// The buffer operation is fairly insensitive to topological invalidity, and the act of
+        /// computing the buffer can often resolve minor issues such as self-intersecting rings. However,
+        /// in some situations the computed result may not be what is desired (i.e. the buffer operation
+        /// may be "confused" by certain topologies, and fail to produce a result which is close to the
+        /// original. An example where this can happen is a "bow-tie: or "figure-8" polygon, with one
+        /// very small lobe and one large one. Depending on the orientations of the lobes, the buffer(0)
+        /// operation may keep the small lobe and discard the "valid" large lobe).
+        /// </para>
+        /// </summary>
         RepairBuffer0
     }
 }

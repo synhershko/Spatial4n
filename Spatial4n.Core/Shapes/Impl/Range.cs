@@ -171,7 +171,9 @@ namespace Spatial4n.Core.Shapes.Impl
                 return Diff(Center, b.Center);
             }
 
-            /** a - b (compareTo order).  < 0 if a < b */
+            /// <summary>
+            /// <c>a - b (compareTo order).  &lt; 0 if a &lt; b</c>
+            /// </summary>
             private static double Diff(double a, double b)
             {
                 double diff = a - b;

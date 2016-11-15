@@ -26,6 +26,15 @@ using System;
 
 namespace Spatial4n.Core.Io.Nts
 {
+    /// <summary>
+    /// This is an extension of <see cref="NtsWktShapeParser"/> that processes the entire
+    /// string with NTS's <see cref="WKTReader"/>.  Some differences:
+    /// <list type="bullet">
+    ///     <item>No support for ENVELOPE and BUFFER</item>
+    ///     <item>MULTI* shapes use NTS's <see cref="IGeometryCollection"/> subclasses, not <see cref="ShapeCollection"/></item>
+    ///     <item>'Z' coordinates are saved into the geometry</item>
+    /// </list>
+    /// </summary>
     public class NtsWKTReaderShapeParser : NtsWktShapeParser
     {
         //Note: Historically, the code here originated from the defunct NtsShapeReadWriter.
@@ -40,12 +49,12 @@ namespace Spatial4n.Core.Io.Nts
             return ParseIfSupported(wktString, new WKTReader(m_ctx.GeometryFactory));
         }
 
-        /**
-         * Reads WKT from the {@code str} via NTS's {@link com.vividsolutions.jts.io.WKTReader}.
-         * @param str
-         * @param reader <pre>new WKTReader(ctx.getGeometryFactory()))</pre>
-         * @return Non-Null
-         */
+        /// <summary>
+        /// Reads WKT from the <paramref name="str"/> via NTS's <see cref="WKTReader"/>.
+        /// </summary>
+        /// <param name="str"></param>
+        /// <param name="reader"><c>new WKTReader(ctx.GeometryFactory)</c></param>
+        /// <returns>Non-Null</returns>
         protected IShape ParseIfSupported(string str, WKTReader reader)
         {
             try

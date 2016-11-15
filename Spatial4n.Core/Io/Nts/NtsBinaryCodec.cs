@@ -38,14 +38,14 @@ namespace Spatial4n.Core.Io.Nts
             useFloat = (factory.precisionModel.PrecisionModelType == PrecisionModels.FloatingSingle);
         }
 
-        protected override double ReadDim(/*DataInput*/BinaryReader dataInput)
+        protected override double ReadDim(BinaryReader dataInput)
         {
             if (useFloat)
                 return dataInput.ReadSingle();
             return base.ReadDim(dataInput);
         }
 
-        protected override void WriteDim(/*DataOutput*/BinaryWriter dataOutput, double v)
+        protected override void WriteDim(BinaryWriter dataOutput, double v)
         {
             if (useFloat)
                 dataOutput.Write((float)v);
@@ -63,14 +63,14 @@ namespace Spatial4n.Core.Io.Nts
             return type;
         }
 
-        protected override IShape ReadShapeByTypeIfSupported(/*DataInput*/BinaryReader dataInput, /*byte*/ShapeType type)
+        protected override IShape ReadShapeByTypeIfSupported(BinaryReader dataInput, ShapeType type)
         {
             if (type != ShapeType.TYPE_GEOM)
                 return base.ReadShapeByTypeIfSupported(dataInput, type);
             return ReadNtsGeom(dataInput);
         }
 
-        protected override bool WriteShapeByTypeIfSupported(/*DataOutput*/BinaryWriter dataOutput, IShape s, /*byte*/ShapeType type)
+        protected override bool WriteShapeByTypeIfSupported(BinaryWriter dataOutput, IShape s, ShapeType type)
         {
             if (type != ShapeType.TYPE_GEOM)
                 return base.WriteShapeByTypeIfSupported(dataOutput, s, type);
@@ -164,7 +164,7 @@ namespace Spatial4n.Core.Io.Nts
             }
         }
 
-        public IShape ReadNtsGeom(/*DataInput*/BinaryReader dataInput)
+        public IShape ReadNtsGeom(BinaryReader dataInput)
         {
             NtsSpatialContext ctx = (NtsSpatialContext)base.ctx;
             WKBReader reader = new WKBReader(ctx.GeometryFactory);
@@ -266,7 +266,7 @@ namespace Spatial4n.Core.Io.Nts
             }
         }
 
-        public void WriteNtsGeom(/*DataOutput*/BinaryWriter dataOutput, IShape s)
+        public void WriteNtsGeom(BinaryWriter dataOutput, IShape s)
         {
             NtsSpatialContext ctx = (NtsSpatialContext)base.ctx;
             IGeometry geom = ctx.GetGeometryFrom(s);//might even translate it

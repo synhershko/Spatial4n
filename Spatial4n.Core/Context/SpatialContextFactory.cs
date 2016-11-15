@@ -26,16 +26,19 @@ using System.Reflection;
 namespace Spatial4n.Core.Context
 {
     /// <summary>
-    /// Factory for a SpatialContext.
+    /// Factory for a <see cref="SpatialContext"/> based on configuration data.  Call
+    /// <see cref="MakeSpatialContext(IDictionary{string, string})"/> to construct one via string name-value
+    /// pairs. To construct one via code then create a factory instance, set the fields, then call
+    /// <see cref="NewSpatialContext()"/>.
     /// </summary>
     public class SpatialContextFactory
     {
-        /** Set by {@link #makeSpatialContext(java.util.Map, ClassLoader)}. */
+        /// <summary>
+        /// Set by <see cref="MakeSpatialContext(IDictionary{string, string})"/>.
+        /// </summary>
         protected IDictionary<string, string> args;
-        /** Set by {@link #makeSpatialContext(java.util.Map, ClassLoader)}. */
-        //protected ClassLoader classLoader;
 
-        /* These fields are public to make it easy to set them without bothering with setters. */
+        // These fields are public to make it easy to set them without bothering with setters.
         public bool geo = true;
         public IDistanceCalculator distCalc;//defaults in SpatialContext c'tor based on geo
         public IRectangle worldBounds;//defaults in SpatialContext c'tor based on geo
@@ -47,12 +50,14 @@ namespace Spatial4n.Core.Context
 
 
         /// <summary>
-        /// The factory class is lookuped up via "spatialContextFactory" in args
-        /// then falling back to a Java system property (with initial caps). If neither are specified
-        /// then {@link SimpleSpatialContextFactory} is chosen.
+        /// Creates a new <see cref="SpatialContext"/> based on configuration in
+        /// <paramref name="args"/>.  See the class definition for what keys are looked up
+        /// in it.
+        /// The factory class is looked up via "spatialContextFactory" in args
+        /// then falling back to an <see cref="Environment.GetEnvironmentVariable(string)"/> setting (with initial caps). If neither are specified
+        /// then <see cref="SpatialContextFactory"/> is chosen.
         /// </summary>
-        /// <param name="args"></param>
-        /// <returns></returns>
+        /// <param name="args">Non-null map of name-value pairs.</param>
         public static SpatialContext MakeSpatialContext(IDictionary<string, string> args)
         {
             SpatialContextFactory instance;
@@ -93,7 +98,9 @@ namespace Spatial4n.Core.Context
             InitField("binaryCodecClass");
         }
 
-        /** Gets {@code name} from args and populates a field by the same name with the value. */
+        /// <summary>
+        /// Gets <paramref name="name"/> from args and populates a field by the same name with the value.
+        /// </summary>
         protected virtual void InitField(string name)
         {
             //  note: java.beans API is more verbose to use correctly (?) but would arguably be better
@@ -183,7 +190,9 @@ namespace Spatial4n.Core.Context
             worldBounds = (IRectangle)ctx.ReadShape(worldBoundsStr);//TODO use readShapeFromWkt
         }
 
-        /** Subclasses should simply construct the instance from the initialized configuration. */
+        /// <summary>
+        /// Subclasses should simply construct the instance from the initialized configuration.
+        /// </summary>
         protected internal virtual SpatialContext NewSpatialContext()
         {
             return new SpatialContext(this);
@@ -216,7 +225,6 @@ namespace Spatial4n.Core.Context
                             goto ctorLoop_continue;
                     }
                     return (T)ctor.Invoke(ctorArgs);
-                    //return clazz.cast(ctor.newInstance(ctorArgs));
                     ctorLoop_continue: { }
                 }
             }

@@ -23,7 +23,7 @@ using System.Diagnostics;
 namespace Spatial4n.Core.Shapes.Nts
 {
     /// <summary>
-    /// Wraps a <see cref="NetTopologySuite.Geometries.Point"/> {@link com.vividsolutions.jts.geom.Point}.
+    /// Wraps a <see cref="GeoAPI.Geometries.IPoint"/>.
     /// </summary>
     public class NtsPoint : IPoint
     {
@@ -34,8 +34,6 @@ namespace Spatial4n.Core.Shapes.Nts
         /// <summary>
         /// A simple constructor without normalization / validation.
         /// </summary>
-        /// <param name="pointGeom"></param>
-        /// <param name="ctx"> </param>
         public NtsPoint(GeoAPI.Geometries.IPoint pointGeom, SpatialContext ctx)
         {
             this.ctx = ctx;

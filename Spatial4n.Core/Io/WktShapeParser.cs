@@ -26,6 +26,36 @@ using System.Text.RegularExpressions;
 
 namespace Spatial4n.Core.Io
 {
+    /// <summary>
+    /// An extensible parser for <a href="http://en.wikipedia.org/wiki/Well-known_text">
+    /// Well Known Text (WKT)</a>.
+    /// The shapes supported by this class are:
+    /// <list type="bullet">
+    ///     <item>POINT</item>
+    ///     <item>MULTIPOINT</item>
+    ///     <item>ENVELOPE (strictly isn't WKT but is defined by OGC's <a href="http://docs.geoserver.org/stable/en/user/tutorials/cql/cql_tutorial.html"> Common Query Language(CQL)</a>)</item>
+    ///     <item>LINESTRING</item>
+    ///     <item>MULTILINESTRING</item>
+    ///     <item>GEOMETRYCOLLECTION</item>
+    ///     <item>BUFFER (non-standard Spatial4n operation)</item>
+    /// </list>
+    /// 'EMPTY' is supported. Specifying 'Z', 'M', or any other dimensionality in the WKT is effectively
+    /// ignored.  Thus, you can specify any number of numbers in the coordinate points but only the first
+    /// two take effect.  The docs for the <c>parse___Shape</c> methods further describe these
+    /// shapes, or you
+    /// <para>
+    /// Most users of this class will call just one method: <see cref="Parse(string)"/>, or
+    /// <see cref="ParseIfSupported(string)"/> to not fail if it isn't parse-able.
+    /// </para>
+    /// <para>
+    /// To support more shapes, extend this class and override
+    /// <see cref="ParseShapeByType(State, string)"/>. It's also possible to delegate to
+    /// a WKTParser by also delegating <see cref="NewState(string)"/>.
+    /// </para>
+    /// <para>
+    /// Note, instances of this base class are threadsafe.
+    /// </para>
+    /// </summary>
     public class WktShapeParser
     {
         //TODO support SRID:  "SRID=4326;pointPOINT(1,2)
@@ -34,7 +64,11 @@ namespace Spatial4n.Core.Io
         // might optionally do data validation & normalization
         protected readonly SpatialContext m_ctx;
 
-        /** This constructor is required by {@link com.spatial4j.core.context.SpatialContextFactory#makeWktShapeParser(com.spatial4j.core.context.SpatialContext)}. */
+        /// <summary>
+        /// This constructor is required by <see cref="SpatialContextFactory.MakeWktShapeParser(SpatialContext)"/>.
+        /// </summary>
+        /// <param name="ctx"></param>
+        /// <param name="factory"></param>
         public WktShapeParser(SpatialContext ctx, SpatialContextFactory factory)
         {
             this.m_ctx = ctx;
@@ -45,12 +79,12 @@ namespace Spatial4n.Core.Io
             get { return m_ctx; }
         }
 
-        /**
-         * Parses the wktString, returning the defined Shape.
-         *
-         * @return Non-null Shape defined in the String
-         * @throws ParseException Thrown if there is an error in the Shape definition
-         */
+        /// <summary>
+        /// Parses the wktString, returning the defined <see cref="IShape"/>.
+        /// </summary>
+        /// <param name="wktString"></param>
+        /// <returns>Non-null <see cref="IShape"/> defined in the string</returns>
+        /// <exception cref="ParseException">Thrown if there is an error in the <see cref="IShape"/> definition</exception>
         public virtual IShape Parse(string wktString)
         {
             IShape shape = ParseIfSupported(wktString);//sets rawString & offset
@@ -60,16 +94,15 @@ namespace Spatial4n.Core.Io
             throw new ParseException("Unknown Shape definition [" + shortenedString + "]", 0);
         }
 
-        /**
-         * Parses the wktString, returning the defined Shape. If it can't because the
-         * shape name is unknown or an empty or blank string was passed, then it returns null.
-         * If the WKT starts with a supported shape but contains an inner unsupported shape then
-         * it will result in a {@link ParseException}.
-         *
-         * @param wktString non-null, can be empty or have surrounding whitespace
-         * @return Shape, null if unknown / unsupported shape.
-         * @throws ParseException Thrown if there is an error in the Shape definition
-         */
+        /// <summary>
+        /// Parses the wktString, returning the defined <see cref="IShape"/>. If it can't because the
+        /// shape name is unknown or an empty or blank string was passed, then it returns null.
+        /// If the WKT starts with a supported shape but contains an inner unsupported shape then
+        /// it will result in a <see cref="ParseException"/>.
+        /// </summary>
+        /// <param name="wktString">non-null, can be empty or have surrounding whitespace</param>
+        /// <returns><see cref="IShape"/>, null if unknown / unsupported shape.</returns>
+        /// <exception cref="ParseException">Thrown if there is an error in the <see cref="IShape"/> definition</exception>
         public virtual IShape ParseIfSupported(string wktString)
         {
             State state = NewState(wktString);
@@ -100,8 +133,10 @@ namespace Spatial4n.Core.Io
             return result;
         }
 
-        /** (internal) Creates a new State with the given String. It's only called by
-         * {@link #parseIfSupported(String)}. This is an extension point for subclassing. */
+        /// <summary>
+        /// (internal) Creates a new State with the given String. It's only called by
+        /// <see cref="ParseIfSupported(string)"/>. This is an extension point for subclassing.
+        /// </summary>
         protected internal virtual State NewState(string wktString)
         {
             //NOTE: if we wanted to re-use old States to reduce object allocation, we might do that
@@ -110,26 +145,25 @@ namespace Spatial4n.Core.Io
             return new State(this, wktString);
         }
 
-        /**
-         * (internal) Parses the remainder of a shape definition following the shape's name
-         * given as {@code shapeType} already consumed via
-         * {@link State#nextWord()}. If
-         * it's able to parse the shape, {@link WktShapeParser.State#offset}
-         * should be advanced beyond
-         * it (e.g. to the ',' or ')' or EOF in general). The default implementation
-         * checks the name against some predefined names and calls corresponding
-         * parse methods to handle the rest. Overriding this method is an
-         * excellent extension point for additional shape types. Or, use this class by delegation to this
-         * method.
-         * <p />
-         * When writing a parse method that reacts to a specific shape type, remember to handle the
-         * dimension and EMPTY token via
-         * {@link com.spatial4j.core.io.WktShapeParser.State#nextIfEmptyAndSkipZM()}.
-         *
-         * @param state
-         * @param shapeType Non-Null string; could have mixed case. The first character is a letter.
-         * @return The shape or null if not supported / unknown.
-         */
+        /// <summary>
+        /// (internal) Parses the remainder of a shape definition following the shape's name
+        /// given as <paramref name="shapeType"/> already consumed via
+        /// <see cref="State.NextWord()"/>. If
+        /// it's able to parse the shape, <see cref="State.offset"/> 
+        /// should be advanced beyond
+        /// it (e.g. to the ',' or ')' or EOF in general). The default implementation
+        /// checks the name against some predefined names and calls corresponding
+        /// parse methods to handle the rest. Overriding this method is an
+        /// excellent extension point for additional shape types. Or, use this class by delegation to this
+        /// method.
+        /// <para>
+        /// When writing a parse method that reacts to a specific shape type, remember to handle the
+        /// dimension and EMPTY token via <see cref="State.NextIfEmptyAndSkipZM()"/>.
+        /// </para>
+        /// </summary>
+        /// <param name="state"></param>
+        /// <param name="shapeType">Non-Null string; could have mixed case. The first character is a letter.</param>
+        /// <returns>The shape or null if not supported / unknown.</returns>
         protected internal virtual IShape ParseShapeByType(State state, string shapeType)
         {
             Debug.Assert(char.IsLetter(shapeType[0]), "Shape must start with letter: " + shapeType);
@@ -168,13 +202,13 @@ namespace Spatial4n.Core.Io
             return null;
         }
 
-        /**
-         * Parses the BUFFER operation applied to a parsed shape.
-         * <pre>
-         *   '(' shape ',' number ')'
-         * </pre>
-         * Whereas 'number' is the distance to buffer the shape by.
-         */
+        /// <summary>
+        /// Parses the BUFFER operation applied to a parsed shape.
+        /// <code>
+        ///   '(' shape ',' number ')'
+        /// </code>
+        /// Whereas 'number' is the distance to buffer the shape by.
+        /// </summary>
         protected virtual IShape ParseBufferShape(State state)
         {
             state.NextExpect('(');
@@ -185,22 +219,22 @@ namespace Spatial4n.Core.Io
             return shape.GetBuffered(distance, m_ctx);
         }
 
-        /** Called to normalize a value that isn't X or Y. X & Y or normalized via
-         * {@link com.spatial4j.core.context.SpatialContext#normX(double)} & normY.
-         */
+        /// <summary>
+        /// Called to normalize a value that isn't X or Y. X & Y or normalized via
+        /// <see cref="SpatialContext.NormX(double)"/> & <see cref="SpatialContext.NormY(double)"/>.
+        /// </summary>
         protected virtual double NormDist(double v)
         {//TODO should this be added to ctx?
             return v;
         }
 
-        /**
-         * Parses a POINT shape from the raw string.
-         * <pre>
-         *   '(' coordinate ')'
-         * </pre>
-         *
-         * @see #point(WktShapeParser.State)
-         */
+        /// <summary>
+        /// Parses a POINT shape from the raw string.
+        /// <code>
+        ///   '(' coordinate ')'
+        /// </code>
+        /// </summary>
+        /// <seealso cref="Point(State)"/>
         protected virtual IShape ParsePointShape(State state)
         {
             if (state.NextIfEmptyAndSkipZM())
@@ -211,15 +245,14 @@ namespace Spatial4n.Core.Io
             return coordinate;
         }
 
-        /**
-         * Parses a MULTIPOINT shape from the raw string -- a collection of points.
-         * <pre>
-         *   '(' coordinate (',' coordinate )* ')'
-         * </pre>
-         * Furthermore, coordinate can optionally be wrapped in parenthesis.
-         *
-         * @see #point(WktShapeParser.State)
-         */
+        /// <summary>
+        /// Parses a MULTIPOINT shape from the raw string -- a collection of points.
+        /// <code>
+        ///   '(' coordinate (',' coordinate )* ')'
+        /// </code>
+        /// Furthermore, coordinate can optionally be wrapped in parenthesis.
+        /// </summary>
+        /// <seealso cref="Point(State)"/>
         protected virtual IShape ParseMultiPointShape(State state)
         {
             if (state.NextIfEmptyAndSkipZM())
@@ -238,15 +271,16 @@ namespace Spatial4n.Core.Io
             return m_ctx.MakeCollection(shapes);
         }
 
-        /**
-         * Parses an ENVELOPE (aka Rectangle) shape from the raw string. The values are normalized.
-         * <p />
-         * Source: OGC "Catalogue Services Specification", the "CQL" (Common Query Language) sub-spec.
-         * <em>Note the inconsistent order of the min & max values between x & y!</em>
-         * <pre>
-         *   '(' x1 ',' x2 ',' y2 ',' y1 ')'
-         * </pre>
-         */
+        /// <summary>
+        /// Parses an ENVELOPE (aka Rectangle) shape from the raw string. The values are normalized.
+        /// <para>
+        /// Source: OGC "Catalogue Services Specification", the "CQL" (Common Query Language) sub-spec.
+        /// <c>Note the inconsistent order of the min & max values between x & y!</c>
+        /// <code>
+        ///   '(' x1 ',' x2 ',' y2 ',' y1 ')'
+        /// </code>
+        /// </para>
+        /// </summary>
         protected virtual IShape ParseEnvelopeShape(State state)
         {
             //FYI no dimension or EMPTY
@@ -262,14 +296,13 @@ namespace Spatial4n.Core.Io
             return m_ctx.MakeRectangle(m_ctx.NormX(x1), m_ctx.NormX(x2), m_ctx.NormY(y1), m_ctx.NormY(y2));
         }
 
-        /**
-         * Parses a LINESTRING shape from the raw string -- an ordered sequence of points.
-         * <pre>
-         *   coordinateSequence
-         * </pre>
-         *
-         * @see #pointList(WktShapeParser.State)
-         */
+        /// <summary>
+        /// Parses a LINESTRING shape from the raw string -- an ordered sequence of points.
+        /// <code>
+        ///   coordinateSequence
+        /// </code>
+        /// </summary>
+        /// <seealso cref="PointList(State)"/>
         protected virtual IShape ParseLineStringShape(State state)
         {
             if (state.NextIfEmptyAndSkipZM())
@@ -278,14 +311,13 @@ namespace Spatial4n.Core.Io
             return m_ctx.MakeLineString(points);
         }
 
-        /**
-         * Parses a MULTILINESTRING shape from the raw string -- a collection of line strings.
-         * <pre>
-         *   '(' coordinateSequence (',' coordinateSequence )* ')'
-         * </pre>
-         *
-         * @see #parseLineStringShape(com.spatial4j.core.io.WktShapeParser.State)
-         */
+        /// <summary>
+        /// Parses a MULTILINESTRING shape from the raw string -- a collection of line strings.
+        /// <code>
+        ///   '(' coordinateSequence (',' coordinateSequence )* ')'
+        /// </code>
+        /// </summary>
+        /// <seealso cref="ParseLineStringShape(State)"/>
         protected virtual IShape ParseMultiLineStringShape(State state)
         {
             if (state.NextIfEmptyAndSkipZM())
@@ -300,12 +332,12 @@ namespace Spatial4n.Core.Io
             return m_ctx.MakeCollection(shapes);
         }
 
-        /**
-         * Parses a GEOMETRYCOLLECTION shape from the raw string.
-         * <pre>
-         *   '(' shape (',' shape )* ')'
-         * </pre>
-         */
+        /// <summary>
+        /// Parses a GEOMETRYCOLLECTION shape from the raw string.
+        /// <code>
+        ///   '(' shape (',' shape )* ')'
+        /// </code>
+        /// </summary>
         protected virtual IShape ParseGeometryCollectionShape(State state)
         {
             if (state.NextIfEmptyAndSkipZM())
@@ -320,9 +352,11 @@ namespace Spatial4n.Core.Io
             return m_ctx.MakeCollection(shapes);
         }
 
-        /** Reads a shape from the current position, starting with the name of the shape. It
-         * calls {@link #parseShapeByType(com.spatial4j.core.io.WktShapeParser.State, String)}
-         * and throws an exception if the shape wasn't supported. */
+        /// <summary>
+        /// Reads a shape from the current position, starting with the name of the shape. It
+        /// calls <seealso cref="ParseShapeByType(State, string)"/>
+        /// and throws an exception if the shape wasn't supported.
+        /// </summary>
         protected virtual IShape Shape(State state)
         {
             string type = state.NextWord();
@@ -332,14 +366,13 @@ namespace Spatial4n.Core.Io
             return shape;
         }
 
-        /**
-         * Reads a list of Points (AKA CoordinateSequence) from the current position.
-         * <pre>
-         *   '(' coordinate (',' coordinate )* ')'
-         * </pre>
-         *
-         * @see #point(WktShapeParser.State)
-         */
+        /// <summary>
+        /// Reads a list of Points (AKA CoordinateSequence) from the current position.
+        /// <code>
+        ///   '(' coordinate (',' coordinate )* ')'
+        /// </code>
+        /// </summary>
+        /// <seealso cref="Point(State)"/>
         protected virtual List<IPoint> PointList(State state)
         {
             List<IPoint> sequence = new List<IPoint>();
@@ -352,13 +385,13 @@ namespace Spatial4n.Core.Io
             return sequence;
         }
 
-        /**
-         * Reads a raw Point (AKA Coordinate) from the current position. Only the first 2 numbers are
-         * used.  The values are normalized.
-         * <pre>
-         *   number number number*
-         * </pre>
-         */
+        /// <summary>
+        /// Reads a raw Point (AKA Coordinate) from the current position. Only the first 2 numbers are
+        /// used.  The values are normalized.
+        /// <code>
+        ///   number number number*
+        /// </code>
+        /// </summary>
         protected virtual IPoint Point(State state)
         {
             double x = state.NextDouble();
@@ -367,16 +400,18 @@ namespace Spatial4n.Core.Io
             return m_ctx.MakePoint(m_ctx.NormX(x), m_ctx.NormY(y));
         }
 
-        /** The parse state. */
+        /// <summary>
+        /// The parse state.
+        /// </summary>
         public class State
         {
             private readonly WktShapeParser outerInstance;
 
-            /** Set in {@link #parseIfSupported(String)}. */
+            /// <summary>Set in <see cref="ParseIfSupported(string)"/>.</summary>
             public string rawString;
-            /** Offset of the next char in {@link #rawString} to be read. */
+            /// <summary>Offset of the next char in <see cref="rawString"/> to be read. </summary>
             public int offset;
-            /** Dimensionality specifier (e.g. 'Z', or 'M') following a shape type name. */
+            /// <summary>Dimensionality specifier (e.g. 'Z', or 'M') following a shape type name.</summary>
             public string dimension;
 
             public State(WktShapeParser outerInstance, string rawString)
@@ -397,13 +432,12 @@ namespace Spatial4n.Core.Io
                 get { return outerInstance; }
             }
 
-            /**
-             * Reads the word starting at the current character position. The word
-             * terminates once {@link Character#isJavaIdentifierPart(char)} returns false (or EOF).
-             * {@link #offset} is advanced past whitespace.
-             *
-             * @return Non-null non-empty String.
-             */
+            /// <summary>
+            /// Reads the word starting at the current character position. The word
+            /// terminates once <see cref="IsIdentifierPartCharacter(char)"/> (which is identical to Java's <c>Character.isJavaIdentifierPart(char)</c>) returns false (or EOF).
+            /// <see cref="offset"/> is advanced past whitespace.
+            /// </summary>
+            /// <returns>Non-null non-empty string.</returns>
             public virtual string NextWord()
             {
                 int startOffset = offset;
@@ -419,14 +453,14 @@ namespace Spatial4n.Core.Io
                 return result;
             }
 
-            /**
-             * Skips over a dimensionality token (e.g. 'Z' or 'M') if found, storing in
-             * {@link #dimension}, and then looks for EMPTY, consuming that and whitespace.
-             * <pre>
-             *   dimensionToken? 'EMPTY'?
-             * </pre>
-             * @return True if EMPTY was found.
-             */
+            /// <summary>
+            /// Skips over a dimensionality token (e.g. 'Z' or 'M') if found, storing in
+            /// <see cref="dimension"/>, and then looks for EMPTY, consuming that and whitespace.
+            /// <code>
+            ///   dimensionToken? 'EMPTY'?
+            /// </code>
+            /// </summary>
+            /// <returns>True if EMPTY was found.</returns>
             public virtual bool NextIfEmptyAndSkipZM()
             {
                 if (Eof)
@@ -452,13 +486,12 @@ namespace Spatial4n.Core.Io
                     offset);
             }
 
-            /**
-             * Reads in a double from the String. Parses digits with an optional decimal, sign, or exponent.
-             * NaN and Infinity are not supported.
-             * {@link #offset} is advanced past whitespace.
-             *
-             * @return Double value
-             */
+            /// <summary>
+            /// Reads in a double from the string. Parses digits with an optional decimal, sign, or exponent.
+            /// NaN and Infinity are not supported.
+            /// <see cref="offset"/> is advanced past whitespace.
+            /// </summary>
+            /// <returns><see cref="double"/> value</returns>
             public virtual double NextDouble()
             {
                 int startOffset = offset;
@@ -478,7 +511,9 @@ namespace Spatial4n.Core.Io
                 return result;
             }
 
-            /** Advances offset forward until it points to a character that isn't part of a number. */
+            /// <summary>
+            /// Advances offset forward until it points to a character that isn't part of a number.
+            /// </summary>
             public virtual void SkipDouble()
             {
                 int startOffset = offset;
@@ -495,7 +530,9 @@ namespace Spatial4n.Core.Io
                 }
             }
 
-            /** Advances past as many doubles as there are, with intervening whitespace. */
+            /// <summary>
+            /// Advances past as many doubles as there are, with intervening whitespace.
+            /// </summary>
             public virtual void SkipNextDoubles()
             {
                 while (!Eof)
@@ -508,13 +545,12 @@ namespace Spatial4n.Core.Io
                 }
             }
 
-            /**
-             * Verifies that the current character is of the expected value.
-             * If the character is the expected value, then it is consumed and
-             * {@link #offset} is advanced past whitespace.
-             *
-             * @param expected The expected char.
-             */
+            /// <summary>
+            /// Verifies that the current character is of the expected value.
+            /// If the character is the expected value, then it is consumed and
+            /// <see cref="offset"/> is advanced past whitespace.
+            /// </summary>
+            /// <param name="expected">The expected char.</param>
             public virtual void NextExpect(char expected)
             {
                 if (Eof)
@@ -526,19 +562,20 @@ namespace Spatial4n.Core.Io
                 NextIfWhitespace();
             }
 
-            /** If the string is consumed, i.e. at end-of-file. */
+            /// <summary>
+            /// If the string is consumed, i.e. at end-of-file.
+            /// </summary>
             public bool Eof
             {
                 get { return offset >= rawString.Length; }
             }
 
-            /**
-             * If the current character is {@code expected}, then offset is advanced after it and any
-             * subsequent whitespace. Otherwise, false is returned.
-             *
-             * @param expected The expected char
-             * @return true if consumed
-             */
+            /// <summary>
+            /// If the current character is <paramref name="expected"/>, then offset is advanced after it and any
+            /// subsequent whitespace. Otherwise, false is returned.
+            /// </summary>
+            /// <param name="expected">The expected char</param>
+            /// <returns>true if consumed</returns>
             public virtual bool NextIf(char expected)
             {
                 if (!Eof && rawString[offset] == expected)
@@ -550,11 +587,11 @@ namespace Spatial4n.Core.Io
                 return false;
             }
 
-            /**
-             * Moves offset to next non-whitespace character. Doesn't move if the offset is already at
-             * non-whitespace. <em>There is very little reason for subclasses to call this because
-             * most other parsing methods call it.</em>
-             */
+            /// <summary>
+            /// Moves offset to next non-whitespace character. Doesn't move if the offset is already at
+            /// non-whitespace. <c>There is very little reason for subclasses to call this because
+            /// most other parsing methods call it.</c>
+            /// </summary>
             public virtual void NextIfWhitespace()
             {
                 for (; offset < rawString.Length; offset++)
@@ -566,26 +603,26 @@ namespace Spatial4n.Core.Io
                 }
             }
 
-            /**
-             * Returns the next chunk of text till the next ',' or ')' (non-inclusive)
-             * or EOF. If a '(' is encountered, then it looks past its matching ')',
-             * taking care to handle nested matching parenthesis too. It's designed to be
-             * of use to subclasses that wish to get the entire subshape at the current
-             * position as a string so that it might be passed to other software that
-             * will parse it.
-             * <p/>
-             * Example:
-             * <pre>
-             *   OUTER(INNER(3, 5))
-             * </pre>
-             * If this is called when offset is at the first character, then it will
-             * return this whole string.  If called at the "I" then it will return
-             * "INNER(3, 5)".  If called at "3", then it will return "3".  In all cases,
-             * offset will be positioned at the next position following the returned
-             * substring.
-             *
-             * @return non-null substring.
-             */
+            /// <summary>
+            /// Returns the next chunk of text till the next ',' or ')' (non-inclusive)
+            /// or EOF. If a '(' is encountered, then it looks past its matching ')',
+            /// taking care to handle nested matching parenthesis too. It's designed to be
+            /// of use to subclasses that wish to get the entire subshape at the current
+            /// position as a string so that it might be passed to other software that
+            /// will parse it.
+            /// <para>
+            /// Example:
+            /// <code>
+            ///   OUTER(INNER(3, 5))
+            /// </code>
+            /// If this is called when offset is at the first character, then it will
+            /// return this whole string.  If called at the "I" then it will return
+            /// "INNER(3, 5)".  If called at "3", then it will return "3".  In all cases,
+            /// offset will be positioned at the next position following the returned
+            /// substring.
+            /// </para>
+            /// </summary>
+            /// <returns>non-null substring.</returns>
             public virtual string NextSubShapeString()
             {
                 int startOffset = offset;

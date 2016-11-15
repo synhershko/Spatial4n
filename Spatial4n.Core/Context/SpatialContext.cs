@@ -26,14 +26,15 @@ using System.Collections.Generic;
 namespace Spatial4n.Core.Context
 {
     /// <summary>
-    /// This is a facade to most of Spatial4j, holding things like {@link
-    /// DistanceUnits}, {@link DistanceCalculator}, and the coordinate world
-    /// boundaries, and acting as a factory for the {@link Shape}s.
-    /// <p/>
-    /// A SpatialContext has public constructors, but note the convenience
-    /// instance {@link #GEO}.  Also, if you wish to construct one based on
-    /// configuration information then consider using {@link SpatialContextFactory}.
-    /// <p/>
+    /// This is a facade to most of Spatial4n, holding things like <see cref="IDistanceCalculator"/>, 
+    /// <see cref="WktShapeParser"/>, and acting as a factory for the <see cref="IShape"/>s.
+    /// <para>
+    /// If you want a typical geodetic context, just reference <see cref="GEO"/>.  Otherwise,
+    /// You should either create and configure a <see cref="SpatialContextFactory"/> and then call
+    /// <see cref="SpatialContextFactory.NewSpatialContext()"/>, OR, call
+    /// <see cref="SpatialContextFactory.MakeSpatialContext(IDictionary{string, string})"/>
+    /// to do this via configuration data.
+    /// </para>
     /// Thread-safe & immutable.
     /// </summary>
     public class SpatialContext
@@ -52,9 +53,6 @@ namespace Spatial4n.Core.Context
         private readonly BinaryCodec binaryCodec;
 
         private readonly bool normWrapLongitude;
-
-
-
 
         /// <summary>
         /// Consider using <see cref="SpatialContextFactory"/> instead.
@@ -151,7 +149,7 @@ namespace Spatial4n.Core.Context
 
         /// <summary>
         /// The extent of x & y coordinates should fit within the return'ed rectangle.
-        /// Do *NOT* invoke reset() on this return type.
+        /// Do *NOT* invoke <see cref="IRectangle.Reset(double, double, double, double)"/> on this return type.
         /// </summary>
         /// <returns></returns>
 		public virtual IRectangle WorldBounds
@@ -169,7 +167,9 @@ namespace Spatial4n.Core.Context
         }
 
         /// <summary>
-        /// Is this a geospatial context (true) or simply 2d spatial (false).
+        /// Is the mathematical world model based on a sphere, or is it a flat plane? The word
+        /// "geodetic" or "geodesic" is sometimes used to refer to the former, and the latter is sometimes
+        /// referred to as "Euclidean" or "cartesian".
         /// </summary>
         /// <returns></returns>
         public virtual bool IsGeo
@@ -195,7 +195,8 @@ namespace Spatial4n.Core.Context
         public virtual double NormY(double y) { return y; }
 
         /// <summary>
-        /// Ensure fits in <see cref="WorldBounds"/>
+        /// Ensure fits in <see cref="WorldBounds"/>. It's called by any shape factory method that
+        /// gets an 'x' dimension.
         /// </summary>
         /// <param name="x"></param>
         public virtual void VerifyX(double x)
@@ -206,7 +207,8 @@ namespace Spatial4n.Core.Context
         }
 
         /// <summary>
-        /// Ensure fits in <see cref="WorldBounds"/>
+        /// Ensure fits in <see cref="WorldBounds"/>. It's called by any shape factory method that
+        /// gets a 'y' dimension.
         /// </summary>
         /// <param name="y"></param>
         public virtual void VerifyY(double y)
@@ -230,7 +232,7 @@ namespace Spatial4n.Core.Context
         }
 
         /// <summary>
-        /// Construct a rectangle. The parameters will be normalized.
+        /// Construct a rectangle.
         /// </summary>
         /// <param name="lowerLeft"></param>
         /// <param name="upperRight"></param>
@@ -327,7 +329,7 @@ namespace Spatial4n.Core.Context
 
         /// <summary>
         /// Constructs a line string. It's an ordered sequence of connected vertexes. There
-        /// is no official shape/interface for it yet so we just return Shape.
+        /// is no official shape/interface for it yet so we just return <see cref="IShape"/>.
         /// </summary>
         /// <param name="points"></param>
         /// <returns></returns>
@@ -350,7 +352,7 @@ namespace Spatial4n.Core.Context
         }
 
         /// <summary>
-        /// Construct a ShapeCollection, analogous to an OGC GeometryCollection.
+        /// Construct a <see cref="ShapeCollection"/>, analogous to an OGC GeometryCollection.
         /// </summary>
         /// <param name="coll"></param>
         /// <returns></returns>
@@ -385,6 +387,14 @@ namespace Spatial4n.Core.Context
             get { return binaryCodec; }
         }
 
+        /// <summary>
+        /// Reads the shape from a String using the old/deprecated
+        /// <see cref="LegacyShapeReadWriterFormat"/>.
+        /// Instead you should use standard WKT via <see cref="ReadShapeFromWkt(string)"/>. This method falls
+        /// back on WKT if it's not in the legacy format.
+        /// </summary>
+        /// <param name="value">non-null</param>
+        /// <returns>non-null</returns>
         [Obsolete]
         public virtual IShape ReadShape(string value)
         {
@@ -405,6 +415,16 @@ namespace Spatial4n.Core.Context
             return s;
         }
 
+        /// <summary>
+        /// Writes the shape to a String using the old/deprecated
+        /// <see cref="LegacyShapeReadWriterFormat"/>. The NTS based subclass will write it
+        /// to WKT if the legacy format doesn't support that shape.
+        /// <para>
+        /// Spatial4n in the near future won't support writing shapes to strings.
+        /// </para>
+        /// </summary>
+        /// <param name="shape">non-null</param>
+        /// <returns>non-null</returns>
         [Obsolete]
         public virtual string ToString(IShape shape)
         {

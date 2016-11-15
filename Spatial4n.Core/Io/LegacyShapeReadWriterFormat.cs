@@ -27,15 +27,15 @@ namespace Spatial4n.Core.Io
     /// Reads & writes a shape from a given string in the old format.
     /// <list type="bullet">
     ///     <item>
-    ///     Point: X Y
+    ///     Point: X Y<para/>
     ///     1.23 4.56
     ///     </item>
     ///     <item>
-    ///     Rect: XMin YMin XMax YMax
+    ///     Rect: XMin YMin XMax YMax<para/>
     ///     1.23 4.56 7.87 4.56
     ///     </item>
     ///     <item>
-    ///     {CIRCLE} '(' {POINT} {DISTANCE} ')'
+    ///     {CIRCLE} '(' {POINT} {DISTANCE} ')'<para/>
     ///     CIRCLE is "CIRCLE" or "Circle" (no other case), and POINT is "X Y" order pair of doubles, or
     ///     "Y,X" (lat,lon) pair of doubles, and DISTANCE is "d=RADIUS" or "distance=RADIUS" where RADIUS
     ///     is a double that is the distance radius in degrees.
@@ -49,18 +49,25 @@ namespace Spatial4n.Core.Io
         {
         }
 
-        /**
-         * Writes a shape to a String, in a format that can be read by
-         * {@link #readShapeOrNull(String, com.spatial4j.core.context.SpatialContext)}.
-         * @param shape Not null.
-         * @return Not null.
-         */
+        /// <summary>
+        /// Writes a shape to a string, in a format that can be read by
+        /// <see cref="SpatialContext"/>.
+        /// </summary>
+        /// <param name="shape">Not null</param>
+        /// <returns>Not null</returns>
         public static string WriteShape(IShape shape)
         {
             return WriteShape(shape, "0.000000");
         }
 
-        /** Overloaded to provide a number format. */
+        /// <summary>
+        /// Writes a shape to a string, in a format that can be read by
+        /// <see cref="SpatialContext"/>.
+        /// Overloaded to provide a <paramref name="numberFormat"/>.
+        /// </summary>
+        /// <param name="shape">Not null</param>
+        /// <param name="numberFormat">A standard or custom numeric .NET format string (float).</param>
+        /// <returns>Not null</returns>
         public static string WriteShape(IShape shape, string numberFormat)
         {
             if (shape is IPoint)
@@ -88,12 +95,16 @@ namespace Spatial4n.Core.Io
             return shape.ToString();
         }
 
-        /** Reads the shape specification as defined in the class javadocs. If the first character is
-         * a letter but it doesn't complete out "Circle" or "CIRCLE" then this method returns null,
-         * offering the caller the opportunity to potentially try additional parsing.
-         * If the first character is not a letter then it's assumed to be a point or rectangle. If that
-         * doesn't work out then an {@link com.spatial4j.core.exception.InvalidShapeException} is thrown.
-         */
+        /// <summary>
+        /// Reads the shape specification as defined in the class javadocs. If the first character is
+        /// a letter but it doesn't complete out "Circle" or "CIRCLE" then this method returns null,
+        /// offering the caller the opportunity to potentially try additional parsing.
+        /// If the first character is not a letter then it's assumed to be a point or rectangle. If that
+        /// doesn't work out then an <see cref="InvalidShapeException"/> is thrown.
+        /// </summary>
+        /// <param name="str"></param>
+        /// <param name="ctx"></param>
+        /// <returns></returns>
         public static IShape ReadShapeOrNull(string str, SpatialContext ctx)
         {
             if (str == null || str.Length == 0)
@@ -182,7 +193,9 @@ namespace Spatial4n.Core.Io
             return ctx.MakePoint(p0, p1);
         }
 
-        /** Reads geospatial latitude then a comma then longitude. */
+        /// <summary>
+        /// Reads geospatial latitude then a comma then longitude.
+        /// </summary>
         private static IPoint ReadLatCommaLonPoint(string value, SpatialContext ctx)
         {
             double[]

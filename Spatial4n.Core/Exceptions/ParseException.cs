@@ -19,6 +19,9 @@ using System;
 
 namespace Spatial4n.Core.Exceptions
 {
+    /// <summary>
+    /// Spatial4n specific type used to throw/catch a parsing error including the offset.
+    /// </summary>
     [Serializable]
     public class ParseException : Exception
     {

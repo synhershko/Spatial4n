@@ -21,6 +21,15 @@ using System;
 
 namespace Spatial4n.Core.Distance
 {
+    /// <summary>
+    /// Various distance calculations and constants. To the extent possible, a 
+    /// <see cref="IDistanceCalculator"/>, retrieved from <see cref="SpatialContext.DistCalc"/>
+    /// should be used in preference to calling these methods directly.
+    /// <para>
+    /// This code came from <a href="https://issues.apache.org/jira/browse/LUCENE-1387">Apache
+    /// Lucene, LUCENE-1387</a>, which in turn came from "LocalLucene".
+    /// </para>
+    /// </summary>
     public static class DistanceUtils
     {
         //pre-compute some angles that are commonly used
@@ -52,7 +61,7 @@ namespace Spatial4n.Core.Distance
         public static readonly double EARTH_EQUATORIAL_RADIUS_KM = 6378.1370;
 
         /// <summary>
-        /// Equivalent to degrees2Dist(1, EARTH_MEAN_RADIUS_KM)
+        /// Equivalent to Degrees2Dist(1, EARTH_MEAN_RADIUS_KM)
         /// </summary>
         public static readonly double DEG_TO_KM = DEGREES_TO_RADIANS * EARTH_MEAN_RADIUS_KM;
         public static readonly double KM_TO_DEG = 1 / DEG_TO_KM;
@@ -67,6 +76,7 @@ namespace Spatial4n.Core.Distance
         /// <param name="vec2">The second vector</param>
         /// <param name="power">The power (2 for cartesian distance, 1 for manhattan, etc.)</param>
         /// <returns>The length. See http://en.wikipedia.org/wiki/Lp_space </returns>
+        /// <seealso cref="VectorDistance(double[], double[], double, double)"/>
         [Obsolete]
         public static double VectorDistance(double[] vec1, double[] vec2, double power)
         {
@@ -81,7 +91,8 @@ namespace Spatial4n.Core.Distance
         /// <param name="vec1">The first vector</param>
         /// <param name="vec2">The second vector</param>
         /// <param name="power">The power (2 for cartesian distance, 1 for manhattan, etc.)</param>
-        /// <param name="oneOverPower">If you've precalculated oneOverPower and cached it, use this method to save one division operation over {@link #vectorDistance(double[], double[], double)}.</param>
+        /// <param name="oneOverPower">If you've precalculated <paramref name="oneOverPower"/> and cached it, 
+        /// use this method to save one division operation over <seealso cref="VectorDistance(double[], double[], double)"/>.</param>
         /// <returns>The length.</returns>
         [Obsolete]
         public static double VectorDistance(double[] vec1, double[] vec2, double power, double oneOverPower)
@@ -125,16 +136,15 @@ namespace Spatial4n.Core.Distance
             return result;
         }
 
-        /**
-		 * Return the coordinates of a vector that is the corner of a box (upper right or lower left), assuming a Rectangular
-		 * coordinate system.  Note, this does not apply for points on a sphere or ellipse (although it could be used as an approximation).
-		 *
-		 * @param center     The center point
-		 * @param result Holds the result, potentially resizing if needed.
-		 * @param distance   The d from the center to the corner
-		 * @param upperRight If true, return the coords for the upper right corner, else return the lower left.
-		 * @return The point, either the upperLeft or the lower right
-		 */
+        /// <summary>
+        /// Return the coordinates of a vector that is the corner of a box (upper right or lower left), assuming a Rectangular
+        /// coordinate system.  Note, this does not apply for points on a sphere or ellipse (although it could be used as an approximation).
+        /// </summary>
+        /// <param name="center">The center point</param>
+        /// <param name="result">Holds the result, potentially resizing if needed.</param>
+        /// <param name="distance">The distance from the center to the corner</param>
+        /// <param name="upperRight">If true, return the coords for the upper right corner, else return the lower left.</param>
+        /// <returns>The point, either the upperLeft or the lower right</returns>
         [Obsolete]
         public static double[] VectorBoxCorner(double[] center, double[] result, double distance, bool upperRight)
         {
@@ -156,18 +166,28 @@ namespace Spatial4n.Core.Distance
             }
             return result;
         }
-
         /**
-		 * Given a start point (startLat, startLon) and a bearing on a sphere of radius <i>sphereRadius</i>, return the destination point.
+		 * 
 		 *
 		 *
-		 * @param startLat The starting point latitude, in radians
-		 * @param startLon The starting point longitude, in radians
-		 * @param distanceRAD The distance to travel along the bearing in radians.
-		 * @param bearingRAD The bearing, in radians.  North is a 0, moving clockwise till radians(360).
-		 * @param result A preallocated array to hold the results.  If null, a new one is constructed.
-		 * @return The destination point, in radians.  First entry is latitude, second is longitude
+		 * @param startLat 
+		 * @param startLon 
+		 * @param distanceRAD 
+		 * @param bearingRAD 
+		 * @param result 
+		 * @return 
 		 */
+
+        /// <summary>
+        /// Given a start point (startLat, startLon) and a bearing on a sphere of radius <i>sphereRadius</i>, return the destination point.
+        /// </summary>
+        /// <param name="startLat">The starting point latitude, in radians</param>
+        /// <param name="startLon">The starting point longitude, in radians</param>
+        /// <param name="distanceRAD">The distance to travel along the bearing in radians.</param>
+        /// <param name="bearingRAD">The bearing, in radians.  North is a 0, moving clockwise till radians(360).</param>
+        /// <param name="ctx"></param>
+        /// <param name="reuse">A preallocated object to hold the results.</param>
+        /// <returns>The destination point, in radians.  First entry is latitude, second is longitude</returns>
         public static IPoint PointOnBearingRAD(double startLat, double startLon, double distanceRAD, double bearingRAD, SpatialContext ctx, IPoint reuse)
         {
             /*
@@ -262,6 +282,11 @@ namespace Spatial4n.Core.Distance
             return (off <= 180 ? off : 360 - off) - 90;
         }
 
+        /// <summary>
+        /// Calculates the bounding box of a circle, as specified by its center point
+        /// and distance. <paramref name="reuse"/> is an optional argument to store the
+        /// results to avoid object creation.
+        /// </summary>
         public static IRectangle CalcBoxByDistFromPtDEG(double lat, double lon, double distDEG, SpatialContext ctx, IRectangle reuse)
         {
             //See http://janmatuschek.de/LatitudeLongitudeBoundingCoordinates Section 3.1, 3.2 and 3.3
@@ -354,7 +379,7 @@ namespace Spatial4n.Core.Distance
         /// The latitude of the horizontal axis (e.g. left-right line)
         /// of a circle.  The horizontal axis of a circle passes through its furthest
         /// left-most and right-most edges. On a 2D plane, this result is always
-        /// <code>from.getY()</code> but, perhaps surprisingly, on a sphere it is going
+        /// <c>from.Y</c> but, perhaps surprisingly, on a sphere it is going
         /// to be slightly different.
         /// </summary>
         /// <param name="lat"></param>
@@ -384,29 +409,40 @@ namespace Spatial4n.Core.Distance
                 return -90;
             return lat;
         }
-
         /**
-       * Calculates the degrees longitude distance at latitude {@code lat} to cover
-       * a distance {@code dist}.
+       * 
+       *  {@code dist}.
        * <p/>
-       * Used to calculate a new expanded buffer distance to account for skewing
-       * effects for shapes that use the lat-lon space as a 2D plane instead of a
-       * sphere.  The expanded buffer will be sure to cover the intended area, but
-       * the shape is still skewed and so it will cover a larger area.  For latitude
-       * 0 (the equator) the result is the same buffer.  At 60 (or -60) degrees, the
-       * result is twice the buffer, meaning that a shape at 60 degrees is twice as
-       * high as it is wide when projected onto a lat-lon plane even if in the real
-       * world it's equal all around.
+       * 
        * <p/>
-       * If the result added to abs({@code lat}) is >= 90 degrees, then skewing is
-       * so severe that the caller should consider tossing the shape and
-       * substituting a spherical cap instead.
+       * 
        *
        * @param lat  latitude in degrees
        * @param dist distance in degrees
        * @return longitudinal degrees (x delta) at input latitude that is >= dist
        *         distance. Will be >= dist and <= 90.
        */
+        /// <summary>
+        /// Calculates the degrees longitude distance at latitude <paramref name="lat"/> to cover
+        /// a distance <paramref name="dist"/>.
+        /// <para>
+        /// Used to calculate a new expanded buffer distance to account for skewing
+        /// effects for shapes that use the lat-lon space as a 2D plane instead of a
+        /// sphere. The expanded buffer will be sure to cover the intended area, but
+        /// the shape is still skewed and so it will cover a larger area. For latitude
+        /// 0 (the equator) the result is the same buffer. At 60 (or -60) degrees, the
+        /// result is twice the buffer, meaning that a shape at 60 degrees is twice as
+        /// high as it is wide when projected onto a lat-lon plane even if in the real
+        /// world it's equal all around.
+        /// </para>
+        /// If the result added to abs(<paramref name="lat"/>) is &gt;= 90 degrees, then skewing is
+        /// so severe that the caller should consider tossing the shape and
+        /// substituting a spherical cap instead.
+        /// </summary>
+        /// <param name="lat">latitude in degrees</param>
+        /// <param name="dist">distance in degrees</param>
+        /// <returns>longitudinal degrees (x delta) at input latitude that is &gt;= 
+        /// <paramref name="dist"/> distance. Will be &gt;= dist and &lt;= 90.</returns>
         public static double CalcLonDegreesAtLat(double lat, double dist)
         {
             //This code was pulled out of DistanceUtils.pointOnBearingRAD() and
@@ -426,14 +462,13 @@ namespace Spatial4n.Core.Distance
             return DistanceUtils.ToDegrees(lonDelta);
         }
 
-        /**
-		 * The square of the cartesian Distance.  Not really a distance, but useful if all that matters is
-		 * comparing the result to another one.
-		 *
-		 * @param vec1 The first point
-		 * @param vec2 The second point
-		 * @return The squared cartesian distance
-		 */
+        /// <summary>
+        /// The square of the cartesian Distance.  Not really a distance, but useful if all that matters is
+        /// comparing the result to another one.
+        /// </summary>
+        /// <param name="vec1">The first point</param>
+        /// <param name="vec2">The second point</param>
+        /// <returns>The squared cartesian distance</returns>
         [Obsolete]
         public static double DistSquaredCartesian(double[] vec1, double[] vec2)
         {
@@ -446,14 +481,14 @@ namespace Spatial4n.Core.Distance
             return result;
         }
 
-        /**
-		 *
-		 * @param lat1     The y coordinate of the first point, in radians
-		 * @param lon1     The x coordinate of the first point, in radians
-		 * @param lat2     The y coordinate of the second point, in radians
-		 * @param lon2     The x coordinate of the second point, in radians
-		 * @return The distance between the two points, as determined by the Haversine formula, in radians.
-		 */
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="lat1">The y coordinate of the first point, in radians</param>
+        /// <param name="lon1">The x coordinate of the first point, in radians</param>
+        /// <param name="lat2">The y coordinate of the second point, in radians</param>
+        /// <param name="lon2">The x coordinate of the second point, in radians</param>
+        /// <returns>The distance between the two points, as determined by the Haversine formula, in radians.</returns>
         public static double DistHaversineRAD(double lat1, double lon1, double lat2, double lon2)
         {
             //TODO investigate slightly different formula using asin() and min() http://www.movable-type.co.uk/scripts/gis-faq-5.1.html
@@ -468,17 +503,17 @@ namespace Spatial4n.Core.Distance
             return 2 * Math.Atan2(Math.Sqrt(h), Math.Sqrt(1 - h));
         }
 
-        /**
-		 * Calculates the distance between two lat/lng's using the Law of Cosines. Due to numeric conditioning
-		 * errors, it is not as accurate as the Haversine formula for small distances.  But with
-		 * double precision, it isn't that bad -- <a href="http://www.movable-type.co.uk/scripts/latlong.html">
-		 *   allegedly 1 meter</a>.
-		 * <p/>
-		 * See <a href="http://gis.stackexchange.com/questions/4906/why-is-law-of-cosines-more-preferable-than-haversine-when-calculating-distance-b">
-		 *  Why is law of cosines more preferable than haversine when calculating distance between two latitude-longitude points?</a>
-		 * <p/>
-		 * The arguments and return value are in radians.
-		 */
+        /// <summary>
+        /// Calculates the distance between two lat/lng's using the Law of Cosines. Due to numeric conditioning
+        /// errors, it is not as accurate as the Haversine formula for small distances.  But with
+        /// double precision, it isn't that bad -- <a href="http://www.movable-type.co.uk/scripts/latlong.html">
+        /// allegedly 1 meter</a>.
+        /// <para>
+        /// See <a href="http://gis.stackexchange.com/questions/4906/why-is-law-of-cosines-more-preferable-than-haversine-when-calculating-distance-b">
+        /// Why is law of cosines more preferable than haversine when calculating distance between two latitude-longitude points?</a>
+        /// </para>
+        /// The arguments and return value are in radians.
+        /// </summary>
         public static double DistLawOfCosinesRAD(double lat1, double lon1, double lat2, double lon2)
         {
             //TODO validate formula
@@ -508,13 +543,14 @@ namespace Spatial4n.Core.Distance
                 return Math.Acos(cosB);
         }
 
-        /**
-		 * Calculates the great circle distance using the Vincenty Formula, simplified for a spherical model. This formula
-		 * is accurate for any pair of points. The equation
-		 * was taken from <a href="http://en.wikipedia.org/wiki/Great-circle_distance">Wikipedia</a>.
-		 * <p/>
-		 * The arguments are in radians, and the result is in radians.
-		 */
+        /// <summary>
+        /// Calculates the great circle distance using the Vincenty Formula, simplified for a spherical model. This formula
+        /// is accurate for any pair of points. The equation
+        /// was taken from <a href="http://en.wikipedia.org/wiki/Great-circle_distance">Wikipedia</a>.
+        /// <para>
+        /// The arguments are in radians, and the result is in radians.
+        /// </para>
+        /// </summary>
         public static double DistVincentyRAD(double lat1, double lon1, double lat2, double lon2)
         {
             // Check for same position
@@ -548,30 +584,36 @@ namespace Spatial4n.Core.Distance
             return ToDegrees(Dist2Radians(dist, radius));
         }
 
+        /// <summary>
+        /// Converts <paramref name="degrees"/> (1/360th of circumference of a circle) into a
+        /// distance as measured by the units of the radius.  A spherical earth model
+        /// is assumed.
+        /// </summary>
         public static double Degrees2Dist(double degrees, double radius)
         {
             return Radians2Dist(ToRadians(degrees), radius);
         }
 
         /// <summary>
-        /// Converts a distance in the units of <code>radius</code> (e.g. kilometers)
+        /// Converts a distance in the units of <paramref name="radius"/> (e.g. kilometers)
         /// to radians (multiples of the radius). A spherical earth model is assumed.
         /// </summary>
-        /// <param name="dist"></param>
-        /// <param name="radius"></param>
-        /// <returns></returns>
         public static double Dist2Radians(double dist, double radius)
         {
             return dist / radius;
         }
 
+        /// <summary>
+        /// Converts <paramref name="radians"/> (multiples of the <paramref name="radius"/>) to
+        /// distance in the units of the radius (e.g. kilometers).
+        /// </summary>
         public static double Radians2Dist(double radians, double radius)
         {
             return radians * radius;
         }
 
         /// <summary>
-        /// Same as {@link Math#toRadians(double)} but 3x faster (multiply vs. divide).
+        /// Same as Java's <c>Math.toRadians(double)</c> but 3x faster (multiply vs. divide).
         /// See CompareRadiansSnippet.java in tests.
         /// </summary>
         /// <param name="degrees"></param>
@@ -582,7 +624,7 @@ namespace Spatial4n.Core.Distance
         }
 
         /// <summary>
-        /// Same as {@link Math#toDegrees(double)} but 3x faster (multiply vs. divide).
+        /// Same as Java's <c>Math.toDegrees(double)</c> but 3x faster (multiply vs. divide).
         /// See CompareRadiansSnippet.java in tests.
         /// </summary>
         /// <param name="radians"></param>

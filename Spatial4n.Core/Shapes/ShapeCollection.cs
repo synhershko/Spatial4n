@@ -27,7 +27,7 @@ namespace Spatial4n.Core.Shapes
 {
     /// <summary>
     /// A collection of Shape objects, analogous to an OGC GeometryCollection. The
-    /// implementation demands a List(with random access) so that the order can be
+    /// implementation demands a List (with random access) so that the order can be
     /// retained if an application requires it, although logically it's treated as an
     /// unordered Set, mostly.
     /// <para>
@@ -48,16 +48,15 @@ namespace Spatial4n.Core.Shapes
     /// </summary>
     /// <typeparam name="Shape"></typeparam>
     public class ShapeCollection : ICollection<IShape>, IShape
-    //where S : Shape
     {
         protected readonly IList<IShape> m_shapes;
         protected readonly IRectangle m_bbox;
 
-        /**
-         * WARNING: {@code shapes} is copied by reference.
-         * @param shapes Copied by reference! (make a defensive copy if caller modifies)
-         * @param ctx
-         */
+        /// <summary>
+        /// WARNING: <paramref name="shapes"/> is copied by reference.
+        /// </summary>
+        /// <param name="shapes">Copied by reference! (make a defensive copy if caller modifies)</param>
+        /// <param name="ctx"></param>
         public ShapeCollection(IList<IShape> shapes, SpatialContext ctx)
         {
             // TODO: Work out if there is a way to mimic this behavior (create a custom IRandomAccess?)
@@ -181,33 +180,32 @@ namespace Spatial4n.Core.Shapes
             return sect.GetValueOrDefault(); // TODO: What to return if null??
         }
 
-        /**
-         * Called by relate() to determine whether to return early if it finds
-         * CONTAINS, instead of checking the remaining shapes. It will do so without
-         * calling this method if the "other" shape is a Point.  If a remaining shape
-         * finds INTERSECTS, then INTERSECTS will be returned.  The only problem with
-         * this returning true is that if some of the shapes overlap, it's possible
-         * that the result of relate() could be dependent on the order of the shapes,
-         * which could be unexpected / wrong depending on the application. The default
-         * implementation returns true because it probably doesn't matter.  If it
-         * does, a subclass could add a boolean flag that this method could return.
-         * That flag could be initialized to true only if the shapes are mutually
-         * disjoint.
-         *
-         * @see #computeMutualDisjoint(java.util.List) .
-         */
+        /// <summary>
+        /// Called by <see cref="Relate(IShape)"/> to determine whether to return early if it finds
+        /// <see cref="SpatialRelation.CONTAINS"/>, instead of checking the remaining shapes. It will do so without
+        /// calling this method if the "other" shape is a Point.  If a remaining shape
+        /// finds <see cref="SpatialRelation.INTERSECTS"/>, then <see cref="SpatialRelation.INTERSECTS"/> will be returned.  The only problem with
+        /// this returning true is that if some of the shapes overlap, it's possible
+        /// that the result of <see cref="Relate(IShape)"/> could be dependent on the order of the shapes,
+        /// which could be unexpected / wrong depending on the application. The default
+        /// implementation returns true because it probably doesn't matter.  If it
+        /// does, a subclass could add a boolean flag that this method could return.
+        /// That flag could be initialized to true only if the shapes are mutually
+        /// disjoint.
+        /// </summary>
+        /// <seealso cref="ComputeMutualDisjoint(IList{IShape})"/>
         protected bool RelateContainsShortCircuits()
         {
             return true;
         }
 
-        /**
-         * Computes whether the shapes are mutually disjoint. This is a utility method
-         * offered for use by a subclass implementing {@link #relateContainsShortCircuits()}.
-         * <b>Beware: this is an O(N^2) algorithm.</b>.  Consequently, consider safely
-         * assuming non-disjoint if shapes.size() > 10 or something.  And if all shapes
-         * are a Point then the result of this method doesn't ultimately matter.
-         */
+        /// <summary>
+        /// Computes whether the shapes are mutually disjoint. This is a utility method
+        /// offered for use by a subclass implementing <see cref="RelateContainsShortCircuits()"/>.
+        /// <b>Beware: this is an O(N^2) algorithm.</b>.  Consequently, consider safely
+        /// assuming non-disjoint if shapes.Count > 10 or something.  And if all shapes
+        /// are a <see cref="IPoint"/> then the result of this method doesn't ultimately matter.
+        /// </summary>
         protected static bool ComputeMutualDisjoint(IList<IShape> shapes)
         {
             //WARNING: this is an O(n^2) algorithm.
@@ -239,7 +237,6 @@ namespace Spatial4n.Core.Shapes
             return sum;
         }
 
-
         public override string ToString()
         {
             StringBuilder buf = new StringBuilder(100);
@@ -259,7 +256,6 @@ namespace Spatial4n.Core.Shapes
             buf.Append(")");
             return buf.ToString();
         }
-
 
         public override bool Equals(object o)
         {

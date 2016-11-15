@@ -33,9 +33,6 @@ namespace Spatial4n.Core.Shapes.Impl
         /// <summary>
         /// A simple constructor without normalization / validation.
         /// </summary>
-        /// <param name="x"></param>
-        /// <param name="y"></param>
-        /// <param name="ctx"></param>
         public Point(double x, double y, SpatialContext ctx)
         {
             this.ctx = ctx;
@@ -109,11 +106,8 @@ namespace Spatial4n.Core.Shapes.Impl
         }
 
         /// <summary>
-        /// All {@link Point} implementations should use this definition of {@link Object#equals(Object)}.
+        /// All <see cref="IPoint"/> implementations should use this definition of <see cref="object.Equals(object)"/>.
         /// </summary>
-        /// <param name="thiz"></param>
-        /// <param name="o"></param>
-        /// <returns></returns>
         public static bool Equals(IPoint thiz, Object o)
         {
             if (thiz == null)
@@ -133,10 +127,8 @@ namespace Spatial4n.Core.Shapes.Impl
         }
 
         /// <summary>
-        /// All {@link Point} implementations should use this definition of {@link Object#hashCode()}.
+        /// All <see cref="IPoint"/> implementations should use this definition of <see cref="object.GetHashCode()"/>.
         /// </summary>
-        /// <param name="thiz"></param>
-        /// <returns></returns>
         public static int GetHashCode(IPoint thiz)
         {
             if (thiz == null)

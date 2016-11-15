@@ -25,7 +25,7 @@ namespace Spatial4n.Core.Shapes.Impl
     /// <summary>
     /// INTERNAL: A line between two points with a buffer distance extending in every direction. By
     /// contrast, an un-buffered line covers no area and as such is extremely unlikely to intersect with
-    /// a point. BufferedLine isn't yet aware of geodesics (e.g. the dateline); it operates in Euclidean
+    /// a point. <see cref="BufferedLine"/> isn't yet aware of geodesics (e.g. the dateline); it operates in Euclidean
     /// space.
     /// </summary>
     public class BufferedLine : IShape
@@ -33,25 +33,20 @@ namespace Spatial4n.Core.Shapes.Impl
         private readonly IPoint pA, pB;
         private readonly double buf;
         private readonly IRectangle bbox;
-        /**
-         * the primary line; passes through pA & pB
-         */
+        /// <summary>the primary line; passes through pA & pB</summary>
         private readonly InfBufLine linePrimary;
-        /**
-         * perpendicular to the primary line, centered between pA & pB
-         */
+        /// <summary>perpendicular to the primary line, centered between pA & pB</summary>
         private readonly InfBufLine linePerp;
 
-        /**
-         * Creates a buffered line from pA to pB. The buffer extends on both sides of
-         * the line, making the width 2x the buffer. The buffer extends out from
-         * pA & pB, making the line in effect 2x the buffer longer than pA to pB.
-         *
-         * @param pA  start point
-         * @param pB  end point
-         * @param buf the buffer distance in degrees
-         * @param ctx
-         */
+        /// <summary>
+        /// Creates a buffered line from pA to pB. The buffer extends on both sides of
+        /// the line, making the width 2x the buffer. The buffer extends out from
+        /// pA & pB, making the line in effect 2x the buffer longer than pA to pB.
+        /// </summary>
+        /// <param name="pA">start point</param>
+        /// <param name="pB">end point</param>
+        /// <param name="buf">the buffer distance in degrees</param>
+        /// <param name="ctx"></param>
         public BufferedLine(IPoint pA, IPoint pB, double buf, SpatialContext ctx)
         {
             Debug.Assert(buf >= 0);//TODO support buf=0 via another class ?
@@ -164,11 +159,11 @@ namespace Spatial4n.Core.Shapes.Impl
             return new BufferedLine(pA, pB, buf + distance, ctx);
         }
 
-        /**
-         * Calls {@link DistanceUtils#calcLonDegreesAtLat(double, double)} given pA or pB's latitude;
-         * whichever is farthest. It's useful to expand a buffer of a line segment when used in
-         * a geospatial context to cover the desired area.
-         */
+        /// <summary>
+        /// Calls <see cref="DistanceUtils.CalcLonDegreesAtLat(double, double)"/> given pA or pB's latitude;
+        /// whichever is farthest. It's useful to expand a buffer of a line segment when used in
+        /// a geospatial context to cover the desired area.
+        /// </summary>
         public static double ExpandBufForLongitudeSkew(IPoint pA, IPoint pB,
                                                        double buf)
         {
@@ -258,17 +253,17 @@ namespace Spatial4n.Core.Shapes.Impl
             get { return buf; }
         }
 
-        /**
-         * INTERNAL
-         */
+        /// <summary>
+        /// INTERNAL
+        /// </summary>
         public virtual InfBufLine LinePrimary
         {
             get { return linePrimary; }
         }
 
-        /**
-         * INTERNAL
-         */
+        /// <summary>
+        /// INTERNAL
+        /// </summary>
         public virtual InfBufLine LinePerp
         {
             get { return linePerp; }

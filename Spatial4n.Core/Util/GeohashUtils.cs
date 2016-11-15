@@ -23,6 +23,17 @@ using System.Text;
 
 namespace Spatial4n.Core.Util
 {
+    /// <summary>
+    ///  Utilities for encoding and decoding <a href="http://en.wikipedia.org/wiki/Geohash">geohashes</a>.
+    ///  <para/>
+    ///  This class isn't used by any other part of Spatial4n; it's included largely for convenience of
+    ///  software using Spatial4n. There are other open-source libraries that have more comprehensive
+    ///  geohash utilities but providing this one avoids an additional dependency for what's a small
+    ///  amount of code.  <c>If you're using Spatial4n just for this class, consider alternatives.</c>
+    ///  <para/>
+    ///  This code originally came from <a href="https://issues.apache.org/jira/browse/LUCENE-1512">
+    ///  Apache Lucene, LUCENE-1512</a>.
+    /// </summary>
     public static class GeohashUtils
     {
         private static readonly char[] BASE_32 = {
@@ -34,8 +45,7 @@ namespace Spatial4n.Core.Util
 
         private static readonly int[] BASE_32_IDX; //sparse array of indexes from '0' to 'z'
 
-        public const int MAX_PRECISION = 24;
-        //DWS: I forget what level results in needless more precision but it's about this
+        public const int MAX_PRECISION = 24; //DWS: I forget what level results in needless more precision but it's about this
 
         private static readonly int[] BITS = { 16, 8, 4, 2, 1 };
 
@@ -72,12 +82,18 @@ namespace Spatial4n.Core.Util
         /// <param name="latitude">Latitude to encode</param>
         /// <param name="longitude">Longitude to encode</param>
         /// <returns>Geohash encoding of the longitude and latitude</returns>
-        public static String EncodeLatLon(double latitude, double longitude)
+        public static string EncodeLatLon(double latitude, double longitude)
         {
             return EncodeLatLon(latitude, longitude, 12);
         }
 
-        public static String EncodeLatLon(double latitude, double longitude, int precision)
+        /// <summary>
+        /// Encodes the given latitude and longitude into a geohash
+        /// </summary>
+        /// <param name="latitude">Latitude to encode</param>
+        /// <param name="longitude">Longitude to encode</param>
+        /// <returns>Geohash encoding of the longitude and latitude</returns>
+        public static string EncodeLatLon(double latitude, double longitude, int precision)
         {
             double[] latInterval = { -90.0, 90.0 };
             double[] lonInterval = { -180.0, 180.0 };
@@ -133,14 +149,13 @@ namespace Spatial4n.Core.Util
             return geohash.ToString();
         }
 
-
-        /**
-		 * Decodes the given geohash into a latitude and longitude
-		 *
-		 * @param geohash Geohash to deocde
-		 * @return Array with the latitude at index 0, and longitude at index 1
-		 */
-        public static IPoint Decode(String geohash, SpatialContext ctx)
+        /// <summary>
+        /// Decodes the given geohash into a latitude and longitude
+        /// </summary>
+        /// <param name="geohash">Geohash to deocde</param>
+        /// <param name="ctx"></param>
+        /// <returns>Array with the latitude at index 0, and longitude at index 1</returns>
+        public static IPoint Decode(string geohash, SpatialContext ctx)
         {
             IRectangle rect = DecodeBoundary(geohash, ctx);
             double latitude = (rect.MinY + rect.MaxY) / 2D;
@@ -148,8 +163,10 @@ namespace Spatial4n.Core.Util
             return ctx.MakePoint(longitude, latitude);
         }
 
-        /** Returns min-max lat, min-max lon. */
-        public static IRectangle DecodeBoundary(String geohash, SpatialContext ctx)
+        /// <summary>
+        /// Returns min-max lat, min-max lon.
+        /// </summary>
+        public static IRectangle DecodeBoundary(string geohash, SpatialContext ctx)
         {
             double minY = -90, maxY = 90, minX = -180, maxX = 180;
             bool isEven = true;
@@ -192,10 +209,10 @@ namespace Spatial4n.Core.Util
             return ctx.MakeRectangle(minX, maxX, minY, maxY);
         }
 
-        /** Array of geohashes 1 level below the baseGeohash. Sorted. */
-        public static String[] GetSubGeohashes(String baseGeohash)
+        /// <summary>Array of geohashes 1 level below the baseGeohash. Sorted.</summary>
+        public static string[] GetSubGeohashes(string baseGeohash)
         {
-            var hashes = new String[BASE_32.Length];
+            var hashes = new string[BASE_32.Length];
             for (int i = 0; i < BASE_32.Length; i++)
             {//note: already sorted
                 char c = BASE_32[i];
@@ -212,9 +229,6 @@ namespace Spatial4n.Core.Util
         /// <summary>
         /// Return the shortest geohash length that will have a width & height >= specified arguments.
         /// </summary>
-        /// <param name="lonErr"></param>
-        /// <param name="latErr"></param>
-        /// <returns></returns>
         public static int LookupHashLenForWidthHeight(double lonErr, double latErr)
         {
             //loop through hash length arrays from beginning till we find one.

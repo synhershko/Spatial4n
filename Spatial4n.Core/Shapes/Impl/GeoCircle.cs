@@ -100,14 +100,15 @@ namespace Spatial4n.Core.Shapes.Impl
 			get { return horizAxisY; }
 		}
 
-	    /// <summary>
-	    /// Called after bounding box is intersected.
-	    /// </summary>
-	    /// <param name="r"></param>
-	    /// <param name="bboxSect">INTERSECTS or CONTAINS from enclosingBox's intersection</param>
-	    /// <returns>DISJOINT, CONTAINS, or INTERSECTS (not WITHIN)</returns>
-	    protected override SpatialRelation RelateRectanglePhase2(IRectangle r, SpatialRelation bboxSect)
-		{
+        /// <summary>
+        /// Called after bounding box is intersected.
+        /// </summary>
+        /// <param name="r"></param>
+        /// <param name="bboxSect"><see cref="SpatialRelation.INTERSECTS"/> or <see cref="SpatialRelation.CONTAINS"/> from enclosingBox's intersection</param>
+        /// <returns><see cref="SpatialRelation.DISJOINT"/>, <see cref="SpatialRelation.CONTAINS"/>, or 
+        /// <see cref="SpatialRelation.INTERSECTS"/> (not <see cref="SpatialRelation.WITHIN"/>)</returns>
+        protected override SpatialRelation RelateRectanglePhase2(IRectangle r, SpatialRelation bboxSect)
+        {
 			if (inverseCircle != null)
 			{
 				return inverseCircle.Relate(r).Inverse();
@@ -166,7 +167,6 @@ namespace Spatial4n.Core.Shapes.Impl
 			}
 
 			return SpatialRelation.DISJOINT;
-
 		}
 
 		private SpatialRelation RelateRectangleCircleWrapsPole(IRectangle r, SpatialContext ctx)
@@ -232,8 +232,10 @@ namespace Spatial4n.Core.Shapes.Impl
 				return SpatialRelation.INTERSECTS;
 		}
 
-		/** Returns either 0 for none, 1 for some, or 4 for all. */
-		private int NumCornersIntersect(IRectangle r)
+        /// <summary>
+        /// Returns either 0 for none, 1 for some, or 4 for all.
+        /// </summary>
+        private int NumCornersIntersect(IRectangle r)
 		{
 			//We play some logic games to avoid calling contains() which can be expensive.
 			// for partial, we exit early with 1 and ignore bool.

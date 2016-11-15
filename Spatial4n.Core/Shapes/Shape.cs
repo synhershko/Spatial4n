@@ -21,12 +21,12 @@ namespace Spatial4n.Core.Shapes
 {
     /// <summary>
     /// The base interface defining a geometric shape. Shape instances should be
-    /// instantiated via one of the create* methods on a {@link SpatialContext} or
-    /// by reading WKT which calls those methods; they should <em>not</em> be
+    /// instantiated via one of the create* methods on a <see cref="SpatialContext"/> or
+    /// by reading WKT which calls those methods; they should <c>not</c> be
     /// created directly.
     /// <para>
     /// Shapes are generally immutable and thread-safe. If a particular shape has a
-    /// <code>Reset(...)</code> method then its use means the shape is actually
+    /// <c>Reset(...)</c> method then its use means the shape is actually
     /// mutable. Mutating shape state is considered expert and should be done with care.
     /// </para>
     /// </summary>
@@ -34,30 +34,27 @@ namespace Spatial4n.Core.Shapes
     {
         /// <summary>
         /// Describe the relationship between the two objects.  For example
-        /// <ul>
-        ///   <li>this is WITHIN other</li>
-        ///   <li>this CONTAINS other</li>
-        ///   <li>this is DISJOINT other</li>
-        ///   <li>this INTERSECTS other</li>
-        /// </ul>
-        /// Note that a Shape implementation may choose to return INTERSECTS when the
-        /// true answer is WITHIN or CONTAINS for performance reasons. If a shape does
+        /// <list type="bullet">
+        ///   <item>this is <see cref="SpatialRelation.WITHIN"/> other</item>
+        ///   <item>this <see cref="SpatialRelation.CONTAINS"/> other</item>
+        ///   <item>this is <see cref="SpatialRelation.DISJOINT"/> other</item>
+        ///   <item>this <see cref="SpatialRelation.INTERSECTS"/> other</item>
+        /// </list>
+        /// Note that a <see cref="IShape"/> implementation may choose to return <see cref="SpatialRelation.INTERSECTS"/> when the
+        /// true answer is <see cref="SpatialRelation.WITHIN"/> or <see cref="SpatialRelation.CONTAINS"/> for performance reasons. If a shape does
         /// this then it <i>must</i> document when it does.  Ideally the shape will not
         /// do this approximation in all circumstances, just sometimes.
         /// <p />
-        /// If the shapes are equal then the result is CONTAINS (preferred) or WITHIN.
+        /// If the shapes are equal then the result is <see cref="SpatialRelation.CONTAINS"/> (preferred) or <see cref="SpatialRelation.WITHIN"/>.
         /// </summary>
-        /// <param name="other"></param>
-        /// <returns></returns>
         SpatialRelation Relate(IShape other);
 
         /// <summary>
-        /// Get the bounding box for this Shape. This means the shape is within the
+        /// Get the bounding box for this <see cref="IShape"/>. This means the shape is within the
         /// bounding box and that it touches each side of the rectangle.
         /// <p/>
-        /// Postcondition: <code>this.getBoundingBox().relate(this) == CONTAINS</code>
+        /// Postcondition: <c>this.BoundingBox.Relate(this) == SpatialRelation.CONTAINS</c>
         /// </summary>
-        /// <returns></returns>
         IRectangle BoundingBox { get; }
 
         /// <summary>
@@ -70,21 +67,18 @@ namespace Spatial4n.Core.Shapes
         bool HasArea { get; }
 
         /// <summary>
-        /// Calculates the area of the shape in the units of {@link
-        /// com.spatial4j.core.distance.DistanceUnits}. If ctx is null then simple
-        /// Euclidean calculations will be used.  This figure can be an estimate.
+        /// Calculates the area of the shape, in square-degrees. If ctx is null then
+        /// simple Euclidean calculations will be used.  This figure can be an
+        /// estimate.
         /// </summary>
-        /// <param name="ctx"></param>
-        /// <returns></returns>
         double GetArea(SpatialContext ctx);
 
         /// <summary>
         /// Returns the center point of this shape. This is usually the same as
-        /// <code>getBoundingBox().getCenter()</code> but it doesn't have to be.
-        /// <p />
-        /// Postcondition: <code>this.relate(this.getCenter()) == CONTAINS</code>
+        /// <c>BoundingBox.Center</c> but it doesn't have to be.
+        /// <para/>
+        /// Postcondition: <c>this.Relate(this.Center) == SpatialContext.CONTAINS</c>
         /// </summary>
-        /// <returns></returns>
         IPoint Center { get; }
 
         /// <summary>
@@ -92,8 +86,6 @@ namespace Spatial4n.Core.Shapes
         /// rounded-corner buffer, although some shapes might buffer differently. This
         /// is an optional operation.
         /// </summary>
-        /// <param name="distance"></param>
-        /// <param name="ctx"></param>
         /// <returns>Not null, and the returned shape should contain the current shape.</returns>
         IShape GetBuffered(double distance, SpatialContext ctx);
 
@@ -104,7 +96,7 @@ namespace Spatial4n.Core.Shapes
         bool IsEmpty { get; }
 
         /// <summary>
-        /// The sub-classes of Shape generally implement the
+        /// The sub-classes of <see cref="IShape"/> generally implement the
         /// same contract for <see cref="object.Equals(object)"/> and <see cref="object.GetHashCode()"/>
         /// amongst the same sub-interface type.  This means, for example, that multiple
         /// Point implementations of different classes are equal if they share the same x

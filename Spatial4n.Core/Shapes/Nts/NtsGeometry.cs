@@ -32,13 +32,13 @@ using System.Diagnostics;
 namespace Spatial4n.Core.Shapes.Nts
 {
     /// <summary>
-    /// Wraps a NTS {@link Geometry} (i.e. may be a polygon or basically anything).
+    /// Wraps a NTS <see cref="IGeometry"/> (i.e. may be a polygon or basically anything).
     /// NTS's does a great deal of the hard work, but there is work here in handling
     /// dateline wrap.
     /// </summary>
     public class NtsGeometry : IShape
     {
-        /** System property boolean that can disable auto validation in an assert. */
+        /// <summary>System property boolean that can disable auto validation in an assert.</summary>
         public static readonly string SYSPROP_ASSERT_VALIDATE = "spatial4n.NtsGeometry.assertValidate";
 
         private readonly IGeometry geom;//cannot be a direct instance of GeometryCollection as it doesn't support relate()
@@ -89,7 +89,9 @@ namespace Spatial4n.Core.Shapes.Nts
             this._hasArea = !((geom is ILineal) || (geom is IPuntal));
         }
 
-        /** called via assertion */
+        /// <summary>
+        /// called via assertion
+        /// </summary>
         private bool AssertValidate()
         {
             string assertValidate = Environment.GetEnvironmentVariable(SYSPROP_ASSERT_VALIDATE); //System.getProperty(SYSPROP_ASSERT_VALIDATE);
@@ -98,12 +100,11 @@ namespace Spatial4n.Core.Shapes.Nts
             return true;
         }
 
-        /**
-        * Validates the shape, throwing a descriptive error if it isn't valid. Note that this
-        * is usually called automatically by default, but that can be disabled.
-        *
-        * @throws InvalidShapeException with descriptive error if the shape isn't valid
-        */
+        /// <summary>
+        /// Validates the shape, throwing a descriptive error if it isn't valid. Note that this
+        /// is usually called automatically by default, but that can be disabled.
+        /// </summary>
+        /// <exception cref="InvalidShapeException">with descriptive error if the shape isn't valid</exception>
         public void Validate()
         {
             if (!validated)
@@ -115,13 +116,13 @@ namespace Spatial4n.Core.Shapes.Nts
             }
         }
 
-        /**
-        * Adds an index to this class internally to compute spatial relations faster. In NTS this
-        * is called a {@link com.vividsolutions.jts.geom.prep.PreparedGeometry}.  This
-        * isn't done by default because it takes some time to do the optimization, and it uses more
-        * memory.  Calling this method isn't thread-safe so be careful when this is done. If it was
-        * already indexed then nothing happens.
-        */
+        /// <summary>
+        /// Adds an index to this class internally to compute spatial relations faster. In NTS this
+        /// is called a <see cref="IPreparedGeometry"/>.  This
+        /// isn't done by default because it takes some time to do the optimization, and it uses more
+        /// memory.  Calling this method isn't thread-safe so be careful when this is done. If it was
+        /// already indexed then nothing happens.
+        /// </summary>
         public void Index()
         {
             if (preparedGeometry == null)
@@ -134,9 +135,10 @@ namespace Spatial4n.Core.Shapes.Nts
             get { return geom.IsEmpty; }
         }
 
-        /** Given {@code geoms} which has already been checked for being in world
-        * bounds, return the minimal longitude range of the bounding box.
-        */
+        /// <summary>
+        /// Given <paramref name="geoms"/> which has already been checked for being in world
+        /// bounds, return the minimal longitude range of the bounding box.
+        /// </summary>
         protected IRectangle ComputeGeoBBox(IGeometry geoms)
         {
             if (geoms.IsEmpty)
@@ -372,15 +374,15 @@ namespace Spatial4n.Core.Shapes.Nts
             }
         }
 
-        /**
-		 * If <code>geom</code> spans the dateline, then this modifies it to be a
-		 * valid NTS geometry that extends to the right of the standard -180 to +180
-		 * width such that some points are greater than +180 but some remain less.
-		 * Takes care to invoke {@link com.vividsolutions.jts.geom.Geometry#geometryChanged()}
-		 * if needed.
-		 *
-		 * @return The number of times the geometry spans the dateline.  >= 0
-		 */
+        /// <summary>
+        /// If <paramref name="geom"/> spans the dateline, then this modifies it to be a
+        /// valid NTS geometry that extends to the right of the standard -180 to +180
+        /// width such that some points are greater than +180 but some remain less.
+        /// Takes care to invoke <see cref="IGeometry.GeometryChanged()"/>
+        /// if needed.
+        /// </summary>
+        /// <param name="geom"></param>
+        /// <returns>The number of times the geometry spans the dateline.  >= 0</returns>
         private static int UnwrapDateline(IGeometry geom)
         {
             if (geom.EnvelopeInternal.Width < 180)
@@ -391,7 +393,7 @@ namespace Spatial4n.Core.Shapes.Nts
             return crossings[0];
         }
 
-        /** See {@link #unwrapDateline(Geometry)}. */
+        /// <summary>See <see cref="UnwrapDateline(IGeometry)"/>.</summary>
         private static int UnwrapDateline(Polygon poly)
         {
             var exteriorRing = poly.ExteriorRing;
@@ -415,7 +417,7 @@ namespace Spatial4n.Core.Shapes.Nts
             return cross;
         }
 
-        /** See {@link #unwrapDateline(Geometry)}. */
+        /// <summary>See <see cref="UnwrapDateline(IGeometry)"/>.</summary>
         private static int UnwrapDateline(LineString lineString)
         {
             var cseq = lineString.CoordinateSequence;
@@ -505,12 +507,12 @@ namespace Spatial4n.Core.Shapes.Nts
             return geom;
         }
 
-        /**
-		 * This "pages" through standard geo boundaries offset by multiples of 360
-		 * longitudinally that intersect geom, and the intersecting results of a page
-		 * and the geom are shifted into the standard -180 to +180 and added to a new
-		 * geometry that is returned.
-		 */
+        /// <summary>
+        /// This "pages" through standard geo boundaries offset by multiples of 360
+        /// longitudinally that intersect geom, and the intersecting results of a page
+        /// and the geom are shifted into the standard -180 to +180 and added to a new
+        /// geometry that is returned.
+        /// </summary>
         private static IGeometry CutUnwrappedGeomInto360(IGeometry geom)
         {
             Envelope geomEnv = geom.EnvelopeInternal;

@@ -23,8 +23,9 @@ namespace Spatial4n.Core.Shapes.Impl
 {
     /// <summary>
     /// A circle, also known as a point-radius, based on a
-    /// {@link com.spatial4j.core.distance.DistanceCalculator} which does all the work. This implementation
-    /// implementation should work for both cartesian 2D and geodetic sphere surfaces.
+    /// <see cref="Distance.IDistanceCalculator"/> which does all the work. This implementation
+    /// implementation should work for both cartesian 2D and geodetic sphere 
+    /// surfaces.
     /// </summary>
     public class Circle : ICircle
     {
@@ -98,6 +99,9 @@ namespace Spatial4n.Core.Shapes.Impl
             get { return radiusDEG > 0; }
         }
 
+        /// <summary>
+        /// Note that the bounding box might contain a minX that is &gt; maxX, due to WGS84 dateline.
+        /// </summary>
         public virtual IRectangle BoundingBox
         {
             get { return enclosingBox; }
@@ -234,18 +238,16 @@ namespace Spatial4n.Core.Shapes.Impl
         }
 
         /// <summary>
-        /// The <code>Y</code> coordinate of where the circle axis intersect.
+        /// The <c>Y</c> coordinate of where the circle axis intersect.
         /// </summary>
-        /// <returns></returns>
         protected virtual double YAxis
         {
             get { return point.Y; }
         }
 
         /// <summary>
-        /// The <code>X</code> coordinate of where the circle axis intersect.
+        /// The <c>X</c> coordinate of where the circle axis intersect.
         /// </summary>
-        /// <returns></returns>
         protected virtual double XAxis
         {
             get { return point.X; }
@@ -275,7 +277,10 @@ namespace Spatial4n.Core.Shapes.Impl
             return Equals(this, obj);
         }
 
-        public static bool Equals(ICircle thiz, Object o)
+        /// <summary>
+        /// All <see cref="ICircle"/> implementations should use this definition of <see cref="object.Equals(object)"/>.
+        /// </summary>
+        public static bool Equals(ICircle thiz, object o)
         {
             if (thiz == null)
                 throw new ArgumentNullException("thiz");
@@ -297,7 +302,7 @@ namespace Spatial4n.Core.Shapes.Impl
         }
 
         /// <summary>
-        /// All {@link Circle} implementations should use this definition of {@link Object#hashCode()}.
+        /// All <see cref="ICircle"/> implementations should use this definition of <see cref="object.GetHashCode()"/>.
         /// </summary>
         /// <param name="thiz"></param>
         /// <returns></returns>

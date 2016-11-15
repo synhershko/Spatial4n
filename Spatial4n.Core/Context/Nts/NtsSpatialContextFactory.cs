@@ -25,6 +25,38 @@ using System.Globalization;
 
 namespace Spatial4n.Core.Context.Nts
 {
+    /// <summary>
+    /// See <see cref="SpatialContextFactory.MakeSpatialContext(IDictionary{string, string})"/>.
+    /// <para>
+    /// The following keys are looked up in the args map, in addition to those in the
+    /// superclass:
+    /// </para>
+    /// <list type="table">
+    ///     <item>
+    ///         <term>datelineRule</term>
+    ///         <description>Width180(default)|CcwRect|None -- see <see cref="DatelineRule"/></description>
+    ///     </item>
+    ///     <item>
+    ///         <term>validationRule</term>
+    ///         <description>Error(default)|None|RepairConvexHull|RepairBuffer0 -- see <see cref="ValidationRule"/></description>
+    ///     </item>
+    ///     <item>
+    ///         <term>autoIndex</term>
+    ///         <description>true|false(default) -- see <see cref="NtsWktShapeParser.IsAutoIndex"/></description>
+    ///     </item>
+    ///     <item>
+    ///         <term>allowMultiOverlap</term>
+    ///         <description>true|false(default) -- see <see cref="NtsSpatialContext.IsAllowMultiOverlap"/></description>
+    ///     </item>
+    ///     <item>
+    ///         <term>precisionModel</term>
+    ///         <description>
+    ///         floating(default) | floating_single | fixed -- see <see cref="PrecisionModel"/>.
+    ///         If <c>fixed</c> then you must also provide <c>precisionScale</c> -- see <see cref="PrecisionModel.Scale"/>
+    ///         </description>
+    ///     </item>
+    /// </list>
+    /// </summary>
     public class NtsSpatialContextFactory : SpatialContextFactory
     {
         protected static readonly PrecisionModel defaultPrecisionModel = new PrecisionModel();//floating

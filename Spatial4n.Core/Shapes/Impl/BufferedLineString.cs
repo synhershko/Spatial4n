@@ -24,37 +24,37 @@ using System.Text;
 namespace Spatial4n.Core.Shapes.Impl
 {
     /// <summary>
-    /// A BufferedLineString is a collection of {@link com.spatial4j.core.shape.impl.BufferedLine} shapes,
+    /// A <see cref="BufferedLineString"/> is a collection of <see cref="BufferedLine"/> shapes,
     /// resulting in what some call a "Track" or "Polyline" (ESRI terminology).
-    /// The buffer can be 0.  Note that BufferedLine isn't yet aware of geodesics (e.g. the dateline).
+    /// The buffer can be 0.  Note that <see cref="BufferedLine"/> isn't yet aware of geodesics (e.g. the dateline).
     /// </summary>
     public class BufferedLineString : IShape
     {
         //TODO add some geospatial awareness like:
         // segment that spans at the dateline (split it at DL?).
 
-        private readonly /*ShapeCollection<BufferedLine>*/ ShapeCollection segments;
+        private readonly ShapeCollection segments;
         private readonly double buf;
 
-        /**
-         * Needs at least 1 point, usually more than that.  If just one then it's
-         * internally treated like 2 points.
-         */
+        /// <summary>
+        /// Needs at least 1 point, usually more than that.  If just one then it's
+        /// internally treated like 2 points.
+        /// </summary>
         public BufferedLineString(IList<IPoint> points, double buf, SpatialContext ctx)
             : this(points, buf, false, ctx)
         {
         }
 
-        /**
-         * @param points ordered control points. If empty then this shape is empty.
-         * @param buf Buffer >= 0
-         * @param expandBufForLongitudeSkew See {@link BufferedLine
-         * #expandBufForLongitudeSkew(com.spatial4j.core.shape.Point,
-         * com.spatial4j.core.shape.Point, double)}.
-         *                                  If true then the buffer for each segment
-         *                                  is computed.
-         * @param ctx
-         */
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="points">ordered control points. If empty then this shape is empty.</param>
+        /// <param name="buf">Buffer &gt;= 0</param>
+        /// <param name="expandBufForLongitudeSkew">
+        /// See <see cref="BufferedLine.ExpandBufForLongitudeSkew(IPoint, IPoint, double)"/>
+        /// If true then the buffer for each segment is computed.
+        /// </param>
+        /// <param name="ctx"></param>
         public BufferedLineString(IList<IPoint> points, double buf, bool expandBufForLongitudeSkew,
                                   SpatialContext ctx)
         {

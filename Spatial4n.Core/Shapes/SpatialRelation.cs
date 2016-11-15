@@ -18,9 +18,9 @@
 namespace Spatial4n.Core.Shapes
 {
     /// <summary>
-    /// The set of spatial relationships.  Naming is consistent with OGC spec conventions as seen in SQL/MM and others.
+    /// The set of spatial relationships. Naming is consistent with OGC spec conventions as seen in SQL/MM and others.
     /// <para>
-    /// No equality case.  If two Shape instances are equal then the result might be CONTAINS (preferred) or WITHIN.  
+    /// No equality case.  If two <see cref="IShape"/> instances are equal then the result might be <see cref="CONTAINS"/> (preferred) or <see cref="WITHIN"/>.  
     /// Client logic may have to be aware of this edge condition; Spatial4n testing certainly does.
     /// </para>
     /// <para></para>
@@ -33,19 +33,17 @@ namespace Spatial4n.Core.Shapes
     {
         //see http://docs.geotools.org/latest/userguide/library/jts/dim9.html#preparedgeometry
 
-        NULL_VALUE, // TODO: Remove???
-
         /// <summary>
         /// The shape is within the target geometry. It's the converse of <see cref="CONTAINS"/>.
         /// Boundaries of shapes count too.  OGC specs refer to this relation as "COVERED BY";
-        /// WITHIN is differentiated there by not including boundaries.
+        /// <see cref="WITHIN"/> is differentiated thereby not including boundaries.
         /// </summary>
 		WITHIN,
 
         /// <summary>
         /// The shape contains the target geometry. It's the converse of <see cref="WITHIN"/>.
         /// Boundaries of shapes count too.  OGC specs refer to this relation as "COVERS";
-        /// CONTAINS is differentiated there by not including boundaries.
+        /// <see cref="CONTAINS"/> is differentiated thereby not including boundaries.
         /// </summary>
 		CONTAINS,
 
@@ -64,6 +62,14 @@ namespace Spatial4n.Core.Shapes
 
     public static class SpatialRelationComparators
     {
+        /// <summary>
+        /// Given the result of <c>shapeA.Relate(shapeB)</c>, transposing that
+        /// result should yield the result of <c>shapeB.Relate(shapeA)</c>. There
+        /// is a corner case is when the shapes are equal, in which case actually
+        /// flipping the Relate() call will result in the same value -- either CONTAINS
+        /// or WITHIN; this method can't possible check for that so the caller might
+        /// have to.
+        /// </summary>
         public static SpatialRelation Transpose(this SpatialRelation sr)
         {
             switch (sr)
@@ -75,12 +81,10 @@ namespace Spatial4n.Core.Shapes
         }
 
         /// <summary>
-        /// If you were to call aShape.relate(bShape) and aShape.relate(cShape), you could call
-        /// this to merge the intersect results as if bShape & cShape were combined into {@link MultShape}.
+        /// If you were to call aShape.Relate(bShape) and aShape.Relate(cShape), you 
+        /// could call this to merge the intersect results as if bShape & cShape were 
+        /// combined into <see cref="ShapeCollection"/>.
         /// </summary>
-        /// <param name="this"></param>
-        /// <param name="other"></param>
-        /// <returns></returns>
         public static SpatialRelation Combine(this SpatialRelation @this, SpatialRelation other)
         {
             // You can think of this algorithm as a state transition / automata.
@@ -99,12 +103,23 @@ namespace Spatial4n.Core.Shapes
             return SpatialRelation.INTERSECTS;
         }
 
+        /// <summary>
+        /// Not DISJOINT, i.e. there is some sort of intersection.
+        /// </summary>
         public static bool Intersects(this SpatialRelation @this)
         {
             return @this != SpatialRelation.DISJOINT;
         }
 
-        /** Not commutative!  WITHIN.inverse().inverse() != WITHIN. */
+        /// <summary>
+        /// If <c>aShape.Relate(bShape)</c> is r, then <c>r.Inverse()</c>
+        /// is <c>Inverse(aShape).Relate(bShape)</c> whereas
+        /// <c>Inverse(shape)</c> is theoretically the opposite area covered by a
+        /// shape, i.e. everywhere but where the shape is.
+        /// <para/>
+        /// Note that it's not commutative!  <code>WITHIN.inverse().inverse() !=
+        /// WITHIN</code>.
+        /// </summary>
         public static SpatialRelation Inverse(this SpatialRelation @this)
         {
             switch (@this)

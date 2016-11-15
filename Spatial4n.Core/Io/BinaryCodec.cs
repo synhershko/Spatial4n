@@ -25,7 +25,7 @@ using System.IO;
 namespace Spatial4n.Core.Io
 {
     /// <summary>
-    /// A binary shape format. It is <em>not</em> designed to be a published standard, unlike Well Known
+    /// A binary shape format. It is <c>not</c> designed to be a published standard, unlike Well Known
     /// Binary (WKB). The initial release is simple but it could get more optimized to use fewer bytes or
     /// to write & read pre-computed index structures.
     /// <para>
@@ -83,7 +83,9 @@ namespace Spatial4n.Core.Io
             }
         }
 
-        /** Note: writes the type byte even if not supported */
+        /// <summary>
+        /// Note: writes the type byte even if not supported
+        /// </summary>
         protected virtual bool WriteShapeByTypeIfSupported(BinaryWriter dataOutput, IShape s)
         {
             ShapeType type = TypeForShape(s);

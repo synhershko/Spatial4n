@@ -22,19 +22,25 @@ using System.Globalization;
 namespace Spatial4n.Core.Io
 {
     /// <summary>
-    /// Utility methods related to parsing shapes.
+    /// Utility methods related to parsing a series of numbers.
+    /// <para>
+    /// This code came from <see cref="Distance.DistanceUtils"/>, which came from
+    /// <a href="https://issues.apache.org/jira/browse/LUCENE-773">Apache
+    /// Lucene, LUCENE-773</a>, which in turn came from "LocalLucene".
+    /// </para>
     /// </summary>
-    [Obsolete]
+    [Obsolete("Not useful; see https://github.com/spatial4j/spatial4j/issues/19")]
     public static class ParseUtils
     {
         /// <summary>
-        /// Given a string containing <i>dimension</i> values encoded in it, separated by commas, return a String array of length <i>dimension</i>
+        /// Given a string containing <c>dimension</c> values encoded in it, separated by commas, return a string array of length <c>dimension</c>
         /// containing the values.
         /// </summary>
         /// <param name="_out">A preallocated array.  Must be size dimension.  If it is not it will be resized.</param>
         /// <param name="externalVal">The value to parse</param>
         /// <param name="dimension">The expected number of values for the point</param>
         /// <returns>An array of the values that make up the point (aka vector)</returns>
+        /// <exception cref="InvalidShapeException">If the dimension specified does not match the number of values in the <paramref name="externalVal"/>.</exception>
         public static string[] ParsePoint(string[] _out, string externalVal, int dimension)
         {
             //TODO: Should we support sparse vectors?
@@ -82,13 +88,14 @@ namespace Spatial4n.Core.Io
         }
 
         /// <summary>
-        /// Given a string containing <i>dimension</i> values encoded in it, separated by commas, return a double array of length <i>dimension</i>
+        /// Given a string containing <c>dimension</c> values encoded in it, separated by commas, return a double array of length <c>dimension</c>
         /// containing the values.
         /// </summary>
         /// <param name="out">A preallocated array.  Must be size dimension.  If it is not it will be resized.</param>
         /// <param name="externalVal">The value to parse</param>
         /// <param name="dimension">The expected number of values for the point</param>
         /// <returns>An array of the values that make up the point (aka vector)</returns>
+        /// <exception cref="InvalidShapeException">If the dimension specified does not match the number of values in the <paramref name="externalVal"/>.</exception>
         public static double[] ParsePointDouble(double[] @out, string externalVal, int dimension)
         {
             if (@out == null || @out.Length != dimension) @out = new double[dimension];
@@ -136,8 +143,8 @@ namespace Spatial4n.Core.Io
         }
 
         /// <summary>
-		/// Extract (by calling {@link #parsePoint(String[], String, int)} and validate the latitude and longitude contained
-		/// in the String by making sure the latitude is between 90 & -90 and longitude is between -180 and 180.<p/>
+		/// Extract (by calling <see cref="ParsePoint(string[], string, int)"/> and validate the latitude and longitude contained
+		/// in the string by making sure the latitude is between 90 & -90 and longitude is between -180 and 180.<p/>
 		/// The latitude is assumed to be the first part of the string and the longitude the second part.
 		/// </summary>
 		/// <param name="latLonStr">The string to parse.  Latitude is the first value, longitude is the second.</param>
@@ -151,9 +158,6 @@ namespace Spatial4n.Core.Io
         /// <summary>
         /// A variation of <see cref="ParseLatitudeLongitude(string)"/> that re-uses an output array.
         /// </summary>
-        /// <param name="outLatLon"></param>
-        /// <param name="latLonStr"></param>
-        /// <returns></returns>
         public static double[] ParseLatitudeLongitude(double[] outLatLon, string latLonStr)
         {
             outLatLon = ParsePointDouble(outLatLon, latLonStr, 2);

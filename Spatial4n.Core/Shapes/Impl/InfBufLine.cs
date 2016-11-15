@@ -90,7 +90,9 @@ namespace Spatial4n.Core.Shapes.Impl
             return (DistanceUnbuffered(p) <= buf);
         }
 
-        /** INTERNAL AKA lineToPointDistance */
+        /// <summary>
+        /// INTERNAL AKA lineToPointDistance
+        /// </summary>
         public virtual double DistanceUnbuffered(IPoint c)
         {
             if (double.IsInfinity(slope))
@@ -113,7 +115,9 @@ namespace Spatial4n.Core.Shapes.Impl
         //    return Math.sqrt(buf*buf + slopeDivBuf*slopeDivBuf);
         //  }
 
-        /** INTERNAL: AKA lineToPointQuadrant */
+        /// <summary>
+        /// INTERNAL: AKA lineToPointQuadrant
+        /// </summary>
         public virtual int Quadrant(IPoint c)
         {
             //check vertical line case 1st
@@ -165,7 +169,9 @@ namespace Spatial4n.Core.Shapes.Impl
             get { return buf; }
         }
 
-        /** 1 / Math.sqrt(slope * slope + 1) */
+        /// <summary>
+        /// <c>1 / Math.Sqrt(slope * slope + 1)</c>
+        /// </summary>
         public virtual double DistDenomInv
         {
             get { return distDenomInv; }

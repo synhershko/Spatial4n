@@ -17,7 +17,9 @@ using System.Runtime.InteropServices;
 
 [assembly:CLSCompliant(true)]
 
+// for testing
 [assembly: InternalsVisibleTo("Spatial4n.Tests")]
+[assembly: InternalsVisibleTo("Lucene.Net.Tests.Spatial")]
 
 // Setting ComVisible to false makes the types in this assembly not visible 
 // to COM components.  If you need to access a type in this assembly from 

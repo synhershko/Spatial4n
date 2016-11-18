@@ -34,6 +34,14 @@ namespace Spatial4n.Core.Shapes
         //see http://docs.geotools.org/latest/userguide/library/jts/dim9.html#preparedgeometry
 
         /// <summary>
+        /// Used in .NET for mimicking the ability to set an enum to null in Java.
+        /// Set to zero explicitly to ensure it will be the default value for an 
+        /// uninitialized SpatialRelation variable.
+        /// </summary>
+        NOT_SET = 0,
+
+
+        /// <summary>
         /// The shape is within the target geometry. It's the converse of <see cref="CONTAINS"/>.
         /// Boundaries of shapes count too.  OGC specs refer to this relation as "COVERED BY";
         /// <see cref="WITHIN"/> is differentiated thereby not including boundaries.

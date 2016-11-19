@@ -24,24 +24,24 @@ using System.Collections.Generic;
 using Xunit;
 using Xunit.Extensions;
 
-namespace Spatial4n.Tests.shape
+namespace Spatial4n.Core.Shape
 {
     public class TestShapesGeo : AbstractTestShapes
     {
-		public static IEnumerable<object[]> Contexts
-		{
-			get
-			{
+        public static IEnumerable<object[]> Contexts
+        {
+            get
+            {
                 //TODO ENABLE LawOfCosines WHEN WORKING
                 //DistanceCalculator distCalcL = new GeodesicSphereDistCalc.Haversine(units.earthRadius());//default
                 IDistanceCalculator distCalcH = new GeodesicSphereDistCalc.Haversine();
-				IDistanceCalculator distCalcV = new GeodesicSphereDistCalc.Vincenty();
+                IDistanceCalculator distCalcV = new GeodesicSphereDistCalc.Vincenty();
 
-			    yield return new object[] { new SpatialContextFactory() { geo = true, distCalc = new RoundingDistCalc(distCalcH) }.NewSpatialContext() };
-			    yield return new object[] { new SpatialContextFactory() { geo = true, distCalc = new RoundingDistCalc(distCalcV) }.NewSpatialContext() };
-			    yield return new object[] { new NtsSpatialContextFactory() { geo = true, distCalc = new RoundingDistCalc(distCalcH) }.NewSpatialContext() };
-			}
-		}
+                yield return new object[] { new SpatialContextFactory() { geo = true, distCalc = new RoundingDistCalc(distCalcH) }.NewSpatialContext() };
+                yield return new object[] { new SpatialContextFactory() { geo = true, distCalc = new RoundingDistCalc(distCalcV) }.NewSpatialContext() };
+                yield return new object[] { new NtsSpatialContextFactory() { geo = true, distCalc = new RoundingDistCalc(distCalcH) }.NewSpatialContext() };
+            }
+        }
 
         //public TestShapesGeo()
         //{
@@ -62,29 +62,29 @@ namespace Spatial4n.Tests.shape
         }
 
         [Theory]
-		[PropertyData("Contexts")]
-		public virtual void TestGeoRectangle(SpatialContext ctx)
-		{
-			base.ctx = ctx;
+        [PropertyData("Contexts")]
+        public virtual void TestGeoRectangle(SpatialContext ctx)
+        {
+            base.ctx = ctx;
 
             double v = 200 * (random.NextDouble() > 0.5 ? -1 : 1);
-		    Assert.Throws<InvalidShapeException>(() => ctx.MakeRectangle(v,0,0,0));
-            Assert.Throws<InvalidShapeException>(() => ctx.MakeRectangle(0,v,0,0));
-            Assert.Throws<InvalidShapeException>(() => ctx.MakeRectangle(0,0,v,0));
-            Assert.Throws<InvalidShapeException>(() => ctx.MakeRectangle(0,0,0,v));
+            Assert.Throws<InvalidShapeException>(() => ctx.MakeRectangle(v, 0, 0, 0));
+            Assert.Throws<InvalidShapeException>(() => ctx.MakeRectangle(0, v, 0, 0));
+            Assert.Throws<InvalidShapeException>(() => ctx.MakeRectangle(0, 0, v, 0));
+            Assert.Throws<InvalidShapeException>(() => ctx.MakeRectangle(0, 0, 0, v));
             Assert.Throws<InvalidShapeException>(() => ctx.MakeRectangle(0, 0, 10, -10));
 
-			//test some relateXRange
-			//    opposite +/- 180
-			Assert.Equal(SpatialRelation.INTERSECTS, ctx.MakeRectangle(170, 180, 0, 0).RelateXRange(-180, -170));
-			Assert.Equal(SpatialRelation.INTERSECTS, ctx.MakeRectangle(-90, -45, 0, 0).RelateXRange(-45, -135));
-			Assert.Equal(SpatialRelation.CONTAINS, ctx.WorldBounds.RelateXRange(-90, -135));
-			//point on edge at dateline using opposite +/- 180
-			Assert.Equal(SpatialRelation.CONTAINS, ctx.MakeRectangle(170, 180, 0, 0).Relate(ctx.MakePoint(-180, 0)));
+            //test some relateXRange
+            //    opposite +/- 180
+            Assert.Equal(SpatialRelation.INTERSECTS, ctx.MakeRectangle(170, 180, 0, 0).RelateXRange(-180, -170));
+            Assert.Equal(SpatialRelation.INTERSECTS, ctx.MakeRectangle(-90, -45, 0, 0).RelateXRange(-45, -135));
+            Assert.Equal(SpatialRelation.CONTAINS, ctx.WorldBounds.RelateXRange(-90, -135));
+            //point on edge at dateline using opposite +/- 180
+            Assert.Equal(SpatialRelation.CONTAINS, ctx.MakeRectangle(170, 180, 0, 0).Relate(ctx.MakePoint(-180, 0)));
 
-			//test 180 becomes -180 for non-zero width rectangle
-			Assert.Equal(ctx.MakeRectangle(-180, -170, 0, 0), ctx.MakeRectangle(180, -170, 0, 0));
-			Assert.Equal(ctx.MakeRectangle(170, 180, 0, 0), ctx.MakeRectangle(170, -180, 0, 0));
+            //test 180 becomes -180 for non-zero width rectangle
+            Assert.Equal(ctx.MakeRectangle(-180, -170, 0, 0), ctx.MakeRectangle(180, -170, 0, 0));
+            Assert.Equal(ctx.MakeRectangle(170, 180, 0, 0), ctx.MakeRectangle(170, -180, 0, 0));
 
             double[] lons = new double[] { 0, 45, 160, 180, -45, -175, -180 }; //minX
             foreach (double lon in lons)
@@ -111,7 +111,7 @@ namespace Spatial4n.Tests.shape
             for (int i = 0; i < AtLeast(100); i++)
             {
                 IRectangle r = RandomRectangle(1);
-                int buf = random.Next(0, 90 +1);
+                int buf = random.Next(0, 90 + 1);
                 IRectangle br = (IRectangle)r.GetBuffered(buf, ctx);
                 AssertRelation(null, SpatialRelation.CONTAINS, br, r);
                 if (r.Width + 2 * buf >= 360)
@@ -124,16 +124,16 @@ namespace Spatial4n.Tests.shape
                 > 11);
         }
 
-		[Theory]
-		[PropertyData("Contexts")]
+        [Theory]
+        [PropertyData("Contexts")]
         public virtual void TestGeoCircle(SpatialContext ctx)
-		{
-			base.ctx = ctx;
+        {
+            base.ctx = ctx;
 
             Assert.Equal(string.Format("Circle(Pt(x={0:0.0},y={1:0.0}), d={2:0.0}° {3:0.00}km)", 10, 20, 30, 3335.85), ctx.MakeCircle(10, 20, 30).ToString());
 
             double v = 200 * (random.NextDouble() > 0.5 ? -1 : 1);
-		    Assert.Throws<InvalidShapeException>(() => ctx.MakeCircle(v,0,5));
+            Assert.Throws<InvalidShapeException>(() => ctx.MakeCircle(v, 0, 5));
             Assert.Throws<InvalidShapeException>(() => ctx.MakeCircle(0, v, 5));
             //Assert.Throws<InvalidShapeException>(() => ctx.MakeCircle(random.Next(-180, 180), random.Next(-90, 90), v));
 

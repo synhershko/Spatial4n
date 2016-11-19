@@ -19,7 +19,7 @@ using Spatial4n.Core.Exceptions;
 using System;
 using System.Globalization;
 
-namespace Spatial4n.Core.Io
+namespace Spatial4n.Core.IO
 {
     /// <summary>
     /// Utility methods related to parsing a series of numbers.

@@ -19,7 +19,7 @@ using GeoAPI.Geometries;
 using NetTopologySuite.Geometries;
 using Spatial4n.Core.Context.Nts;
 using Spatial4n.Core.Exceptions;
-using Spatial4n.Core.Io.Nts;
+using Spatial4n.Core.IO.Nts;
 using Spatial4n.Core.Shapes;
 using Spatial4n.Core.Shapes.Nts;
 using System;
@@ -28,7 +28,7 @@ using System.Diagnostics;
 using System.Linq;
 using Xunit;
 
-namespace Spatial4n.Tests.io
+namespace Spatial4n.Core.IO
 {
     public class NtsWktShapeParserTest : WktShapeParserTest
     {
@@ -45,7 +45,7 @@ namespace Spatial4n.Tests.io
         [Fact]
         public virtual void TestParsePolygon()
         {
-            
+
 
             IShape polygonNoHoles = new PolygonBuilder(ctx)
         .Point(100, 0)

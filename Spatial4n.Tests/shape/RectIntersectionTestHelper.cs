@@ -22,7 +22,7 @@ using System;
 using System.Diagnostics;
 using Xunit;
 
-namespace Spatial4n.Tests.shape
+namespace Spatial4n.Core.Shape
 {
     public abstract class RectIntersectionTestHelper : RandomizedShapeTest
     {

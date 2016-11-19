@@ -23,7 +23,7 @@ using System.Globalization;
 using Xunit;
 using Xunit.Extensions;
 
-namespace Spatial4n.Tests.io
+namespace Spatial4n.Core.IO
 {
     public class ShapeReadWriterTest
 	{

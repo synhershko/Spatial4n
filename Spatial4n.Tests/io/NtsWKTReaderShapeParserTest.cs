@@ -18,11 +18,11 @@
 using Spatial4n.Core.Context;
 using Spatial4n.Core.Context.Nts;
 using Spatial4n.Core.Exceptions;
-using Spatial4n.Core.Io.Nts;
+using Spatial4n.Core.IO.Nts;
 using Spatial4n.Core.Shapes;
 using Xunit;
 
-namespace Spatial4n.Tests.io
+namespace Spatial4n.Core.IO
 {
     public class NtsWKTReaderShapeParserTest
     {

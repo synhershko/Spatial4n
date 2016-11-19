@@ -22,7 +22,7 @@ using Spatial4n.Core.Shapes.Nts;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Spatial4n.Tests.io
+namespace Spatial4n.Core.IO
 {
     /// <summary>
     /// Builder for creating a {@link com.spatial4j.core.shape.Shape} instance of a Polygon

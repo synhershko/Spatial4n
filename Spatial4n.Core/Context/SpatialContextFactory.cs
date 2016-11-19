@@ -16,7 +16,7 @@
  */
 
 using Spatial4n.Core.Distance;
-using Spatial4n.Core.Io;
+using Spatial4n.Core.IO;
 using Spatial4n.Core.Shapes;
 using System;
 using System.Collections.Generic;
@@ -233,7 +233,7 @@ namespace Spatial4n.Core.Context
                 throw new ApplicationException(e.Message, e);
             }
             throw new ApplicationException(clazz + " needs a constructor that takes: "
-                + "[" + string.Join(",", ctorArgs) + "]");
+                + "[" + string.Join(",", ctorArgs.Select(x => x.GetType().ToString()).ToArray()) + "]");
         }
     }
 }

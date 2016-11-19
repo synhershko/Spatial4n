@@ -23,7 +23,7 @@ using System;
 using System.Diagnostics;
 using Xunit;
 
-namespace Spatial4n.Tests.shape
+namespace Spatial4n.Core.Shape
 {
     /// <summary>
     /// A base test class with utility methods to help test shapes.

@@ -17,7 +17,7 @@
 
 using Xunit;
 
-namespace Spatial4n.Tests
+namespace Spatial4n.Core
 {
 	public static class CustomAssert
 	{

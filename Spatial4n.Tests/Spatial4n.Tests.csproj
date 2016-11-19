@@ -10,7 +10,7 @@
     <ProjectGuid>{1DE4AC79-7ECF-4C37-8EDA-F78D211151AB}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Spatial4n.Tests</RootNamespace>
+    <RootNamespace>Spatial4n.Core</RootNamespace>
     <AssemblyName>Spatial4n.Tests</AssemblyName>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{3AC096D0-A1C2-E12C-1390-A8335801FDAB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
@@ -80,12 +80,31 @@
     <CodeAnalysisIgnoreBuiltInRules>true</CodeAnalysisIgnoreBuiltInRules>
     <CodeAnalysisFailOnMissingRules>false</CodeAnalysisFailOnMissingRules>
   </PropertyGroup>
-  <ItemGroup>
+  <PropertyGroup>
+    <AssemblyOriginatorKeyFile>..\Spatial4n.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>true</SignAssembly>
+  </PropertyGroup>
+  <ItemGroup Condition=" $(Framework.Contains('NET35')) ">
+    <Reference Include="GeoAPI, Version=1.7.4.0, Culture=neutral, PublicKeyToken=a1a0da7def465678, processorArchitecture=MSIL">
+      <HintPath>..\packages\GeoAPI.1.7.4\lib\net35-client\GeoAPI.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="NetTopologySuite, Version=1.14.0.0, Culture=neutral, PublicKeyToken=f580a05016ebada1, processorArchitecture=MSIL">
+      <HintPath>..\packages\NetTopologySuite.1.14\lib\net35-client\NetTopologySuite.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="PowerCollections, Version=1.0.0.0, Culture=neutral, PublicKeyToken=2573bf8a1bdddcd5, processorArchitecture=MSIL">
+      <HintPath>..\packages\NetTopologySuite.1.14\lib\net35-client\PowerCollections.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup Condition=" $(Framework.Contains('NET40')) ">
     <Reference Include="GeoAPI, Version=1.7.4.0, Culture=neutral, PublicKeyToken=a1a0da7def465678, processorArchitecture=MSIL">
       <HintPath>..\packages\GeoAPI.1.7.4\lib\net40-client\GeoAPI.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Microsoft.VisualStudio.QualityTools.UnitTestFramework, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
     <Reference Include="NetTopologySuite, Version=1.14.0.0, Culture=neutral, PublicKeyToken=f580a05016ebada1, processorArchitecture=MSIL">
       <HintPath>..\packages\NetTopologySuite.1.14\lib\net40-client\NetTopologySuite.dll</HintPath>
       <Private>True</Private>
@@ -94,6 +113,9 @@
       <HintPath>..\packages\NetTopologySuite.1.14\lib\net40-client\PowerCollections.dll</HintPath>
       <Private>True</Private>
     </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="Microsoft.VisualStudio.QualityTools.UnitTestFramework, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
     <Reference Include="System" />
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
@@ -111,34 +133,34 @@
     </CodeAnalysisDependentAssemblyPaths>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="context\SpatialContextFactoryTest.cs" />
+    <Compile Include="Context\SpatialContextFactoryTest.cs" />
     <Compile Include="CustomAssert.cs" />
-    <Compile Include="io\BinaryCodecTest.cs" />
-    <Compile Include="io\NtsWKTReaderShapeParserTest.cs" />
-    <Compile Include="io\NtsWktShapeParserTest.cs" />
-    <Compile Include="io\NtsBinaryCodecTest.cs" />
-    <Compile Include="io\PolygonBuilder.cs" />
-    <Compile Include="io\ShapeReadWriterTest.cs" />
-    <Compile Include="io\WktCustomShapeParserTest.cs" />
-    <Compile Include="io\WktShapeParserTest.cs" />
+    <Compile Include="IO\BinaryCodecTest.cs" />
+    <Compile Include="IO\NtsWKTReaderShapeParserTest.cs" />
+    <Compile Include="IO\NtsWktShapeParserTest.cs" />
+    <Compile Include="IO\NtsBinaryCodecTest.cs" />
+    <Compile Include="IO\PolygonBuilder.cs" />
+    <Compile Include="IO\ShapeReadWriterTest.cs" />
+    <Compile Include="IO\WktCustomShapeParserTest.cs" />
+    <Compile Include="IO\WktShapeParserTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="distance\TestDistances.cs" />
+    <Compile Include="Distance\TestDistances.cs" />
     <Compile Include="PropertyDataAttribute.cs" />
     <Compile Include="RandomExtensions.cs" />
     <Compile Include="RandomSeed.cs" />
     <Compile Include="RepeatTestAttribute.cs" />
-    <Compile Include="shape\AbstractTestShapes.cs" />
-    <Compile Include="shape\BufferedLineStringTest.cs" />
-    <Compile Include="shape\BufferedLineTest.cs" />
-    <Compile Include="shape\NtsGeometryTest.cs" />
-    <Compile Include="shape\RandomizedShapeTest.cs" />
-    <Compile Include="shape\RectIntersectionTestHelper.cs" />
-    <Compile Include="shape\RoundingDistCalc.cs" />
-    <Compile Include="shape\ShapeCollectionTest.cs" />
-    <Compile Include="shape\TestShapesGeo.cs" />
-    <Compile Include="shape\TestShapes2D.cs" />
+    <Compile Include="Shape\AbstractTestShapes.cs" />
+    <Compile Include="Shape\BufferedLineStringTest.cs" />
+    <Compile Include="Shape\BufferedLineTest.cs" />
+    <Compile Include="Shape\NtsGeometryTest.cs" />
+    <Compile Include="Shape\RandomizedShapeTest.cs" />
+    <Compile Include="Shape\RectIntersectionTestHelper.cs" />
+    <Compile Include="Shape\RoundingDistCalc.cs" />
+    <Compile Include="Shape\ShapeCollectionTest.cs" />
+    <Compile Include="Shape\TestShapesGeo.cs" />
+    <Compile Include="Shape\TestShapes2D.cs" />
     <Compile Include="TemporaryCulture.cs" />
-    <Compile Include="util\TestGeohashUtils.cs" />
+    <Compile Include="Util\TestGeohashUtils.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config">
@@ -146,9 +168,13 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Spatial4n.Core\Spatial4n.Core.NTS.csproj">
+    <ProjectReference Include="..\Spatial4n.Core.NTS\Spatial4n.Core.NTS.csproj">
       <Project>{ddcb0537-c471-4acd-b48b-56eb1711eb4a}</Project>
       <Name>Spatial4n.Core.NTS</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Spatial4n.Core\Spatial4n.Core.csproj">
+      <Project>{777904ac-46ef-466c-9e13-2a52a6735987}</Project>
+      <Name>Spatial4n.Core</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />

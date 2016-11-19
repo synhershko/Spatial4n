@@ -21,7 +21,7 @@ using Spatial4n.Core.Shapes.Impl;
 using System.Collections.Generic;
 using Xunit;
 
-namespace Spatial4n.Tests.shape
+namespace Spatial4n.Core.Shape
 {
     /** @author David Smiley - dsmiley@mitre.org */
     public class ShapeCollectionTest : RandomizedShapeTest

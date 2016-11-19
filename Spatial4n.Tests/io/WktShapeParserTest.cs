@@ -17,11 +17,11 @@
 
 using Spatial4n.Core.Context;
 using Spatial4n.Core.Exceptions;
-using Spatial4n.Core.Io;
+using Spatial4n.Core.IO;
 using Spatial4n.Core.Shapes;
 using Xunit;
 
-namespace Spatial4n.Tests.io
+namespace Spatial4n.Core.IO
 {
     public class WktShapeParserTest
     {

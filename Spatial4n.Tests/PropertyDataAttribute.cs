@@ -21,7 +21,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using Xunit.Extensions;
 
-namespace Spatial4n.Tests
+namespace Spatial4n.Core
 {
 	/// <summary>
 	/// Provides a data source for a data theory, with the data coming from a public static property on the test class.

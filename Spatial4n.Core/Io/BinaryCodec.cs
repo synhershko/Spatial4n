@@ -22,7 +22,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 
-namespace Spatial4n.Core.Io
+namespace Spatial4n.Core.IO
 {
     /// <summary>
     /// A binary shape format. It is <c>not</c> designed to be a published standard, unlike Well Known

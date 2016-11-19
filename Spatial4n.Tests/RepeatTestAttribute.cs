@@ -21,7 +21,7 @@ using Xunit;
 using Xunit.Extensions;
 using Xunit.Sdk;
 
-namespace Spatial4n.Tests
+namespace Spatial4n.Core
 {
 	public class RepeatTestAttribute : FactAttribute
 	{

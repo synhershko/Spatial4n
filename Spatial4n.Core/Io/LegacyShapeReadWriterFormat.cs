@@ -21,7 +21,7 @@ using Spatial4n.Core.Shapes;
 using System;
 using System.Globalization;
 
-namespace Spatial4n.Core.Io
+namespace Spatial4n.Core.IO
 {
     /// <summary>
     /// Reads & writes a shape from a given string in the old format.

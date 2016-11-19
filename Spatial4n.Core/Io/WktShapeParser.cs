@@ -24,7 +24,7 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Text.RegularExpressions;
 
-namespace Spatial4n.Core.Io
+namespace Spatial4n.Core.IO
 {
     /// <summary>
     /// An extensible parser for <a href="http://en.wikipedia.org/wiki/Well-known_text">

@@ -20,7 +20,7 @@ using Spatial4n.Core.Distance;
 using Spatial4n.Core.Shapes;
 using System;
 
-namespace Spatial4n.Tests.shape
+namespace Spatial4n.Core.Shape
 {
     public class RoundingDistCalc : AbstractDistanceCalculator 
     {

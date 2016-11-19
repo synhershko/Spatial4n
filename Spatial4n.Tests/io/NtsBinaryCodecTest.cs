@@ -21,7 +21,7 @@ using Spatial4n.Core.Context.Nts;
 using Spatial4n.Core.Shapes;
 using Xunit;
 
-namespace Spatial4n.Tests.io
+namespace Spatial4n.Core.IO
 {
     public class NtsBinaryCodecTest : BinaryCodecTest
     {

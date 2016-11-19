@@ -18,7 +18,7 @@
 using GeoAPI.Geometries;
 using Spatial4n.Core.Context;
 using Spatial4n.Core.Context.Nts;
-using Spatial4n.Core.Io.Nts;
+using Spatial4n.Core.IO.Nts;
 using Spatial4n.Core.Shapes;
 using Spatial4n.Core.Shapes.Impl;
 using Spatial4n.Core.Shapes.Nts;
@@ -28,7 +28,7 @@ using System.Diagnostics;
 using System.IO;
 using Xunit;
 
-namespace Spatial4n.Tests.shape
+namespace Spatial4n.Core.Shape
 {
     /// <summary>
     /// Tests {@link com.spatial4j.core.shape.jts.JtsGeometry} and some other code related

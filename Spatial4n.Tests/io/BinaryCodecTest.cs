@@ -17,14 +17,14 @@
 
 using GeoAPI.IO;
 using Spatial4n.Core.Context;
-using Spatial4n.Core.Io;
+using Spatial4n.Core.IO;
 using Spatial4n.Core.Shapes;
 using System;
 using System.IO;
 using System.Linq;
 using Xunit;
 
-namespace Spatial4n.Tests.io
+namespace Spatial4n.Core.IO
 {
     public class BinaryCodecTest
     {

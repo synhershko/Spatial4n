@@ -17,7 +17,7 @@
 
 using Spatial4n.Core.Distance;
 using Spatial4n.Core.Exceptions;
-using Spatial4n.Core.Io;
+using Spatial4n.Core.IO;
 using Spatial4n.Core.Shapes;
 using Spatial4n.Core.Shapes.Impl;
 using System;
@@ -179,7 +179,7 @@ namespace Spatial4n.Core.Context
 
         /// <summary>
         /// Normalize the 'x' dimension. Might reduce precision or wrap it to be within the bounds. This
-        /// is called by <see cref="Io.WktShapeParser"/> before creating a shape.
+        /// is called by <see cref="IO.WktShapeParser"/> before creating a shape.
         /// </summary>
         public virtual double NormX(double x)
         {
@@ -190,7 +190,7 @@ namespace Spatial4n.Core.Context
 
         /// <summary>
         /// Normalize the 'y' dimension. Might reduce precision or wrap it to be within the bounds. This
-        /// is called by <see cref="Io.WktShapeParser"/> before creating a shape.
+        /// is called by <see cref="IO.WktShapeParser"/> before creating a shape.
         /// </summary>
         public virtual double NormY(double y) { return y; }
 
@@ -362,7 +362,7 @@ namespace Spatial4n.Core.Context
         }
 
         /// <summary>
-        /// The <see cref="Io.WktShapeParser"/> used by <see cref="ReadShapeFromWkt(string)"/>.
+        /// The <see cref="IO.WktShapeParser"/> used by <see cref="ReadShapeFromWkt(string)"/>.
         /// </summary>
         /// <returns></returns>
         public virtual WktShapeParser WktShapeParser
@@ -372,7 +372,7 @@ namespace Spatial4n.Core.Context
 
         /// <summary>
         /// Reads a shape from the string formatted in WKT.
-        /// See <see cref="Io.WktShapeParser"/>.
+        /// See <see cref="IO.WktShapeParser"/>.
         /// </summary>
         /// <param name="wkt">non-null WKT.</param>
         /// <returns>non-null</returns>

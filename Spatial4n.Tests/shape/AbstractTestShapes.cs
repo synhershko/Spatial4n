@@ -23,7 +23,7 @@ using System;
 using Xunit;
 using Xunit.Extensions;
 
-namespace Spatial4n.Tests.shape
+namespace Spatial4n.Core.Shape
 {
     public abstract class AbstractTestShapes : RandomizedShapeTest
     {

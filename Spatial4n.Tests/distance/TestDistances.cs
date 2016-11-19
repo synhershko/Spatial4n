@@ -22,7 +22,7 @@ using Spatial4n.Core.Shapes.Impl;
 using System;
 using Xunit;
 
-namespace Spatial4n.Tests.distance
+namespace Spatial4n.Core.Distance
 {
     public class TestDistances
     {

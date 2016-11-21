@@ -35,7 +35,7 @@
     <Optimize>true</Optimize>
     <Framework>$(TargetFrameworkVersion.Replace("v", "NET").Replace(".", ""))</Framework>
     <OutputPath>bin\$(Configuration.Replace("35", ""))\$(Framework)\</OutputPath>
-    <DefineConstants>TRACE;NET40;FEATURE_STRONG_NAME</DefineConstants>
+    <DefineConstants>TRACE;NET40;FEATURE_STRONG_NAME;FEATURE_NTS</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <DocumentationFile>$(OutputPath)\Spatial4n.Core.NTS.xml</DocumentationFile>
@@ -66,7 +66,7 @@
     <Optimize>true</Optimize>
     <Framework>$(TargetFrameworkVersion.Replace("v", "NET").Replace(".", ""))</Framework>
     <OutputPath>bin\$(Configuration.Replace("35", ""))\$(Framework)\</OutputPath>
-    <DefineConstants>TRACE;NET35;FEATURE_STRONG_NAME</DefineConstants>
+    <DefineConstants>TRACE;NET35;FEATURE_STRONG_NAME;FEATURE_NTS</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <CodeAnalysisLogFile>$(OutputPath)\Spatial4n.Core.dll.CodeAnalysisLog.xml</CodeAnalysisLogFile>
@@ -142,8 +142,8 @@
     <Compile Include="..\Spatial4n.Core.NTS\Shapes\Nts\NtsPoint.cs">
       <Link>Shapes\Nts\NtsPoint.cs</Link>
     </Compile>
-    <Compile Include="..\VersionInfo.cs">
-      <Link>Properties\VersionInfo.cs</Link>
+    <Compile Include="..\CommonAssemblyInfo.cs">
+      <Link>Properties\CommonAssemblyInfo.cs</Link>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

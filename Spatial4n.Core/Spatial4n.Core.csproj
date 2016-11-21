@@ -144,6 +144,9 @@
     <Compile Include="IO\ParseUtils.cs" />
     <Compile Include="IO\WktShapeParser.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="..\CommonAssemblyInfo.cs">
+      <Link>Properties\CommonAssemblyInfo.cs</Link>
+    </Compile>
     <Compile Include="Shapes\Circle.cs" />
     <Compile Include="Shapes\Impl\BufferedLine.cs" />
     <Compile Include="Shapes\Impl\BufferedLineString.cs" />

@@ -1,4 +1,5 @@
-﻿/*
+﻿#if FEATURE_NTS
+/*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -18,6 +19,7 @@
 using GeoAPI.Geometries;
 using NetTopologySuite.Geometries;
 using NetTopologySuite.Geometries.Implementation;
+using Spatial4n.Core.Exceptions;
 using Spatial4n.Core.IO.Nts;
 using System;
 using System.Collections.Generic;
@@ -102,7 +104,7 @@ namespace Spatial4n.Core.Context.Nts
             if (scaleStr != null)
             {
                 if (modelStr != null && !modelStr.Equals("fixed"))
-                    throw new ApplicationException("Since precisionScale was specified; precisionModel must be 'fixed' but got: " + modelStr);
+                    throw new RuntimeException("Since precisionScale was specified; precisionModel must be 'fixed' but got: " + modelStr);
                 precisionModel = new PrecisionModel(double.Parse(scaleStr, CultureInfo.InvariantCulture));
             }
             else if (modelStr != null)
@@ -117,11 +119,11 @@ namespace Spatial4n.Core.Context.Nts
                 }
                 else if (modelStr.Equals("fixed"))
                 {
-                    throw new ApplicationException("For fixed model, must specifiy 'precisionScale'");
+                    throw new RuntimeException("For fixed model, must specifiy 'precisionScale'");
                 }
                 else
                 {
-                    throw new ApplicationException("Unknown precisionModel: " + modelStr);
+                    throw new RuntimeException("Unknown precisionModel: " + modelStr);
                 }
             }
         }
@@ -142,3 +144,4 @@ namespace Spatial4n.Core.Context.Nts
         }
     }
 }
+#endif

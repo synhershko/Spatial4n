@@ -24,8 +24,10 @@ namespace Spatial4n.Core.Exceptions
     /// a rectangle's minimum Y was specified as greater than the maximum Y. This class is not used for
     /// parsing exceptions; that's usually <see cref="ParseException"/>.
     /// </summary>
+#if FEATURE_SERIALIZABLE
 	[Serializable]
-    public class InvalidShapeException : ApplicationException
+#endif
+    public class InvalidShapeException : RuntimeException
     {
         public InvalidShapeException(string reason) : base(reason)
         {

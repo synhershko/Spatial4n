@@ -1,4 +1,5 @@
-﻿/*
+﻿#if FEATURE_NTS
+/*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -163,7 +164,6 @@ namespace Spatial4n.Core.Shapes.Nts
                     if (xRange == Range.LongitudeRange.WORLD_180E180W)
                         break; // can't grow any bigger
                 }
-                // TODO: Inconsistent API between this and GeoAPI
                 return new Rectangle(xRange.Min, xRange.Max, env.MinY, env.MaxY, ctx);
             }
             else
@@ -557,3 +557,4 @@ namespace Spatial4n.Core.Shapes.Nts
         //  }
     }
 }
+#endif

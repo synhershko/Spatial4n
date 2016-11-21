@@ -19,7 +19,12 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
+
+#if NETCORE10
+using Xunit.Sdk;
+#else
 using Xunit.Extensions;
+#endif
 
 namespace Spatial4n.Core
 {
@@ -62,10 +67,20 @@ namespace Spatial4n.Core
 		/// <param name="parameterTypes">The types of the parameters for the test method</param>
 		/// <returns>The theory data, in table form</returns>
 		[SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", MessageId = "0", Justification = "This is validated elsewhere.")]
-		public override IEnumerable<object[]> GetData(MethodInfo methodUnderTest, Type[] parameterTypes)
-		{
-			Type type = PropertyType ?? methodUnderTest.ReflectedType;
-			PropertyInfo propInfo = type.GetProperty(propertyName, BindingFlags.Public | BindingFlags.Static | BindingFlags.FlattenHierarchy);
+#if NETCORE10
+        public override IEnumerable<object[]> GetData(MethodInfo methodUnderTest)
+#else
+        public override IEnumerable<object[]> GetData(MethodInfo methodUnderTest, Type[] parameterTypes)
+#endif
+        {
+#if NETCORE10
+            // Spatial4n TODO: This won't work the same as ReflectedType which has been removed
+            // from the API in .NET Core
+            Type type = PropertyType ?? methodUnderTest.DeclaringType;
+#else
+            Type type = PropertyType ?? methodUnderTest.ReflectedType;
+#endif
+            PropertyInfo propInfo = type.GetProperty(propertyName, BindingFlags.Public | BindingFlags.Static | BindingFlags.FlattenHierarchy);
 			if (propInfo == null)
 			{
 				string typeName = type.FullName;

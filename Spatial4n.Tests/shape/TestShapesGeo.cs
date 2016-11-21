@@ -15,8 +15,11 @@
  * limitations under the License.
  */
 
-using Spatial4n.Core.Context;
+#if FEATURE_NTS
 using Spatial4n.Core.Context.Nts;
+#endif
+
+using Spatial4n.Core.Context;
 using Spatial4n.Core.Distance;
 using Spatial4n.Core.Exceptions;
 using Spatial4n.Core.Shapes;
@@ -39,7 +42,9 @@ namespace Spatial4n.Core.Shape
 
                 yield return new object[] { new SpatialContextFactory() { geo = true, distCalc = new RoundingDistCalc(distCalcH) }.NewSpatialContext() };
                 yield return new object[] { new SpatialContextFactory() { geo = true, distCalc = new RoundingDistCalc(distCalcV) }.NewSpatialContext() };
+#if FEATURE_NTS
                 yield return new object[] { new NtsSpatialContextFactory() { geo = true, distCalc = new RoundingDistCalc(distCalcH) }.NewSpatialContext() };
+#endif
             }
         }
 

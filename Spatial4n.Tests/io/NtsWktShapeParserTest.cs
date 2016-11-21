@@ -15,6 +15,8 @@
  * limitations under the License.
  */
 
+#if FEATURE_NTS
+
 using GeoAPI.Geometries;
 using NetTopologySuite.Geometries;
 using Spatial4n.Core.Context.Nts;
@@ -207,3 +209,5 @@ namespace Spatial4n.Core.IO
         }
     }
 }
+
+#endif

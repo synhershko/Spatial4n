@@ -99,8 +99,8 @@ namespace Spatial4n.Core.Shape
             Assert.False(line.Contains(ctx.MakePoint(10, 1 + 3 + 0.1)));
         }
 
-        [Fact]
-        [RepeatTest(15)]
+        //[Fact]
+        [RepeatFact(15)]
         public virtual void Quadrants()
         {
             //random line

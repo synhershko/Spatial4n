@@ -3,49 +3,36 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
 VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Spatial4n.Core", "Spatial4n.Core\Spatial4n.Core.csproj", "{777904AC-46EF-466C-9E13-2A52A6735987}"
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Spatial4n.Tests", "Spatial4n.Tests\Spatial4n.Tests.xproj", "{385FC6A2-E90E-4D13-B700-423489363E25}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Spatial4n.Core.NTS", "Spatial4n.Core.NTS\Spatial4n.Core.NTS.csproj", "{DDCB0537-C471-4ACD-B48B-56EB1711EB4A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Spatial4n.Core", "Spatial4n.Core\Spatial4n.Core.csproj", "{B79939F8-A5DE-400F-AB19-7F8519871946}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Spatial4n.Tests", "Spatial4n.Tests\Spatial4n.Tests.csproj", "{1DE4AC79-7ECF-4C37-8EDA-F78D211151AB}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Spatial4n.Core.NTS", "Spatial4n.Core.NTS\Spatial4n.Core.NTS.csproj", "{BD31FF3A-017A-4ED5-99CC-821818261CDF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
-		Debug35|Any CPU = Debug35|Any CPU
 		Release|Any CPU = Release|Any CPU
-		Release35|Any CPU = Release35|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{777904AC-46EF-466C-9E13-2A52A6735987}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{777904AC-46EF-466C-9E13-2A52A6735987}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{777904AC-46EF-466C-9E13-2A52A6735987}.Debug35|Any CPU.ActiveCfg = Debug35|Any CPU
-		{777904AC-46EF-466C-9E13-2A52A6735987}.Debug35|Any CPU.Build.0 = Debug35|Any CPU
-		{777904AC-46EF-466C-9E13-2A52A6735987}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{777904AC-46EF-466C-9E13-2A52A6735987}.Release|Any CPU.Build.0 = Release|Any CPU
-		{777904AC-46EF-466C-9E13-2A52A6735987}.Release35|Any CPU.ActiveCfg = Release35|Any CPU
-		{777904AC-46EF-466C-9E13-2A52A6735987}.Release35|Any CPU.Build.0 = Release35|Any CPU
-		{DDCB0537-C471-4ACD-B48B-56EB1711EB4A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{DDCB0537-C471-4ACD-B48B-56EB1711EB4A}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{DDCB0537-C471-4ACD-B48B-56EB1711EB4A}.Debug35|Any CPU.ActiveCfg = Debug35|Any CPU
-		{DDCB0537-C471-4ACD-B48B-56EB1711EB4A}.Debug35|Any CPU.Build.0 = Debug35|Any CPU
-		{DDCB0537-C471-4ACD-B48B-56EB1711EB4A}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{DDCB0537-C471-4ACD-B48B-56EB1711EB4A}.Release|Any CPU.Build.0 = Release|Any CPU
-		{DDCB0537-C471-4ACD-B48B-56EB1711EB4A}.Release35|Any CPU.ActiveCfg = Release35|Any CPU
-		{DDCB0537-C471-4ACD-B48B-56EB1711EB4A}.Release35|Any CPU.Build.0 = Release35|Any CPU
-		{1DE4AC79-7ECF-4C37-8EDA-F78D211151AB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{1DE4AC79-7ECF-4C37-8EDA-F78D211151AB}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{1DE4AC79-7ECF-4C37-8EDA-F78D211151AB}.Debug35|Any CPU.ActiveCfg = Debug35|Any CPU
-		{1DE4AC79-7ECF-4C37-8EDA-F78D211151AB}.Debug35|Any CPU.Build.0 = Debug35|Any CPU
-		{1DE4AC79-7ECF-4C37-8EDA-F78D211151AB}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{1DE4AC79-7ECF-4C37-8EDA-F78D211151AB}.Release|Any CPU.Build.0 = Release|Any CPU
-		{1DE4AC79-7ECF-4C37-8EDA-F78D211151AB}.Release35|Any CPU.ActiveCfg = Release35|Any CPU
-		{1DE4AC79-7ECF-4C37-8EDA-F78D211151AB}.Release35|Any CPU.Build.0 = Release35|Any CPU
+		{385FC6A2-E90E-4D13-B700-423489363E25}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{385FC6A2-E90E-4D13-B700-423489363E25}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{385FC6A2-E90E-4D13-B700-423489363E25}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{385FC6A2-E90E-4D13-B700-423489363E25}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B6BE4761-EEBA-4F22-949A-7017C33A25F6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B6BE4761-EEBA-4F22-949A-7017C33A25F6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B6BE4761-EEBA-4F22-949A-7017C33A25F6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B6BE4761-EEBA-4F22-949A-7017C33A25F6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B79939F8-A5DE-400F-AB19-7F8519871946}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B79939F8-A5DE-400F-AB19-7F8519871946}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B79939F8-A5DE-400F-AB19-7F8519871946}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B79939F8-A5DE-400F-AB19-7F8519871946}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BD31FF3A-017A-4ED5-99CC-821818261CDF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BD31FF3A-017A-4ED5-99CC-821818261CDF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BD31FF3A-017A-4ED5-99CC-821818261CDF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BD31FF3A-017A-4ED5-99CC-821818261CDF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
-	EndGlobalSection
-	GlobalSection(TestCaseManagementSettings) = postSolution
-		CategoryFile = Spatial4n.vsmdi
 	EndGlobalSection
 EndGlobal

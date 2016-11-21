@@ -15,6 +15,8 @@
  * limitations under the License.
  */
 
+#if FEATURE_NTS
+
 using Spatial4n.Core.Context;
 using Spatial4n.Core.Context.Nts;
 using Spatial4n.Core.Exceptions;
@@ -90,3 +92,5 @@ namespace Spatial4n.Core.IO
         }
     }
 }
+
+#endif

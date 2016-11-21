@@ -15,8 +15,11 @@
  * limitations under the License.
  */
 
-using Spatial4n.Core.Context;
+#if FEATURE_NTS
 using Spatial4n.Core.Context.Nts;
+#endif
+
+using Spatial4n.Core.Context;
 using Spatial4n.Core.Shapes;
 using System.Collections.Generic;
 using System.Globalization;
@@ -32,7 +35,9 @@ namespace Spatial4n.Core.IO
 			get
 			{
 				yield return new object[] { SpatialContext.GEO };
-				yield return new object[] { NtsSpatialContext.GEO };
+#if FEATURE_NTS
+                yield return new object[] { NtsSpatialContext.GEO };
+#endif
 			}
 		}
 

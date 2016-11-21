@@ -21,6 +21,7 @@ using Spatial4n.Core.Shapes;
 using Spatial4n.Core.Shapes.Impl;
 using System;
 using System.Diagnostics;
+using System.Reflection;
 using Xunit;
 
 namespace Spatial4n.Core.Shape
@@ -66,7 +67,7 @@ namespace Spatial4n.Core.Shape
             {
                 try
                 {
-                    clazz.GetMethod("Equals");
+                    clazz.GetTypeInfo().GetMethod("Equals");
                 }
                 catch (Exception e)
                 {
@@ -74,7 +75,7 @@ namespace Spatial4n.Core.Shape
                 }
                 try
                 {
-                    clazz.GetMethod("GetHashCode");
+                    clazz.GetTypeInfo().GetMethod("GetHashCode");
                 }
                 catch (Exception e)
                 {

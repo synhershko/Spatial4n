@@ -15,8 +15,8 @@
  * limitations under the License.
  */
 
-using GeoAPI.IO;
 using Spatial4n.Core.Context;
+using Spatial4n.Core.Exceptions;
 using Spatial4n.Core.IO;
 using Spatial4n.Core.Shapes;
 using System;

@@ -22,7 +22,9 @@ namespace Spatial4n.Core.Exceptions
     /// <summary>
     /// Spatial4n specific type used to throw/catch a parsing error including the offset.
     /// </summary>
+#if FEATURE_SERIALIZABLE
     [Serializable]
+#endif
     public class ParseException : Exception
     {
         public ParseException(string message, int errorOffset)

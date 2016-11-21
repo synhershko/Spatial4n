@@ -1,98 +1,133 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
+    <MinimumVisualStudioVersion>14.0</MinimumVisualStudioVersion>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>8.0.30703</ProductVersion>
-    <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{777904AC-46EF-466C-9E13-2A52A6735987}</ProjectGuid>
+    <ProjectGuid>{B79939F8-A5DE-400F-AB19-7F8519871946}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Spatial4n.Core</RootNamespace>
     <AssemblyName>Spatial4n.Core</AssemblyName>
+    <DefaultLanguage>en-US</DefaultLanguage>
     <FileAlignment>512</FileAlignment>
-    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
+    <ProjectTypeGuids>{786C830F-07A1-408B-BD7F-6EE04809D6DB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <TargetFrameworkProfile>
     </TargetFrameworkProfile>
+    <TargetFrameworkVersion>v5.0</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <Framework>$(TargetFrameworkVersion.Replace("v", "NET").Replace(".", ""))</Framework>
-    <OutputPath>bin\$(Configuration.Replace("35", ""))\$(Framework)\</OutputPath>
-    <DefineConstants>DEBUG;TRACE;$(Framework)</DefineConstants>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>TRACE;DEBUG</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <Optimize>true</Optimize>
-    <Framework>$(TargetFrameworkVersion.Replace("v", "NET").Replace(".", ""))</Framework>
-    <OutputPath>bin\$(Configuration.Replace("35", ""))\$(Framework)\</OutputPath>
-    <DefineConstants>TRACE;$(Framework)</DefineConstants>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <DocumentationFile>$(OutputPath)\Spatial4n.Core.XML</DocumentationFile>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug35|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <Framework>$(TargetFrameworkVersion.Replace("v", "NET").Replace(".", ""))</Framework>
-    <OutputPath>bin\$(Configuration.Replace("35", ""))\$(Framework)\</OutputPath>
-    <DefineConstants>DEBUG;TRACE;$(Framework)</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <CodeAnalysisLogFile>$(OutputPath)\Spatial4n.Core.dll.CodeAnalysisLog.xml</CodeAnalysisLogFile>
-    <CodeAnalysisUseTypeNameInSuppression>true</CodeAnalysisUseTypeNameInSuppression>
-    <CodeAnalysisModuleSuppressionsFile>GlobalSuppressions.cs</CodeAnalysisModuleSuppressionsFile>
-    <ErrorReport>prompt</ErrorReport>
-    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-    <CodeAnalysisRuleSetDirectories>;C:\Program Files (x86)\Microsoft Visual Studio 10.0\Team Tools\Static Analysis Tools\\Rule Sets</CodeAnalysisRuleSetDirectories>
-    <CodeAnalysisIgnoreBuiltInRuleSets>true</CodeAnalysisIgnoreBuiltInRuleSets>
-    <CodeAnalysisRuleDirectories>;C:\Program Files (x86)\Microsoft Visual Studio 10.0\Team Tools\Static Analysis Tools\FxCop\\Rules</CodeAnalysisRuleDirectories>
-    <CodeAnalysisIgnoreBuiltInRules>true</CodeAnalysisIgnoreBuiltInRules>
-    <CodeAnalysisFailOnMissingRules>false</CodeAnalysisFailOnMissingRules>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release35|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
-    <Optimize>true</Optimize>
-    <Framework>$(TargetFrameworkVersion.Replace("v", "NET").Replace(".", ""))</Framework>
-    <OutputPath>bin\$(Configuration.Replace("35", ""))\$(Framework)\</OutputPath>
-    <DefineConstants>TRACE;$(Framework)</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <CodeAnalysisLogFile>$(OutputPath)\Spatial4n.Core.dll.CodeAnalysisLog.xml</CodeAnalysisLogFile>
-    <CodeAnalysisUseTypeNameInSuppression>true</CodeAnalysisUseTypeNameInSuppression>
-    <CodeAnalysisModuleSuppressionsFile>GlobalSuppressions.cs</CodeAnalysisModuleSuppressionsFile>
-    <ErrorReport>prompt</ErrorReport>
-    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-    <CodeAnalysisRuleSetDirectories>;C:\Program Files (x86)\Microsoft Visual Studio 10.0\Team Tools\Static Analysis Tools\\Rule Sets</CodeAnalysisRuleSetDirectories>
-    <CodeAnalysisIgnoreBuiltInRuleSets>false</CodeAnalysisIgnoreBuiltInRuleSets>
-    <CodeAnalysisRuleDirectories>;C:\Program Files (x86)\Microsoft Visual Studio 10.0\Team Tools\Static Analysis Tools\FxCop\\Rules</CodeAnalysisRuleDirectories>
-    <CodeAnalysisIgnoreBuiltInRules>true</CodeAnalysisIgnoreBuiltInRules>
-    <CodeAnalysisFailOnMissingRules>false</CodeAnalysisFailOnMissingRules>
-    <DocumentationFile>$(OutputPath)\Spatial4n.Core.XML</DocumentationFile>
-  </PropertyGroup>
-  <PropertyGroup>
-    <SignAssembly>true</SignAssembly>
   </PropertyGroup>
   <PropertyGroup>
     <AssemblyOriginatorKeyFile>..\Spatial4n.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
+  <PropertyGroup Condition=" $(DefineConstants.Contains('FEATURE_STRONG_NAME'))">
+    <SignAssembly>true</SignAssembly>
+  </PropertyGroup>
   <ItemGroup>
-    <Reference Include="System" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Xml.Linq" />
+    <!-- A reference to the entire .NET Framework is automatically included -->
+    <None Include="project.json" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\VersionInfo.cs">
-      <Link>Properties\VersionInfo.cs</Link>
+    <Compile Include="..\Spatial4n.Core\Context\SpatialContext.cs">
+      <Link>Context\SpatialContext.cs</Link>
+    </Compile>
+    <Compile Include="..\Spatial4n.Core\Context\SpatialContextFactory.cs">
+      <Link>Context\SpatialContextFactory.cs</Link>
+    </Compile>
+    <Compile Include="..\Spatial4n.Core\Distance\AbstractDistanceCalculator.cs">
+      <Link>Distance\AbstractDistanceCalculator.cs</Link>
+    </Compile>
+    <Compile Include="..\Spatial4n.Core\Distance\CartesianDistCalc.cs">
+      <Link>Distance\CartesianDistCalc.cs</Link>
+    </Compile>
+    <Compile Include="..\Spatial4n.Core\Distance\DistanceCalculator.cs">
+      <Link>Distance\DistanceCalculator.cs</Link>
+    </Compile>
+    <Compile Include="..\Spatial4n.Core\Distance\DistanceUtils.cs">
+      <Link>Distance\DistanceUtils.cs</Link>
+    </Compile>
+    <Compile Include="..\Spatial4n.Core\Distance\GeodesicSphereDistCalc.cs">
+      <Link>Distance\GeodesicSphereDistCalc.cs</Link>
+    </Compile>
+    <Compile Include="..\Spatial4n.Core\Exceptions\InvalidShapeException.cs">
+      <Link>Exceptions\InvalidShapeException.cs</Link>
+    </Compile>
+    <Compile Include="..\Spatial4n.Core\Exceptions\ParseException.cs">
+      <Link>Exceptions\ParseException.cs</Link>
+    </Compile>
+    <Compile Include="..\Spatial4n.Core\IO\BinaryCodec.cs">
+      <Link>IO\BinaryCodec.cs</Link>
+    </Compile>
+    <Compile Include="..\Spatial4n.Core\IO\LegacyShapeReadWriterFormat.cs">
+      <Link>IO\LegacyShapeReadWriterFormat.cs</Link>
+    </Compile>
+    <Compile Include="..\Spatial4n.Core\IO\ParseUtils.cs">
+      <Link>IO\ParseUtils.cs</Link>
+    </Compile>
+    <Compile Include="..\Spatial4n.Core\IO\WktShapeParser.cs">
+      <Link>IO\WktShapeParser.cs</Link>
+    </Compile>
+    <Compile Include="..\Spatial4n.Core\Shapes\Circle.cs">
+      <Link>Shapes\Circle.cs</Link>
+    </Compile>
+    <Compile Include="..\Spatial4n.Core\Shapes\Impl\BufferedLine.cs">
+      <Link>Shapes\Impl\BufferedLine.cs</Link>
+    </Compile>
+    <Compile Include="..\Spatial4n.Core\Shapes\Impl\BufferedLineString.cs">
+      <Link>Shapes\Impl\BufferedLineString.cs</Link>
+    </Compile>
+    <Compile Include="..\Spatial4n.Core\Shapes\Impl\CircleImpl.cs">
+      <Link>Shapes\Impl\CircleImpl.cs</Link>
+    </Compile>
+    <Compile Include="..\Spatial4n.Core\Shapes\Impl\GeoCircle.cs">
+      <Link>Shapes\Impl\GeoCircle.cs</Link>
+    </Compile>
+    <Compile Include="..\Spatial4n.Core\Shapes\Impl\InfBufLine.cs">
+      <Link>Shapes\Impl\InfBufLine.cs</Link>
+    </Compile>
+    <Compile Include="..\Spatial4n.Core\Shapes\Impl\PointImpl.cs">
+      <Link>Shapes\Impl\PointImpl.cs</Link>
+    </Compile>
+    <Compile Include="..\Spatial4n.Core\Shapes\Impl\Range.cs">
+      <Link>Shapes\Impl\Range.cs</Link>
+    </Compile>
+    <Compile Include="..\Spatial4n.Core\Shapes\Impl\RectangleImpl.cs">
+      <Link>Shapes\Impl\RectangleImpl.cs</Link>
+    </Compile>
+    <Compile Include="..\Spatial4n.Core\Shapes\Point.cs">
+      <Link>Shapes\Point.cs</Link>
+    </Compile>
+    <Compile Include="..\Spatial4n.Core\Shapes\Rectangle.cs">
+      <Link>Shapes\Rectangle.cs</Link>
+    </Compile>
+    <Compile Include="..\Spatial4n.Core\Shapes\Shape.cs">
+      <Link>Shapes\Shape.cs</Link>
+    </Compile>
+    <Compile Include="..\Spatial4n.Core\Shapes\ShapeCollection.cs">
+      <Link>Shapes\ShapeCollection.cs</Link>
+    </Compile>
+    <Compile Include="..\Spatial4n.Core\Shapes\SpatialRelation.cs">
+      <Link>Shapes\SpatialRelation.cs</Link>
+    </Compile>
+    <Compile Include="..\Spatial4n.Core\Util\GeohashUtils.cs">
+      <Link>Util\GeohashUtils.cs</Link>
     </Compile>
     <Compile Include="Context\SpatialContext.cs" />
     <Compile Include="Context\SpatialContextFactory.cs" />
@@ -103,6 +138,7 @@
     <Compile Include="Distance\GeodesicSphereDistCalc.cs" />
     <Compile Include="Exceptions\InvalidShapeException.cs" />
     <Compile Include="Exceptions\ParseException.cs" />
+    <Compile Include="Exceptions\RuntimeException.cs" />
     <Compile Include="IO\BinaryCodec.cs" />
     <Compile Include="IO\LegacyShapeReadWriterFormat.cs" />
     <Compile Include="IO\ParseUtils.cs" />
@@ -124,7 +160,8 @@
     <Compile Include="Shapes\SpatialRelation.cs" />
     <Compile Include="Util\GeohashUtils.cs" />
   </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <ItemGroup />
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

@@ -503,7 +503,7 @@ namespace Spatial4n.Core.IO
                 {
                     result = double.Parse(rawString.Substring(startOffset, offset - startOffset));
                 }
-                catch (Exception e)
+                catch (RuntimeException e)
                 {
                     throw new ParseException(e.ToString(), offset);
                 }
@@ -660,7 +660,7 @@ namespace Spatial4n.Core.IO
                 // NOTE: char.GetUnicodeCategory throws an exception when in the range 0x00d800 to 0x00dfff
                 if (c < 0x00d800 && c > 0x00dfff)
                 {
-                    UnicodeCategory category = char.GetUnicodeCategory(c);
+                    UnicodeCategory category = CharUnicodeInfo.GetUnicodeCategory(c);
 
                     return category == UnicodeCategory.CurrencySymbol ||
                         category == UnicodeCategory.ConnectorPunctuation ||
@@ -680,7 +680,7 @@ namespace Spatial4n.Core.IO
                     (c >= '\u000E' && c <= '\u001B') ||
                     (c >= '\u007F' && c <= '\u009F') ||
                     // NOTE: char.GetUnicodeCategory throws an exception when in the range 0x00d800 to 0x00dfff
-                    (c < 0x00d800 && c > 0x00dfff && char.GetUnicodeCategory(c) == UnicodeCategory.Format);
+                    (c < 0x00d800 && c > 0x00dfff && CharUnicodeInfo.GetUnicodeCategory(c) == UnicodeCategory.Format);
             }
 
             private static Regex identifierPart = new Regex(@"\p{Sc}|\p{Pc}|\p{Nl}|\p{Mc}", RegexOptions.Compiled);

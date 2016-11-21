@@ -15,10 +15,12 @@
  * limitations under the License.
  */
 
-using Spatial4n.Core.Context;
+#if FEATURE_NTS
 using Spatial4n.Core.Context.Nts;
-using Spatial4n.Core.Distance;
 using Spatial4n.Core.IO.Nts;
+#endif
+
+using Spatial4n.Core.Distance;
 using Spatial4n.Core.Shapes.Impl;
 using System.Collections.Generic;
 using Xunit;
@@ -72,6 +74,8 @@ namespace Spatial4n.Core.Context
             Assert.Equal(test, ctx.DistCalc);
         }
 
+#if FEATURE_NTS
+
         [Fact]
         public void TestNtsContextFactory()
         {
@@ -105,6 +109,7 @@ namespace Spatial4n.Core.Context
                 "autoIndex", "true");
             CustomAssert.EqualWithDelta(300, ctx.WorldBounds.MaxY, 0.0);
         }
+#endif
 
         [Fact]
         public void TestSystemPropertyLookup()
@@ -122,6 +127,7 @@ namespace Spatial4n.Core.Context
             }
         }
 
+#if FEATURE_NTS
         public class CustomWktShapeParser : NtsWktShapeParser
         {
             internal static bool once = false;//cheap way to test it was created
@@ -131,5 +137,6 @@ namespace Spatial4n.Core.Context
                 once = true;
             }
         }
+#endif
     }
 }

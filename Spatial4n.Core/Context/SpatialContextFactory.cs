@@ -104,7 +104,7 @@ namespace Spatial4n.Core.Context
         protected virtual void InitField(string name)
         {
             //  note: java.beans API is more verbose to use correctly (?) but would arguably be better
-            FieldInfo field = GetType().GetField(name, BindingFlags.GetField | BindingFlags.Public | BindingFlags.Instance | BindingFlags.NonPublic);
+            FieldInfo field = GetType().GetTypeInfo().GetField(name, BindingFlags.GetField | BindingFlags.Public | BindingFlags.Instance | BindingFlags.NonPublic);
             string str;
             if (args.TryGetValue(name, out str))
             {
@@ -115,7 +115,7 @@ namespace Spatial4n.Core.Context
                     {
                         o = bool.Parse(str);
                     }
-                    else if (field.FieldType.IsClass)
+                    else if (field.FieldType.GetTypeInfo().IsClass)
                     {
                         try
                         {
@@ -123,10 +123,10 @@ namespace Spatial4n.Core.Context
                         }
                         catch (TypeLoadException e)
                         {
-                            throw new ApplicationException(e.Message, e);
+                            throw new Exception(e.Message, e);
                         }
                     }
-                    else if (field.FieldType.IsEnum)
+                    else if (field.FieldType.GetTypeInfo().IsEnum)
                     {
                         o = Enum.Parse(field.FieldType, str, true);
                     }
@@ -142,7 +142,7 @@ namespace Spatial4n.Core.Context
                 }
                 catch (Exception e)
                 {
-                    throw new ApplicationException(
+                    throw new Exception(
                         "Invalid value '" + str + "' on field " + name + " of type " + field.FieldType, e);
                 }
             }
@@ -153,23 +153,23 @@ namespace Spatial4n.Core.Context
             string calcStr;
             if (!args.TryGetValue("distCalculator", out calcStr) || calcStr == null)
                 return;
-            if (calcStr.Equals("haversine", StringComparison.InvariantCultureIgnoreCase))
+            if (calcStr.Equals("haversine", StringComparison.OrdinalIgnoreCase))
             {
                 distCalc = new GeodesicSphereDistCalc.Haversine();
             }
-            else if (calcStr.Equals("lawOfCosines", StringComparison.InvariantCultureIgnoreCase))
+            else if (calcStr.Equals("lawOfCosines", StringComparison.OrdinalIgnoreCase))
             {
                 distCalc = new GeodesicSphereDistCalc.LawOfCosines();
             }
-            else if (calcStr.Equals("vincentySphere", StringComparison.InvariantCultureIgnoreCase))
+            else if (calcStr.Equals("vincentySphere", StringComparison.OrdinalIgnoreCase))
             {
                 distCalc = new GeodesicSphereDistCalc.Vincenty();
             }
-            else if (calcStr.Equals("cartesian", StringComparison.InvariantCultureIgnoreCase))
+            else if (calcStr.Equals("cartesian", StringComparison.OrdinalIgnoreCase))
             {
                 distCalc = new CartesianDistCalc();
             }
-            else if (calcStr.Equals("cartesian^2", StringComparison.InvariantCultureIgnoreCase))
+            else if (calcStr.Equals("cartesian^2", StringComparison.OrdinalIgnoreCase))
             {
                 distCalc = new CartesianDistCalc(true);
             }
@@ -213,7 +213,7 @@ namespace Spatial4n.Core.Context
             try
             {
                 //can't simply lookup constructor by arg type because might be subclass type
-                foreach (ConstructorInfo ctor in clazz.GetConstructors())
+                foreach (ConstructorInfo ctor in clazz.GetTypeInfo().GetConstructors())
                 {
                     Type[] parameterTypes = ctor.GetParameters().Select(x => x.ParameterType).ToArray();
                     if (parameterTypes.Length != ctorArgs.Length)
@@ -221,7 +221,7 @@ namespace Spatial4n.Core.Context
                     for (int i = 0; i < ctorArgs.Length; i++)
                     {
                         object ctorArg = ctorArgs[i];
-                        if (!parameterTypes[i].IsAssignableFrom(ctorArg.GetType()))
+                        if (!parameterTypes[i].GetTypeInfo().IsAssignableFrom(ctorArg.GetType()))
                             goto ctorLoop_continue;
                     }
                     return (T)ctor.Invoke(ctorArgs);
@@ -230,9 +230,9 @@ namespace Spatial4n.Core.Context
             }
             catch (Exception e)
             {
-                throw new ApplicationException(e.Message, e);
+                throw new Exception(e.Message, e);
             }
-            throw new ApplicationException(clazz + " needs a constructor that takes: "
+            throw new Exception(clazz + " needs a constructor that takes: "
                 + "[" + string.Join(",", ctorArgs.Select(x => x.GetType().ToString()).ToArray()) + "]");
         }
     }

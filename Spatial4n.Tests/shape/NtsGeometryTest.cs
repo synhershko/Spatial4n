@@ -1,4 +1,5 @@
-﻿/*
+﻿#if FEATURE_NTS
+/*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -153,8 +154,8 @@ namespace Spatial4n.Core.Shape
             Assert.True(POLY_SHAPE.BoundingBox.GetArea(ctx) > POLY_SHAPE.GetArea(ctx));
         }
 
-        [Fact]
-        [RepeatTest(100)]
+        //[Fact]
+        [RepeatFact(100)]
         public virtual void TestPointAndRectIntersect()
         {
             IRectangle r = RandomRectangle(5);
@@ -277,3 +278,5 @@ namespace Spatial4n.Core.Shape
         }
     }
 }
+
+#endif

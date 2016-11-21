@@ -15,8 +15,11 @@
  * limitations under the License.
  */
 
-using Spatial4n.Core.Context;
+#if FEATURE_NTS
 using Spatial4n.Core.Context.Nts;
+#endif
+
+using Spatial4n.Core.Context;
 using Spatial4n.Core.Exceptions;
 using Spatial4n.Core.Shapes;
 using Spatial4n.Core.Shapes.Impl;
@@ -36,7 +39,9 @@ namespace Spatial4n.Core.Shape
             {
                 IRectangle WB = new Rectangle(-2000, 2000, -300, 300, null);//whatever
                 yield return new object[] { new SpatialContextFactory() { geo = false, worldBounds = WB }.NewSpatialContext() };
+#if FEATURE_NTS
                 yield return new object[] { new NtsSpatialContextFactory() { geo = false, worldBounds = WB }.NewSpatialContext() };
+#endif
             }
         }
 

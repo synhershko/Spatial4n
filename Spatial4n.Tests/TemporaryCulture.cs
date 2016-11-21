@@ -28,11 +28,19 @@ namespace Spatial4n.Core
 
         public TemporaryCulture(CultureInfo cultureInfo)
         {
+#if NETCORE10
+            oldCurrentCulture = CultureInfo.CurrentCulture;
+            oldCurrentUiCulture = CultureInfo.CurrentUICulture;
+
+            CultureInfo.CurrentCulture = cultureInfo;
+            CultureInfo.CurrentUICulture = cultureInfo;
+#else
             oldCurrentCulture = Thread.CurrentThread.CurrentCulture;
             oldCurrentUiCulture = Thread.CurrentThread.CurrentUICulture;
 
             Thread.CurrentThread.CurrentCulture = cultureInfo;
             Thread.CurrentThread.CurrentUICulture = cultureInfo;
+#endif
         }
 
         public TemporaryCulture(string cultureName)
@@ -42,8 +50,13 @@ namespace Spatial4n.Core
 
         public void Dispose()
         {
+#if NETCORE10
+            CultureInfo.CurrentCulture = oldCurrentCulture;
+            CultureInfo.CurrentUICulture = oldCurrentUiCulture;
+#else
             Thread.CurrentThread.CurrentCulture = oldCurrentCulture;
             Thread.CurrentThread.CurrentUICulture = oldCurrentUiCulture;
+#endif
         }
     }
 }

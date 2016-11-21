@@ -23,21 +23,23 @@ using Xunit.Sdk;
 
 namespace Spatial4n.Core
 {
-	public class RepeatTestAttribute : FactAttribute
+	public class RepeatFactAttribute : FactAttribute
 	{
 		readonly int _count;
 
-		public RepeatTestAttribute(int count)
+		public RepeatFactAttribute(int count)
 		{
 			_count = count;
 		}
 
+#if !NETCORE10
 		protected override IEnumerable<ITestCommand> EnumerateTestCommands(
 			IMethodInfo method)
 		{
 			return base.EnumerateTestCommands(method)
 				.SelectMany(tc => Enumerable.Repeat(tc, _count));
 		}
+#endif
 	}
 
 	public class RepeatTheoryAttribute : TheoryAttribute
@@ -49,11 +51,14 @@ namespace Spatial4n.Core
 			_count = count;
 		}
 
-		protected override IEnumerable<ITestCommand> EnumerateTestCommands(
+#if !NETCORE10
+        // Spatial4n TODO: Work out how to make the test repeat in .NET Core
+        protected override IEnumerable<ITestCommand> EnumerateTestCommands(
 			IMethodInfo method)
 		{
 			return base.EnumerateTestCommands(method)
 				.SelectMany(tc => Enumerable.Repeat(tc, _count));
 		}
+#endif
 	}
 }

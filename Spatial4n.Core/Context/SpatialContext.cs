@@ -35,7 +35,7 @@ namespace Spatial4n.Core.Context
     /// <see cref="SpatialContextFactory.MakeSpatialContext(IDictionary{string, string})"/>
     /// to do this via configuration data.
     /// </para>
-    /// Thread-safe & immutable.
+    /// Thread-safe &amp; immutable.
     /// </summary>
     public class SpatialContext
     {
@@ -148,7 +148,7 @@ namespace Spatial4n.Core.Context
         }
 
         /// <summary>
-        /// The extent of x & y coordinates should fit within the return'ed rectangle.
+        /// The extent of x &amp; y coordinates should fit within the return'ed rectangle.
         /// Do *NOT* invoke <see cref="IRectangle.Reset(double, double, double, double)"/> on this return type.
         /// </summary>
         /// <returns></returns>
@@ -290,7 +290,7 @@ namespace Spatial4n.Core.Context
         }
 
         /// <summary>
-        /// Construct a circle. The units of "distance" should be the same as x & y.
+        /// Construct a circle. The units of "distance" should be the same as x &amp; y.
         /// </summary>
         /// <param name="x"></param>
         /// <param name="y"></param>
@@ -302,7 +302,7 @@ namespace Spatial4n.Core.Context
         }
 
         /// <summary>
-        /// Construct a circle. The units of "distance" should be the same as x & y.
+        /// Construct a circle. The units of "distance" should be the same as x &amp; y.
         /// </summary>
         /// <param name="point"></param>
         /// <param name="distance"></param>

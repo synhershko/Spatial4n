@@ -25,7 +25,7 @@ namespace Spatial4n.Core.Shapes.Impl
     /// <summary>
     /// A simple Rectangle implementation that also supports a longitudinal
     /// wrap-around. When minX > maxX, this will assume it is world coordinates that
-    /// cross the date line using degrees. Immutable & threadsafe.
+    /// cross the date line using degrees. Immutable &amp; threadsafe.
     /// </summary>
     public class Rectangle : IRectangle
     {

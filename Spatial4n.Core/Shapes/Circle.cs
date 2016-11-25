@@ -32,7 +32,7 @@ namespace Spatial4n.Core.Shapes
 
         /// <summary>
         /// The distance from the point's center to its edge, measured in the same
-        /// units as x & y (e.g. degrees if WGS84).
+        /// units as x &amp; y (e.g. degrees if WGS84).
         /// </summary>
         double Radius { get; }
     }

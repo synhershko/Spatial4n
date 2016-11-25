@@ -90,7 +90,7 @@ namespace Spatial4n.Core.Shapes
 
         /// <summary>
         /// If you were to call aShape.Relate(bShape) and aShape.Relate(cShape), you 
-        /// could call this to merge the intersect results as if bShape & cShape were 
+        /// could call this to merge the intersect results as if bShape &amp; cShape were 
         /// combined into <see cref="ShapeCollection"/>.
         /// </summary>
         public static SpatialRelation Combine(this SpatialRelation @this, SpatialRelation other)

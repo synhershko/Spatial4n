@@ -227,7 +227,7 @@ namespace Spatial4n.Core.Util
         }
 
         /// <summary>
-        /// Return the shortest geohash length that will have a width & height >= specified arguments.
+        /// Return the shortest geohash length that will have a width &amp; height >= specified arguments.
         /// </summary>
         public static int LookupHashLenForWidthHeight(double lonErr, double latErr)
         {

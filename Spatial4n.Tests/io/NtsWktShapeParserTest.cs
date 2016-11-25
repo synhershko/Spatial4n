@@ -36,7 +36,7 @@ namespace Spatial4n.Core.IO
     {
         //By extending WktShapeParserTest we inherit its test too
 
-        internal readonly NtsSpatialContext ctx;//note: masks superclass
+        new internal readonly NtsSpatialContext ctx;//note: masks superclass
 
         public NtsWktShapeParserTest()
                   : base(NtsSpatialContext.GEO)
@@ -161,7 +161,9 @@ namespace Spatial4n.Core.IO
                 ctx.ReadShapeFromWkt("POLYGON((0 0, 10 0, 10 20))");//doesn't connect around
                 Assert.True(false);
             }
+#pragma warning disable 168
             catch (ParseException e)
+#pragma warning restore 168
             {
                 //expected
             }
@@ -171,7 +173,9 @@ namespace Spatial4n.Core.IO
                 ctx.ReadShapeFromWkt("POLYGON((0 0, 10 0, 10 20, 5 -5, 0 20, 0 0))");//Topology self-intersect
                 Assert.True(false);
             }
+#pragma warning disable 168
             catch (ParseException e)
+#pragma warning restore 168
             {
                 //expected
             }

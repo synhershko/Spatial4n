@@ -100,7 +100,7 @@ namespace Spatial4n.Core.Shapes
         /// same contract for <see cref="object.Equals(object)"/> and <see cref="object.GetHashCode()"/>
         /// amongst the same sub-interface type.  This means, for example, that multiple
         /// Point implementations of different classes are equal if they share the same x
-        /// & y.
+        /// &amp; y.
         /// </summary>
         bool Equals(object other);
     }

@@ -24,7 +24,7 @@ using System.Globalization;
 namespace Spatial4n.Core.IO
 {
     /// <summary>
-    /// Reads & writes a shape from a given string in the old format.
+    /// Reads &amp; writes a shape from a given string in the old format.
     /// <list type="bullet">
     ///     <item>
     ///     Point: X Y<para/>

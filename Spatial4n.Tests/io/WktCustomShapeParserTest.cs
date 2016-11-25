@@ -89,8 +89,10 @@ namespace Spatial4n.Core.IO
             {
                 //First few lines compile, despite newState() being protected. Just proving extensibility.
                 WktShapeParser other = null;
+#pragma warning disable 162
                 if (false)
                     other.NewState(wkt);
+#pragma warning restore 162
 
                 return new State(this, wkt);
             }

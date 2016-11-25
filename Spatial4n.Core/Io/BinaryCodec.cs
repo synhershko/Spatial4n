@@ -27,7 +27,7 @@ namespace Spatial4n.Core.IO
     /// <summary>
     /// A binary shape format. It is <c>not</c> designed to be a published standard, unlike Well Known
     /// Binary (WKB). The initial release is simple but it could get more optimized to use fewer bytes or
-    /// to write & read pre-computed index structures.
+    /// to write &amp; read pre-computed index structures.
     /// <para>
     /// Immutable and thread-safe.
     /// </para>

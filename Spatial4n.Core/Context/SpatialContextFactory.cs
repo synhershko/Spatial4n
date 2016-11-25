@@ -187,7 +187,9 @@ namespace Spatial4n.Core.Context
 
             //kinda ugly we do this just to read a rectangle.  TODO refactor
             var ctx = NewSpatialContext();
+#pragma warning disable 612, 618
             worldBounds = (IRectangle)ctx.ReadShape(worldBoundsStr);//TODO use readShapeFromWkt
+#pragma warning restore 612, 618
         }
 
         /// <summary>

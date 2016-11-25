@@ -31,7 +31,7 @@ namespace Spatial4n.Core.Shapes
     /// retained if an application requires it, although logically it's treated as an
     /// unordered Set, mostly.
     /// <para>
-    /// Ideally, <see cref="ShapeCollection{S}.Relate(Shapes.IShape)"/> should return the same result no matter what
+    /// Ideally, <see cref="Relate(Shapes.IShape)"/> should return the same result no matter what
     /// the shape order is, although the default implementation can be order
     /// dependent when the shapes overlap; see <see cref="RelateContainsShortCircuits()"/>.
     /// To improve performance slightly, the caller could order the shapes by
@@ -46,7 +46,6 @@ namespace Spatial4n.Core.Shapes
     /// bbox'es, for example.
     /// </para>
     /// </summary>
-    /// <typeparam name="Shape"></typeparam>
     public class ShapeCollection : ICollection<IShape>, IShape
     {
         protected readonly IList<IShape> m_shapes;

@@ -69,7 +69,9 @@ namespace Spatial4n.Core.Shape
                 {
                     clazz.GetTypeInfo().GetMethod("Equals");
                 }
+#pragma warning disable 168
                 catch (Exception e)
+#pragma warning restore 168
                 {
                     Assert.True(false, "Shape needs to define 'equals' : " + clazz.Name);
                 }
@@ -77,7 +79,9 @@ namespace Spatial4n.Core.Shape
                 {
                     clazz.GetTypeInfo().GetMethod("GetHashCode");
                 }
+#pragma warning disable 168
                 catch (Exception e)
+#pragma warning restore 168
                 {
                     Assert.True(false, "Shape needs to define 'hashCode' : " + clazz.Name);
                 }
@@ -226,7 +230,9 @@ namespace Spatial4n.Core.Shape
                     if (aBBox.Height == 0 && bBBox.Height == 0
                         && (aBBox.MaxY == 90 && bBBox.MaxY == 90
                       || aBBox.MinY == -90 && bBBox.MinY == -90))
+#pragma warning disable 642
                         ;//== a point at the pole
+#pragma warning restore 642
                     else
                         Assert.Equal(/*msg,*/ aBBox, bBBox);
                 }

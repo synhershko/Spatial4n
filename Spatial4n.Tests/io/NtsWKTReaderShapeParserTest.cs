@@ -26,6 +26,7 @@ using Xunit;
 
 namespace Spatial4n.Core.IO
 {
+#pragma warning disable 612, 618
     public class NtsWKTReaderShapeParserTest
     {
         internal readonly SpatialContext ctx;
@@ -41,6 +42,7 @@ namespace Spatial4n.Core.IO
         [Fact]
         public virtual void WktGeoPt()
         {
+
             IShape s = ctx.ReadShape("Point(-160 30)");
             Assert.Equal(ctx.MakePoint(-160, 30), s);
         }
@@ -75,7 +77,9 @@ namespace Spatial4n.Core.IO
                 ctx.ReadShape("POLYGON((0 0, 10 0, 10 20))");//doesn't connect around
                 Assert.True(false);
             }
+#pragma warning disable 168
             catch (InvalidShapeException e)
+#pragma warning restore 168
             {
                 //expected
             }
@@ -85,12 +89,15 @@ namespace Spatial4n.Core.IO
                 ctx.ReadShape("POLYGON((0 0, 10 0, 10 20, 5 -5, 0 20, 0 0))");//Topology self-intersect
                 Assert.True(false);
             }
+#pragma warning disable 168
             catch (InvalidShapeException e)
+#pragma warning restore 168
             {
                 //expected
             }
         }
     }
+#pragma warning restore 612, 618
 }
 
 #endif

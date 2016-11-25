@@ -35,14 +35,18 @@ namespace Spatial4n.Core.Distance
         //pre-compute some angles that are commonly used
         [Obsolete]
         public static readonly double DEG_45_AS_RADS = Math.PI / 4;
+#pragma warning disable 612, 618
         [Obsolete]
         public static readonly double SIN_45_AS_RADS = Math.Sin(DEG_45_AS_RADS);
+#pragma warning restore 612, 618
 
         public static readonly double DEG_90_AS_RADS = Math.PI / 2;
         public static readonly double DEG_180_AS_RADS = Math.PI;
 
+#pragma warning disable 612, 618
         [Obsolete]
         public static readonly double DEG_225_AS_RADS = 5 * DEG_45_AS_RADS;
+#pragma warning restore 612, 618
         [Obsolete]
         public static readonly double DEG_270_AS_RADS = 3 * DEG_90_AS_RADS;
 
@@ -166,17 +170,6 @@ namespace Spatial4n.Core.Distance
             }
             return result;
         }
-        /**
-		 * 
-		 *
-		 *
-		 * @param startLat 
-		 * @param startLon 
-		 * @param distanceRAD 
-		 * @param bearingRAD 
-		 * @param result 
-		 * @return 
-		 */
 
         /// <summary>
         /// Given a start point (startLat, startLon) and a bearing on a sphere of radius <i>sphereRadius</i>, return the destination point.
@@ -356,11 +349,6 @@ namespace Spatial4n.Core.Distance
         /// The delta longitude of a point-distance. In other words, half the width of
         /// the bounding box of a circle.
         /// </summary>
-        /// <param name="lat"></param>
-        /// <param name="lon"></param>
-        /// <param name="distance"></param>
-        /// <param name="radius"></param>
-        /// <returns></returns>
         public static double CalcBoxByDistFromPt_deltaLonDEG(double lat, double lon, double distDEG)
         {
             //http://gis.stackexchange.com/questions/19221/find-tangent-point-on-circle-furthest-east-or-west
@@ -382,10 +370,6 @@ namespace Spatial4n.Core.Distance
         /// <c>from.Y</c> but, perhaps surprisingly, on a sphere it is going
         /// to be slightly different.
         /// </summary>
-        /// <param name="lat"></param>
-        /// <param name="lon"></param>
-        /// <param name="distance"></param>
-        /// <returns></returns>
         public static double CalcBoxByDistFromPt_latHorizAxisDEG(double lat, double lon, double distDEG)
         {
             //http://gis.stackexchange.com/questions/19221/find-tangent-point-on-circle-furthest-east-or-west
@@ -409,19 +393,7 @@ namespace Spatial4n.Core.Distance
                 return -90;
             return lat;
         }
-        /**
-       * 
-       *  {@code dist}.
-       * <p/>
-       * 
-       * <p/>
-       * 
-       *
-       * @param lat  latitude in degrees
-       * @param dist distance in degrees
-       * @return longitudinal degrees (x delta) at input latitude that is >= dist
-       *         distance. Will be >= dist and <= 90.
-       */
+
         /// <summary>
         /// Calculates the degrees longitude distance at latitude <paramref name="lat"/> to cover
         /// a distance <paramref name="dist"/>.
@@ -576,9 +548,6 @@ namespace Spatial4n.Core.Distance
         /// Converts a distance in the units of the radius to degrees (360 degrees are
         /// in a circle). A spherical earth model is assumed.
         /// </summary>
-        /// <param name="dist"></param>
-        /// <param name="radius"></param>
-        /// <returns></returns>
         public static double Dist2Degrees(double dist, double radius)
         {
             return ToDegrees(Dist2Radians(dist, radius));
@@ -616,8 +585,6 @@ namespace Spatial4n.Core.Distance
         /// Same as Java's <c>Math.toRadians(double)</c> but 3x faster (multiply vs. divide).
         /// See CompareRadiansSnippet.java in tests.
         /// </summary>
-        /// <param name="degrees"></param>
-        /// <returns></returns>
         public static double ToRadians(double degrees)
         {
             return degrees * DEGREES_TO_RADIANS;
@@ -627,8 +594,6 @@ namespace Spatial4n.Core.Distance
         /// Same as Java's <c>Math.toDegrees(double)</c> but 3x faster (multiply vs. divide).
         /// See CompareRadiansSnippet.java in tests.
         /// </summary>
-        /// <param name="radians"></param>
-        /// <returns></returns>
         public static double ToDegrees(double radians)
         {
             return radians * RADIANS_TO_DEGREES;

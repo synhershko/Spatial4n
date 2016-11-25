@@ -33,15 +33,15 @@ namespace Spatial4n.Core.Shapes.Impl
         private readonly IPoint pA, pB;
         private readonly double buf;
         private readonly IRectangle bbox;
-        /// <summary>the primary line; passes through pA & pB</summary>
+        /// <summary>the primary line; passes through pA &amp; pB</summary>
         private readonly InfBufLine linePrimary;
-        /// <summary>perpendicular to the primary line, centered between pA & pB</summary>
+        /// <summary>perpendicular to the primary line, centered between pA &amp; pB</summary>
         private readonly InfBufLine linePerp;
 
         /// <summary>
         /// Creates a buffered line from pA to pB. The buffer extends on both sides of
         /// the line, making the width 2x the buffer. The buffer extends out from
-        /// pA & pB, making the line in effect 2x the buffer longer than pA to pB.
+        /// pA &amp; pB, making the line in effect 2x the buffer longer than pA to pB.
         /// </summary>
         /// <param name="pA">start point</param>
         /// <param name="pB">end point</param>
@@ -51,10 +51,8 @@ namespace Spatial4n.Core.Shapes.Impl
         {
             Debug.Assert(buf >= 0);//TODO support buf=0 via another class ?
 
-            /**
-             * If true, buf should bump-out from the pA & pB, in effect
-             *                  extending the line a little.
-             */
+            // If true, buf should bump-out from the pA & pB, in effect
+            // extending the line a little.
             bool bufExtend = true;//TODO support false and make this a
                                   // parameter
 

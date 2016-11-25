@@ -36,6 +36,7 @@
     <WarningLevel>4</WarningLevel>
     <SignAssembly>false</SignAssembly>
     <DocumentationFile>bin\Release\netstandard1.5\Spatial4n.Core.NTS.xml</DocumentationFile>
+    <NoWarn>1591</NoWarn>
   </PropertyGroup>
   <PropertyGroup>
     <AssemblyOriginatorKeyFile>..\Spatial4n.snk</AssemblyOriginatorKeyFile>
@@ -64,6 +65,7 @@
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
     <SignAssembly>true</SignAssembly>
     <DocumentationFile>bin\Release_Strong_Name\netstandard1.5\Spatial4n.Core.NTS.xml</DocumentationFile>
+    <NoWarn>1591</NoWarn>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="GeoAPI, Version=1.7.4.0, Culture=neutral, PublicKeyToken=a1a0da7def465678, processorArchitecture=MSIL">

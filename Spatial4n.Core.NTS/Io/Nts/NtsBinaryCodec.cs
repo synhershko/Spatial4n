@@ -168,7 +168,9 @@ namespace Spatial4n.Core.IO.Nts
         public IShape ReadNtsGeom(BinaryReader dataInput)
         {
             NtsSpatialContext ctx = (NtsSpatialContext)base.ctx;
+#pragma warning disable 612, 618
             WKBReader reader = new WKBReader(ctx.GeometryFactory);
+#pragma warning restore 612, 618
             try
             {
                 Stream inStream = new InputStreamAnonymousHelper(dataInput);

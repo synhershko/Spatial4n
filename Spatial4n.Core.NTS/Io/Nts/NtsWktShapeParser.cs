@@ -98,7 +98,7 @@ namespace Spatial4n.Core.IO.Nts
 
         /// <summary>
         /// Bypasses <see cref="NtsSpatialContext.MakeLineString(IList{Shapes.IPoint})"/> so that we can more
-        /// efficiently get the <see cref="LineString"/> without creating a <see cref="IList{Shapes.IPoint}"/>.
+        /// efficiently get the <see cref="LineString"/> without creating a <see cref="List{T}">List{Shapes.IPoint}</see>.
         /// </summary>
         protected override IShape ParseLineStringShape(WktShapeParser.State state)
         {

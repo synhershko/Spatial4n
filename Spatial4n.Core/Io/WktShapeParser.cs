@@ -220,8 +220,8 @@ namespace Spatial4n.Core.IO
         }
 
         /// <summary>
-        /// Called to normalize a value that isn't X or Y. X & Y or normalized via
-        /// <see cref="SpatialContext.NormX(double)"/> & <see cref="SpatialContext.NormY(double)"/>.
+        /// Called to normalize a value that isn't X or Y. X &amp; Y or normalized via
+        /// <see cref="SpatialContext.NormX(double)"/> &amp; <see cref="SpatialContext.NormY(double)"/>.
         /// </summary>
         protected virtual double NormDist(double v)
         {//TODO should this be added to ctx?
@@ -275,7 +275,7 @@ namespace Spatial4n.Core.IO
         /// Parses an ENVELOPE (aka Rectangle) shape from the raw string. The values are normalized.
         /// <para>
         /// Source: OGC "Catalogue Services Specification", the "CQL" (Common Query Language) sub-spec.
-        /// <c>Note the inconsistent order of the min & max values between x & y!</c>
+        /// <c>Note the inconsistent order of the min &amp; max values between x &amp; y!</c>
         /// <code>
         ///   '(' x1 ',' x2 ',' y2 ',' y1 ')'
         /// </code>

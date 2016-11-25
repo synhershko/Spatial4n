@@ -194,7 +194,7 @@ namespace Spatial4n.Core.Shape
                                     });
         }
 
-        public static void CheckShapesImplementEquals(Type[] classes)
+        new public static void CheckShapesImplementEquals(Type[] classes)
         {
             foreach (var clazz in classes)
             {

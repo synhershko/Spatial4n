@@ -171,7 +171,9 @@ namespace Spatial4n.Core.Distance
         [Fact]
         public virtual void TestDistCalcPointOnBearing_Cartesian()
         {
+#pragma warning disable 612, 618
             ctx = new SpatialContext(false);
+#pragma warning restore 612, 618
             EPS = 10e-6; //tighter epsilon (aka delta)
             for (int i = 0; i < 1000; i++)
             {

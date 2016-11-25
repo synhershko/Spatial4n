@@ -123,7 +123,9 @@ namespace Spatial4n.Core.Context
             protected internal override SpatialContext NewSpatialContext()
             {
                 geo = false;
+#pragma warning disable 612, 618
                 return new SpatialContext(false);
+#pragma warning restore 612, 618
             }
         }
 

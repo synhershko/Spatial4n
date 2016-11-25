@@ -18,14 +18,14 @@
 namespace Spatial4n.Core.Shapes
 {
     /// <summary>
-    /// A Point with X & Y coordinates.
+    /// A Point with X &amp; Y coordinates.
     /// </summary>
     public interface IPoint : IShape
     {
         /// <summary>
         /// Expert: Resets the state of this point given the arguments. This is a performance
         /// feature to avoid excessive <see cref="IShape"/> object allocation as well as some
-        /// argument normalization & error checking. Mutable shapes is error-prone so use with
+        /// argument normalization &amp; error checking. Mutable shapes is error-prone so use with
         /// care.
         /// </summary>
         void Reset(double x, double y);

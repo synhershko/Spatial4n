@@ -50,7 +50,9 @@ namespace Spatial4n.Core.IO
                 ctx.ReadShapeFromWkt(wkt);
                 Assert.True(false, "ParseException expected");
             }
+#pragma warning disable 168
             catch (ParseException e)
+#pragma warning restore 168
             {//expected
             }
         }

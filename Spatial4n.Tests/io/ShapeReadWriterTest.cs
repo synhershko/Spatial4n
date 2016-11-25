@@ -28,6 +28,7 @@ using Xunit.Extensions;
 
 namespace Spatial4n.Core.IO
 {
+#pragma warning disable 612, 618
     public class ShapeReadWriterTest
 	{
 		public static IEnumerable<object[]> Contexts
@@ -98,4 +99,5 @@ namespace Spatial4n.Core.IO
 		//  Looking for more tests?  Shapes are tested in TestShapes2D.
 
 	}
+#pragma warning restore 612, 618
 }

@@ -95,7 +95,9 @@ namespace Spatial4n.Core.Context.Nts
             return m_geometryFactory.PrecisionModel.MakePrecise(y);
         }
 
+#pragma warning disable 672
         public override string ToString(IShape shape)
+#pragma warning restore 672
         {
             //Note: this logic is from the defunct NtsShapeReadWriter
             if (shape is NtsGeometry)
@@ -104,7 +106,9 @@ namespace Spatial4n.Core.Context.Nts
                 return ntsGeom.Geometry.AsText();
             }
             //Note: doesn't handle ShapeCollection or BufferedLineString
+#pragma warning disable 612, 618
             return base.ToString(shape);
+#pragma warning restore 612, 618
         }
 
         /// <summary>

@@ -144,7 +144,7 @@ namespace Spatial4n.Core.IO
 
         /// <summary>
 		/// Extract (by calling <see cref="ParsePoint(string[], string, int)"/> and validate the latitude and longitude contained
-		/// in the string by making sure the latitude is between 90 & -90 and longitude is between -180 and 180.<p/>
+		/// in the string by making sure the latitude is between 90 &amp; -90 and longitude is between -180 and 180.<p/>
 		/// The latitude is assumed to be the first part of the string and the longitude the second part.
 		/// </summary>
 		/// <param name="latLonStr">The string to parse.  Latitude is the first value, longitude is the second.</param>

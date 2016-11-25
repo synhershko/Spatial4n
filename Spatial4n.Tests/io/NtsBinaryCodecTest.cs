@@ -18,39 +18,44 @@
 #if FEATURE_NTS
 
 using GeoAPI.Geometries;
+using NetTopologySuite.Geometries;
 using NetTopologySuite.Utilities;
+using Spatial4n.Core.Context;
 using Spatial4n.Core.Context.Nts;
 using Spatial4n.Core.Shapes;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using Xunit;
 
 namespace Spatial4n.Core.IO
 {
     public class NtsBinaryCodecTest : BinaryCodecTest
     {
+        private static readonly Random rand = new Random();
 
-        // TODO: Wtf is this?
-        //      @ParametersFactory
-        //public static Iterable<Object[]> parameters()
-        //      {
-        //          //try floats
-        //          NtsSpatialContextFactory factory = new NtsSpatialContextFactory();
-        //          factory.precisionModel = new PrecisionModel(PrecisionModel.FLOATING_SINGLE);
+        public static IEnumerable<object[]> Contexts
+        {
+            get
+            {
+                //try floats
+                NtsSpatialContextFactory factory = new NtsSpatialContextFactory();
+                factory.precisionModel = new PrecisionModel(PrecisionModels.FloatingSingle);
 
-        //          return Arrays.asList($$(
-        //              $(NtsSpatialContext.GEO),//doubles
-        //      $(factory.newSpatialContext())//floats
-        //          ));
-        //      }
+                yield return new object[] { NtsSpatialContext.GEO /*doubles*/ };
+                yield return new object[] { factory.NewSpatialContext() /*floats*/ };
+            }
+        }
 
         public NtsBinaryCodecTest()
-            : base(NtsSpatialContext.GEO)
+            : base(SelectRandomContext())
+        { }
+
+        private static SpatialContext SelectRandomContext()
         {
+            return (SpatialContext)Contexts.ElementAt(rand.Next(0, Contexts.Count()))[0];
         }
 
-        public NtsBinaryCodecTest(NtsSpatialContext ctx)
-            : base(ctx)
-        {
-        }
 
         [Fact]
         public virtual void TestPoly()

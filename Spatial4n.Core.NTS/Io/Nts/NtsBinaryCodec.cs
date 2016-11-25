@@ -96,7 +96,7 @@ namespace Spatial4n.Core.IO.Nts
 
             public override int Read(byte[] buffer, int offset, int count)
             {
-                return Read(buffer, offset, count);
+                return dataInput.Read(buffer, offset, count);
             }
 
             public override bool CanRead

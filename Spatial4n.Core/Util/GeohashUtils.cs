@@ -92,6 +92,7 @@ namespace Spatial4n.Core.Util
         /// </summary>
         /// <param name="latitude">Latitude to encode</param>
         /// <param name="longitude">Longitude to encode</param>
+        /// <param name="precision"></param>
         /// <returns>Geohash encoding of the longitude and latitude</returns>
         public static string EncodeLatLon(double latitude, double longitude, int precision)
         {

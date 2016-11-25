@@ -28,6 +28,7 @@
     <file src="..\Spatial4n.Core.NTS\bin\Release_Strong_Name\netstandard1.5\Spatial4n.Core.NTS.pdb" target="lib\netstandard1.5\Spatial4n.Core.NTS.pdb" />
     <file src="..\Spatial4n.Core.NTS\bin\Release_Strong_Name\netstandard1.5\Spatial4n.Core.NTS.xml" target="lib\netstandard1.5\Spatial4n.Core.NTS.xml" />
 
-    <file src="..\Spatial4n.Core.NTS\**\*.cs" target="" />
+    <!-- Source files for NuGet symbols package -->
+    <file src="..\Spatial4n.Core.NTS\**\*.cs" target="src" />
   </files>
 </package>

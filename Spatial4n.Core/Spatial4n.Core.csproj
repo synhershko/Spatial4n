@@ -25,6 +25,7 @@
     <DefineConstants>TRACE;DEBUG</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <SignAssembly>false</SignAssembly>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -33,102 +34,42 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <SignAssembly>false</SignAssembly>
+    <DocumentationFile>$(OutputPath)\$(TargetFramework)\$(AssemblyName).xml</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup>
     <AssemblyOriginatorKeyFile>..\Spatial4n.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
-  <PropertyGroup Condition=" $(DefineConstants.Contains('FEATURE_STRONG_NAME'))">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug_Strong_Name|AnyCPU'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\Debug_Strong_Name\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;FEATURE_STRONG_NAME</DefineConstants>
+    <NoStdLib>true</NoStdLib>
+    <DebugType>full</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
     <SignAssembly>true</SignAssembly>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release_Strong_Name|AnyCPU'">
+    <OutputPath>bin\Release_Strong_Name\</OutputPath>
+    <DefineConstants>TRACE;FEATURE_STRONG_NAME</DefineConstants>
+    <Optimize>true</Optimize>
+    <NoStdLib>true</NoStdLib>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <SignAssembly>true</SignAssembly>
+    <DocumentationFile>$(OutputPath)\$(TargetFramework)\$(AssemblyName).xml</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
     <!-- A reference to the entire .NET Framework is automatically included -->
     <None Include="project.json" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\Spatial4n.Core\Context\SpatialContext.cs">
-      <Link>Context\SpatialContext.cs</Link>
-    </Compile>
-    <Compile Include="..\Spatial4n.Core\Context\SpatialContextFactory.cs">
-      <Link>Context\SpatialContextFactory.cs</Link>
-    </Compile>
-    <Compile Include="..\Spatial4n.Core\Distance\AbstractDistanceCalculator.cs">
-      <Link>Distance\AbstractDistanceCalculator.cs</Link>
-    </Compile>
-    <Compile Include="..\Spatial4n.Core\Distance\CartesianDistCalc.cs">
-      <Link>Distance\CartesianDistCalc.cs</Link>
-    </Compile>
-    <Compile Include="..\Spatial4n.Core\Distance\DistanceCalculator.cs">
-      <Link>Distance\DistanceCalculator.cs</Link>
-    </Compile>
-    <Compile Include="..\Spatial4n.Core\Distance\DistanceUtils.cs">
-      <Link>Distance\DistanceUtils.cs</Link>
-    </Compile>
-    <Compile Include="..\Spatial4n.Core\Distance\GeodesicSphereDistCalc.cs">
-      <Link>Distance\GeodesicSphereDistCalc.cs</Link>
-    </Compile>
-    <Compile Include="..\Spatial4n.Core\Exceptions\InvalidShapeException.cs">
-      <Link>Exceptions\InvalidShapeException.cs</Link>
-    </Compile>
-    <Compile Include="..\Spatial4n.Core\Exceptions\ParseException.cs">
-      <Link>Exceptions\ParseException.cs</Link>
-    </Compile>
-    <Compile Include="..\Spatial4n.Core\IO\BinaryCodec.cs">
-      <Link>IO\BinaryCodec.cs</Link>
-    </Compile>
-    <Compile Include="..\Spatial4n.Core\IO\LegacyShapeReadWriterFormat.cs">
-      <Link>IO\LegacyShapeReadWriterFormat.cs</Link>
-    </Compile>
-    <Compile Include="..\Spatial4n.Core\IO\ParseUtils.cs">
-      <Link>IO\ParseUtils.cs</Link>
-    </Compile>
-    <Compile Include="..\Spatial4n.Core\IO\WktShapeParser.cs">
-      <Link>IO\WktShapeParser.cs</Link>
-    </Compile>
-    <Compile Include="..\Spatial4n.Core\Shapes\Circle.cs">
-      <Link>Shapes\Circle.cs</Link>
-    </Compile>
-    <Compile Include="..\Spatial4n.Core\Shapes\Impl\BufferedLine.cs">
-      <Link>Shapes\Impl\BufferedLine.cs</Link>
-    </Compile>
-    <Compile Include="..\Spatial4n.Core\Shapes\Impl\BufferedLineString.cs">
-      <Link>Shapes\Impl\BufferedLineString.cs</Link>
-    </Compile>
-    <Compile Include="..\Spatial4n.Core\Shapes\Impl\CircleImpl.cs">
-      <Link>Shapes\Impl\CircleImpl.cs</Link>
-    </Compile>
-    <Compile Include="..\Spatial4n.Core\Shapes\Impl\GeoCircle.cs">
-      <Link>Shapes\Impl\GeoCircle.cs</Link>
-    </Compile>
-    <Compile Include="..\Spatial4n.Core\Shapes\Impl\InfBufLine.cs">
-      <Link>Shapes\Impl\InfBufLine.cs</Link>
-    </Compile>
-    <Compile Include="..\Spatial4n.Core\Shapes\Impl\PointImpl.cs">
-      <Link>Shapes\Impl\PointImpl.cs</Link>
-    </Compile>
-    <Compile Include="..\Spatial4n.Core\Shapes\Impl\Range.cs">
-      <Link>Shapes\Impl\Range.cs</Link>
-    </Compile>
-    <Compile Include="..\Spatial4n.Core\Shapes\Impl\RectangleImpl.cs">
-      <Link>Shapes\Impl\RectangleImpl.cs</Link>
-    </Compile>
-    <Compile Include="..\Spatial4n.Core\Shapes\Point.cs">
-      <Link>Shapes\Point.cs</Link>
-    </Compile>
-    <Compile Include="..\Spatial4n.Core\Shapes\Rectangle.cs">
-      <Link>Shapes\Rectangle.cs</Link>
-    </Compile>
-    <Compile Include="..\Spatial4n.Core\Shapes\Shape.cs">
-      <Link>Shapes\Shape.cs</Link>
-    </Compile>
-    <Compile Include="..\Spatial4n.Core\Shapes\ShapeCollection.cs">
-      <Link>Shapes\ShapeCollection.cs</Link>
-    </Compile>
-    <Compile Include="..\Spatial4n.Core\Shapes\SpatialRelation.cs">
-      <Link>Shapes\SpatialRelation.cs</Link>
-    </Compile>
-    <Compile Include="..\Spatial4n.Core\Util\GeohashUtils.cs">
-      <Link>Util\GeohashUtils.cs</Link>
-    </Compile>
     <Compile Include="Context\SpatialContext.cs" />
     <Compile Include="Context\SpatialContextFactory.cs" />
     <Compile Include="Distance\AbstractDistanceCalculator.cs" />

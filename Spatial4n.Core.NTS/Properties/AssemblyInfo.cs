@@ -1,20 +1,27 @@
-﻿using System.Resources;
+﻿using System;
 using System.Reflection;
-using System.Runtime.CompilerServices;
+using System.Resources;
 using System.Runtime.InteropServices;
 
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("Spatial4n.Core.NTS")]
-[assembly: AssemblyDescription("A Geospatial Library for .NET - port of Spatial4j. This assembly contains the Spatial4n extensions for NetTopologySuite.")]
+[assembly: AssemblyDescription("A Geospatial Library for .NET - port of Spatial4j. Spatial4n extensions for NetTopologySuite.")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("Spatial4n.Core.NTS")]
-[assembly: AssemblyCopyright("(c) spatial4j and Itamar Syn-Hershko")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 [assembly: NeutralResourcesLanguage("en")]
+[assembly: CLSCompliant(true)]
+
+// Setting ComVisible to false makes the types in this assembly not visible 
+// to COM components.  If you need to access a type in this assembly from 
+// COM, set the ComVisible attribute to true on that type.
+[assembly: ComVisible(false)]
+
+// The following GUID is for the ID of the typelib if this project is exposed to COM
+[assembly: Guid("efd57d2c-a197-4030-87ed-781ed35e4dc4")]
 
 // Version information for an assembly consists of the following four values:
 //

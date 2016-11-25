@@ -38,7 +38,7 @@
     <DefineConstants>TRACE;NET40;FEATURE_STRONG_NAME;FEATURE_NTS</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <DocumentationFile>$(OutputPath)\Spatial4n.Core.NTS.xml</DocumentationFile>
+    <DocumentationFile>bin\Release\NET40\Spatial4n.Core.NTS.xml</DocumentationFile>
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug35|AnyCPU' ">
@@ -78,7 +78,7 @@
     <CodeAnalysisIgnoreBuiltInRuleSets>true</CodeAnalysisIgnoreBuiltInRuleSets>
     <CodeAnalysisRuleDirectories>;C:\Program Files (x86)\Microsoft Visual Studio 10.0\Team Tools\Static Analysis Tools\FxCop\\Rules</CodeAnalysisRuleDirectories>
     <CodeAnalysisIgnoreBuiltInRules>true</CodeAnalysisIgnoreBuiltInRules>
-    <DocumentationFile>$(OutputPath)\Spatial4n.Core.NTS.xml</DocumentationFile>
+    <DocumentationFile>bin\Release\NET35\Spatial4n.Core.NTS.xml</DocumentationFile>
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup>
@@ -136,6 +136,9 @@
     <Compile Include="..\Spatial4n.Core.NTS\IO\Nts\NtsWktShapeParser.cs">
       <Link>IO\Nts\NtsWktShapeParser.cs</Link>
     </Compile>
+    <Compile Include="..\Spatial4n.Core.NTS\Properties\AssemblyInfo.cs">
+      <Link>Properties\AssemblyInfo.cs</Link>
+    </Compile>
     <Compile Include="..\Spatial4n.Core.NTS\Shapes\Nts\NtsGeometry.cs">
       <Link>Shapes\Nts\NtsGeometry.cs</Link>
     </Compile>
@@ -145,7 +148,6 @@
     <Compile Include="..\CommonAssemblyInfo.cs">
       <Link>Properties\CommonAssemblyInfo.cs</Link>
     </Compile>
-    <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

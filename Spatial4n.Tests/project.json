@@ -24,5 +24,9 @@
   },
   "buildOptions": {
     "define": [ "NETCORE10" ]
+  },
+  "configurations": {
+    "Debug_Strong_Name": {},
+    "Release_Strong_Name": {}
   }
 }

@@ -9,26 +9,47 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Spatial4n.Core", "Spatial4n
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Spatial4n.Core.NTS", "Spatial4n.Core.NTS\Spatial4n.Core.NTS.csproj", "{BD31FF3A-017A-4ED5-99CC-821818261CDF}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{8215F287-5A3E-4B9B-8735-D8D41405BBD8}"
+	ProjectSection(SolutionItems) = preProject
+		.nuget\Spatial4n.Core.NTS.nuspec = .nuget\Spatial4n.Core.NTS.nuspec
+		.nuget\Spatial4n.Core.nuspec = .nuget\Spatial4n.Core.nuspec
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".build", ".build", "{6CB3CB17-7BB8-465A-AB42-37AD2F9093D8}"
+	ProjectSection(SolutionItems) = preProject
+		.build\build.ps1 = .build\build.ps1
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug_Strong_Name|Any CPU = Debug_Strong_Name|Any CPU
 		Debug|Any CPU = Debug|Any CPU
+		Release_Strong_Name|Any CPU = Release_Strong_Name|Any CPU
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{385FC6A2-E90E-4D13-B700-423489363E25}.Debug_Strong_Name|Any CPU.ActiveCfg = Debug_Strong_Name|Any CPU
+		{385FC6A2-E90E-4D13-B700-423489363E25}.Debug_Strong_Name|Any CPU.Build.0 = Debug_Strong_Name|Any CPU
 		{385FC6A2-E90E-4D13-B700-423489363E25}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{385FC6A2-E90E-4D13-B700-423489363E25}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{385FC6A2-E90E-4D13-B700-423489363E25}.Release_Strong_Name|Any CPU.ActiveCfg = Release_Strong_Name|Any CPU
+		{385FC6A2-E90E-4D13-B700-423489363E25}.Release_Strong_Name|Any CPU.Build.0 = Release_Strong_Name|Any CPU
 		{385FC6A2-E90E-4D13-B700-423489363E25}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{385FC6A2-E90E-4D13-B700-423489363E25}.Release|Any CPU.Build.0 = Release|Any CPU
-		{B6BE4761-EEBA-4F22-949A-7017C33A25F6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{B6BE4761-EEBA-4F22-949A-7017C33A25F6}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{B6BE4761-EEBA-4F22-949A-7017C33A25F6}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{B6BE4761-EEBA-4F22-949A-7017C33A25F6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B79939F8-A5DE-400F-AB19-7F8519871946}.Debug_Strong_Name|Any CPU.ActiveCfg = Debug_Strong_Name|Any CPU
+		{B79939F8-A5DE-400F-AB19-7F8519871946}.Debug_Strong_Name|Any CPU.Build.0 = Debug_Strong_Name|Any CPU
 		{B79939F8-A5DE-400F-AB19-7F8519871946}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{B79939F8-A5DE-400F-AB19-7F8519871946}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B79939F8-A5DE-400F-AB19-7F8519871946}.Release_Strong_Name|Any CPU.ActiveCfg = Release_Strong_Name|Any CPU
+		{B79939F8-A5DE-400F-AB19-7F8519871946}.Release_Strong_Name|Any CPU.Build.0 = Release_Strong_Name|Any CPU
 		{B79939F8-A5DE-400F-AB19-7F8519871946}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B79939F8-A5DE-400F-AB19-7F8519871946}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BD31FF3A-017A-4ED5-99CC-821818261CDF}.Debug_Strong_Name|Any CPU.ActiveCfg = Debug_Strong_Name|Any CPU
+		{BD31FF3A-017A-4ED5-99CC-821818261CDF}.Debug_Strong_Name|Any CPU.Build.0 = Debug_Strong_Name|Any CPU
 		{BD31FF3A-017A-4ED5-99CC-821818261CDF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{BD31FF3A-017A-4ED5-99CC-821818261CDF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BD31FF3A-017A-4ED5-99CC-821818261CDF}.Release_Strong_Name|Any CPU.ActiveCfg = Release_Strong_Name|Any CPU
+		{BD31FF3A-017A-4ED5-99CC-821818261CDF}.Release_Strong_Name|Any CPU.Build.0 = Release_Strong_Name|Any CPU
 		{BD31FF3A-017A-4ED5-99CC-821818261CDF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BD31FF3A-017A-4ED5-99CC-821818261CDF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection

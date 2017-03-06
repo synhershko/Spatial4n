@@ -501,7 +501,7 @@ namespace Spatial4n.Core.IO
                 double result;
                 try
                 {
-                    result = double.Parse(rawString.Substring(startOffset, offset - startOffset));
+                    result = double.Parse(rawString.Substring(startOffset, offset - startOffset), CultureInfo.InvariantCulture);
                 }
                 catch (RuntimeException e)
                 {

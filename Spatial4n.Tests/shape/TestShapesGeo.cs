@@ -231,5 +231,13 @@ namespace Spatial4n.Core.Shape
 
             TestCircleIntersect();
         }
+
+        // Spatial4n-specific hack, since we have no ReflectedType in .NET Core, so PropertyData doesn't work in a base class
+        [Theory]
+        [PropertyData("Contexts", PropertyType = typeof(TestShapesGeo))]
+        public override void TestMakeRect(SpatialContext ctx)
+        {
+            base.TestMakeRect(ctx);
+        }
     }
 }

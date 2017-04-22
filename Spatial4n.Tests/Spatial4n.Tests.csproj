@@ -1,0 +1,36 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>netcoreapp1.0;net40;net35</TargetFrameworks>
+    <PackageTargetFallback Condition="$(TargetFramework.StartsWith('netcore'))">$(PackageTargetFallback);dnxcore50;portable-net403+sl5+win8+wp8+wpa81</PackageTargetFallback>
+    
+    <!-- For now, we can switch framework to test by manually editing this file -->
+    <!--<TargetFramework>net40</TargetFramework>-->
+    <AssemblyName>Spatial4n.Tests</AssemblyName>
+    <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
+    <NetStandardImplicitPackageVersion>1.6.0</NetStandardImplicitPackageVersion>
+    <RuntimeFrameworkVersion>1.0.4</RuntimeFrameworkVersion>
+  </PropertyGroup>
+  
+  <ItemGroup Condition="!$(TargetFramework.StartsWith('netcore'))">
+    <PackageReference Include="xunit" Version="1.9.2" />
+    <PackageReference Include="xunit.extensions" Version="1.9.2" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.1.0" />
+  </ItemGroup>
+  
+  <ItemGroup Condition="$(TargetFramework.StartsWith('netcore'))">
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.0.0-preview-20170106-08" />
+    <PackageReference Include="xunit" Version="2.2.0" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.2.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Spatial4n.Core.NTS\Spatial4n.Core.NTS.csproj" />
+    <ProjectReference Include="..\Spatial4n.Core\Spatial4n.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Service Include="{82a7f48d-3b50-4b1e-b82e-3ada8210c358}" />
+  </ItemGroup>
+
+</Project>

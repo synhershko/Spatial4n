@@ -20,7 +20,7 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 
-#if NETCORE10
+#if NETCOREAPP1_0
 using Xunit.Sdk;
 #else
 using Xunit.Extensions;
@@ -67,21 +67,21 @@ namespace Spatial4n.Core
 		/// <param name="parameterTypes">The types of the parameters for the test method</param>
 		/// <returns>The theory data, in table form</returns>
 		[SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", MessageId = "0", Justification = "This is validated elsewhere.")]
-#if NETCORE10
+#if NETCOREAPP1_0
         public override IEnumerable<object[]> GetData(MethodInfo methodUnderTest)
 #else
         public override IEnumerable<object[]> GetData(MethodInfo methodUnderTest, Type[] parameterTypes)
 #endif
         {
-#if NETCORE10
-            // Spatial4n TODO: This won't work the same as ReflectedType which has been removed
-            // from the API in .NET Core
+#if NETCOREAPP1_0
+            // Spatial4n note: must always use PropertyType in .NET Core if the data is in a subclass, since ReflectedType is not supported
             Type type = PropertyType ?? methodUnderTest.DeclaringType;
 #else
             Type type = PropertyType ?? methodUnderTest.ReflectedType;
+            
 #endif
             PropertyInfo propInfo = type.GetProperty(propertyName, BindingFlags.Public | BindingFlags.Static | BindingFlags.FlattenHierarchy);
-			if (propInfo == null)
+            if (propInfo == null)
 			{
 				string typeName = type.FullName;
 				if (methodUnderTest.DeclaringType != null)
@@ -94,7 +94,7 @@ namespace Spatial4n.Core
 
 				if (propInfo == null)
 					throw new ArgumentException(string.Format("Could not find public static property {0} on {1}", propertyName,
-				                                          type.FullName));
+                                                          typeName));
 			}
 
 			object obj = propInfo.GetValue(null, null);

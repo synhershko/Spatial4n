@@ -7,10 +7,6 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("Spatial4n.Core")]
-[assembly: AssemblyDescription("A Geospatial Library for .NET - port of Spatial4j")]
-[assembly: AssemblyConfiguration("")]
-[assembly: AssemblyProduct("Spatial4n.Core")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 [assembly: NeutralResourcesLanguage("en")]
@@ -33,20 +29,8 @@ using System.Runtime.InteropServices;
         "a4a66f9a")]
 #else
 [assembly: InternalsVisibleTo("Spatial4n.Tests")]
-//[assembly: InternalsVisibleTo("Lucene.Net.Tests.Spatial")]
 #endif
 
-// Version information for an assembly consists of the following four values:
-//
-//      Major Version
-//      Minor Version 
-//      Build Number
-//      Revision
-//
-// You can specify all the values or you can default the Build and Revision Numbers 
-// by using the '*' as shown below:
-// [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("0.4.1.0")]
 
 // NOTE: AssemblyFileVersion and AssemblyInformationalVersion attributes are managed
 // by the build process in the common CommonAssemblyInfo.cs file. Because we are strong-named,

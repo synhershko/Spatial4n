@@ -223,8 +223,8 @@ namespace Spatial4n.Core.Shape
             new RectIntersectionAnonymousHelper(ctx).TestRelateWithRectangle();
         }
 
-        [Theory]
-        [PropertyData("Contexts")]
+        //[Theory]
+        //[PropertyData("Contexts")]
         public virtual void TestMakeRect(SpatialContext ctx)
         {
             this.ctx = ctx;

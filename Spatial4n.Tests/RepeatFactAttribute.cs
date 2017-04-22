@@ -32,7 +32,7 @@ namespace Spatial4n.Core
 			_count = count;
 		}
 
-#if !NETCORE10
+#if !NETCOREAPP1_0
 		protected override IEnumerable<ITestCommand> EnumerateTestCommands(
 			IMethodInfo method)
 		{
@@ -51,7 +51,7 @@ namespace Spatial4n.Core
 			_count = count;
 		}
 
-#if !NETCORE10
+#if !NETCOREAPP1_0
         // Spatial4n TODO: Work out how to make the test repeat in .NET Core
         protected override IEnumerable<ITestCommand> EnumerateTestCommands(
 			IMethodInfo method)

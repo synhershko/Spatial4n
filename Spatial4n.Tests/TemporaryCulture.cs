@@ -28,7 +28,7 @@ namespace Spatial4n.Core
 
         public TemporaryCulture(CultureInfo cultureInfo)
         {
-#if NETCORE10
+#if NETCOREAPP1_0
             oldCurrentCulture = CultureInfo.CurrentCulture;
             oldCurrentUiCulture = CultureInfo.CurrentUICulture;
 
@@ -50,7 +50,7 @@ namespace Spatial4n.Core
 
         public void Dispose()
         {
-#if NETCORE10
+#if NETCOREAPP1_0
             CultureInfo.CurrentCulture = oldCurrentCulture;
             CultureInfo.CurrentUICulture = oldCurrentUiCulture;
 #else

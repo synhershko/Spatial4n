@@ -220,5 +220,13 @@ namespace Spatial4n.Core.Shape
                 }
             }
         }
+
+        // Spatial4n-specific hack, since we have no ReflectedType in .NET Core, so PropertyData doesn't work in a base class
+        [Theory]
+        [PropertyData("Contexts", PropertyType = typeof(TestShapes2D))]
+        public override void TestMakeRect(SpatialContext ctx)
+        {
+            base.TestMakeRect(ctx);
+        }
     }
 }

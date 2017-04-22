@@ -1,8 +1,9 @@
-﻿using System;
+﻿#if !NETSTANDARD1_6
+using System;
 
 namespace Spatial4n.Core
 {
-    public static class TypeExtensions
+    internal static class TypeExtensions
     {
         public static Type GetTypeInfo(this Type type)
         {
@@ -10,3 +11,4 @@ namespace Spatial4n.Core
         }
     }
 }
+#endif

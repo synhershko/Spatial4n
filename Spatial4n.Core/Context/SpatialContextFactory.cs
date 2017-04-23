@@ -104,7 +104,7 @@ namespace Spatial4n.Core.Context
         protected virtual void InitField(string name)
         {
             //  note: java.beans API is more verbose to use correctly (?) but would arguably be better
-            FieldInfo field = GetType().GetTypeInfo().GetField(name, BindingFlags.GetField | BindingFlags.Public | BindingFlags.Instance | BindingFlags.NonPublic);
+            FieldInfo field = GetType().GetTypeInfo().GetField(name, BindingFlags.Public | BindingFlags.Instance | BindingFlags.NonPublic);
             string str;
             if (args.TryGetValue(name, out str))
             {

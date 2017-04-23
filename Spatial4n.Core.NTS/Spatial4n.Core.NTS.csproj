@@ -4,6 +4,7 @@
   
   <PropertyGroup>
     <TargetFrameworks>netstandard1.6;net40;net35</TargetFrameworks>
+    <NetStandardImplicitPackageVersion Condition=" '$(TargetFramework)' == 'netstandard1.6' ">1.6.0</NetStandardImplicitPackageVersion>
     <PackageTargetFallback Condition=" '$(TargetFramework)' == 'netstandard1.6' ">$(PackageTargetFallback);dnxcore50;portable-net403+sl5+win8+wp8+wpa81</PackageTargetFallback>
 
     <AssemblyVersion>0.4.1</AssemblyVersion>

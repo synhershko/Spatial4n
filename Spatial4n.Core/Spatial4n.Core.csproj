@@ -4,6 +4,7 @@
 
   <PropertyGroup>
     <TargetFrameworks>netstandard1.6;net40;net35</TargetFrameworks>
+    <NetStandardImplicitPackageVersion Condition=" '$(TargetFramework)' == 'netstandard1.6' ">1.6.0</NetStandardImplicitPackageVersion>
     <AssemblyVersion>0.4.1</AssemblyVersion>
 
     <AssemblyTitle>Spatial4n.Core</AssemblyTitle>

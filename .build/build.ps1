@@ -1,16 +1,15 @@
 properties {
 	[string]$base_directory   = resolve-path "..\."
 	[string]$release_directory  = "$base_directory\.release"
-	[string]$source_directory = "$base_directory"
 	[string]$tools_directory  = "$base_directory\.tools"
-	[string]$output_directory = "$release_directory\packagesource"
-	[string]$template_directory = "$base_directory\.nuget"
+	[string]$source_directory = "$base_directory"
+	[string]$nuget_package_directory = "$release_directory\packagesource"
+	[string]$solutionFile = "$base_directory\Spatial4n.sln"
 
+	[string]$packageVersion   = "0.4.1"  
 	[string]$version          = "0.0.0"
-	[string]$packageVersion   = "$version-pre"
 	[string]$configuration    = "Release"
-
-	[string[]]$target_frameworks = @("net35", "net40")
+	[bool]$backupFiles        = $true
 
 	[string]$common_assembly_info = "$base_directory\CommonAssemblyInfo.cs"
 	[string]$copyright_year = [DateTime]::Today.Year.ToString() #Get the current year from the system
@@ -18,23 +17,39 @@ properties {
 	[string]$company_name = ""
 }
 
-task default -depends Finalize
+$backedUpFiles = New-Object System.Collections.ArrayList
+
+task default -depends Test
 
 task Clean -description "This task cleans up the build directory" {
 	Remove-Item $release_directory -Force -Recurse -ErrorAction SilentlyContinue
-	
+}
+
+task Init -description "This tasks makes sure the build environment is correctly setup" {  
+
 	Write-Host "Base Directory: $base_directory"
 	Write-Host "Release Directory: $release_directory"
 	Write-Host "Source Directory: $source_directory"
 	Write-Host "Tools Directory: $tools_directory"
-	Write-Host "Output Directory: $output_directory"
+	Write-Host "NuGet Package Directory: $nuget_package_directory"
 	Write-Host "Template Directory: $template_directory"
 	Write-Host "Version: $version"
 	Write-Host "Package Version: $packageVersion"
 	Write-Host "Configuration: $configuration"
+	
+	Ensure-Directory-Exists "$release_directory"
 }
 
-task Init -description "This tasks makes sure the build environment is correctly setup" {  
+task Compile -depends Clean, Init -description "This task compiles the solution" {
+
+	Write-Host "Compiling..." -ForegroundColor Green
+
+	pushd $base_directory
+	$projects = Get-ChildItem -Path "*.csproj" -Recurse
+	popd
+
+	&dotnet msbuild $solutionFile /t:Restore
+
 	#If build runner is MyGet or version is not passed in, parse it from $packageVersion
 	if (($env:BuildRunner -ne $null -and $env:BuildRunner -eq "MyGet") -or $version -eq "0.0.0") {		
 		$version = $packageVersion
@@ -43,212 +58,123 @@ task Init -description "This tasks makes sure the build environment is correctly
 		}
 		echo "Updated version to: $version"
 	}
-	
-	#Backup the original CommonAssemblyInfo.cs file
-	Ensure-Directory-Exists "$release_directory"
-	Move-Item $common_assembly_info "$common_assembly_info.bak" -Force
 
-	Generate-Assembly-Info `
-		-file $common_assembly_info `
-		-company $company_name `
-		-version $version `
-		-packageVersion $packageVersion `
-		-copyright $copyright
+	$gitCommit = ((git rev-parse --verify --short=10 head) | Out-String).Trim()
+	$pv = "$packageVersion commit:[$gitCommit]"
 
-	# Ensure we have the latest version of NuGet
-	exec { 
-		&"$tools_directory\nuget\NuGet.exe" update -self
-	} -ErrorAction SilentlyContinue
-}
+	try {
+		Backup-File $common_assembly_info
 
-task Restore -depends Clean -description "This task runs NuGet package restore" {
-	exec { 
-		&"$tools_directory\nuget\NuGet.exe" restore "$source_directory\Spatial4n.Legacy.sln"
-	}
+		Generate-Assembly-Info `
+			-fileVersion $version `
+			-file $common_assembly_info
 
-	#NOTE: Need to run dotnet restore on each directory or they won't build
-	$project_directory = "$source_directory\Spatial4n.Core"
-
-	exec {
-		cd $project_directory
-		dotnet restore
-	}
-
-	$project_directory = "$source_directory\Spatial4n.Core.NTS"
-
-	exec {
-		cd $project_directory
-		dotnet restore
+		&dotnet msbuild $solutionFile /t:Build `
+			/p:Configuration=$configuration `
+			/p:InformationalVersion=$pv `
+			/p:Company=$company_name `
+			/p:Copyright=$copyright
+	} finally {
+		Restore-File $common_assembly_info
 	}
 }
 
-task Compile -depends Clean, Init, Restore -description "This task compiles the solution" {
+task Pack -depends Compile -description "This task creates the NuGet packages" {
+	Ensure-Directory-Exists $nuget_package_directory
 
-	Write-Host "Compiling..." -ForegroundColor Green
+	pushd $base_directory
+	$packages = Get-ChildItem -Path "*.csproj" -Recurse | ? { !$_.Directory.Name.Contains(".Test") }
+	popd
 
-	Build-Framework-Versions $target_frameworks
-}
+	try {
+		$versionFile = "$base_directory\PackageVersion.proj"
+		Backup-File $versionFile
 
-task Package -depends Compile -description "This tasks makes creates the NuGet packages" {
-	
-	#create the nuget package output directory
-	Ensure-Directory-Exists "$output_directory"
+		Generate-Version-File `
+			-version $version `
+			-packageVersion $packageVersion `
+			-file $versionFile
 
-	Create-Spatial4n-Core-Package
-	Create-Spatial4n-Core-NTS-Package
-}
-
-task Finalize -depends Package -description "This tasks finalizes the build" {  
-	#Restore the original CommonAssemblyInfo.cs file from backup
-	Remove-Item $common_assembly_info -Force -ErrorAction SilentlyContinue
-	Move-Item "$common_assembly_info.bak" $common_assembly_info -Force
-}
-
-function Create-Spatial4n-Core-Package {
-	$output_nuspec_file = "$template_directory\Spatial4n.Core.nuspec"
-	
-	exec { 
-		&"$tools_directory\nuget\NuGet.exe" pack $output_nuspec_file -Symbols -Version $packageVersion -OutputDirectory $output_directory -properties "copyright=$copyright"
+		foreach ($package in $packages) {
+			Write-Host "Creating NuGet package for $package..." -ForegroundColor Magenta
+			&dotnet pack $package --output $nuget_package_directory --configuration $configuration --no-build --version-suffix $packageVersion
+		}
+	} finally {
+		Restore-File $versionFile
 	}
 }
 
-function Create-Spatial4n-Core-NTS-Package {
-	$output_nuspec_file = "$template_directory\Spatial4n.Core.NTS.nuspec"
-	
-	exec { 
-		&"$tools_directory\nuget\NuGet.exe" pack $output_nuspec_file -Symbols -Version $packageVersion -OutputDirectory $output_directory -properties "copyright=$copyright"
+task Test -depends Pack -description "This task runs the tests" {
+	$testProject = "$base_directory\Spatial4n.Tests\Spatial4n.Tests.csproj"
+	$xml = [xml](Get-Content $testProject)
+	$targetFrameworks = [string]$xml.Project.PropertyGroup.TargetFrameworks;
+	$frameworks = $targetFrameworks.Split(';', [StringSplitOptions]::RemoveEmptyEntries)
+
+	foreach ($framework in $frameworks) {
+		Write-Host "Running tests for framework: $framework" -ForegroundColor Green
+
+		&dotnet test $testProject --configuration $configuration --framework $framework.Trim() --no-build
 	}
 }
 
-function Build-Framework-Versions ([string[]] $target_frameworks) {
-	#create the build for each version of the framework
-	foreach ($target_framework in $target_frameworks) {
-		Build-Spatial4n-Core-Legacy-Framework-Version $target_framework
-		Build-Spatial4n-Core-NTS-Legacy-Framework-Version $target_framework
-	}
+function Generate-Version-File {
+param(
+	[string]$packageVersion,
+	[string]$file = $(throw "file is a required parameter.")
+)
 
-	Build-Spatial4n-Core
-	Build-Spatial4n-Core-NTS
+  $versionFile = "<Project>
+	<PropertyGroup>
+		<PackageVersion>$packageVersion</PackageVersion>
+	</PropertyGroup>
+</Project>
+"
+	$dir = [System.IO.Path]::GetDirectoryName($file)
+	Ensure-Directory-Exists $dir
+
+	Write-Host "Generating version file: $file"
+	Out-File -filePath $file -encoding UTF8 -inputObject $versionFile
 }
 
-function Build-Spatial4n-Core {
-	
-	Write-Host "Compiling Spatial4n.Core (Portable)" -ForegroundColor Blue
+function Generate-Assembly-Info {
+param(
+	[string]$fileVersion,
+	[string]$file = $(throw "file is a required parameter.")
+)
 
-	$project_directory = "$source_directory\Spatial4n.Core"
-	$build_config = [System.String]::Concat($configuration, "_Strong_Name")
+  $asmInfo = "using System;
+using System.Reflection;
 
-	exec { 
-		cd $project_directory; 
-		dotnet build --configuration $build_config
-	}
+[assembly: AssemblyFileVersion(""$fileVersion"")]
+"
+	$dir = [System.IO.Path]::GetDirectoryName($file)
+	Ensure-Directory-Exists $dir
+
+	Write-Host "Generating assembly info file: $file"
+	Out-File -filePath $file -encoding UTF8 -inputObject $asmInfo
 }
 
-function Build-Spatial4n-Core-NTS {
-	Write-Host "Compiling Spatial4n.Core.NTS (Portable)" -ForegroundColor Blue
-
-	$project_directory = "$source_directory\Spatial4n.Core.NTS"
-	$build_config = [System.String]::Concat($configuration, "_Strong_Name")
-
-	exec { 
-		
-		cd $project_directory; 
-		dotnet build --configuration $build_config
-	}
-}
-
-function Build-Spatial4n-Core-Legacy-Framework-Version ([string] $target_framework) {
-	$target_framework_upper = $target_framework.toUpper()
-	$build_config = Get-TargetFramework-Configuration $target_framework
-	
-	Write-Host "Compiling Spatial4n.Core for $target_framework_upper" -ForegroundColor Blue
-
-	exec { 
-		msbuild "$source_directory\Spatial4n.Core.Legacy\Spatial4n.Core.csproj" `
-			/verbosity:quiet `
-			/property:Configuration=$build_config `
-			"/t:Clean;Rebuild" `
-			/property:WarningLevel=3
+function Backup-File([string]$path) {
+	if ($backupFiles -eq $true) {
+		Copy-Item $path "$path.bak" -Force
+		$backedUpFiles.Insert(0, $path)
+	} else {
+		Write-Host "Ignoring backup of file $path" -ForegroundColor DarkRed
 	}
 }
 
-function Build-Spatial4n-Core-NTS-Legacy-Framework-Version ([string] $target_framework) {
-	$target_framework_upper = $target_framework.toUpper()
-	$build_config = Get-TargetFramework-Configuration $target_framework
-	
-	Write-Host "Compiling Spatial4n.Core.NTS for $target_framework_upper" -ForegroundColor Blue
-
-	exec { 
-		msbuild "$source_directory\Spatial4n.Core.NTS.Legacy\Spatial4n.Core.NTS.csproj" `
-			/verbosity:quiet `
-			/property:Configuration=$build_config `
-			"/t:Clean;Rebuild" `
-			/property:WarningLevel=3
+function Restore-File([string]$path) {
+	if ($backupFiles -eq $true) {
+		if (Test-Path "$path.bak") {
+			Move-Item "$path.bak" $path -Force
+		}
+		$backedUpFiles.Remove($path)
 	}
 }
 
 function Ensure-Directory-Exists([string] $path)
 {
-	if ([System.IO.Path]::GetFileName($path) -eq "") {
-		#add a fake file name if it doesn't exist
-		$file = "$path\dummy.tmp"
-		$dir = [System.IO.Path]::GetDirectoryName($file)
+	if (!(Test-Path $path)) {
+		New-Item $path -ItemType Directory
 	}
-	elseif ($path.EndsWith("\") -eq $true) {
-		#add a fake file name and slash if it is missing
-		$file = "$pathdummy.tmp"
-		$dir = [System.IO.Path]::GetDirectoryName($file)
-	} else {
-		#assume the path contains a file name
-		$dir = $path
-	}
-	if ([System.IO.Directory]::Exists($dir) -eq $false) {
-		Write-Host "Creating directory $dir"
-		[System.IO.Directory]::CreateDirectory($dir)
-	}
-}
-
-function Generate-Assembly-Info
-{
-param(
-	[string]$copyright, 
-	[string]$version,
-	[string]$packageVersion,
-	[string]$company,
-	[string]$file = $(throw "file is a required parameter.")
-)
-  $asmInfo = "using System;
-using System.Reflection;
-using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
-
-[assembly: AssemblyCompanyAttribute(""$company"")]
-[assembly: AssemblyCopyrightAttribute(""$copyright"")]
-[assembly: AssemblyInformationalVersionAttribute(""$packageVersion"")]
-[assembly: AssemblyFileVersionAttribute(""$version"")]
-"
-	$dir = [System.IO.Path]::GetDirectoryName($file)
-	if ([System.IO.Directory]::Exists($dir) -eq $false)
-	{
-		Write-Host "Creating directory $dir"
-		[System.IO.Directory]::CreateDirectory($dir)
-	}
-
-	Write-Host "Generating assembly info file: $file"
-	out-file -filePath $file -encoding UTF8 -inputObject $asmInfo
-}
-
-function Is-Prerelease {
-	if ($packageVersion.Contains("-")) {
-		return $true
-	}
-	return $false
-}
-
-function Get-TargetFramework-Configuration ([string] $net_version) {
-	$build_config = "Release"
-	if ($net_version -eq "net35") {
-		$build_config = "Release35"
-	}
-	return $build_config
 }

@@ -1,10 +1,11 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
+  <Import Project="..\PackageVersion.proj" />
+
   <PropertyGroup>
     <TargetFrameworks>netstandard1.6;net40;net35</TargetFrameworks>
-
-    <Version>0.4.1</Version>
     <AssemblyVersion>0.4.1</AssemblyVersion>
+
     <AssemblyTitle>Spatial4n.Core</AssemblyTitle>
     <Description>A Geospatial Library for .NET - a .NET port of spatial4j</Description>
     <Authors>Itamar Syn-Hershko</Authors>
@@ -13,15 +14,28 @@
     <Copyright>Copyright © 2012 - 2017 spatial4j and Itamar Syn-Hershko</Copyright>
     <PackageTags>Lucene Lucene.net spatial geospatial geo spatial4j search</PackageTags>
     <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\$(AssemblyName).xml</DocumentationFile>
+    <NoWarn>1591</NoWarn>
+    <GenerateAssemblyFileVersionAttribute>false</GenerateAssemblyFileVersionAttribute>
+    <DefineConstants>FEATURE_STRONG_NAME</DefineConstants>
+    <FrameworkPathOverride Condition="'$(TargetFramework)' == 'net35'">C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v3.5\Profile\Client</FrameworkPathOverride>
   </PropertyGroup>
 
-  <PropertyGroup>
-    <DefineConstants Condition="$(Configuration.EndsWith('_Strong_Name'))">$(DefineConstants);FEATURE_STRONG_NAME</DefineConstants>
+  <PropertyGroup Condition="$(DefineConstants.Contains('FEATURE_STRONG_NAME'))">
+    <SignAssembly>True</SignAssembly>
+    <AssemblyOriginatorKeyFile>..\Spatial4n.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(TargetFramework)'=='netstandard1.6'">
+    <NoWarn>$(NoWarn);1701;1702;1705</NoWarn>
   </PropertyGroup>
   
   <ItemGroup Condition="'$(TargetFramework)' == 'netstandard1.6'">
     <PackageReference Include="System.Reflection" Version="4.3.0" />
     <PackageReference Include="System.Reflection.TypeExtensions" Version="4.3.0" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <Compile Include="..\CommonAssemblyInfo.cs" Link="CommonAssemblyInfo.cs" />
   </ItemGroup>
 
 </Project>

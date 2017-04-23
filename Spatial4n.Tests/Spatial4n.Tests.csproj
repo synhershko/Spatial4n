@@ -3,13 +3,27 @@
   <PropertyGroup>
     <TargetFrameworks>netcoreapp1.0;net40;net35</TargetFrameworks>
     <PackageTargetFallback Condition="$(TargetFramework.StartsWith('netcore'))">$(PackageTargetFallback);dnxcore50;portable-net403+sl5+win8+wp8+wpa81</PackageTargetFallback>
-    
+
     <!-- For now, we can switch framework to test by manually editing this file -->
-    <!--<TargetFramework>net40</TargetFramework>-->
+    <!--<TargetFramework>net35</TargetFramework>-->
+    <Version>0.4.1</Version>
     <AssemblyName>Spatial4n.Tests</AssemblyName>
     <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
     <NetStandardImplicitPackageVersion>1.6.0</NetStandardImplicitPackageVersion>
     <RuntimeFrameworkVersion>1.0.4</RuntimeFrameworkVersion>
+    <NoWarn>1591</NoWarn>
+    <GenerateAssemblyFileVersionAttribute>false</GenerateAssemblyFileVersionAttribute>
+    <DefineConstants>FEATURE_STRONG_NAME</DefineConstants>
+    <FrameworkPathOverride Condition="'$(TargetFramework)' == 'net35'">C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v3.5\Profile\Client</FrameworkPathOverride>
+  </PropertyGroup>
+  
+  <PropertyGroup Condition="$(DefineConstants.Contains('FEATURE_STRONG_NAME'))">
+    <SignAssembly>True</SignAssembly>
+    <AssemblyOriginatorKeyFile>..\Spatial4n.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(TargetFramework)'=='netstandard1.6'">
+    <NoWarn>$(NoWarn);1701;1702;1705</NoWarn>
   </PropertyGroup>
   
   <ItemGroup Condition="!$(TargetFramework.StartsWith('netcore'))">
@@ -19,7 +33,7 @@
   </ItemGroup>
   
   <ItemGroup Condition="$(TargetFramework.StartsWith('netcore'))">
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.0.0-preview-20170106-08" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.0.0" />
     <PackageReference Include="xunit" Version="2.2.0" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.2.0" />
   </ItemGroup>
@@ -27,6 +41,10 @@
   <ItemGroup>
     <ProjectReference Include="..\Spatial4n.Core.NTS\Spatial4n.Core.NTS.csproj" />
     <ProjectReference Include="..\Spatial4n.Core\Spatial4n.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="..\CommonAssemblyInfo.cs" Link="CommonAssemblyInfo.cs" />
   </ItemGroup>
 
   <ItemGroup>

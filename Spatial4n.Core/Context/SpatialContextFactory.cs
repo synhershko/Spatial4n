@@ -104,7 +104,7 @@ namespace Spatial4n.Core.Context
         protected virtual void InitField(string name)
         {
             //  note: java.beans API is more verbose to use correctly (?) but would arguably be better
-            FieldInfo field = GetType().GetTypeInfo().GetField(name, BindingFlags.Public | BindingFlags.Instance | BindingFlags.NonPublic);
+            FieldInfo field = GetType().GetField(name, BindingFlags.Public | BindingFlags.Instance | BindingFlags.NonPublic);
             string str;
             if (args.TryGetValue(name, out str))
             {
@@ -123,7 +123,7 @@ namespace Spatial4n.Core.Context
                         }
                         catch (TypeLoadException e)
                         {
-                            throw new Exception(e.Message, e);
+                            throw new Exception(e.ToString(), e);
                         }
                     }
                     else if (field.FieldType.GetTypeInfo().IsEnum)
@@ -138,7 +138,7 @@ namespace Spatial4n.Core.Context
                 }
                 catch (FieldAccessException e)
                 {
-                    throw new Exception(e.Message, e);
+                    throw new Exception(e.ToString(), e);
                 }
                 catch (Exception e)
                 {
@@ -215,7 +215,7 @@ namespace Spatial4n.Core.Context
             try
             {
                 //can't simply lookup constructor by arg type because might be subclass type
-                foreach (ConstructorInfo ctor in clazz.GetTypeInfo().GetConstructors())
+                foreach (ConstructorInfo ctor in clazz.GetConstructors())
                 {
                     Type[] parameterTypes = ctor.GetParameters().Select(x => x.ParameterType).ToArray();
                     if (parameterTypes.Length != ctorArgs.Length)
@@ -223,7 +223,7 @@ namespace Spatial4n.Core.Context
                     for (int i = 0; i < ctorArgs.Length; i++)
                     {
                         object ctorArg = ctorArgs[i];
-                        if (!parameterTypes[i].GetTypeInfo().IsAssignableFrom(ctorArg.GetType()))
+                        if (!parameterTypes[i].GetTypeInfo().IsAssignableFrom(ctorArg.GetType().GetTypeInfo()))
                             goto ctorLoop_continue;
                     }
                     return (T)ctor.Invoke(ctorArgs);

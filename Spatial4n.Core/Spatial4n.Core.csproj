@@ -3,8 +3,7 @@
   <Import Project="..\PackageVersion.proj" />
 
   <PropertyGroup>
-    <TargetFrameworks>netstandard1.6;net40;net35</TargetFrameworks>
-    <NetStandardImplicitPackageVersion Condition=" '$(TargetFramework)' == 'netstandard1.6' ">1.6.0</NetStandardImplicitPackageVersion>
+    <TargetFrameworks>netstandard1.3;net40;net35</TargetFrameworks>
     <AssemblyVersion>0.4.1</AssemblyVersion>
 
     <AssemblyTitle>Spatial4n.Core</AssemblyTitle>
@@ -26,11 +25,11 @@
     <AssemblyOriginatorKeyFile>..\Spatial4n.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(TargetFramework)'=='netstandard1.6'">
+  <PropertyGroup Condition="'$(TargetFramework)'=='netstandard1.3'">
     <NoWarn>$(NoWarn);1701;1702;1705</NoWarn>
   </PropertyGroup>
   
-  <ItemGroup Condition="'$(TargetFramework)' == 'netstandard1.6'">
+  <ItemGroup Condition="'$(TargetFramework)' == 'netstandard1.3'">
     <PackageReference Include="System.Reflection" Version="4.3.0" />
     <PackageReference Include="System.Reflection.TypeExtensions" Version="4.3.0" />
   </ItemGroup>

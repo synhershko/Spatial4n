@@ -49,7 +49,9 @@ task Compile -depends Clean, Init -description "This task compiles the solution"
 	$projects = Get-ChildItem -Path "*.csproj" -Recurse
 	popd
 
-	&dotnet msbuild $solutionFile /t:Restore
+	Exec {
+		&dotnet msbuild $solutionFile /t:Restore
+	}
 
 	#If build runner is MyGet or version is not passed in, parse it from $packageVersion
 	if (($env:BuildRunner -ne $null -and $env:BuildRunner -eq "MyGet") -or $version -eq "0.0.0") {		
@@ -60,8 +62,13 @@ task Compile -depends Clean, Init -description "This task compiles the solution"
 		echo "Updated version to: $version"
 	}
 
-	$gitCommit = ((git rev-parse --verify --short=10 head) | Out-String).Trim()
-	$pv = "$packageVersion commit:[$gitCommit]"
+	$pv = $packageVersion
+	#check for presense of Git
+	& where.exe git.exe
+	if ($LASTEXITCODE -eq 0) {
+		$gitCommit = ((git rev-parse --verify --short=10 head) | Out-String).Trim()
+		$pv = "$packageVersion commit:[$gitCommit]"
+	}
 
 	try {
 		Backup-File $common_assembly_info

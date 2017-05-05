@@ -23,6 +23,7 @@ task default -depends Test
 
 task Clean -description "This task cleans up the build directory" {
 	Remove-Item $release_directory -Force -Recurse -ErrorAction SilentlyContinue
+	Get-ChildItem $base_directory -Include *.bak -Recurse | foreach ($_) {Remove-Item $_.FullName}
 }
 
 task Init -description "This tasks makes sure the build environment is correctly setup" {  

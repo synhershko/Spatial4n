@@ -77,11 +77,13 @@ task Compile -depends Clean, Init -description "This task compiles the solution"
 			-fileVersion $version `
 			-file $common_assembly_info
 
-		&dotnet msbuild $solutionFile /t:Build `
-			/p:Configuration=$configuration `
-			/p:InformationalVersion=$pv `
-			/p:Company=$company_name `
-			/p:Copyright=$copyright
+		Exec {
+			&dotnet msbuild $solutionFile /t:Build `
+				/p:Configuration=$configuration `
+				/p:InformationalVersion=$pv `
+				/p:Company=$company_name `
+				/p:Copyright=$copyright
+		}
 	} finally {
 		Restore-File $common_assembly_info
 	}
@@ -105,7 +107,9 @@ task Pack -depends Compile -description "This task creates the NuGet packages" {
 
 		foreach ($package in $packages) {
 			Write-Host "Creating NuGet package for $package..." -ForegroundColor Magenta
-			&dotnet pack $package --output $nuget_package_directory --configuration $configuration --no-build --version-suffix $packageVersion
+			Exec {
+				&dotnet pack $package --output $nuget_package_directory --configuration $configuration --no-build --version-suffix $packageVersion
+			}
 		}
 	} finally {
 		Restore-File $versionFile
@@ -121,7 +125,9 @@ task Test -depends Pack -description "This task runs the tests" {
 	foreach ($framework in $frameworks) {
 		Write-Host "Running tests for framework: $framework" -ForegroundColor Green
 
-		&dotnet test $testProject --configuration $configuration --framework $framework.Trim() --no-build
+		Exec {
+			&dotnet test $testProject --configuration $configuration --framework $framework.Trim() --no-build
+		}
 	}
 }
 

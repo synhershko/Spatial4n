@@ -20,62 +20,45 @@ using Spatial4n.Core.Shapes;
 
 namespace Spatial4n.Core.Distance
 {
-	public interface DistanceCalculator
-	{
-		/// <summary>
-		/// The distance between <code>from</code> and <code>to</code>.
-		/// </summary>
-		/// <param name="from"></param>
-		/// <param name="to"></param>
-		/// <returns></returns>
-		double Distance(Point from, Point to);
+    public interface IDistanceCalculator
+    {
+        /// <summary>
+        /// The distance between <paramref name="from"/> and <paramref name="to"/>.
+        /// </summary>
+        double Distance(IPoint from, IPoint to);
 
-		/// <summary>
-		/// The distance between <code>from</code> and <code>Point(toX,toY)</code>.
-		/// </summary>
-		/// <param name="from"></param>
-		/// <param name="toX"></param>
-		/// <param name="toY"></param>
-		/// <returns></returns>
-		double Distance(Point from, double toX, double toY);
+        /// <summary>
+        /// The distance between <paramref name="from"/> and <c>Point(toX,toY)</c>.
+        /// </summary>
+        double Distance(IPoint from, double toX, double toY);
 
-	    /// <summary>
-	    /// Calculates where a destination point is given an origin (<code>from</code>)
-	    /// distance, and bearing (given in degrees -- 0-360).
-	    /// </summary>
-	    /// <param name="from"></param>
-	    /// <param name="distDEG"></param>
-	    /// <param name="bearingDEG"></param>
-	    /// <param name="ctx"></param>
-	    /// <param name="reuse"> </param>
-	    /// <returns></returns>
-	    Point PointOnBearing(Point from, double distDEG, double bearingDEG, SpatialContext ctx, Point reuse);
+        /// <summary>
+        /// Returns true if the distance between from and to is &lt;= distance.
+        /// </summary>
+        bool Within(IPoint from, double toX, double toY, double distance);
 
-		/// <summary>
-		/// Calculates the bounding box of a circle, as specified by its center point
-		/// and distance.
-		/// </summary>
-		/// <param name="from"></param>
-		/// <param name="distDEG"></param>
-		/// <param name="ctx"></param>
-		/// <returns></returns>
-        Rectangle CalcBoxByDistFromPt(Point from, double distDEG, SpatialContext ctx, Rectangle reuse);
+        /// <summary>
+        /// Calculates where a destination point is given an origin (<c>from</c>)
+        /// distance, and bearing (given in degrees -- 0-360).  If reuse is given, then
+        /// this method may <see cref="IPoint.Reset(double, double)"/> it and return it.
+        /// </summary>
+        IPoint PointOnBearing(IPoint from, double distDEG, double bearingDEG, SpatialContext ctx, IPoint reuse);
 
-		/// <summary>
-		/// The <code>Y</code> coordinate of the horizontal axis (e.g. left-right line)
-		/// of a circle.  The horizontal axis of a circle passes through its furthest
-		/// left-most and right-most edges. On a 2D plane, this result is always
-		/// <code>from.getY()</code> but, perhaps surprisingly, on a sphere it is going
-		/// to be slightly different.
-		/// </summary>
-		/// <param name="from"></param>
-		/// <param name="distDEG"></param>
-		/// <param name="ctx"></param>
-		/// <returns></returns>
-		double CalcBoxByDistFromPt_yHorizAxisDEG(Point from, double distDEG, SpatialContext ctx);
+        /// <summary>
+        /// Calculates the bounding box of a circle, as specified by its center point
+        /// and distance.
+        /// </summary>
+        IRectangle CalcBoxByDistFromPt(IPoint from, double distDEG, SpatialContext ctx, IRectangle reuse);
 
-		double Area(Rectangle rect);
+        /// <summary>
+        /// The <c>Y</c> coordinate of the horizontal axis of a circle that has maximum width. On a
+        /// 2D plane, this result is always <c>from.Y</c> but, perhaps surprisingly, on a sphere
+        /// it is going to be slightly different.
+        /// </summary>
+        double CalcBoxByDistFromPt_yHorizAxisDEG(IPoint from, double distDEG, SpatialContext ctx);
 
-		double Area(Circle circle);
-	}
+        double Area(IRectangle rect);
+
+        double Area(ICircle circle);
+    }
 }

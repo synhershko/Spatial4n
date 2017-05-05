@@ -19,16 +19,23 @@ using System;
 
 namespace Spatial4n.Core.Exceptions
 {
+    /// <summary>
+    /// A shape was constructed but failed because, based on the given parts, it's invalid. For example
+    /// a rectangle's minimum Y was specified as greater than the maximum Y. This class is not used for
+    /// parsing exceptions; that's usually <see cref="ParseException"/>.
+    /// </summary>
+#if FEATURE_SERIALIZABLE
 	[Serializable]
-	public class InvalidShapeException : Exception
-	{
-		public InvalidShapeException(string reason) : base(reason)
-		{
-		}
+#endif
+    public class InvalidShapeException : RuntimeException
+    {
+        public InvalidShapeException(string reason) : base(reason)
+        {
+        }
 
-		public InvalidShapeException(string reason, Exception exception)
-			: base(reason, exception)
-		{
-		}
-	}
+        public InvalidShapeException(string reason, Exception exception)
+            : base(reason, exception)
+        {
+        }
+    }
 }

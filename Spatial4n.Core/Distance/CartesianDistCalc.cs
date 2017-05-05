@@ -15,58 +15,70 @@
  * limitations under the License.
  */
 
-using System;
 using Spatial4n.Core.Context;
 using Spatial4n.Core.Shapes;
-using Spatial4n.Core.Util;
+using System;
 
 namespace Spatial4n.Core.Distance
 {
-	/// <summary>
-	/// Calculates based on Euclidean / Cartesian 2d plane.
-	/// </summary>
-	public class CartesianDistCalc : AbstractDistanceCalculator
-	{
-		private readonly bool squared;
+    /// <summary>
+    /// Calculates based on Euclidean / Cartesian 2d plane.
+    /// </summary>
+    public class CartesianDistCalc : AbstractDistanceCalculator
+    {
+        private readonly bool squared;
 
-		public CartesianDistCalc()
-		{
-			squared = false;
-		}
+        public CartesianDistCalc()
+        {
+            squared = false;
+        }
 
-		public CartesianDistCalc(bool squared)
-		{
-			this.squared = squared;
-		}
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="squared">
+        /// Set to true to have <see cref="AbstractDistanceCalculator.Distance(IPoint, IPoint)"/>
+        /// return the square of the correct answer. This is a
+        /// performance optimization used when sorting in which the
+        /// actual distance doesn't matter so long as the sort order is
+        /// consistent.
+        /// </param>
+        public CartesianDistCalc(bool squared)
+        {
+            this.squared = squared;
+        }
 
-		public override double Distance(Point from, double toX, double toY)
-		{
-			double result = 0;
+        public override double Distance(IPoint from, double toX, double toY)
+        {
+            double deltaX = from.X - toX;
+            double deltaY = from.Y - toY;
+            double xSquaredPlusYSquared = deltaX * deltaX + deltaY * deltaY;
 
-			double v = from.GetX() - toX;
-			result += (v * v);
+            if (squared)
+                return xSquaredPlusYSquared;
 
-			v = from.GetY() - toY;
-			result += (v * v);
+            return Math.Sqrt(xSquaredPlusYSquared);
+        }
 
-			if (squared)
-				return result;
+        public override bool Within(IPoint from, double toX, double toY, double distance)
+        {
+            double deltaX = from.X - toX;
+            double deltaY = from.Y - toY;
+            return deltaX * deltaX + deltaY * deltaY <= distance * distance;
+        }
 
-			return Math.Sqrt(result);
-		}
-
-        public override Point PointOnBearing(Point from, double distDEG, double bearingDEG, SpatialContext ctx, Point reuse)
+        public override IPoint PointOnBearing(IPoint from, double distDEG, double bearingDEG, SpatialContext ctx, IPoint reuse)
         {
             if (distDEG == 0)
             {
                 if (reuse == null)
                     return from;
-                reuse.Reset(from.GetX(), from.GetY());
+                reuse.Reset(from.X, from.Y);
                 return reuse;
             }
             double bearingRAD = DistanceUtils.ToRadians(bearingDEG);
-            double x = from.GetX() + Math.Sin(bearingRAD)*distDEG;
-            double y = from.GetY() + Math.Cos(bearingRAD)*distDEG;
+            double x = from.X + Math.Sin(bearingRAD) * distDEG;
+            double y = from.Y + Math.Cos(bearingRAD) * distDEG;
             if (reuse == null)
             {
                 return ctx.MakePoint(x, y);
@@ -78,12 +90,12 @@ namespace Spatial4n.Core.Distance
             }
         }
 
-        public override Rectangle CalcBoxByDistFromPt(Point from, double distDEG, SpatialContext ctx, Rectangle reuse)
+        public override IRectangle CalcBoxByDistFromPt(IPoint from, double distDEG, SpatialContext ctx, IRectangle reuse)
         {
-            double minX = from.GetX() - distDEG;
-            double maxX = from.GetX() + distDEG;
-            double minY = from.GetY() - distDEG;
-            double maxY = from.GetY() + distDEG;
+            double minX = from.X - distDEG;
+            double maxX = from.X + distDEG;
+            double minY = from.Y - distDEG;
+            double maxY = from.Y + distDEG;
             if (reuse == null)
             {
                 return ctx.MakeRectangle(minX, maxX, minY, maxY);
@@ -95,33 +107,34 @@ namespace Spatial4n.Core.Distance
             }
         }
 
-        public override double CalcBoxByDistFromPt_yHorizAxisDEG(Point from, double distDEG, SpatialContext ctx)
-		{
-			return from.GetY();
-		}
+        public override double CalcBoxByDistFromPt_yHorizAxisDEG(IPoint from, double distDEG, SpatialContext ctx)
+        {
+            return from.Y;
+        }
 
-		public override double Area(Rectangle rect)
-		{
-			return rect.GetArea(null);
-		}
+        public override double Area(IRectangle rect)
+        {
+            return rect.GetArea(null);
+        }
 
-		public override double Area(Circle circle)
-		{
-			return circle.GetArea(null);
-		}
+        public override double Area(ICircle circle)
+        {
+            return circle.GetArea(null);
+        }
 
-		public override bool Equals(object o)
-		{
-			if (this == o) return true;
+        public override bool Equals(object o)
+        {
+            if (this == o) return true;
+            if (o == null || GetType() != o.GetType()) return false;
 
-			var that = o as CartesianDistCalc;
-			if (that == null) return false;
-			return squared == that.squared;
-		}
+            var that = o as CartesianDistCalc;
+            if (that == null) return false;
+            return squared == that.squared;
+        }
 
-		public override int GetHashCode()
-		{
-			return (squared ? 1 : 0);
-		}
-	}
+        public override int GetHashCode()
+        {
+            return (squared ? 1 : 0);
+        }
+    }
 }

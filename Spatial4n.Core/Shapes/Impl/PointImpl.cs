@@ -15,124 +15,130 @@
  * limitations under the License.
  */
 
-using System;
 using Spatial4n.Core.Context;
+using System;
+using System.Diagnostics;
 
 namespace Spatial4n.Core.Shapes.Impl
 {
-	/// <summary>
-	/// A basic 2D implementation of a Point.
-	/// </summary>
-	public class PointImpl : Point
-	{
+    /// <summary>
+    /// A basic 2D implementation of a Point.
+    /// </summary>
+    public class Point : IPoint
+    {
         private readonly SpatialContext ctx;
-		private double x;
-		private double y;
+        private double x;
+        private double y;
 
         /// <summary>
         /// A simple constructor without normalization / validation.
         /// </summary>
-        /// <param name="x"></param>
-        /// <param name="y"></param>
-        /// <param name="ctx"></param>
-        public PointImpl(double x, double y, SpatialContext ctx)
+        public Point(double x, double y, SpatialContext ctx)
         {
             this.ctx = ctx;
             Reset(x, y);
         }
 
-        public void Reset(double x, double y)
+        public virtual bool IsEmpty
         {
+            get { return double.IsNaN(x); }
+        }
+
+        public virtual void Reset(double x, double y)
+        {
+            Debug.Assert(!IsEmpty);
             this.x = x;
             this.y = y;
         }
 
-		public SpatialRelation Relate(Shape other)
-		{
-			if (other is Point)
-				return this.Equals(other) ? SpatialRelation.INTERSECTS : SpatialRelation.DISJOINT;
-			return other.Relate(this).Transpose();
-		}
+        public virtual double X
+        {
+            get { return x; }
+        }
 
-		public Rectangle GetBoundingBox()
-		{
-		    return ctx.MakeRectangle(this, this);
-		}
+        public virtual double Y
+        {
+            get { return y; }
+        }
 
-		public bool HasArea()
-		{
-			return false;
-		}
+        public virtual IRectangle BoundingBox
+        {
+            get { return ctx.MakeRectangle(this, this); }
+        }
 
-		public Point GetCenter()
-		{
-			return this;
-		}
+        public virtual IPoint Center
+        {
+            get { return this; }
+        }
 
-		public double GetX()
-		{
-			return x;
-		}
+        public virtual IShape GetBuffered(double distance, SpatialContext ctx)
+        {
+            return ctx.MakeCircle(this, distance);
+        }
 
-		public double GetY()
-		{
-			return y;
-		}
+        public virtual SpatialRelation Relate(IShape other)
+        {
+            if (IsEmpty || other.IsEmpty)
+                return SpatialRelation.DISJOINT;
+            if (other is IPoint)
+                return this.Equals(other) ? SpatialRelation.INTERSECTS : SpatialRelation.DISJOINT;
+            return other.Relate(this).Transpose();
+        }
 
-	    public double GetArea(SpatialContext ctx)
-		{
-			return 0;
-		}
+        public virtual bool HasArea
+        {
+            get { return false; }
+        }
 
-		public override string ToString()
-		{
-		    return string.Format("Pt(x={0:0.0},y={1:0.0})", x, y);
-		}
+        public virtual double GetArea(SpatialContext ctx)
+        {
+            return 0;
+        }
 
-		public override bool Equals(object o)
-		{
-			return Equals(this, o);
-		}
+        public override string ToString()
+        {
+            return string.Format("Pt(x={0:0.0#############},y={1:0.0#############})", x, y);
+        }
 
-		/// <summary>
-		/// All {@link Point} implementations should use this definition of {@link Object#equals(Object)}.
-		/// </summary>
-		/// <param name="thiz"></param>
-		/// <param name="o"></param>
-		/// <returns></returns>
-		public static bool Equals(Point thiz, Object o)
-		{
-			if (thiz == null)
-				throw new ArgumentNullException("thiz");
+        public override bool Equals(object o)
+        {
+            return Equals(this, o);
+        }
 
-			if (thiz == o) return true;
-			
-			var point = o as Point;
-			if (point == null) return false;
+        /// <summary>
+        /// All <see cref="IPoint"/> implementations should use this definition of <see cref="object.Equals(object)"/>.
+        /// </summary>
+        public static bool Equals(IPoint thiz, Object o)
+        {
+            if (thiz == null)
+                throw new ArgumentNullException("thiz");
 
-			return thiz.GetX().Equals(point.GetX()) && thiz.GetY().Equals(point.GetY());
-		}
+            if (thiz == o) return true;
 
-		public override int GetHashCode()
-		{
-			return GetHashCode(this);
-		}
+            var point = o as IPoint;
+            if (point == null) return false;
 
-		/// <summary>
-		/// All {@link Point} implementations should use this definition of {@link Object#hashCode()}.
-		/// </summary>
-		/// <param name="thiz"></param>
-		/// <returns></returns>
-		public static int GetHashCode(Point thiz)
-		{
-			if (thiz == null)
-				throw new ArgumentNullException("thiz");
+            return thiz.X.Equals(point.X) && thiz.Y.Equals(point.Y);
+        }
 
-			long temp = thiz.GetX() != +0.0d ? BitConverter.DoubleToInt64Bits(thiz.GetX()) : 0L;
-			int result = (int)(temp ^ ((uint)temp >> 32));
-			temp = thiz.GetY() != +0.0d ? BitConverter.DoubleToInt64Bits(thiz.GetY()) : 0L;
-			result = 31 * result + (int)(temp ^ ((uint)temp >> 32));
-			return result;
-		}
-	}
+        public override int GetHashCode()
+        {
+            return GetHashCode(this);
+        }
+
+        /// <summary>
+        /// All <see cref="IPoint"/> implementations should use this definition of <see cref="object.GetHashCode()"/>.
+        /// </summary>
+        public static int GetHashCode(IPoint thiz)
+        {
+            if (thiz == null)
+                throw new ArgumentNullException("thiz");
+
+            long temp = thiz.X != +0.0d ? BitConverter.DoubleToInt64Bits(thiz.X) : 0L;
+            int result = (int)(temp ^ ((uint)temp >> 32));
+            temp = thiz.Y != +0.0d ? BitConverter.DoubleToInt64Bits(thiz.Y) : 0L;
+            result = 31 * result + (int)(temp ^ ((uint)temp >> 32));
+            return result;
+        }
+    }
 }

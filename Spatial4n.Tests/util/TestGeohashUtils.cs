@@ -1,10 +1,26 @@
-﻿using System;
+﻿/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 using Spatial4n.Core.Context;
 using Spatial4n.Core.Shapes;
 using Spatial4n.Core.Util;
 using Xunit;
 
-namespace Spatial4n.Tests.util
+namespace Spatial4n.Core.Util
 {
     public class TestGeohashUtils
     {
@@ -15,9 +31,9 @@ namespace Spatial4n.Tests.util
          * lat=57.64911 lng=10.40744 should be encoded as "u4pruydqqvj8"
          */
         [Fact]
-        public void TestEncode()
+        public virtual void TestEncode()
         {
-            String hash = GeohashUtils.EncodeLatLon(42.6, -5.6);
+            string hash = GeohashUtils.EncodeLatLon(42.6, -5.6);
             Assert.Equal("ezs42e44yx96", hash);
 
             hash = GeohashUtils.EncodeLatLon(57.64911, 10.40744);
@@ -29,14 +45,14 @@ namespace Spatial4n.Tests.util
          * decoded within 0.00001 of the original value
          */
         [Fact]
-        public void TestDecodePreciseLongitudeLatitude()
+        public virtual void TestDecodePreciseLongitudeLatitude()
         {
-            String hash = GeohashUtils.EncodeLatLon(52.3738007, 4.8909347);
+            string hash = GeohashUtils.EncodeLatLon(52.3738007, 4.8909347);
 
-            Point point = GeohashUtils.Decode(hash, ctx);
+            IPoint point = GeohashUtils.Decode(hash, ctx);
 
-            CustomAssert.EqualWithDelta(52.3738007, point.GetY(), 0.00001D);
-            CustomAssert.EqualWithDelta(4.8909347, point.GetX(), 0.00001D);
+            CustomAssert.EqualWithDelta(52.3738007, point.Y, 0.00001D);
+            CustomAssert.EqualWithDelta(4.8909347, point.X, 0.00001D);
         }
 
         /**
@@ -44,41 +60,41 @@ namespace Spatial4n.Tests.util
          * within 0.00001 of the original value
          */
         [Fact]
-        public void TestDecodeImpreciseLongitudeLatitude()
+        public virtual void TestDecodeImpreciseLongitudeLatitude()
         {
-            String hash = GeohashUtils.EncodeLatLon(84.6, 10.5);
+            string hash = GeohashUtils.EncodeLatLon(84.6, 10.5);
 
-            Point point = GeohashUtils.Decode(hash, ctx);
+            IPoint point = GeohashUtils.Decode(hash, ctx);
 
-            CustomAssert.EqualWithDelta(84.6, point.GetY(), 0.00001D);
-            CustomAssert.EqualWithDelta(10.5, point.GetX(), 0.00001D);
+            CustomAssert.EqualWithDelta(84.6, point.Y, 0.00001D);
+            CustomAssert.EqualWithDelta(10.5, point.X, 0.00001D);
         }
 
         /*
          * see https://issues.apache.org/jira/browse/LUCENE-1815 for details
          */
         [Fact]
-        public void TestDecodeEncode()
+        public virtual void TestDecodeEncode()
         {
-            String geoHash = "u173zq37x014";
+            string geoHash = "u173zq37x014";
             Assert.Equal(geoHash, GeohashUtils.EncodeLatLon(52.3738007, 4.8909347));
-            Point point = GeohashUtils.Decode(geoHash, ctx);
-            CustomAssert.EqualWithDelta(52.37380061d, point.GetY(), 0.000001d);
-            CustomAssert.EqualWithDelta(4.8909343d, point.GetX(), 0.000001d);
+            IPoint point = GeohashUtils.Decode(geoHash, ctx);
+            CustomAssert.EqualWithDelta(52.37380061d, point.Y, 0.000001d);
+            CustomAssert.EqualWithDelta(4.8909343d, point.X, 0.000001d);
 
-            Assert.Equal(geoHash, GeohashUtils.EncodeLatLon(point.GetY(), point.GetX()));
+            Assert.Equal(geoHash, GeohashUtils.EncodeLatLon(point.Y, point.X));
 
             geoHash = "u173";
             point = GeohashUtils.Decode("u173", ctx);
-            geoHash = GeohashUtils.EncodeLatLon(point.GetY(), point.GetX());
-            Point point2 = GeohashUtils.Decode(geoHash, ctx);
-            CustomAssert.EqualWithDelta(point.GetY(), point2.GetY(), 0.000001d);
-            CustomAssert.EqualWithDelta(point.GetX(), point2.GetX(), 0.000001d);
+            geoHash = GeohashUtils.EncodeLatLon(point.Y, point.X);
+            IPoint point2 = GeohashUtils.Decode(geoHash, ctx);
+            CustomAssert.EqualWithDelta(point.Y, point2.Y, 0.000001d);
+            CustomAssert.EqualWithDelta(point.X, point2.X, 0.000001d);
         }
 
         /** see the table at http://en.wikipedia.org/wiki/Geohash */
         [Fact]
-        public void testHashLenToWidth()
+        public virtual void TestHashLenToWidth()
         {
             //test odd & even len
             double[] boxOdd = GeohashUtils.LookupDegreesSizeForHashLen(3);
@@ -91,7 +107,7 @@ namespace Spatial4n.Tests.util
 
         /** see the table at http://en.wikipedia.org/wiki/Geohash */
         [Fact]
-        public void testLookupHashLenForWidthHeight()
+        public virtual void TestLookupHashLenForWidthHeight()
         {
             Assert.Equal(1, GeohashUtils.LookupHashLenForWidthHeight(999, 999));
 

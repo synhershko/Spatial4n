@@ -1,10 +1,32 @@
-﻿using System;
+﻿/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
-using Xunit.Extensions;
 
-namespace Spatial4n.Tests
+#if NETCOREAPP1_0
+using Xunit.Sdk;
+#else
+using Xunit.Extensions;
+#endif
+
+namespace Spatial4n.Core
 {
 	/// <summary>
 	/// Provides a data source for a data theory, with the data coming from a public static property on the test class.
@@ -45,11 +67,21 @@ namespace Spatial4n.Tests
 		/// <param name="parameterTypes">The types of the parameters for the test method</param>
 		/// <returns>The theory data, in table form</returns>
 		[SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", MessageId = "0", Justification = "This is validated elsewhere.")]
-		public override IEnumerable<object[]> GetData(MethodInfo methodUnderTest, Type[] parameterTypes)
-		{
-			Type type = PropertyType ?? methodUnderTest.ReflectedType;
-			PropertyInfo propInfo = type.GetProperty(propertyName, BindingFlags.Public | BindingFlags.Static | BindingFlags.FlattenHierarchy);
-			if (propInfo == null)
+#if NETCOREAPP1_0
+        public override IEnumerable<object[]> GetData(MethodInfo methodUnderTest)
+#else
+        public override IEnumerable<object[]> GetData(MethodInfo methodUnderTest, Type[] parameterTypes)
+#endif
+        {
+#if NETCOREAPP1_0
+            // Spatial4n note: must always use PropertyType in .NET Core if the data is in a subclass, since ReflectedType is not supported
+            Type type = PropertyType ?? methodUnderTest.DeclaringType;
+#else
+            Type type = PropertyType ?? methodUnderTest.ReflectedType;
+            
+#endif
+            PropertyInfo propInfo = type.GetProperty(propertyName, BindingFlags.Public | BindingFlags.Static | BindingFlags.FlattenHierarchy);
+            if (propInfo == null)
 			{
 				string typeName = type.FullName;
 				if (methodUnderTest.DeclaringType != null)
@@ -62,7 +94,7 @@ namespace Spatial4n.Tests
 
 				if (propInfo == null)
 					throw new ArgumentException(string.Format("Could not find public static property {0} on {1}", propertyName,
-				                                          type.FullName));
+                                                          typeName));
 			}
 
 			object obj = propInfo.GetValue(null, null);

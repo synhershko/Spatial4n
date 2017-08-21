@@ -96,23 +96,11 @@ task Pack -depends Compile -description "This task creates the NuGet packages" {
 	$packages = Get-ChildItem -Path "*.csproj" -Recurse | ? { !$_.Directory.Name.Contains(".Test") }
 	popd
 
-	try {
-		$versionFile = "$base_directory\PackageVersion.proj"
-		Backup-File $versionFile
-
-		Generate-Version-File `
-			-version $version `
-			-packageVersion $packageVersion `
-			-file $versionFile
-
-		foreach ($package in $packages) {
-			Write-Host "Creating NuGet package for $package..." -ForegroundColor Magenta
-			Exec {
-				&dotnet pack $package --output $nuget_package_directory --configuration $configuration --no-build --version-suffix $packageVersion
-			}
+	foreach ($package in $packages) {
+		Write-Host "Creating NuGet package for $package..." -ForegroundColor Magenta
+		Exec {
+			&dotnet pack $package --output $nuget_package_directory --configuration $configuration --no-build --include-symbols /p:PackageVersion=$packageVersion
 		}
-	} finally {
-		Restore-File $versionFile
 	}
 }
 
@@ -129,25 +117,6 @@ task Test -depends Pack -description "This task runs the tests" {
 			&dotnet test $testProject --configuration $configuration --framework $framework.Trim() --no-build
 		}
 	}
-}
-
-function Generate-Version-File {
-param(
-	[string]$packageVersion,
-	[string]$file = $(throw "file is a required parameter.")
-)
-
-  $versionFile = "<Project>
-	<PropertyGroup>
-		<PackageVersion>$packageVersion</PackageVersion>
-	</PropertyGroup>
-</Project>
-"
-	$dir = [System.IO.Path]::GetDirectoryName($file)
-	Ensure-Directory-Exists $dir
-
-	Write-Host "Generating version file: $file"
-	Out-File -filePath $file -encoding UTF8 -inputObject $versionFile
 }
 
 function Generate-Assembly-Info {

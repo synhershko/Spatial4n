@@ -32,7 +32,7 @@ namespace Spatial4n.Core
 			_count = count;
 		}
 
-#if !NETCOREAPP1_0
+#if !NETCOREAPP
 		protected override IEnumerable<ITestCommand> EnumerateTestCommands(
 			IMethodInfo method)
 		{
@@ -40,9 +40,9 @@ namespace Spatial4n.Core
 				.SelectMany(tc => Enumerable.Repeat(tc, _count));
 		}
 #endif
-	}
+    }
 
-	public class RepeatTheoryAttribute : TheoryAttribute
+    public class RepeatTheoryAttribute : TheoryAttribute
 	{
 		readonly int _count;
 
@@ -51,7 +51,7 @@ namespace Spatial4n.Core
 			_count = count;
 		}
 
-#if !NETCOREAPP1_0
+#if !NETCOREAPP
         // Spatial4n TODO: Work out how to make the test repeat in .NET Core
         protected override IEnumerable<ITestCommand> EnumerateTestCommands(
 			IMethodInfo method)
@@ -60,5 +60,5 @@ namespace Spatial4n.Core
 				.SelectMany(tc => Enumerable.Repeat(tc, _count));
 		}
 #endif
-	}
+    }
 }

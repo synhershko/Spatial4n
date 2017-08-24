@@ -101,7 +101,9 @@ namespace Spatial4n.Core.Shape
             TestRelationsImpl(false);
             TestRelationsImpl(true);
         }
+#pragma warning disable xUnit1013
         public virtual void TestRelationsImpl(bool prepare)
+#pragma warning restore xUnit1013
         {
             Debug.Assert(!((NtsWktShapeParser)ctx.WktShapeParser).IsAutoIndex);
             //base polygon

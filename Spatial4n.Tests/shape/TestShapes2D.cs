@@ -159,7 +159,9 @@ namespace Spatial4n.Core.Shape
             TestEmptiness(ctx.MakeCircle(double.NaN, double.NaN, random.nextBoolean() ? 0 : double.NaN));
         }
 
+#pragma warning disable xUnit1013
         public static void TestCircleReset(SpatialContext ctx)
+#pragma warning restore xUnit1013
         {
             ICircle c = ctx.MakeCircle(3, 4, 5);
             ICircle c2 = ctx.MakeCircle(5, 6, 7);
@@ -194,7 +196,9 @@ namespace Spatial4n.Core.Shape
                                     });
         }
 
+#pragma warning disable xUnit1013
         new public static void CheckShapesImplementEquals(Type[] classes)
+#pragma warning restore xUnit1013
         {
             foreach (var clazz in classes)
             {

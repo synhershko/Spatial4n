@@ -35,8 +35,9 @@ namespace Spatial4n.Core.Shape
         //      @Rule
         //public TestLog testLog = TestLog.instance;
         //SpatialContext.GEO ;//
-
+#pragma warning disable xUnit1013
         public static void LogShapes(BufferedLine line, IRectangle rect)
+#pragma warning restore xUnit1013
         {
             string lineWKT =
                 "LINESTRING(" + line.A.X + " " + line.A.Y + "," +
@@ -132,7 +133,7 @@ namespace Spatial4n.Core.Shape
             }
             //compare results
             int calcClosestQuad = line.LinePrimary.Quadrant(rect.Center);
-            Assert.True(farthestDistanceQuads.Contains(calcClosestQuad));
+            Assert.Contains(calcClosestQuad, farthestDistanceQuads);
         }
 
         private BufferedLine NewRandomLine()

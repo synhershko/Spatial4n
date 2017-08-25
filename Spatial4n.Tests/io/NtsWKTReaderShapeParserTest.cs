@@ -39,17 +39,14 @@ namespace Spatial4n.Core.IO
             ctx = factory.NewSpatialContext();
         }
 
-        [Fact(Skip = "spatial4n TODO: Bug in WKTReader throws exception 'Cannot use GeometryServiceProvider without an assigned IGeometryServices class'.")]
-        //[Fact]
+        [Fact]
         public virtual void WktGeoPt()
         {
-            //GeoAPI.Geometries.Ge
             IShape s = ctx.ReadShape("Point(-160 30)");
             Assert.Equal(ctx.MakePoint(-160, 30), s);
         }
 
-        [Fact(Skip = "spatial4n TODO: Bug in WKTReader throws exception 'Cannot use GeometryServiceProvider without an assigned IGeometryServices class'.")]
-        //[Fact]
+        [Fact]
         public virtual void WktGeoRect()
         {
             //REMEMBER: Polygon WKT's outer ring is counter-clockwise order. If you accidentally give the other direction,

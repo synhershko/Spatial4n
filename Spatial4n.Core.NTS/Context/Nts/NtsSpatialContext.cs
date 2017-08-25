@@ -16,6 +16,7 @@
  * limitations under the License.
  */
 
+using GeoAPI;
 using GeoAPI.Geometries;
 using NetTopologySuite.Geometries;
 using NetTopologySuite.Utilities;
@@ -41,6 +42,13 @@ namespace Spatial4n.Core.Context.Nts
 
         static NtsSpatialContext()
         {
+            // spatial4n specific - need to bootstrap GeoAPI with
+            // the NetTopologySuite geometry. See: 
+            // https://github.com/NetTopologySuite/NetTopologySuite/issues/189#issuecomment-324844404
+#if NETSTANDARD
+            GeoAPI.NetTopologySuiteBootstrapper.Bootstrap();
+#endif
+
             NtsSpatialContextFactory factory = new NtsSpatialContextFactory();
             factory.geo = true;
             GEO = new NtsSpatialContext(factory);

@@ -88,8 +88,7 @@ namespace Spatial4n.Core.IO
             return gsf.CreateCircle();
         }
 
-        [Fact(Skip = "spatial4n TODO: Bug in WKBReader throws exception 'Cannot use GeometryServiceProvider without an assigned IGeometryServices class'.")]
-        //[Fact]
+        [Fact]
         public override void TestCollection()
         {
             base.TestCollection();

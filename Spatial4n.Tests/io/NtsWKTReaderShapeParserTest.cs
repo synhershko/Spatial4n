@@ -49,6 +49,7 @@ namespace Spatial4n.Core.IO
         }
 
         [Fact(Skip = "spatial4n TODO: Bug in WKTReader throws exception 'Cannot use GeometryServiceProvider without an assigned IGeometryServices class'.")]
+        //[Fact]
         public virtual void WktGeoRect()
         {
             //REMEMBER: Polygon WKT's outer ring is counter-clockwise order. If you accidentally give the other direction,

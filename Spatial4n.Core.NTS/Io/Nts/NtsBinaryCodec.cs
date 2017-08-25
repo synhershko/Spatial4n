@@ -33,7 +33,7 @@ namespace Spatial4n.Core.IO.Nts
         protected readonly bool useFloat;//instead of double
         private const int wkbXDR = 0;
         public NtsBinaryCodec(NtsSpatialContext ctx, NtsSpatialContextFactory factory)
-                  : base(ctx, factory)
+            : base(ctx, factory)
         {
             //note: ctx.geometryFactory hasn't been set yet
             useFloat = (factory.precisionModel.PrecisionModelType == PrecisionModels.FloatingSingle);
@@ -165,7 +165,7 @@ namespace Spatial4n.Core.IO.Nts
             }
         }
 
-        public IShape ReadNtsGeom(BinaryReader dataInput)
+        public virtual IShape ReadNtsGeom(BinaryReader dataInput)
         {
             NtsSpatialContext ctx = (NtsSpatialContext)base.ctx;
 #pragma warning disable 612, 618
@@ -269,7 +269,7 @@ namespace Spatial4n.Core.IO.Nts
             }
         }
 
-        public void WriteNtsGeom(BinaryWriter dataOutput, IShape s)
+        public virtual void WriteNtsGeom(BinaryWriter dataOutput, IShape s)
         {
             NtsSpatialContext ctx = (NtsSpatialContext)base.ctx;
             IGeometry geom = ctx.GetGeometryFrom(s);//might even translate it

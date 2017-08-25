@@ -61,7 +61,7 @@ namespace Spatial4n.Core.Shapes.Impl
         {
         }
 
-        public void Reset(double minX, double maxX, double minY, double maxY)
+        public virtual void Reset(double minX, double maxX, double minY, double maxY)
         {
             Debug.Assert(!IsEmpty);
             this.minX = minX;
@@ -278,12 +278,12 @@ namespace Spatial4n.Core.Shapes.Impl
             return SpatialRelation.INTERSECTS;
         }
 
-        public SpatialRelation RelateYRange(double ext_minY, double ext_maxY)
+        public virtual SpatialRelation RelateYRange(double ext_minY, double ext_maxY)
         {
             return Relate_Range(minY, maxY, ext_minY, ext_maxY);
         }
 
-        public SpatialRelation RelateXRange(double ext_minX, double ext_maxX)
+        public virtual SpatialRelation RelateXRange(double ext_minX, double ext_maxX)
         {
             //For ext & this we have local minX and maxX variable pairs. We rotate them so that minX <= maxX
             double minX = this.minX;

@@ -194,7 +194,7 @@ namespace Spatial4n.Core.Shapes.Impl
                 return ExpandTo((LongitudeRange)other);
             }
 
-            public LongitudeRange ExpandTo(LongitudeRange other)
+            public virtual LongitudeRange ExpandTo(LongitudeRange other)
             {
                 LongitudeRange a, b;// a.ctr <= b.ctr
                 if (this.CompareTo(other) <= 0)

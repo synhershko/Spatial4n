@@ -171,7 +171,7 @@ namespace Spatial4n.Core.IO
             return ctx.MakeCircle(ReadPoint(dataInput), ReadDim(dataInput));
         }
 
-        public void WriteCircle(BinaryWriter dataOutput, ICircle c)
+        public virtual void WriteCircle(BinaryWriter dataOutput, ICircle c)
         {
             WritePoint(dataOutput, c.Center);
             WriteDim(dataOutput, c.Radius);

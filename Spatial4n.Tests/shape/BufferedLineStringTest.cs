@@ -41,7 +41,7 @@ namespace Spatial4n.Core.Shape
                 IRectangle nearR = RandomRectangle(nearP);
                 int numPoints = 2 + random.Next(3 + 1);//2-5 points
 
-                List<Core.Shapes.IPoint> points = new List<Core.Shapes.IPoint>(numPoints);
+                IList<Core.Shapes.IPoint> points = new List<Core.Shapes.IPoint>(numPoints);
                 while (points.Count < numPoints)
                 {
                     points.Add(RandomPointIn(nearR));

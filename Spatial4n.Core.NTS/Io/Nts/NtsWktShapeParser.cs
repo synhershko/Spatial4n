@@ -174,10 +174,9 @@ namespace Spatial4n.Core.IO.Nts
         {
             GeometryFactory geometryFactory = m_ctx.GeometryFactory;
 
-            List<Coordinate[]> coordinateSequenceList = CoordinateSequenceList(state);
+            IList<Coordinate[]> coordinateSequenceList = CoordinateSequenceList(state);
 
-            ILinearRing shell = geometryFactory.CreateLinearRing
-        (coordinateSequenceList[0]);
+            ILinearRing shell = geometryFactory.CreateLinearRing(coordinateSequenceList[0]);
 
             ILinearRing[] holes = null;
             if (coordinateSequenceList.Count > 1)
@@ -202,7 +201,7 @@ namespace Spatial4n.Core.IO.Nts
             if (state.NextIfEmptyAndSkipZM())
                 return m_ctx.MakeCollection(new List<IShape>());
 
-            List<IShape> polygons = new List<IShape>();
+            IList<IShape> polygons = new List<IShape>();
             state.NextExpect('(');
             do
             {
@@ -219,9 +218,9 @@ namespace Spatial4n.Core.IO.Nts
         ///   '(' coordinateSequence (',' coordinateSequence )* ')'
         /// </code>
         /// </summary>
-        protected virtual List<Coordinate[]> CoordinateSequenceList(WktShapeParser.State state)
+        protected virtual IList<Coordinate[]> CoordinateSequenceList(WktShapeParser.State state)
         {
-            List<Coordinate[]> sequenceList = new List<Coordinate[]>();
+            IList<Coordinate[]> sequenceList = new List<Coordinate[]>();
             state.NextExpect('(');
             do
             {

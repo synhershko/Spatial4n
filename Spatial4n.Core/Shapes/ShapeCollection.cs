@@ -138,7 +138,7 @@ namespace Spatial4n.Core.Shapes
 
         public virtual IShape GetBuffered(double distance, SpatialContext ctx)
         {
-            List<Shapes.IShape> bufColl = new List<Shapes.IShape>(Count);
+            IList<Shapes.IShape> bufColl = new List<Shapes.IShape>(Count);
             foreach (Shapes.IShape shape in m_shapes)
             {
                 bufColl.Add(shape.GetBuffered(distance, ctx));

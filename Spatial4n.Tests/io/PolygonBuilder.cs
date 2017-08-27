@@ -32,8 +32,8 @@ namespace Spatial4n.Core.IO
     public class PolygonBuilder
     {
         private readonly NtsSpatialContext ctx;
-        private readonly List<Coordinate> points = new List<Coordinate>();
-        private readonly List<ILinearRing> holes = new List<ILinearRing>();
+        private readonly IList<Coordinate> points = new List<Coordinate>();
+        private readonly IList<ILinearRing> holes = new List<ILinearRing>();
 
         public PolygonBuilder(NtsSpatialContext ctx)
         {
@@ -103,7 +103,7 @@ namespace Spatial4n.Core.IO
         public class PolygonHoleBuilder
         {
 
-            private readonly List<Coordinate> points = new List<Coordinate>();
+            private readonly IList<Coordinate> points = new List<Coordinate>();
             private readonly PolygonBuilder polygonBuilder;
 
             /**

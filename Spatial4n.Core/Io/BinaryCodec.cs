@@ -181,7 +181,7 @@ namespace Spatial4n.Core.IO
         {
             byte type = dataInput.ReadByte();
             int size = dataInput.ReadInt32();
-            List<IShape> shapes = new List<IShape>(size);
+            IList<IShape> shapes = new List<IShape>(size);
             for (int i = 0; i < size; i++)
             {
                 if (type == 0)

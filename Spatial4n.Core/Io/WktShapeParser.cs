@@ -257,7 +257,7 @@ namespace Spatial4n.Core.IO
         {
             if (state.NextIfEmptyAndSkipZM())
                 return m_ctx.MakeCollection(new List<IShape>());
-            List<IShape> shapes = new List<IShape>();
+            IList<IShape> shapes = new List<IShape>();
             state.NextExpect('(');
             do
             {
@@ -307,7 +307,7 @@ namespace Spatial4n.Core.IO
         {
             if (state.NextIfEmptyAndSkipZM())
                 return m_ctx.MakeLineString(new List<IPoint>());
-            List<IPoint> points = PointList(state);
+            IList<IPoint> points = PointList(state);
             return m_ctx.MakeLineString(points);
         }
 
@@ -322,7 +322,7 @@ namespace Spatial4n.Core.IO
         {
             if (state.NextIfEmptyAndSkipZM())
                 return m_ctx.MakeCollection(new List<IShape>());
-            List<IShape> shapes = new List<IShape>();
+            IList<IShape> shapes = new List<IShape>();
             state.NextExpect('(');
             do
             {
@@ -342,7 +342,7 @@ namespace Spatial4n.Core.IO
         {
             if (state.NextIfEmptyAndSkipZM())
                 return m_ctx.MakeCollection(new List<IShape>());
-            List<IShape> shapes = new List<IShape>();
+            IList<IShape> shapes = new List<IShape>();
             state.NextExpect('(');
             do
             {
@@ -373,9 +373,9 @@ namespace Spatial4n.Core.IO
         /// </code>
         /// </summary>
         /// <seealso cref="Point(State)"/>
-        protected virtual List<IPoint> PointList(State state)
+        protected virtual IList<IPoint> PointList(State state)
         {
-            List<IPoint> sequence = new List<IPoint>();
+            IList<IPoint> sequence = new List<IPoint>();
             state.NextExpect('(');
             do
             {

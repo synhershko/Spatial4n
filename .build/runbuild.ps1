@@ -26,7 +26,30 @@ task Clean -description "This task cleans up the build directory" {
 	Get-ChildItem $base_directory -Include *.bak -Recurse | foreach ($_) {Remove-Item $_.FullName}
 }
 
-task Init -description "This tasks makes sure the build environment is correctly setup" {  
+task InstallSDK -description "This task makes sure the correct SDK version is installed" {
+	& where.exe dotnet.exe
+	$sdkVersion = ""
+
+	if ($LASTEXITCODE -eq 0) {
+		$sdkVersion = ((& dotnet.exe --version) | Out-String).Trim()
+	}
+	
+	Write-Host "Current SDK version: $sdkVersion" -ForegroundColor Yellow
+	if (!$sdkVersion.Equals("2.0.0")) {
+		Write-Host "Require SDK version 2.0.0, installing..." -ForegroundColor Red
+		#Install the correct version of the .NET SDK for this build
+	    Invoke-Expression "$base_directory\build\dotnet-install.ps1 -Version 2.0.0"
+	}
+
+	# Safety check - this should never happen
+	& where.exe dotnet.exe
+
+	if ($LASTEXITCODE -ne 0) {
+		throw "Could not find dotnet CLI in PATH. Please install the .NET Core 2.0 SDK."
+	}
+}
+
+task Init -depends InstallSDK -description "This tasks makes sure the build environment is correctly setup" {  
 
 	Write-Host "Base Directory: $base_directory"
 	Write-Host "Release Directory: $release_directory"

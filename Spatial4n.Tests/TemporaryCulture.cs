@@ -21,7 +21,7 @@ using System.Threading;
 
 namespace Spatial4n.Core
 {
-    public class TemporaryCulture : IDisposable
+    public sealed class TemporaryCulture : IDisposable
     {
         private readonly CultureInfo oldCurrentCulture;
         private readonly CultureInfo oldCurrentUiCulture;

@@ -32,7 +32,7 @@ namespace Spatial4n.Core.Exceptions
         /// </summary>
         /// <param name="info">The <see cref="SerializationInfo"/> that holds the serialized object data about the exception being thrown.</param>
         /// <param name="context">The <see cref="StreamingContext"/> that contains contextual information about the source or destination.</param>
-        public RuntimeException(SerializationInfo info, StreamingContext context)
+        protected RuntimeException(SerializationInfo info, StreamingContext context)
             : base(info, context)
         {
         }

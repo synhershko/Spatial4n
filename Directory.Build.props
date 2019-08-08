@@ -34,8 +34,6 @@
     <PackageProjectUrl>https://github.com/synhershko/spatial4n</PackageProjectUrl>
     <IsPackable>false</IsPackable>
     <IncludeSymbols>true</IncludeSymbols>
-    <!-- This is the new symbols format (the only one currently supported at NuGet.org) -->
-    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
     <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
   </PropertyGroup>
   

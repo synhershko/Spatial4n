@@ -34,6 +34,11 @@
 
   <PropertyGroup Condition="'$(TargetFramework)' == 'netstandard1.3' OR '$(TargetFramework)' == 'netstandard2.0'">
     <DefineConstants>$(DefineConstants);NETSTANDARD</DefineConstants>
+    <DebugType>portable</DebugType>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(TargetFramework)' == 'net35' OR '$(TargetFramework)' == 'net40'">
+    <DebugType>full</DebugType>
   </PropertyGroup>
 
   <ItemGroup Condition="'$(TargetFramework)' == 'netstandard1.3' OR '$(TargetFramework)' == 'netstandard2.0'">

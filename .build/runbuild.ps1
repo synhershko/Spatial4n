@@ -97,7 +97,7 @@ task Compile -depends Clean, Init -description "This task compiles the solution"
 }
 
 task Pack -depends Compile -description "This task creates the NuGet packages" {
-	Ensure-Directory-Exists $nuget_package_directory
+	Ensure-Directory-Exists "$nuget_package_directory"
 
 	pushd $base_directory
 	$packages = Get-ChildItem -Path "*.csproj" -Recurse | ? { !$_.Directory.Name.Contains(".Test") }
@@ -106,8 +106,19 @@ task Pack -depends Compile -description "This task creates the NuGet packages" {
 	foreach ($package in $packages) {
 		Write-Host "Creating NuGet package for $package..." -ForegroundColor Magenta
 		Exec {
-			&dotnet pack $package --output $nuget_package_directory --configuration $configuration --no-build --include-symbols /p:PackageVersion=$packageVersion
+			&dotnet pack $package --output "$nuget_package_directory" --configuration $configuration --no-build --include-source /p:PackageVersion=$packageVersion
 		}
+
+		$temp = New-TemporaryDirectory
+
+		# Create portable symbols (the only format that NuGet.org supports) for .NET Standard and .NET 4.0 only
+		Exec {
+			&dotnet pack $package --output "$temp" --configuration $configuration /p:PackageVersion=$packageVersion /p:SymbolPackageFormat=snupkg /p:PortableDebugTypeOnly=true
+		}
+
+		# Move the portable files to the $nuget_package_directory
+		Get-ChildItem -Path "$temp" -Include *.snupkg -Recurse | Copy-Item -Destination "$nuget_package_directory"
+		Remove-Item -LiteralPath "$temp" -Force -Recurse -ErrorAction SilentlyContinue
 	}
 }
 
@@ -149,4 +160,10 @@ function Ensure-Directory-Exists([string] $path)
 	if (!(Test-Path $path)) {
 		New-Item $path -ItemType Directory
 	}
+}
+
+function New-TemporaryDirectory {
+    $parent = [System.IO.Path]::GetTempPath()
+    [string] $name = [System.Guid]::NewGuid()
+    New-Item -ItemType Directory -Path (Join-Path $parent $name)
 }

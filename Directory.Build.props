@@ -21,12 +21,12 @@
 <Project>
   <PropertyGroup Label="NuGet Package Properties">
     <Authors>Itamar Syn-Hershko, Shad Storhaug</Authors>
-    <PackageLicenseUrl>https://raw.github.com/synhershko/Spatial4n/master/LICENSE.txt</PackageLicenseUrl>
     <PackageProjectUrl>https://github.com/synhershko/spatial4n</PackageProjectUrl>
     <IsPackable>false</IsPackable>
     <IncludeSymbols>true</IncludeSymbols>
     <!-- This is the new symbols format (the only one currently supported at NuGet.org) -->
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
   </PropertyGroup>
   
   <PropertyGroup Label="Copyright Info">

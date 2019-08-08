@@ -11,7 +11,6 @@ properties {
 	[string]$configuration    = "Release"
 	[bool]$backupFiles        = $true
 
-	[string]$common_assembly_info = "$base_directory\CommonAssemblyInfo.cs"
 	[string]$copyright_year = [DateTime]::Today.Year.ToString() #Get the current year from the system
 	[string]$copyright = "Copyright © 2012 - $copyright_year spatial4j and Itamar Syn-Hershko"
 	[string]$company_name = ""
@@ -93,22 +92,13 @@ task Compile -depends Clean, Init -description "This task compiles the solution"
 		$pv = "$packageVersion commit:[$gitCommit]"
 	}
 
-	try {
-		Backup-File $common_assembly_info
-
-		Generate-Assembly-Info `
-			-fileVersion $version `
-			-file $common_assembly_info
-
-		Exec {
-			&dotnet msbuild $solutionFile /t:Build `
-				/p:Configuration=$configuration `
-				/p:InformationalVersion=$pv `
-				/p:Company=$company_name `
-				/p:Copyright=$copyright
-		}
-	} finally {
-		Restore-File $common_assembly_info
+	Exec {
+		&dotnet msbuild $solutionFile /t:Build `
+			/p:Configuration=$configuration `
+			/p:FileVersion=$version `
+			/p:InformationalVersion=$pv `
+			/p:Company=$company_name `
+			/p:Copyright=$copyright
 	}
 }
 
@@ -140,24 +130,6 @@ task Test -depends Pack -description "This task runs the tests" {
 			&dotnet test $testProject --configuration $configuration --framework $framework.Trim() --no-build
 		}
 	}
-}
-
-function Generate-Assembly-Info {
-param(
-	[string]$fileVersion,
-	[string]$file = $(throw "file is a required parameter.")
-)
-
-  $asmInfo = "using System;
-using System.Reflection;
-
-[assembly: AssemblyFileVersion(""$fileVersion"")]
-"
-	$dir = [System.IO.Path]::GetDirectoryName($file)
-	Ensure-Directory-Exists $dir
-
-	Write-Host "Generating assembly info file: $file"
-	Out-File -filePath $file -encoding UTF8 -inputObject $asmInfo
 }
 
 function Backup-File([string]$path) {

@@ -10,10 +10,6 @@ properties {
 	[string]$version          = "0.0.0"
 	[string]$configuration    = "Release"
 	[bool]$backupFiles        = $true
-
-	[string]$copyright_year = [DateTime]::Today.Year.ToString() #Get the current year from the system
-	[string]$copyright = "Copyright © 2012 - $copyright_year spatial4j and Itamar Syn-Hershko"
-	[string]$company_name = ""
 }
 
 $backedUpFiles = New-Object System.Collections.ArrayList
@@ -96,9 +92,7 @@ task Compile -depends Clean, Init -description "This task compiles the solution"
 		&dotnet msbuild $solutionFile /t:Build `
 			/p:Configuration=$configuration `
 			/p:FileVersion=$version `
-			/p:InformationalVersion=$pv `
-			/p:Company=$company_name `
-			/p:Copyright=$copyright
+			/p:InformationalVersion=$pv
 	}
 }
 

@@ -35,10 +35,10 @@ task InstallSDK -description "This task makes sure the correct SDK version is in
 	}
 	
 	Write-Host "Current SDK version: $sdkVersion" -ForegroundColor Yellow
-	if (!$sdkVersion.Equals("2.0.0")) {
-		Write-Host "Require SDK version 2.0.0, installing..." -ForegroundColor Red
+	if (([version]$sdkVersion) -lt ([version]"2.2.401")) {
+		Write-Host "Require SDK version 2.2.401, installing..." -ForegroundColor Red
 		#Install the correct version of the .NET SDK for this build
-	    Invoke-Expression "$base_directory\build\dotnet-install.ps1 -Version 2.0.0"
+	    Invoke-Expression "$base_directory/.build/dotnet-install.ps1 -Version 2.2.401"
 	}
 
 	# Safety check - this should never happen

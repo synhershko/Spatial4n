@@ -6,7 +6,6 @@
 
     <!-- For now, we can switch framework to test by manually editing this file -->
     <!--<TargetFramework>net35</TargetFramework>-->
-    <Version>0.4.1</Version>
     <AssemblyName>Spatial4n.Tests</AssemblyName>
     <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
     <NoWarn>1591</NoWarn>

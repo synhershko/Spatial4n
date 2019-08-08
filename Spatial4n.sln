@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.26730.8
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29123.88
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".build", ".build", "{6CB3CB17-7BB8-465A-AB42-37AD2F9093D8}"
 	ProjectSection(SolutionItems) = preProject
@@ -14,6 +14,11 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Spatial4n.Core", "Spatial4n.Core\Spatial4n.Core.csproj", "{55165E3E-85ED-4718-8D1B-D4C6110E3552}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Spatial4n.Core.NTS", "Spatial4n.Core.NTS\Spatial4n.Core.NTS.csproj", "{FE15818D-3C0F-4156-AAF4-EFA40DE2726A}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{71012F51-E7D3-4D12-A87C-B6B163643309}"
+	ProjectSection(SolutionItems) = preProject
+		Directory.Build.props = Directory.Build.props
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

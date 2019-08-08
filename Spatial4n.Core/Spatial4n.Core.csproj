@@ -7,11 +7,8 @@
     <AssemblyVersion>0.4.1</AssemblyVersion>
     <AssemblyTitle>Spatial4n.Core</AssemblyTitle>
     <Description>A Geospatial Library for .NET - a .NET port of spatial4j</Description>
-    <Authors>Itamar Syn-Hershko</Authors>
-    <PackageLicenseUrl>https://raw.github.com/synhershko/Spatial4n/master/LICENSE.txt</PackageLicenseUrl>
-    <PackageProjectUrl>https://github.com/synhershko/spatial4n</PackageProjectUrl>
-    <Copyright>Copyright © 2012 - 2017 spatial4j and Itamar Syn-Hershko</Copyright>
     <PackageTags>Lucene Lucene.net spatial geospatial geo spatial4j search</PackageTags>
+    <IsPackable>true</IsPackable>
     <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\$(AssemblyName).xml</DocumentationFile>
     <NoWarn>1591</NoWarn>
     <GenerateAssemblyFileVersionAttribute>false</GenerateAssemblyFileVersionAttribute>

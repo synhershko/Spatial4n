@@ -154,7 +154,9 @@ namespace Spatial4n.Core.IO.Nts
                 if (m_datelineRule == Nts.DatelineRule.CcwRect)
                 {
                     // If NTS says it is clockwise, then it's actually a dateline crossing rectangle.
+#pragma warning disable 612, 618
                     crossesDateline = !CGAlgorithms.IsCCW(geometry.Coordinates);
+#pragma warning restore 612, 618
                 }
                 else
                 {

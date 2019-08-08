@@ -37,13 +37,13 @@
   </PropertyGroup>
 
   <ItemGroup Condition="'$(TargetFramework)' == 'netstandard1.3' OR '$(TargetFramework)' == 'netstandard2.0'">
-    <PackageReference Include="GeoAPI" Version="1.7.5-pre4" />
-    <PackageReference Include="NetTopologySuite" Version="1.15.0-pre011" />
+    <PackageReference Include="GeoAPI" Version="1.7.5" />
+    <PackageReference Include="NetTopologySuite" Version="1.15.0" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework)' == 'net35' OR '$(TargetFramework)' == 'net40'">
-    <PackageReference Include="GeoAPI" Version="1.7.4" />
-    <PackageReference Include="NetTopologySuite" Version="1.14.0" />
+    <PackageReference Include="GeoAPI" Version="1.7.5" />
+    <PackageReference Include="NetTopologySuite" Version="1.15.0" />
   </ItemGroup>
 
   <ItemGroup>

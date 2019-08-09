@@ -87,6 +87,12 @@ namespace Spatial4n.Core.IO
             gsf.NumPoints = (points);
             return gsf.CreateCircle();
         }
+
+        [Fact]
+        public override void TestCollection()
+        {
+            base.TestCollection();
+        }
     }
 }
 

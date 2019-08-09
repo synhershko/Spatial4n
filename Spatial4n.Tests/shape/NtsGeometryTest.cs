@@ -101,7 +101,9 @@ namespace Spatial4n.Core.Shape
             TestRelationsImpl(false);
             TestRelationsImpl(true);
         }
+#pragma warning disable xUnit1013
         public virtual void TestRelationsImpl(bool prepare)
+#pragma warning restore xUnit1013
         {
             Debug.Assert(!((NtsWktShapeParser)ctx.WktShapeParser).IsAutoIndex);
             //base polygon
@@ -264,8 +266,14 @@ namespace Spatial4n.Core.Shape
 
         private string ReadFirstLineFromRsrc(string wktRsrcPath)
         {
-            var projectPath = AppDomain.CurrentDomain.BaseDirectory.Substring(0,
-                AppDomain.CurrentDomain.BaseDirectory.LastIndexOf("Spatial4n.Tests", StringComparison.InvariantCultureIgnoreCase));
+
+#if !NETCOREAPP1_0
+            var baseDirectory = AppDomain.CurrentDomain.BaseDirectory;
+#else
+            var baseDirectory = System.AppContext.BaseDirectory;
+#endif
+            var projectPath = baseDirectory.Substring(0,
+                baseDirectory.LastIndexOf("Spatial4n.Tests", StringComparison.OrdinalIgnoreCase));
 
             var fullPath = Path.Combine(projectPath, "Spatial4n.Tests");
             fullPath = Path.Combine(fullPath, "resources");

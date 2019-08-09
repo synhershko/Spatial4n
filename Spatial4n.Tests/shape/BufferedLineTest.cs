@@ -35,8 +35,9 @@ namespace Spatial4n.Core.Shape
         //      @Rule
         //public TestLog testLog = TestLog.instance;
         //SpatialContext.GEO ;//
-
+#pragma warning disable xUnit1013
         public static void LogShapes(BufferedLine line, IRectangle rect)
+#pragma warning restore xUnit1013
         {
             string lineWKT =
                 "LINESTRING(" + line.A.X + " " + line.A.Y + "," +
@@ -110,9 +111,9 @@ namespace Spatial4n.Core.Shape
             IRectangle rect = NewRandomLine().BoundingBox;
             //logShapes(line, rect);
             //compute closest corner brute force
-            List<IPoint> corners = QuadrantCorners(rect);
+            IList<IPoint> corners = QuadrantCorners(rect);
             // a collection instead of 1 value due to ties
-            List<int?> farthestDistanceQuads = new List<int?>();
+            IList<int?> farthestDistanceQuads = new List<int?>();
             double farthestDistance = -1;
             int quad = 1;
             foreach (IPoint corner in corners)
@@ -132,7 +133,7 @@ namespace Spatial4n.Core.Shape
             }
             //compare results
             int calcClosestQuad = line.LinePrimary.Quadrant(rect.Center);
-            Assert.True(farthestDistanceQuads.Contains(calcClosestQuad));
+            Assert.Contains(calcClosestQuad, farthestDistanceQuads);
         }
 
         private BufferedLine NewRandomLine()
@@ -143,9 +144,9 @@ namespace Spatial4n.Core.Shape
             return new BufferedLine(pA, pB, buf, ctx);
         }
 
-        private List<IPoint> QuadrantCorners(IRectangle rect)
+        private IList<IPoint> QuadrantCorners(IRectangle rect)
         {
-            List<IPoint> corners = new List<IPoint>(4);
+            IList<IPoint> corners = new List<IPoint>(4);
             corners.Add(ctx.MakePoint(rect.MaxX, rect.MaxY));
             corners.Add(ctx.MakePoint(rect.MinX, rect.MaxY));
             corners.Add(ctx.MakePoint(rect.MinX, rect.MinY));
@@ -166,7 +167,7 @@ namespace Spatial4n.Core.Shape
             protected override IShape GenerateRandomShape(IPoint nearP)
             {
                 IRectangle nearR = RandomRectangle(nearP);
-                List<IPoint> corners = outerInstance.QuadrantCorners(nearR);
+                IList<IPoint> corners = outerInstance.QuadrantCorners(nearR);
                 int r4 = outerInstance.random.Next(3 + 1);//0..3
                 IPoint pA = corners[r4];
                 IPoint pB = corners[(r4 + 2) % 4];

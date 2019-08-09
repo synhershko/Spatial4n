@@ -1,0 +1,48 @@
+﻿<!--
+
+ Licensed to the Apache Software Foundation (ASF) under one
+ or more contributor license agreements.  See the NOTICE file
+ distributed with this work for additional information
+ regarding copyright ownership.  The ASF licenses this file
+ to you under the Apache License, Version 2.0 (the
+ "License"); you may not use this file except in compliance
+ with the License.  You may obtain a copy of the License at
+
+   http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing,
+ software distributed under the License is distributed on an
+ "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ KIND, either express or implied.  See the License for the
+ specific language governing permissions and limitations
+ under the License.
+
+-->
+<Project>
+  <PropertyGroup Label="Version Defaults">
+    <!-- We are strong-named - never change this unless we increment major version. -->
+    <AssemblyVersion>0.4.1</AssemblyVersion>
+    <!-- Default for FileVersion, InformationalVersion, and PackageVersion if not passed in -->
+    <Version>0.4.1.0</Version>
+    <!-- IMPORTANT: Since this is a port, we are using the 4th (revision) number for patches.
+         For example, if we don't port the changes of Spatial4j, the version after 0.4.1 should be 0.4.1.1, not 0.4.2! 
+         If we do port the changes from Spatial4j, then we should increment the first 3 segments to be the same as the ported version. -->
+  </PropertyGroup>
+  
+  <PropertyGroup Label="NuGet Package Properties">
+    <Authors>Itamar Syn-Hershko, Shad Storhaug</Authors>
+    <PackageProjectUrl>https://github.com/synhershko/spatial4n</PackageProjectUrl>
+    <IsPackable>false</IsPackable>
+    <IncludeSymbols>true</IncludeSymbols>
+    <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
+  </PropertyGroup>
+  
+  <PropertyGroup Label="Copyright Info">
+    <Product>Spatial4n</Product>
+    <CurrentYear Condition=" '$(CurrentYear)' == '' ">$([System.DateTime]::UtcNow.Year.ToString())</CurrentYear>
+    <BeginCopyrightYear>2012</BeginCopyrightYear>
+    <CopyrightYearRange>$(BeginCopyrightYear) - $(CurrentYear)</CopyrightYearRange>
+    <CopyrightYearRange Condition=" '$(BeginCopyrightYear)' == '$(CurrentYear)' ">$(CurrentYear)</CopyrightYearRange>
+    <Copyright>Copyright © $(CopyrightYearRange) spatial4j and Itamar Syn-Hershko</Copyright>
+  </PropertyGroup>
+</Project>

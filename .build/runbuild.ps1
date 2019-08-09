@@ -10,11 +10,6 @@ properties {
 	[string]$version          = "0.0.0"
 	[string]$configuration    = "Release"
 	[bool]$backupFiles        = $true
-
-	[string]$common_assembly_info = "$base_directory\CommonAssemblyInfo.cs"
-	[string]$copyright_year = [DateTime]::Today.Year.ToString() #Get the current year from the system
-	[string]$copyright = "Copyright © 2012 - $copyright_year spatial4j and Itamar Syn-Hershko"
-	[string]$company_name = ""
 }
 
 $backedUpFiles = New-Object System.Collections.ArrayList
@@ -23,9 +18,33 @@ task default -depends Test
 
 task Clean -description "This task cleans up the build directory" {
 	Remove-Item $release_directory -Force -Recurse -ErrorAction SilentlyContinue
+	Get-ChildItem $base_directory -Include *.bak -Recurse | foreach ($_) {Remove-Item $_.FullName}
 }
 
-task Init -description "This tasks makes sure the build environment is correctly setup" {  
+task InstallSDK -description "This task makes sure the correct SDK version is installed" {
+	& where.exe dotnet.exe
+	$sdkVersion = ""
+
+	if ($LASTEXITCODE -eq 0) {
+		$sdkVersion = ((& dotnet.exe --version) | Out-String).Trim()
+	}
+	
+	Write-Host "Current SDK version: $sdkVersion" -ForegroundColor Yellow
+	if (([version]$sdkVersion) -lt ([version]"2.2.401")) {
+		Write-Host "Require SDK version 2.2.401, installing..." -ForegroundColor Red
+		#Install the correct version of the .NET SDK for this build
+	    Invoke-Expression "$base_directory/.build/dotnet-install.ps1 -Version 2.2.401"
+	}
+
+	# Safety check - this should never happen
+	& where.exe dotnet.exe
+
+	if ($LASTEXITCODE -ne 0) {
+		throw "Could not find dotnet CLI in PATH. Please install the .NET Core 2.0 SDK."
+	}
+}
+
+task Init -depends InstallSDK -description "This tasks makes sure the build environment is correctly setup" {  
 
 	Write-Host "Base Directory: $base_directory"
 	Write-Host "Release Directory: $release_directory"
@@ -48,7 +67,9 @@ task Compile -depends Clean, Init -description "This task compiles the solution"
 	$projects = Get-ChildItem -Path "*.csproj" -Recurse
 	popd
 
-	&dotnet msbuild $solutionFile /t:Restore
+	Exec {
+		&dotnet msbuild $solutionFile /t:Restore
+	}
 
 	#If build runner is MyGet or version is not passed in, parse it from $packageVersion
 	if (($env:BuildRunner -ne $null -and $env:BuildRunner -eq "MyGet") -or $version -eq "0.0.0") {		
@@ -59,48 +80,45 @@ task Compile -depends Clean, Init -description "This task compiles the solution"
 		echo "Updated version to: $version"
 	}
 
-	$gitCommit = ((git rev-parse --verify --short=10 head) | Out-String).Trim()
-	$pv = "$packageVersion commit:[$gitCommit]"
+	$pv = $packageVersion
+	#check for presense of Git
+	& where.exe git.exe
+	if ($LASTEXITCODE -eq 0) {
+		$gitCommit = ((git rev-parse --verify --short=10 head) | Out-String).Trim()
+		$pv = "$packageVersion commit:[$gitCommit]"
+	}
 
-	try {
-		Backup-File $common_assembly_info
-
-		Generate-Assembly-Info `
-			-fileVersion $version `
-			-file $common_assembly_info
-
+	Exec {
 		&dotnet msbuild $solutionFile /t:Build `
 			/p:Configuration=$configuration `
-			/p:InformationalVersion=$pv `
-			/p:Company=$company_name `
-			/p:Copyright=$copyright
-	} finally {
-		Restore-File $common_assembly_info
+			/p:FileVersion=$version `
+			/p:InformationalVersion=$pv
 	}
 }
 
 task Pack -depends Compile -description "This task creates the NuGet packages" {
-	Ensure-Directory-Exists $nuget_package_directory
+	Ensure-Directory-Exists "$nuget_package_directory"
 
 	pushd $base_directory
 	$packages = Get-ChildItem -Path "*.csproj" -Recurse | ? { !$_.Directory.Name.Contains(".Test") }
 	popd
 
-	try {
-		$versionFile = "$base_directory\PackageVersion.proj"
-		Backup-File $versionFile
-
-		Generate-Version-File `
-			-version $version `
-			-packageVersion $packageVersion `
-			-file $versionFile
-
-		foreach ($package in $packages) {
-			Write-Host "Creating NuGet package for $package..." -ForegroundColor Magenta
-			&dotnet pack $package --output $nuget_package_directory --configuration $configuration --no-build --version-suffix $packageVersion
+	foreach ($package in $packages) {
+		Write-Host "Creating NuGet package for $package..." -ForegroundColor Magenta
+		Exec {
+			&dotnet pack $package --output "$nuget_package_directory" --configuration $configuration --no-build --include-source /p:PackageVersion=$packageVersion
 		}
-	} finally {
-		Restore-File $versionFile
+
+		$temp = New-TemporaryDirectory
+
+		# Create portable symbols (the only format that NuGet.org supports) for .NET Standard and .NET 4.0 only
+		Exec {
+			&dotnet pack $package --output "$temp" --configuration $configuration /p:PackageVersion=$packageVersion /p:SymbolPackageFormat=snupkg /p:PortableDebugTypeOnly=true
+		}
+
+		# Move the portable files to the $nuget_package_directory
+		Get-ChildItem -Path "$temp" -Include *.snupkg -Recurse | Copy-Item -Destination "$nuget_package_directory"
+		Remove-Item -LiteralPath "$temp" -Force -Recurse -ErrorAction SilentlyContinue
 	}
 }
 
@@ -113,45 +131,10 @@ task Test -depends Pack -description "This task runs the tests" {
 	foreach ($framework in $frameworks) {
 		Write-Host "Running tests for framework: $framework" -ForegroundColor Green
 
-		&dotnet test $testProject --configuration $configuration --framework $framework.Trim() --no-build
+		Exec {
+			&dotnet test $testProject --configuration $configuration --framework $framework.Trim() --no-build
+		}
 	}
-}
-
-function Generate-Version-File {
-param(
-	[string]$packageVersion,
-	[string]$file = $(throw "file is a required parameter.")
-)
-
-  $versionFile = "<Project>
-	<PropertyGroup>
-		<PackageVersion>$packageVersion</PackageVersion>
-	</PropertyGroup>
-</Project>
-"
-	$dir = [System.IO.Path]::GetDirectoryName($file)
-	Ensure-Directory-Exists $dir
-
-	Write-Host "Generating version file: $file"
-	Out-File -filePath $file -encoding UTF8 -inputObject $versionFile
-}
-
-function Generate-Assembly-Info {
-param(
-	[string]$fileVersion,
-	[string]$file = $(throw "file is a required parameter.")
-)
-
-  $asmInfo = "using System;
-using System.Reflection;
-
-[assembly: AssemblyFileVersion(""$fileVersion"")]
-"
-	$dir = [System.IO.Path]::GetDirectoryName($file)
-	Ensure-Directory-Exists $dir
-
-	Write-Host "Generating assembly info file: $file"
-	Out-File -filePath $file -encoding UTF8 -inputObject $asmInfo
 }
 
 function Backup-File([string]$path) {
@@ -177,4 +160,10 @@ function Ensure-Directory-Exists([string] $path)
 	if (!(Test-Path $path)) {
 		New-Item $path -ItemType Directory
 	}
+}
+
+function New-TemporaryDirectory {
+    $parent = [System.IO.Path]::GetTempPath()
+    [string] $name = [System.Guid]::NewGuid()
+    New-Item -ItemType Directory -Path (Join-Path $parent $name)
 }

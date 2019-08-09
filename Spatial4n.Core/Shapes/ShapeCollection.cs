@@ -96,7 +96,7 @@ namespace Spatial4n.Core.Shapes
             get { return m_shapes; }
         }
 
-        public IShape this[int index]
+        public virtual IShape this[int index]
         {
             get
             {
@@ -104,7 +104,7 @@ namespace Spatial4n.Core.Shapes
             }
         }
 
-        public int Count
+        public virtual int Count
         {
             get { return m_shapes.Count; }
         }
@@ -138,7 +138,7 @@ namespace Spatial4n.Core.Shapes
 
         public virtual IShape GetBuffered(double distance, SpatialContext ctx)
         {
-            List<Shapes.IShape> bufColl = new List<Shapes.IShape>(Count);
+            IList<Shapes.IShape> bufColl = new List<Shapes.IShape>(Count);
             foreach (Shapes.IShape shape in m_shapes)
             {
                 bufColl.Add(shape.GetBuffered(distance, ctx));
@@ -193,7 +193,7 @@ namespace Spatial4n.Core.Shapes
         /// disjoint.
         /// </summary>
         /// <seealso cref="ComputeMutualDisjoint(IList{IShape})"/>
-        protected bool RelateContainsShortCircuits()
+        protected virtual bool RelateContainsShortCircuits()
         {
             return true;
         }

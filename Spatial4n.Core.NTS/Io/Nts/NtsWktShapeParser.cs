@@ -51,7 +51,7 @@ namespace Spatial4n.Core.IO.Nts
         /// <summary>
         /// See <see cref="Nts.ValidationRule"/>
         /// </summary>
-        public ValidationRule ValidationRule
+        public virtual ValidationRule ValidationRule
         {
             get { return m_validationRule; }
         }
@@ -60,7 +60,7 @@ namespace Spatial4n.Core.IO.Nts
         /// NtsGeometry shapes are automatically validated when <see cref="ValidationRule"/> isn't
         /// <c>none</c>.
         /// </summary>
-        public bool IsAutoValidate
+        public virtual bool IsAutoValidate
         {
             get { return m_validationRule != Nts.ValidationRule.None; }
         }
@@ -69,7 +69,7 @@ namespace Spatial4n.Core.IO.Nts
         /// If NtsGeometry shapes should be automatically prepared (i.e. optimized) when read via WKT.
         /// <see cref="NtsGeometry.Index()"/>
         /// </summary>
-        public bool IsAutoIndex
+        public virtual bool IsAutoIndex
         {
             get { return m_autoIndex; }
         }
@@ -78,7 +78,7 @@ namespace Spatial4n.Core.IO.Nts
         /// <summary>
         /// See <see cref="Nts.DatelineRule"/>
         /// </summary>
-        public DatelineRule DatelineRule
+        public virtual DatelineRule DatelineRule
         {
             get { return m_datelineRule; }
         }
@@ -144,7 +144,7 @@ namespace Spatial4n.Core.IO.Nts
             return MakeShapeFromGeometry(geometry);
         }
 
-        protected IRectangle MakeRectFromPoly(IGeometry geometry)
+        protected virtual IRectangle MakeRectFromPoly(IGeometry geometry)
         {
             Debug.Assert(geometry.IsRectangle);
             Envelope env = geometry.EnvelopeInternal;
@@ -154,7 +154,9 @@ namespace Spatial4n.Core.IO.Nts
                 if (m_datelineRule == Nts.DatelineRule.CcwRect)
                 {
                     // If NTS says it is clockwise, then it's actually a dateline crossing rectangle.
+#pragma warning disable 612, 618
                     crossesDateline = !CGAlgorithms.IsCCW(geometry.Coordinates);
+#pragma warning restore 612, 618
                 }
                 else
                 {
@@ -170,14 +172,13 @@ namespace Spatial4n.Core.IO.Nts
         /// <summary>
         /// Reads a polygon, returning a NTS polygon.
         /// </summary>
-        protected IPolygon Polygon(WktShapeParser.State state)
+        protected virtual IPolygon Polygon(WktShapeParser.State state)
         {
             GeometryFactory geometryFactory = m_ctx.GeometryFactory;
 
-            List<Coordinate[]> coordinateSequenceList = CoordinateSequenceList(state);
+            IList<Coordinate[]> coordinateSequenceList = CoordinateSequenceList(state);
 
-            ILinearRing shell = geometryFactory.CreateLinearRing
-        (coordinateSequenceList[0]);
+            ILinearRing shell = geometryFactory.CreateLinearRing(coordinateSequenceList[0]);
 
             ILinearRing[] holes = null;
             if (coordinateSequenceList.Count > 1)
@@ -197,12 +198,12 @@ namespace Spatial4n.Core.IO.Nts
         ///   '(' polygon (',' polygon )* ')'
         /// </code>
         /// </summary>
-        protected IShape ParseMulitPolygonShape(WktShapeParser.State state)
+        protected virtual IShape ParseMulitPolygonShape(WktShapeParser.State state)
         {
             if (state.NextIfEmptyAndSkipZM())
                 return m_ctx.MakeCollection(new List<IShape>());
 
-            List<IShape> polygons = new List<IShape>();
+            IList<IShape> polygons = new List<IShape>();
             state.NextExpect('(');
             do
             {
@@ -219,9 +220,9 @@ namespace Spatial4n.Core.IO.Nts
         ///   '(' coordinateSequence (',' coordinateSequence )* ')'
         /// </code>
         /// </summary>
-        protected List<Coordinate[]> CoordinateSequenceList(WktShapeParser.State state)
+        protected virtual IList<Coordinate[]> CoordinateSequenceList(WktShapeParser.State state)
         {
-            List<Coordinate[]> sequenceList = new List<Coordinate[]>();
+            IList<Coordinate[]> sequenceList = new List<Coordinate[]>();
             state.NextExpect('(');
             do
             {
@@ -237,7 +238,7 @@ namespace Spatial4n.Core.IO.Nts
         ///   '(' coordinate (',' coordinate )* ')'
         /// </code>
         /// </summary>
-        protected Coordinate[] CoordinateSequence(WktShapeParser.State state)
+        protected virtual Coordinate[] CoordinateSequence(WktShapeParser.State state)
         {
             List<Coordinate> sequence = new List<Coordinate>();
             state.NextExpect('(');
@@ -256,7 +257,7 @@ namespace Spatial4n.Core.IO.Nts
         /// </summary>
         /// <param name="state"></param>
         /// <returns></returns>
-        protected Coordinate Coordinate(WktShapeParser.State state)
+        protected virtual Coordinate Coordinate(WktShapeParser.State state)
         {
             double x = m_ctx.NormX(state.NextDouble());
             m_ctx.VerifyX(x);
@@ -274,7 +275,7 @@ namespace Spatial4n.Core.IO.Nts
         /// <summary>
         /// Creates the NtsGeometry, potentially validating, repairing, and preparing.
         /// </summary>
-        protected NtsGeometry MakeShapeFromGeometry(IGeometry geometry)
+        protected virtual NtsGeometry MakeShapeFromGeometry(IGeometry geometry)
         {
             bool dateline180Check = DatelineRule != Nts.DatelineRule.None;
             NtsGeometry ntsGeom;

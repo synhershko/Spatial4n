@@ -106,7 +106,7 @@ namespace Spatial4n.Core.Shapes.Nts
         /// is usually called automatically by default, but that can be disabled.
         /// </summary>
         /// <exception cref="InvalidShapeException">with descriptive error if the shape isn't valid</exception>
-        public void Validate()
+        public virtual void Validate()
         {
             if (!validated)
             {
@@ -124,7 +124,7 @@ namespace Spatial4n.Core.Shapes.Nts
         /// memory.  Calling this method isn't thread-safe so be careful when this is done. If it was
         /// already indexed then nothing happens.
         /// </summary>
-        public void Index()
+        public virtual void Index()
         {
             if (preparedGeometry == null)
                 preparedGeometry = PreparedGeometryFactory.Prepare(geom);
@@ -140,7 +140,7 @@ namespace Spatial4n.Core.Shapes.Nts
         /// Given <paramref name="geoms"/> which has already been checked for being in world
         /// bounds, return the minimal longitude range of the bounding box.
         /// </summary>
-        protected IRectangle ComputeGeoBBox(IGeometry geoms)
+        protected virtual IRectangle ComputeGeoBBox(IGeometry geoms)
         {
             if (geoms.IsEmpty)
                 return new Rectangle(double.NaN, double.NaN, double.NaN, double.NaN, ctx);

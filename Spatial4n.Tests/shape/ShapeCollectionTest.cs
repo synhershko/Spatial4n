@@ -79,7 +79,7 @@ namespace Spatial4n.Core.Shape
             protected override /*ShapeCollection*/ IShape GenerateRandomShape(IPoint nearP)
             {
                 //testLog.log("Break on nearP.toString(): {}", nearP);
-                List<IShape> shapes = new List<IShape>();
+                IList<IShape> shapes = new List<IShape>();
                 int count = random.Next(1, 4 + 1);
                 for (int i = 0; i < count; i++)
                 {

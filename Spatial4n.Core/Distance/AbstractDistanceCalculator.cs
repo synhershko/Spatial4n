@@ -22,7 +22,7 @@ namespace Spatial4n.Core.Distance
 {
     public abstract class AbstractDistanceCalculator : IDistanceCalculator
     {
-        public double Distance(IPoint @from, IPoint to)
+        public virtual double Distance(IPoint @from, IPoint to)
         {
             return Distance(from, to.X, to.Y);
         }
@@ -37,6 +37,7 @@ namespace Spatial4n.Core.Distance
             return GetType().Name;
         }
 
+        // spatial4n specific - need to implement abstract members here to satisfy the IDistanceCalculator contract
         public abstract double Distance(IPoint from, double toX, double toY);
         public abstract IPoint PointOnBearing(IPoint from, double distDEG, double bearingDEG, SpatialContext ctx, IPoint reuse);
         public abstract IRectangle CalcBoxByDistFromPt(IPoint from, double distDEG, SpatialContext ctx, IRectangle reuse);

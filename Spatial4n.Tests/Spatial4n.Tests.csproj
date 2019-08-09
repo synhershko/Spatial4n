@@ -1,20 +1,21 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>netcoreapp1.0;net40;net35</TargetFrameworks>
-    <NetStandardImplicitPackageVersion>1.6.0</NetStandardImplicitPackageVersion>
-    <PackageTargetFallback Condition="$(TargetFramework.StartsWith('netcore'))">$(PackageTargetFallback);dnxcore50;portable-net403+sl5+win8+wp8+wpa81</PackageTargetFallback>
+    <TargetFrameworks>netcoreapp2.0;netcoreapp1.0;net40;net35</TargetFrameworks>
+    <PackageTargetFallback Condition=" '$(TargetFramework)' == 'netcoreapp1.0' ">$(PackageTargetFallback);dnxcore50</PackageTargetFallback>
 
     <!-- For now, we can switch framework to test by manually editing this file -->
     <!--<TargetFramework>net35</TargetFramework>-->
-    <Version>0.4.1</Version>
     <AssemblyName>Spatial4n.Tests</AssemblyName>
     <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
-    <RuntimeFrameworkVersion>1.0.4</RuntimeFrameworkVersion>
     <NoWarn>1591</NoWarn>
     <GenerateAssemblyFileVersionAttribute>false</GenerateAssemblyFileVersionAttribute>
     <DefineConstants>FEATURE_STRONG_NAME</DefineConstants>
-    <FrameworkPathOverride Condition="'$(TargetFramework)' == 'net35'">C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v3.5\Profile\Client</FrameworkPathOverride>
+    <FrameworkPathOverride Condition="'$(TargetFramework)' == 'net35'">$(MSBuildProgramFiles32)\Reference Assemblies\Microsoft\Framework\.NETFramework\v3.5\Profile\Client</FrameworkPathOverride>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <DefineConstants>$(DefineConstants);FEATURE_NTS</DefineConstants>
   </PropertyGroup>
   
   <PropertyGroup Condition="$(DefineConstants.Contains('FEATURE_STRONG_NAME'))">
@@ -22,8 +23,12 @@
     <AssemblyOriginatorKeyFile>..\Spatial4n.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(TargetFramework)'=='netcoreapp1.0'">
-    <NoWarn>$(NoWarn);1701;1702;1705</NoWarn>
+  <PropertyGroup>
+    <NoWarn>$(NoWarn);1701;1702;1705;xUnit2006</NoWarn>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" $(TargetFramework.StartsWith('netcore')) ">
+    <DefineConstants>$(DefineConstants);NETCOREAPP</DefineConstants>
   </PropertyGroup>
   
   <ItemGroup Condition="!$(TargetFramework.StartsWith('netcore'))">
@@ -32,19 +37,22 @@
     <PackageReference Include="xunit.runner.visualstudio" Version="2.1.0" />
   </ItemGroup>
   
-  <ItemGroup Condition="$(TargetFramework.StartsWith('netcore'))">
+  <ItemGroup Condition=" '$(TargetFramework)' == 'netcoreapp1.0' ">
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.0.0" />
     <PackageReference Include="xunit" Version="2.2.0" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.2.0" />
   </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\Spatial4n.Core.NTS\Spatial4n.Core.NTS.csproj" />
-    <ProjectReference Include="..\Spatial4n.Core\Spatial4n.Core.csproj" />
+  <ItemGroup Condition=" '$(TargetFramework)' == 'netcoreapp2.0' ">
+    <DotNetCliToolReference Include="dotnet-xunit" Version="2.3.0-beta4-build3742" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.0.0" />
+    <PackageReference Include="xunit" Version="2.3.0-beta4-build3742" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.3.0-beta4-build3742" />
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Include="..\CommonAssemblyInfo.cs" Link="CommonAssemblyInfo.cs" />
+    <ProjectReference Include="..\Spatial4n.Core.NTS\Spatial4n.Core.NTS.csproj" />
+    <ProjectReference Include="..\Spatial4n.Core\Spatial4n.Core.csproj" />
   </ItemGroup>
 
   <ItemGroup>

@@ -16,6 +16,9 @@
  */
 
 using System;
+#if FEATURE_SERIALIZABLE
+using System.Runtime.Serialization;
+#endif
 
 namespace Spatial4n.Core.Exceptions
 {
@@ -37,5 +40,20 @@ namespace Spatial4n.Core.Exceptions
             : base(reason, exception)
         {
         }
+
+#if FEATURE_SERIALIZABLE
+        public InvalidShapeException()
+        { }
+
+        /// <summary>
+        /// Initializes a new instance of this class with serialized data.
+        /// </summary>
+        /// <param name="info">The <see cref="SerializationInfo"/> that holds the serialized object data about the exception being thrown.</param>
+        /// <param name="context">The <see cref="StreamingContext"/> that contains contextual information about the source or destination.</param>
+        protected InvalidShapeException(SerializationInfo info, StreamingContext context)
+            : base(info, context)
+        {
+        }
+#endif
     }
 }

@@ -42,7 +42,6 @@ namespace Spatial4n.Core.IO
         [Fact]
         public virtual void WktGeoPt()
         {
-
             IShape s = ctx.ReadShape("Point(-160 30)");
             Assert.Equal(ctx.MakePoint(-160, 30), s);
         }

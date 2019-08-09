@@ -56,7 +56,7 @@ namespace Spatial4n.Core.IO.Nts
         /// <param name="str"></param>
         /// <param name="reader"><c>new WKTReader(ctx.GeometryFactory)</c></param>
         /// <returns>Non-Null</returns>
-        protected IShape ParseIfSupported(string str, WKTReader reader)
+        protected virtual IShape ParseIfSupported(string str, WKTReader reader)
         {
             try
             {

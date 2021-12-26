@@ -115,7 +115,7 @@ namespace Spatial4n.Core.Context
                     {
                         o = bool.Parse(str);
                     }
-                    else if (field.FieldType.GetTypeInfo().IsClass)
+                    else if (field.FieldType.IsClass)
                     {
                         try
                         {
@@ -126,7 +126,7 @@ namespace Spatial4n.Core.Context
                             throw new Exception(e.ToString(), e);
                         }
                     }
-                    else if (field.FieldType.GetTypeInfo().IsEnum)
+                    else if (field.FieldType.IsEnum)
                     {
                         o = Enum.Parse(field.FieldType, str, true);
                     }
@@ -223,7 +223,7 @@ namespace Spatial4n.Core.Context
                     for (int i = 0; i < ctorArgs.Length; i++)
                     {
                         object ctorArg = ctorArgs[i];
-                        if (!parameterTypes[i].GetTypeInfo().IsAssignableFrom(ctorArg.GetType().GetTypeInfo()))
+                        if (!parameterTypes[i].IsAssignableFrom(ctorArg.GetType()))
                             goto ctorLoop_continue;
                     }
                     return (T)ctor.Invoke(ctorArgs);

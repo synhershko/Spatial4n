@@ -10,17 +10,11 @@
     <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\$(AssemblyName).xml</DocumentationFile>
     <NoWarn>1591</NoWarn>
     <GenerateAssemblyFileVersionAttribute>false</GenerateAssemblyFileVersionAttribute>
-    <DefineConstants>FEATURE_STRONG_NAME</DefineConstants>
     <FrameworkPathOverride Condition="'$(TargetFramework)' == 'net35'">$(MSBuildProgramFiles32)\Reference Assemblies\Microsoft\Framework\.NETFramework\v3.5\Profile\Client</FrameworkPathOverride>
   </PropertyGroup>
 
   <PropertyGroup>
     <DefineConstants>$(DefineConstants);FEATURE_NTS</DefineConstants>
-  </PropertyGroup>
-  
-  <PropertyGroup Condition="$(DefineConstants.Contains('FEATURE_STRONG_NAME'))">
-    <SignAssembly>True</SignAssembly>
-    <AssemblyOriginatorKeyFile>..\Spatial4n.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
 
   <PropertyGroup>

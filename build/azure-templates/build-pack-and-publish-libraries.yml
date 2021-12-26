@@ -1,0 +1,118 @@
+# Runs dotnet build on the solution files,
+# dotnet pack on the non-test projects,
+# and dotnet publish on the test projects.
+# Creates build artifacts for
+# * .nuspec files of packable projects (in $(Build.ArtifactStagingDirectory)/$(NugetArtifactName))
+# * .pdb files of packable projects (in $(Build.ArtifactStagingDirectory)/$(NugetArtifactName))
+# * Published (portable) .dll files and dependencies of test projects (in $(Build.ArtifactStagingDirectory)/$(BinaryArtifactName))
+
+# Publishing only takes into account the target frameworks specified in testTargetFrameworks (semicolon separated list).
+
+parameters:
+  artifactFeedID: '' # The GUID of the Azure Artifacts NuGet feed
+  testTargetFrameworks: '' # A semicolon separated list of target frameworks indicating which frameworks tests will be run on. See: https://docs.microsoft.com/en-us/dotnet/standard/frameworks.
+  informationalVersion: '' # The AssemblyInformationalVersion that will be passed to dotnet build.
+  fileVersion: '' # The AssemblyFileVersion that will be passed to dotnet build.
+  assemblyVersion: '' # The AssemblyVersion that will be passed to dotnet build.
+  packageVersion: '' # The NuGet version that will be passed to dotnet pack.
+  buildSdkVersion: '' # The SDK version to use to run the build
+  buildConfiguration: 'Release' # Defines the build configuration. Default 'Release'.
+  buildPlatform: 'Any CPU' # Defines the build platform. Default 'Any CPU'.
+  nugetArtifactName: 'nuget' # The name of the Azure DevOps build artifact where the NuGet assets (.nupkg and .pdb files) will be output. Default 'nuget'.
+  binaryArtifactName: 'testbinaries' # The name of the Azure DevOps build artifact where the test assemblies will be output. Default 'testbinaries'.
+  solutionFilesConvention: '**/*.sln' # The glob pattern where to look for solution files. Default '**\*.sln'.
+
+
+steps:
+- pwsh: |
+    function EnsureNotNullOrEmpty([string]$param, [string]$nameOfParam) {
+        if ([string]::IsNullOrEmpty($param)) {
+            Write-Host "##vso[task.logissue type=error;]Missing template parameter \"$nameOfParam\""
+            Write-Host "##vso[task.complete result=Failed;]"
+        }
+    }
+    EnsureNotNullOrEmpty('${{ parameters.artifactFeedID }}', 'artifactFeedID')
+    EnsureNotNullOrEmpty('${{ parameters.testTargetFrameworks }}', 'testTargetFrameworks')
+    EnsureNotNullOrEmpty('${{ parameters.informationalVersion }}', 'informationalVersion')
+    EnsureNotNullOrEmpty('${{ parameters.fileVersion }}', 'fileVersion')
+    EnsureNotNullOrEmpty('${{ parameters.assemblyVersion }}', 'assemblyVersion')
+    EnsureNotNullOrEmpty('${{ parameters.packageVersion }}', 'packageVersion')
+    EnsureNotNullOrEmpty('${{ parameters.buildSdkVersion }}', 'buildSdkVersion')
+    EnsureNotNullOrEmpty('${{ parameters.buildConfiguration }}', 'buildConfiguration')
+    EnsureNotNullOrEmpty('${{ parameters.buildPlatform }}', 'buildPlatform')
+    EnsureNotNullOrEmpty('${{ parameters.nugetArtifactName }}', 'nugetArtifactName')
+    EnsureNotNullOrEmpty('${{ parameters.binaryArtifactName }}', 'binaryArtifactName')
+    EnsureNotNullOrEmpty('${{ parameters.solutionFilesConvention }}', 'solutionFilesConvention')
+  displayName: 'Validate Template Parameters'
+
+- task: UseDotNet@2
+  displayName: 'Use .NET sdk ${{ parameters.buildSdkVersion }}'
+  inputs:
+    packageType: 'sdk'
+    version: ${{ parameters.buildSdkVersion }}
+
+# Fix errors with not being able to locate SDK: https://developercommunity.visualstudio.com/t/nuget-restore-fails-because-net-core-sdk-cannot-be/598541
+- pwsh: dotnet new globaljson --sdk-version '${{ parameters.buildSdkVersion }}'
+
+#- template: 'show-all-files.yml' # Uncomment for debugging
+#- template: 'show-all-environment-variables.yml' # Uncomment for debugging
+
+  # Runs dotnet build 
+- task: DotNetCoreCLI@2
+  displayName: 'dotnet build ${{ parameters.solutionFilesConvention }}'
+  inputs:
+    command: custom
+    projects: '${{ parameters.solutionFilesConvention }}'
+    custom: build
+    arguments: '--configuration ${{ parameters.buildConfiguration }} --verbosity normal /p:Platform="${{ parameters.buildPlatform }}" /p:InformationalVersion="${{ parameters.informationalVersion }}" /p:FileVersion="${{ parameters.fileVersion }}" /p:AssemblyVersion="${{ parameters.assemblyVersion }}" /p:TestAllTargetFrameworks=true /p:PortableDebugTypeOnly=true'
+
+  # Packs the project binaries into .nupkg files (NuGet).
+  # Note that we are outputting .symbols.nupkg files as well 
+  # as build artifacts, even though they are not used.
+- task: DotNetCoreCLI@2
+  displayName: 'dotnet pack'
+  inputs:
+    command: custom
+    projects: '${{ parameters.solutionFilesConvention }}'
+    custom: pack
+    arguments: '--configuration ${{ parameters.buildConfiguration }} --output "$(Build.ArtifactStagingDirectory)/${{ parameters.nugetArtifactName }}" --no-build --verbosity normal /p:PackageVersion="${{ parameters.packageVersion }}"'
+
+  # Copy the .pdb files as build artifacts, which will later be used
+  # to push to the Azure Artifacts symbol server.
+- task: CopyFiles@2
+  displayName: 'Copy .pdb Files to: /${{ parameters.nugetArtifactName }}'
+  inputs:
+    SourceFolder: '$(System.DefaultWorkingDirectory)'
+    Contents: '**/bin/${{ parameters.buildConfiguration }}/**/*.pdb'
+    TargetFolder: '$(Build.ArtifactStagingDirectory)/${{ parameters.nugetArtifactName }}'
+
+- task: PublishBuildArtifacts@1
+  displayName: 'Publish Artifact: ${{ parameters.nugetArtifactName }}'
+  inputs:
+    PathtoPublish: '$(Build.ArtifactStagingDirectory)/${{ parameters.nugetArtifactName }}'
+    ArtifactName: '${{ parameters.nugetArtifactName }}'
+  condition: succeededOrFailed()
+
+  # Loops through each framework in the TestTargetFrameworks variable and
+  # publishes the project in the artifact staging directory with the framework
+  # and project name as part of the folder structure.
+- pwsh: |
+    $testTargetFrameworksString = "${{ parameters.testTargetFrameworks }}"
+    $outputRoot = "$(Build.ArtifactStagingDirectory)/${{ parameters.binaryArtifactName }}"
+    $configuration = "${{ parameters.buildConfiguration }}"
+    $sourcesDirectory = "$(Build.SourcesDirectory)"
+    
+    $testTargetFrameworks = $testTargetFrameworksString.Split([char]';',[char]',')
+    foreach ($framework in $testTargetFrameworks) {
+        $outputPath = "$outputRoot/$framework"
+        Write-Host "Publishing '$framework' to '$outputPath'..."
+        dotnet publish --output "$outputPath" --framework "$framework" --configuration "$configuration" --no-build --no-restore --verbosity normal /p:TestAllTargetFrameworks=true
+    }
+  displayName: 'dotnet publish ${{ parameters.testTargetFrameworks }}'
+
+- task: PublishBuildArtifacts@1
+  displayName: 'Publish Artifact: ${{ parameters.binaryArtifactName }}'
+  inputs:
+    PathtoPublish: '$(Build.ArtifactStagingDirectory)/${{ parameters.binaryArtifactName }}'
+    ArtifactName: '${{ parameters.binaryArtifactName }}'
+  condition: succeededOrFailed()

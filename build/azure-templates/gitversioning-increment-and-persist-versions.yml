@@ -1,0 +1,72 @@
+# Runs GitVersioning (nbgv),
+# persists the current NBGV_NuGetPackageVersion, NBGV_AssemblyFileVersion, and BUILD_BuildNumber to a file and uploads it as a build artifact.
+
+# Output parameters:
+# - $(InformationalVersion)
+# - $(FileVersion)
+# - $(AssemblyVersion)
+# - $(PackageVersion)
+
+# Also, need to create a version.json configuration file. See: https://github.com/AArnott/Nerdbank.GitVersioning#installation-and-configuration
+
+parameters:
+  versionArtifactName: 'version' # The name of the artifact where the version assets (version text files) can be downloaded
+  packageVersionFileName: 'packageVersion.txt' # The name of the file where the PackageVersion will be stored in the versionArtifact for use in later build jobs
+  fileVersionFileName: 'fileVersion.txt' # The name of the file where the FileVersion will be stored in the versionArtifact for use in later build jobs
+  buildNumberFileName: 'buildNumber.txt' # The name of the file where the Build.BuildNumber will be stored in the versionArtifact for use in later build jobs
+
+
+steps:
+- pwsh: |
+    function EnsureNotNullOrEmpty([string]$param, [string]$nameOfParam) {
+        if ([string]::IsNullOrEmpty($param)) {
+            Write-Host "##vso[task.logissue type=error;]Missing template parameter \"$nameOfParam\""
+            Write-Host "##vso[task.complete result=Failed;]"
+        }
+    }
+    EnsureNotNullOrEmpty('${{ parameters.versionArtifactName }}', 'versionArtifactName')
+    EnsureNotNullOrEmpty('${{ parameters.packageVersionFileName }}', 'packageVersionFileName')
+    EnsureNotNullOrEmpty('${{ parameters.fileVersionFileName }}', 'fileVersionFileName')
+    EnsureNotNullOrEmpty('${{ parameters.buildNumberFileName }}', 'buildNumberFileName')
+  displayName: 'Validate Template Parameters'
+
+- task: DotNetCoreCLI@2  
+  inputs:
+    command: custom
+    custom: tool
+    arguments: install nbgv --tool-path . --add-source https://api.nuget.org/v3/index.json --version 3.3.37
+  displayName: Install NBGV tool (GitVersioning)
+
+- script: nbgv cloud --common-vars --all-vars
+  displayName: 'Set Version'
+
+- pwsh: |
+    $environmentVars = Get-ChildItem -path env:* | sort Name
+    foreach($var in $environmentVars)
+    {
+        $keyname = $var.Key
+        $keyvalue = $var.Value
+        Write-Output "${keyname}: $keyvalue"
+    }
+  displayName: 'Show all Environment Variables'
+
+- pwsh: |
+    Write-Host "##vso[task.setvariable variable=InformationalVersion;]$env:NBGV_ASSEMBLYINFORMATIONALVERSION"
+    Write-Host "##vso[task.setvariable variable=FileVersion;]$env:NBGV_ASSEMBLYFILEVERSION"
+    Write-Host "##vso[task.setvariable variable=AssemblyVersion;]$env:NBGV_ASSEMBLYVERSION"
+    Write-Host "##vso[task.setvariable variable=PackageVersion;]$env:NBGV_NUGETPACKAGEVERSION"
+  displayName: 'Write Output Parameters'
+
+- pwsh: |
+    $dir = '$(Build.ArtifactStagingDirectory)/${{ parameters.versionArtifactName }}'
+    if (!(Test-Path $dir)) { New-Item -ItemType Directory -Path "$dir" -Force }
+    '$(PackageVersion)' | Out-File -FilePath "$dir/${{ parameters.packageVersionFileName }}" -Force
+    '$(FileVersion)' | Out-File -FilePath "$dir/${{ parameters.fileVersionFileName }}" -Force
+    '$(Build.BuildNumber)' | Out-File -FilePath "$dir/${{ parameters.buildNumberFileName }}" -Force
+  displayName: 'Write Versions to Files'
+
+- task: PublishBuildArtifacts@1
+  displayName: 'Publish Artifact: $(VersionArtifactName)'
+  inputs:
+    PathtoPublish: '$(Build.ArtifactStagingDirectory)/$(VersionArtifactName)'
+    ArtifactName: '$(VersionArtifactName)'

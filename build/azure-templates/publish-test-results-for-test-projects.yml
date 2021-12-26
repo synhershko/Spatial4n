@@ -1,0 +1,58 @@
+# Runs Publish Test Results task for all test projects
+
+# The tasks can be easily re-generated (except for any special cases) using the following powershell script
+
+#$source_directory = "F:/Projects/Morfologik.Stemming" # Change to your repo location
+#
+#$testProjects = Get-ChildItem -Path "$source_directory/**/*.csproj" -Recurse | ? { $_.Directory.Name.Contains(".Tests") }
+#
+#[string]$output = ''
+#
+#foreach ($testProject in $testProjects) {
+#    $projectName = [System.IO.Path]::GetFileNameWithoutExtension($testProject)
+#
+#    $block = `
+#        "- template: publish-test-results-for-target-frameworks.yml`n" + `
+#        "  parameters:`n" + `
+#        "    testProjectName: '$projectName'`n" + `
+#        "    osName: '$`{`{ parameters.osName `}`}'`n" + `
+#        "    testPlatform: '$`{`{ parameters.testPlatform `}`}'`n" + `
+#        "    testResultsFormat: '$`{`{ parameters.testResultsFormat `}`}'`n" + `
+#        "    testResultsArtifactName: '$`{`{ parameters.testResultsArtifactName `}`}'`n" + `
+#        "    testResultsFileName: '$`{`{ parameters.testResultsFileName `}`}'`n" + `
+#        "`n"
+#
+#    $output = "$output$block"
+#}
+#
+#Set-Clipboard -Value $output
+
+parameters:
+  osName: '' # The name of the operating system for display purposes.
+  testPlatform: 'x64' # Target platform architecture used for test execution. The allowed values depend on the type of architecture being targeted (x86, x86_64, x64, ARM, etc.).
+  testResultsFormat: VSTest # Specify the format of the results files you want to publish. The following formats are supported: JUnit, NUnit, VSTest, XUnit, CTest
+  testResultsArtifactName: 'testresults' # The name of the Azure DevOps build artifact where the test results will be published. Default 'testresults'.
+  testResultsFileName: 'TestResults.trx' # The name of the file (not path) of the test results. Default 'TestResults.trx'.
+
+steps:
+- pwsh: |
+    function EnsureNotNullOrEmpty([string]$param, [string]$nameOfParam) {
+        if ([string]::IsNullOrEmpty($param)) {
+            Write-Host "##vso[task.logissue type=error;]Missing template parameter \"$nameOfParam\""
+            Write-Host "##vso[task.complete result=Failed;]"
+        }
+    }
+    EnsureNotNullOrEmpty('${{ parameters.osName }}', 'osName')
+    EnsureNotNullOrEmpty('${{ parameters.testResultsFormat }}', 'testResultsFormat')
+    EnsureNotNullOrEmpty('${{ parameters.testResultsArtifactName }}', 'testResultsArtifactName')
+    EnsureNotNullOrEmpty('${{ parameters.testResultsFileName }}', 'testResultsFileName')
+  displayName: 'Validate Template Parameters'
+
+- template: publish-test-results-for-target-frameworks.yml
+  parameters:
+    testProjectName: 'Spatial4n.Tests'
+    osName: '${{ parameters.osName }}'
+    testPlatform: '${{ parameters.testPlatform }}'
+    testResultsFormat: '${{ parameters.testResultsFormat }}'
+    testResultsArtifactName: '${{ parameters.testResultsArtifactName }}'
+    testResultsFileName: '${{ parameters.testResultsFileName }}'

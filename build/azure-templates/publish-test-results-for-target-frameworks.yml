@@ -1,0 +1,75 @@
+# Runs Publish Test Results task for a specific framework
+
+parameters:
+  testProjectName: '' # The name of the test project
+  osName: '' # The name of the operating system for display purposes.
+  testPlatform: 'x64' # Target platform architecture used for test execution. The allowed values depend on the type of architecture being targeted (x86, x86_64, x64, ARM, etc.).
+  testResultsFormat: VSTest # Specify the format of the results files you want to publish. The following formats are supported: JUnit, NUnit, VSTest, XUnit, CTest
+  testResultsArtifactName: 'testresults' # The name of the Azure DevOps build artifact where the test results will be published. Default 'testresults'.
+  testResultsFileName: 'TestResults.trx' # The name of the file (not path) of the test results. Default 'TestResults.trx'.
+
+steps:
+- pwsh: |
+    function EnsureNotNullOrEmpty([string]$param, [string]$nameOfParam) {
+        if ([string]::IsNullOrEmpty($param)) {
+            Write-Host "##vso[task.logissue type=error;]Missing template parameter \"$nameOfParam\""
+            Write-Host "##vso[task.complete result=Failed;]"
+        }
+    }
+    EnsureNotNullOrEmpty('${{ parameters.testProjectName }}', 'testProjectName')
+    EnsureNotNullOrEmpty('${{ parameters.osName }}', 'osName')
+    EnsureNotNullOrEmpty('${{ parameters.testPlatform }}', 'testPlatform')
+    EnsureNotNullOrEmpty('${{ parameters.testResultsFormat }}', 'testResultsFormat')
+    EnsureNotNullOrEmpty('${{ parameters.testResultsArtifactName }}', 'testResultsArtifactName')
+    EnsureNotNullOrEmpty('${{ parameters.testResultsFileName }}', 'testResultsFileName')
+  displayName: 'Validate Template Parameters'
+
+- template: publish-test-results.yml
+  parameters:
+    framework: 'net6.0'
+    testProjectName: '${{ parameters.testProjectName }}'
+    osName: '${{ parameters.osName }}'
+    testPlatform: '${{ parameters.testPlatform }}'
+    testResultsFormat: '${{ parameters.testResultsFormat }}'
+    testResultsArtifactName: '${{ parameters.testResultsArtifactName }}'
+    testResultsFileName: '${{ parameters.testResultsFileName }}'
+
+- template: publish-test-results.yml
+  parameters:
+    framework: 'net5.0'
+    testProjectName: '${{ parameters.testProjectName }}'
+    osName: '${{ parameters.osName }}'
+    testPlatform: '${{ parameters.testPlatform }}'
+    testResultsFormat: '${{ parameters.testResultsFormat }}'
+    testResultsArtifactName: '${{ parameters.testResultsArtifactName }}'
+    testResultsFileName: '${{ parameters.testResultsFileName }}'
+
+- template: publish-test-results.yml
+  parameters:
+    framework: 'netcoreapp3.1'
+    testProjectName: '${{ parameters.testProjectName }}'
+    osName: '${{ parameters.osName }}'
+    testPlatform: '${{ parameters.testPlatform }}'
+    testResultsFormat: '${{ parameters.testResultsFormat }}'
+    testResultsArtifactName: '${{ parameters.testResultsArtifactName }}'
+    testResultsFileName: '${{ parameters.testResultsFileName }}'
+
+- template: publish-test-results.yml
+  parameters:
+    framework: 'net40'
+    testProjectName: '${{ parameters.testProjectName }}'
+    osName: '${{ parameters.osName }}'
+    testPlatform: '${{ parameters.testPlatform }}'
+    testResultsFormat: '${{ parameters.testResultsFormat }}'
+    testResultsArtifactName: '${{ parameters.testResultsArtifactName }}'
+    testResultsFileName: '${{ parameters.testResultsFileName }}'
+
+- template: publish-test-results.yml
+  parameters:
+    framework: 'net35'
+    testProjectName: '${{ parameters.testProjectName }}'
+    osName: '${{ parameters.osName }}'
+    testPlatform: '${{ parameters.testPlatform }}'
+    testResultsFormat: '${{ parameters.testResultsFormat }}'
+    testResultsArtifactName: '${{ parameters.testResultsArtifactName }}'
+    testResultsFileName: '${{ parameters.testResultsFileName }}'

@@ -1,0 +1,56 @@
+# Downloads an artifact with the specified nugetArtifactName,
+# pushes any .nupkg files to the specified artifactFeedID,
+# and pushes any debugging symbols (.pdb files) in the artifact
+# (except for those named *.Tests.pdb) to TeamServices.
+
+parameters:
+  nugetArtifactName: 'nuget' # The name of the artifact where the NuGet assets (.nupkg and .pdb files) can be downloaded
+  artifactFeedID: '' # The GUID of the Azure Artifacts NuGet feed
+  testSymbolFilesConvention: '**/*.Tests*.pdb' # The glob pattern (within the nugetArtifact) where to look for test project symbols (.pdb) files, so they can be distinguished from other project file types.
+
+steps:
+- pwsh: |
+    function EnsureNotNullOrEmpty([string]$param, [string]$nameOfParam) {
+        if ([string]::IsNullOrEmpty($param)) {
+            Write-Host "##vso[task.logissue type=error;]Missing template parameter \"$nameOfParam\""
+            Write-Host "##vso[task.complete result=Failed;]"
+        }
+    }
+    EnsureNotNullOrEmpty('${{ parameters.nugetArtifactName }}', 'nugetArtifactName')
+    EnsureNotNullOrEmpty('${{ parameters.artifactFeedID }}', 'artifactFeedID')
+    EnsureNotNullOrEmpty('${{ parameters.testSymbolFilesConvention }}', 'testSymbolFilesConvention')
+  displayName: 'Validate Template Parameters'
+
+- task: DownloadBuildArtifacts@0
+  displayName: 'Download Build Artifacts: ${{ parameters.nugetArtifactName }}'
+  inputs:
+    artifactName: ${{ parameters.nugetArtifactName }}
+    downloadPath: '$(Build.ArtifactStagingDirectory)'
+
+#  # Push to MyGet
+#- task: NuGetCommand@2
+#  displayName: 'NuGet push'
+#  inputs:
+#    command: push
+#    packagesToPush: '$(Build.ArtifactStagingDirectory)/${{ parameters.nugetArtifactName }}/**/*.nupkg;!$(Build.ArtifactStagingDirectory)/${{ parameters.nugetArtifactName }}/**/*.symbols.nupkg'
+#    nuGetFeedType: external
+#    publishFeedCredentials: 'MyGet-icu4n'
+
+- task: NuGetCommand@2
+  displayName: 'NuGet push'
+  inputs:
+    command: push
+    packagesToPush: '$(Build.ArtifactStagingDirectory)/${{ parameters.nugetArtifactName }}/**/*.nupkg;!$(Build.ArtifactStagingDirectory)/${{ parameters.nugetArtifactName }}/**/*.symbols.nupkg'
+    publishVstsFeed: '/${{ parameters.artifactFeedID }}'
+    allowPackageConflicts: true
+
+- task: PublishSymbols@2
+  displayName: 'Publish symbols path'
+  inputs:
+    SymbolsFolder: '$(Build.ArtifactStagingDirectory)/${{ parameters.nugetArtifactName }}'
+    SearchPattern: |
+      **/bin/**/*.pdb
+      !${{ parameters.testSymbolFilesConvention }}
+    IndexSources: true
+    PublishSymbols: true
+    SymbolServerType: TeamServices

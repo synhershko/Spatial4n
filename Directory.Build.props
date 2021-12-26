@@ -43,6 +43,6 @@
     <BeginCopyrightYear>2012</BeginCopyrightYear>
     <CopyrightYearRange>$(BeginCopyrightYear) - $(CurrentYear)</CopyrightYearRange>
     <CopyrightYearRange Condition=" '$(BeginCopyrightYear)' == '$(CurrentYear)' ">$(CurrentYear)</CopyrightYearRange>
-    <Copyright>Copyright © $(CopyrightYearRange) spatial4j and Itamar Syn-Hershko</Copyright>
+    <Copyright>Copyright © $(CopyrightYearRange) spatial4j, Itamar Syn-Hershko, Shad Storhaug, and contributors</Copyright>
   </PropertyGroup>
 </Project>

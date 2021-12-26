@@ -18,10 +18,10 @@
 using Spatial4n.Core.Context;
 using Spatial4n.Core.Distance;
 using Spatial4n.Core.Shapes;
-using Spatial4n.Core.Shapes.Impl;
 using System;
 using System.Diagnostics;
 using Xunit;
+using Range = Spatial4n.Core.Shapes.Impl.Range;
 
 namespace Spatial4n.Core.Shape
 {

@@ -277,3 +277,6 @@ __pycache__/
 
 # TODO: Add custom ignore paths here
 .release/
+
+# BeyondCompare .orig files (when doing conflict resolution)
+*.orig

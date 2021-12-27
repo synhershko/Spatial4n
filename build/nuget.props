@@ -4,12 +4,14 @@
     <PackageTags>lucene lucene.net spatial geospatial geo spatial4j search</PackageTags>
     <Authors>Itamar Syn-Hershko, Shad Storhaug</Authors>
     <PackageProjectUrl>https://github.com/$(GitHubOrganization)/$(GitHubProject)/</PackageProjectUrl>
-    <!--<PackageIconUrl></PackageIconUrl>-->
+    <PackageIconUrl>https://raw.githubusercontent.com/$(GitHubOrganization)/$(GitHubProject)/master/branding/spatial4n-icon-128x128.png</PackageIconUrl>
+    <PackageIcon>spatial4n-icon-128x128.png</PackageIcon>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
     <ReleaseNotesUrl Condition=" '$(PackageVersion)' != '' ">https://github.com/$(GitHubOrganization)/$(GitHubProject)/releases/tag/$(PackageVersion)</ReleaseNotesUrl>
     <PackageReleaseNotes Condition=" '$(ReleaseNotesUrl)' != '' ">$(ReleaseNotesUrl)</PackageReleaseNotes>
   </PropertyGroup>
   <ItemGroup>
     <None Include="$(SolutionDir)LICENSE.txt" Pack="true" PackagePath="LICENSE.txt"/>
+    <None Include="$(SolutionDir)branding/$(PackageIcon)" Pack="true" PackagePath="$(PackageIcon)"/>
   </ItemGroup>
 </Project>

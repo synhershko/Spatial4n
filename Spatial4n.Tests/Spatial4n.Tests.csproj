@@ -26,6 +26,16 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="resources\fiji.wkt.txt" />
+    <None Remove="resources\russia.wkt.txt" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="resources\fiji.wkt.txt" />
+    <EmbeddedResource Include="resources\russia.wkt.txt" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="$(MicrosoftNETTestSdkPackageReferenceVersion)" />
     <PackageReference Include="xunit" Version="$(XunitPackageReferenceVersion)" />
     <PackageReference Include="xunit.runner.visualstudio" Version="$(XunitRunnerVisualStudioPackageReferenceVersion)" />

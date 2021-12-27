@@ -272,18 +272,11 @@ namespace Spatial4n.Core.Shape
 
         private string ReadFirstLineFromRsrc(string wktRsrcPath)
         {
-
-            var baseDirectory = AppDomain.CurrentDomain.BaseDirectory;
-            var projectPath = baseDirectory.Substring(0,
-                baseDirectory.LastIndexOf("Spatial4n.Tests", StringComparison.OrdinalIgnoreCase));
-
-            var fullPath = Path.Combine(projectPath, "Spatial4n.Tests");
-            fullPath = Path.Combine(fullPath, "resources");
-            fullPath = Path.Combine(fullPath, wktRsrcPath);
-
-            using (var stream = File.OpenText(fullPath))
+            using (var stream = this.GetType().Assembly.GetManifestResourceStream("Spatial4n.Tests.resources." + wktRsrcPath))
             {
-                return stream.ReadLine();
+                Assert.NotNull(stream);
+                using (var reader = new StreamReader(stream, System.Text.Encoding.UTF8))
+                    return reader.ReadLine();
             }
         }
     }

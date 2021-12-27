@@ -4,6 +4,8 @@
   
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0;net40;net35</TargetFrameworks>
+    
+    
 
     <AssemblyTitle>Spatial4n.Core</AssemblyTitle>
     <Description>A Geospatial Library for .NET - a .NET port of spatial4j</Description>
@@ -18,6 +20,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <InternalsVisibleTo Include="Spatial4n.Core.NTS" />
     <InternalsVisibleTo Include="Spatial4n.Tests" />
   </ItemGroup>
   

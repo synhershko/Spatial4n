@@ -138,7 +138,7 @@ namespace Spatial4n.Core.Context.Nts
             }
         }
 
-        protected override SpatialContext NewSpatialContext()
+        protected internal override SpatialContext NewSpatialContext()
         {
             return new NtsSpatialContext(this);
         }

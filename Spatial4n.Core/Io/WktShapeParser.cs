@@ -164,7 +164,7 @@ namespace Spatial4n.Core.IO
         /// <param name="state"></param>
         /// <param name="shapeType">Non-Null string; could have mixed case. The first character is a letter.</param>
         /// <returns>The shape or null if not supported / unknown.</returns>
-        protected internal virtual IShape ParseShapeByType(State state, string shapeType)
+        protected virtual IShape ParseShapeByType(State state, string shapeType)
         {
             Debug.Assert(char.IsLetter(shapeType[0]), "Shape must start with letter: " + shapeType);
 

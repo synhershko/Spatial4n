@@ -34,7 +34,7 @@ steps:
   inputs:
     command: custom
     custom: tool
-    arguments: install nbgv --tool-path . --add-source https://api.nuget.org/v3/index.json --version 3.3.37
+    arguments: install nbgv --tool-path . --add-source https://api.nuget.org/v3/index.json --version 3.5.68-alpha
   displayName: Install NBGV tool (GitVersioning)
 
 - script: nbgv cloud --common-vars --all-vars

@@ -65,9 +65,7 @@ namespace Spatial4n.Core.Context
                 throw new ArgumentNullException(nameof(args)); // spatial4n specific - use ArgumentNullException instead of NullReferenceException
 
             SpatialContextFactory instance;
-            string cname;
-            args.TryGetValue("spatialContextFactory", out cname);
-            if (cname == null)
+            if (!args.TryGetValue("spatialContextFactory", out string cname) || cname == null)
             {
                 cname = Environment.GetEnvironmentVariable("SpatialContextFactory");
             }
@@ -113,8 +111,7 @@ namespace Spatial4n.Core.Context
 
             //  note: java.beans API is more verbose to use correctly (?) but would arguably be better
             FieldInfo field = GetType().GetField(name, BindingFlags.Public | BindingFlags.Instance | BindingFlags.NonPublic);
-            string str;
-            if (args.TryGetValue(name, out str))
+            if (args.TryGetValue(name, out string str))
             {
                 try
                 {
@@ -162,8 +159,7 @@ namespace Spatial4n.Core.Context
             if (args is null)
                 throw new InvalidOperationException("args must be set prior to calling InitCalculator()"); // spatial4n specific - use InvalidOperationException instead of NullReferenceException
 
-            string calcStr;
-            if (!args.TryGetValue("distCalculator", out calcStr) || calcStr == null)
+            if (!args.TryGetValue("distCalculator", out string calcStr) || calcStr == null)
                 return;
             if (calcStr.Equals("haversine", StringComparison.OrdinalIgnoreCase))
             {
@@ -197,8 +193,7 @@ namespace Spatial4n.Core.Context
             if (args is null)
                 throw new InvalidOperationException("args must be set prior to calling InitWorldBounds()"); // spatial4n specific - use InvalidOperationException instead of NullReferenceException
 
-            string worldBoundsStr;
-            if (!args.TryGetValue("worldBounds", out worldBoundsStr) || worldBoundsStr == null)
+            if (!args.TryGetValue("worldBounds", out string worldBoundsStr) || worldBoundsStr == null)
                 return;
 
             //kinda ugly we do this just to read a rectangle.  TODO refactor

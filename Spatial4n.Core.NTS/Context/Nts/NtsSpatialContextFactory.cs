@@ -96,10 +96,8 @@ namespace Spatial4n.Core.Context.Nts
             InitField("useNtsPoint");
             InitField("useNtsLineString");
 
-            string scaleStr;
-            string modelStr;
-            args.TryGetValue("precisionScale", out scaleStr);
-            args.TryGetValue("precisionModel", out modelStr);
+            args.TryGetValue("precisionScale", out string scaleStr);
+            args.TryGetValue("precisionModel", out string modelStr);
 
             if (scaleStr != null)
             {

@@ -71,7 +71,7 @@ namespace Spatial4n.Core.Shapes
         /// simple Euclidean calculations will be used.  This figure can be an
         /// estimate.
         /// </summary>
-        double GetArea(SpatialContext ctx);
+        double GetArea(SpatialContext? ctx);
 
         /// <summary>
         /// Returns the center point of this shape. This is usually the same as

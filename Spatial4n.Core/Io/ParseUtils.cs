@@ -41,8 +41,12 @@ namespace Spatial4n.Core.IO
         /// <param name="dimension">The expected number of values for the point</param>
         /// <returns>An array of the values that make up the point (aka vector)</returns>
         /// <exception cref="InvalidShapeException">If the dimension specified does not match the number of values in the <paramref name="externalVal"/>.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="externalVal"/> is <c>null</c>.</exception>
         public static string[] ParsePoint(string[] _out, string externalVal, int dimension)
         {
+            if (externalVal is null)
+                throw new ArgumentNullException(nameof(externalVal)); // spatial4n specific - use ArgumentNullException instead of NullReferenceException
+
             //TODO: Should we support sparse vectors?
             if (_out == null || _out.Length != dimension) _out = new string[dimension];
             int idx = externalVal.IndexOf(',');
@@ -96,8 +100,12 @@ namespace Spatial4n.Core.IO
         /// <param name="dimension">The expected number of values for the point</param>
         /// <returns>An array of the values that make up the point (aka vector)</returns>
         /// <exception cref="InvalidShapeException">If the dimension specified does not match the number of values in the <paramref name="externalVal"/>.</exception>
-        public static double[] ParsePointDouble(double[] @out, string externalVal, int dimension)
+        /// <exception cref="ArgumentNullException"><paramref name="externalVal"/> is <c>null</c>.</exception>
+        public static double[] ParsePointDouble(double[]? @out, string externalVal, int dimension)
         {
+            if (externalVal is null)
+                throw new ArgumentNullException(nameof(externalVal)); // spatial4n specific - use ArgumentNullException instead of NullReferenceException
+
             if (@out == null || @out.Length != dimension) @out = new double[dimension];
             int idx = externalVal.IndexOf(',');
             int end = idx;
@@ -150,6 +158,7 @@ namespace Spatial4n.Core.IO
 		/// <param name="latLonStr">The string to parse.  Latitude is the first value, longitude is the second.</param>
 		/// <returns>The lat long</returns>
         /// <exception cref="InvalidShapeException">if there was an error parsing</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="latLonStr"/> is <c>null</c>.</exception>
 		public static double[] ParseLatitudeLongitude(string latLonStr)
         {
             return ParseLatitudeLongitude(null, latLonStr);
@@ -158,7 +167,8 @@ namespace Spatial4n.Core.IO
         /// <summary>
         /// A variation of <see cref="ParseLatitudeLongitude(string)"/> that re-uses an output array.
         /// </summary>
-        public static double[] ParseLatitudeLongitude(double[] outLatLon, string latLonStr)
+        /// <exception cref="ArgumentNullException"><paramref name="latLonStr"/> is <c>null</c>.</exception>
+        public static double[] ParseLatitudeLongitude(double[]? outLatLon, string latLonStr)
         {
             outLatLon = ParsePointDouble(outLatLon, latLonStr, 2);
 

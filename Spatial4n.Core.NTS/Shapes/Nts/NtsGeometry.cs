@@ -46,12 +46,15 @@ namespace Spatial4n.Core.Shapes.Nts
         private readonly bool _hasArea;
         private readonly IRectangle bbox;
         protected readonly NtsSpatialContext ctx;
-        protected IPreparedGeometry preparedGeometry;
+        protected IPreparedGeometry? preparedGeometry;
         protected bool validated = false;
 
         public NtsGeometry(IGeometry geom, NtsSpatialContext ctx, bool dateline180Check, bool allowMultiOverlap)
         {
-            this.ctx = ctx;
+            if (geom is null)
+                throw new ArgumentNullException(nameof(geom)); // spatial4n specific - use ArgumentNullException instead of NullReferenceException
+
+            this.ctx = ctx ?? throw new ArgumentNullException(nameof(ctx)); // spatial4n specific - use ArgumentNullException instead of NullReferenceException
 
             //GeometryCollection isn't supported in relate()
             if (geom.GetType() == typeof(GeometryCollection))
@@ -148,12 +151,12 @@ namespace Spatial4n.Core.Shapes.Nts
             if (env.Width > 180 && geoms.NumGeometries > 1)
             {
                 // This is ShapeCollection's bbox algorithm
-                Range xRange = null;
+                Range? xRange = null;
                 for (int i = 0; i < geoms.NumGeometries; i++)
                 {
                     Envelope envI = geoms.GetGeometryN(i).EnvelopeInternal;
                     Range xRange2 = new Range.LongitudeRange(envI.MinX, envI.MaxX);
-                    if (xRange == null)
+                    if (xRange is null)
                     {
                         xRange = xRange2;
                     }
@@ -164,7 +167,7 @@ namespace Spatial4n.Core.Shapes.Nts
                     if (xRange == Range.LongitudeRange.WORLD_180E180W)
                         break; // can't grow any bigger
                 }
-                return new Rectangle(xRange.Min, xRange.Max, env.MinY, env.MaxY, ctx);
+                return new Rectangle(xRange!.Min, xRange.Max, env.MinY, env.MaxY, ctx);
             }
             else
             {
@@ -184,10 +187,10 @@ namespace Spatial4n.Core.Shapes.Nts
             get { return _hasArea; }
         }
 
-        public virtual double GetArea(SpatialContext ctx)
+        public virtual double GetArea(SpatialContext? ctx)
         {
             double geomArea = geom.Area;
-            if (ctx == null || geomArea == 0)
+            if (ctx is null || geomArea == 0)
                 return geomArea;
             //Use the area proportional to how filled the bbox is.
             double bboxArea = BoundingBox.GetArea(null);//plain 2d area
@@ -208,7 +211,9 @@ namespace Spatial4n.Core.Shapes.Nts
             get
             {
                 if (IsEmpty) //geom.getCentroid == null
+#pragma warning disable CS8600 // Converting null literal or possible null value to non-nullable type.
                     return new NtsPoint(ctx.GeometryFactory.CreatePoint((Coordinate)null), ctx);
+#pragma warning restore CS8600 // Converting null literal or possible null value to non-nullable type.
                 return new NtsPoint((NetTopologySuite.Geometries.Point)geom.Centroid, ctx);
             }
         }

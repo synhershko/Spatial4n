@@ -27,6 +27,7 @@
 
   <PropertyGroup>
     <RepositoryRoot>$(MSBuildThisFileDirectory)</RepositoryRoot>
+    <LangVersion>8.0</LangVersion>
     <GitHubOrganization>synhershko</GitHubOrganization>
     <GitHubProject>spatial4n</GitHubProject>
   </PropertyGroup>

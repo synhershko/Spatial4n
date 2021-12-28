@@ -63,7 +63,7 @@ namespace Spatial4n.Core.Shapes.Impl
 
             int cQuad = Quadrant(prC);
 
-            IPoint nearestP = scratch;
+            IPoint? nearestP = scratch;
             CornerByQuadrant(r, oppositeQuad[cQuad], nearestP);
             bool nearestContains = Contains(nearestP);
 

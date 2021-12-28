@@ -19,6 +19,7 @@
 using GeoAPI.Geometries;
 using Spatial4n.Core.Context;
 using Spatial4n.Core.Shapes.Impl;
+using System;
 using System.Diagnostics;
 
 namespace Spatial4n.Core.Shapes.Nts
@@ -62,7 +63,7 @@ namespace Spatial4n.Core.Shapes.Nts
             get { return false; }
         }
 
-        public virtual double GetArea(SpatialContext ctx)
+        public virtual double GetArea(SpatialContext? ctx)
         {
             return 0;
         }
@@ -74,6 +75,9 @@ namespace Spatial4n.Core.Shapes.Nts
 
         public virtual IShape GetBuffered(double distance, SpatialContext ctx)
         {
+            if (ctx is null)
+                throw new ArgumentNullException(nameof(ctx)); // spatial4n specific - use ArgumentNullException instead of NullReferenceException
+
             return ctx.MakeCircle(this, distance);
         }
 

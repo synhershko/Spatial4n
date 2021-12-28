@@ -48,7 +48,7 @@ namespace Spatial4n.Core.Distance
         /// Calculates the bounding box of a circle, as specified by its center point
         /// and distance.
         /// </summary>
-        IRectangle CalcBoxByDistFromPt(IPoint from, double distDEG, SpatialContext ctx, IRectangle reuse);
+        IRectangle CalcBoxByDistFromPt(IPoint from, double distDEG, SpatialContext ctx, IRectangle? reuse);
 
         /// <summary>
         /// The <c>Y</c> coordinate of the horizontal axis of a circle that has maximum width. On a

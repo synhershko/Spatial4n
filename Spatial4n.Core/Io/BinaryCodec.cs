@@ -58,8 +58,8 @@ namespace Spatial4n.Core.IO
         public virtual IShape ReadShape(BinaryReader dataInput)
         {
             byte type = dataInput.ReadByte();
-            IShape s = ReadShapeByTypeIfSupported(dataInput, (ShapeType)type);
-            if (s == null)
+            IShape? s = ReadShapeByTypeIfSupported(dataInput, (ShapeType)type);
+            if (s is null)
                 throw new ArgumentException("Unsupported shape byte " + type);
             return s;
         }
@@ -71,7 +71,7 @@ namespace Spatial4n.Core.IO
                 throw new ArgumentException("Unsupported shape " + s.GetType());
         }
 
-        protected virtual IShape ReadShapeByTypeIfSupported(BinaryReader dataInput, ShapeType type)
+        protected virtual IShape? ReadShapeByTypeIfSupported(BinaryReader dataInput, ShapeType type)
         {
             switch (type)
             {
@@ -190,8 +190,8 @@ namespace Spatial4n.Core.IO
                 }
                 else
                 {
-                    IShape s = ReadShapeByTypeIfSupported(dataInput, (ShapeType)type);
-                    if (s == null)
+                    IShape? s = ReadShapeByTypeIfSupported(dataInput, (ShapeType)type);
+                    if (s is null)
                         throw new InvalidShapeException("Unsupported shape byte " + type);
                     shapes.Add(s);
                 }

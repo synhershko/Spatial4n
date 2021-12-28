@@ -32,11 +32,11 @@ namespace Spatial4n.Core.Exceptions
 #endif
     public class InvalidShapeException : RuntimeException
     {
-        public InvalidShapeException(string reason) : base(reason)
+        public InvalidShapeException(string? reason) : base(reason)
         {
         }
 
-        public InvalidShapeException(string reason, Exception exception)
+        public InvalidShapeException(string? reason, Exception? exception)
             : base(reason, exception)
         {
         }

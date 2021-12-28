@@ -83,7 +83,7 @@ namespace Spatial4n.Core.IO.Nts
             get { return m_datelineRule; }
         }
 
-        protected override IShape ParseShapeByType(WktShapeParser.State state, string shapeType)
+        protected override IShape? ParseShapeByType(WktShapeParser.State state, string shapeType)
         {
             if (shapeType.Equals("POLYGON", StringComparison.OrdinalIgnoreCase))
             {
@@ -180,7 +180,7 @@ namespace Spatial4n.Core.IO.Nts
 
             ILinearRing shell = geometryFactory.CreateLinearRing(coordinateSequenceList[0]);
 
-            ILinearRing[] holes = null;
+            ILinearRing[]? holes = null;
             if (coordinateSequenceList.Count > 1)
             {
                 holes = new ILinearRing[coordinateSequenceList.Count - 1];

@@ -36,12 +36,12 @@ namespace Spatial4n.Core.Context
         /// <summary>
         /// Set by <see cref="MakeSpatialContext(IDictionary{string, string})"/>.
         /// </summary>
-        protected IDictionary<string, string> args;
+        protected IDictionary<string, string>? args;
 
         // These fields are public to make it easy to set them without bothering with setters.
         public bool geo = true;
-        public IDistanceCalculator distCalc;//defaults in SpatialContext c'tor based on geo
-        public IRectangle worldBounds;//defaults in SpatialContext c'tor based on geo
+        public IDistanceCalculator? distCalc;//defaults in SpatialContext c'tor based on geo
+        public IRectangle? worldBounds;//defaults in SpatialContext c'tor based on geo
 
         public bool normWrapLongitude = false;
 
@@ -58,8 +58,12 @@ namespace Spatial4n.Core.Context
         /// then <see cref="SpatialContextFactory"/> is chosen.
         /// </summary>
         /// <param name="args">Non-null map of name-value pairs.</param>
+        /// <exception cref="ArgumentNullException"><paramref name="args"/> is <c>null</c>.</exception>
         public static SpatialContext MakeSpatialContext(IDictionary<string, string> args)
         {
+            if (args is null)
+                throw new ArgumentNullException(nameof(args)); // spatial4n specific - use ArgumentNullException instead of NullReferenceException
+
             SpatialContextFactory instance;
             string cname;
             args.TryGetValue("spatialContextFactory", out cname);
@@ -101,8 +105,12 @@ namespace Spatial4n.Core.Context
         /// <summary>
         /// Gets <paramref name="name"/> from args and populates a field by the same name with the value.
         /// </summary>
+        /// <exception cref="InvalidOperationException"><see cref="args"/> is not set prior to calling this method.</exception>
         protected virtual void InitField(string name)
         {
+            if (args is null)
+                throw new InvalidOperationException("args must be set prior to calling InitField()"); // spatial4n specific - use InvalidOperationException instead of NullReferenceException
+
             //  note: java.beans API is more verbose to use correctly (?) but would arguably be better
             FieldInfo field = GetType().GetField(name, BindingFlags.Public | BindingFlags.Instance | BindingFlags.NonPublic);
             string str;
@@ -148,8 +156,12 @@ namespace Spatial4n.Core.Context
             }
         }
 
+        /// <exception cref="InvalidOperationException"><see cref="args"/> is not set prior to calling this method.</exception>
         protected virtual void InitCalculator()
         {
+            if (args is null)
+                throw new InvalidOperationException("args must be set prior to calling InitCalculator()"); // spatial4n specific - use InvalidOperationException instead of NullReferenceException
+
             string calcStr;
             if (!args.TryGetValue("distCalculator", out calcStr) || calcStr == null)
                 return;
@@ -179,8 +191,12 @@ namespace Spatial4n.Core.Context
             }
         }
 
+        /// <exception cref="InvalidOperationException"><see cref="args"/> is not set prior to calling this method.</exception>
         protected virtual void InitWorldBounds()
         {
+            if (args is null)
+                throw new InvalidOperationException("args must be set prior to calling InitWorldBounds()"); // spatial4n specific - use InvalidOperationException instead of NullReferenceException
+
             string worldBoundsStr;
             if (!args.TryGetValue("worldBounds", out worldBoundsStr) || worldBoundsStr == null)
                 return;

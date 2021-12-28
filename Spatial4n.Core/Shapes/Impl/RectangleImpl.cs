@@ -121,9 +121,9 @@ namespace Spatial4n.Core.Shapes.Impl
             get { return maxX != minX && maxY != minY; }
         }
 
-        public virtual double GetArea(SpatialContext ctx)
+        public virtual double GetArea(SpatialContext? ctx)
         {
-            if (ctx == null)
+            if (ctx is null)
             {
                 return Width * Height;
             }

@@ -198,7 +198,7 @@ namespace Spatial4n.Core.Context.Nts
             //A Nts Point is fairly heavyweight!  TODO could/should we optimize this?
             VerifyX(x);
             VerifyY(y);
-            Coordinate coord = double.IsNaN(x) ? null : new Coordinate(x, y);
+            Coordinate? coord = double.IsNaN(x) ? null : new Coordinate(x, y);
             return new NtsPoint(m_geometryFactory.CreatePoint(coord), this);
         }
 

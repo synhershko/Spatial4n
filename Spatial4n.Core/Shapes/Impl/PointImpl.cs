@@ -26,14 +26,14 @@ namespace Spatial4n.Core.Shapes.Impl
     /// </summary>
     public class Point : IPoint
     {
-        private readonly SpatialContext ctx;
+        private readonly SpatialContext? ctx;
         private double x;
         private double y;
 
         /// <summary>
         /// A simple constructor without normalization / validation.
         /// </summary>
-        public Point(double x, double y, SpatialContext ctx)
+        public Point(double x, double y, SpatialContext? ctx)
         {
             this.ctx = ctx;
             Reset(x, y);
@@ -63,7 +63,12 @@ namespace Spatial4n.Core.Shapes.Impl
 
         public virtual IRectangle BoundingBox
         {
-            get { return ctx.MakeRectangle(this, this); }
+            get 
+            {
+                if (ctx is null)
+                    throw new InvalidOperationException("Must provide a SpatialContext in the constructor."); // spatial4n specific - use InvalidOperationException instead of NullReferenceException
+                return ctx.MakeRectangle(this, this); 
+            }
         }
 
         public virtual IPoint Center
@@ -90,7 +95,7 @@ namespace Spatial4n.Core.Shapes.Impl
             get { return false; }
         }
 
-        public virtual double GetArea(SpatialContext ctx)
+        public virtual double GetArea(SpatialContext? ctx)
         {
             return 0;
         }
@@ -108,10 +113,10 @@ namespace Spatial4n.Core.Shapes.Impl
         /// <summary>
         /// All <see cref="IPoint"/> implementations should use this definition of <see cref="object.Equals(object)"/>.
         /// </summary>
-        public static bool Equals(IPoint thiz, Object o)
+        public static bool Equals(IPoint thiz, object o)
         {
             if (thiz == null)
-                throw new ArgumentNullException("thiz");
+                throw new ArgumentNullException(nameof(thiz));
 
             if (thiz == o) return true;
 
@@ -132,7 +137,7 @@ namespace Spatial4n.Core.Shapes.Impl
         public static int GetHashCode(IPoint thiz)
         {
             if (thiz == null)
-                throw new ArgumentNullException("thiz");
+                throw new ArgumentNullException(nameof(thiz));
 
             long temp = thiz.X != +0.0d ? BitConverter.DoubleToInt64Bits(thiz.X) : 0L;
             int result = (int)(temp ^ ((uint)temp >> 32));

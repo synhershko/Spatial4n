@@ -69,7 +69,7 @@ namespace Spatial4n.Core.Shapes
         {
             if (!shapes.Any())
                 return ctx.MakeRectangle(double.NaN, double.NaN, double.NaN, double.NaN);
-            Range xRange = null;
+            Range? xRange = null;
             double minY = double.PositiveInfinity;
             double maxY = double.NegativeInfinity;
             foreach (Shapes.IShape geom in shapes)
@@ -77,7 +77,7 @@ namespace Spatial4n.Core.Shapes
                 IRectangle r = geom.BoundingBox;
 
                 Range xRange2 = Range.XRange(r, ctx);
-                if (xRange == null)
+                if (xRange is null)
                 {
                     xRange = xRange2;
                 }
@@ -88,7 +88,7 @@ namespace Spatial4n.Core.Shapes
                 minY = Math.Min(minY, r.MinY);
                 maxY = Math.Max(maxY, r.MaxY);
             }
-            return ctx.MakeRectangle(xRange.Min, xRange.Max, minY, maxY);
+            return ctx.MakeRectangle(xRange!.Min, xRange.Max, minY, maxY);
         }
 
         public virtual IList<IShape> Shapes
@@ -222,7 +222,7 @@ namespace Spatial4n.Core.Shapes
             return true;
         }
 
-        public virtual double GetArea(SpatialContext ctx)
+        public virtual double GetArea(SpatialContext? ctx)
         {
             double MAX_AREA = m_bbox.GetArea(ctx);
             double sum = 0;

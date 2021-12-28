@@ -72,9 +72,9 @@ namespace Spatial4n.Core.Shapes.Impl
             get { return radiusDEG; }
         }
 
-        public virtual double GetArea(SpatialContext ctx)
+        public virtual double GetArea(SpatialContext? ctx)
         {
-            if (ctx == null)
+            if (ctx is null)
             {
                 return Math.PI * radiusDEG * radiusDEG;
             }

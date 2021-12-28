@@ -47,8 +47,16 @@ namespace Spatial4n.Core.Shapes.Impl
         /// <param name="pB">end point</param>
         /// <param name="buf">the buffer distance in degrees</param>
         /// <param name="ctx"></param>
+        /// <exception cref="ArgumentNullException"><paramref name="pA"/>, <paramref name="pB"/>, or <paramref name="ctx"/> is <c>null</c>.</exception>
         public BufferedLine(IPoint pA, IPoint pB, double buf, SpatialContext ctx)
         {
+            if (pA is null)
+                throw new ArgumentNullException(nameof(pA)); // spatial4n specific - use ArgumentNullException instead of NullReferenceException
+            if (pB is null)
+                throw new ArgumentNullException(nameof(pB)); // spatial4n specific - use ArgumentNullException instead of NullReferenceException
+            if (ctx is null)
+                throw new ArgumentNullException(nameof(ctx)); // spatial4n specific - use ArgumentNullException instead of NullReferenceException
+
             Debug.Assert(buf >= 0);//TODO support buf=0 via another class ?
 
             // If true, buf should bump-out from the pA & pB, in effect
@@ -225,7 +233,7 @@ namespace Spatial4n.Core.Shapes.Impl
         }
 
 
-        public virtual double GetArea(SpatialContext ctx)
+        public virtual double GetArea(SpatialContext? ctx)
         {
             return linePrimary.Buf * linePerp.Buf * 4;
         }

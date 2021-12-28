@@ -85,9 +85,13 @@ namespace Spatial4n.Core.IO
         /// <param name="wktString"></param>
         /// <returns>Non-null <see cref="IShape"/> defined in the string</returns>
         /// <exception cref="ParseException">Thrown if there is an error in the <see cref="IShape"/> definition</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="wktString"/> is <c>null</c>.</exception>
         public virtual IShape Parse(string wktString)
         {
-            IShape shape = ParseIfSupported(wktString);//sets rawString & offset
+            if (wktString is null)
+                throw new ArgumentNullException(nameof(wktString)); // spatial4n specific - use ArgumentNullException instead of NullReferenceException
+
+            IShape? shape = ParseIfSupported(wktString);//sets rawString & offset
             if (shape != null)
                 return shape;
             string shortenedString = (wktString.Length <= 128 ? wktString : wktString.Substring(0, (128 - 3) - 0) + "...");
@@ -103,8 +107,12 @@ namespace Spatial4n.Core.IO
         /// <param name="wktString">non-null, can be empty or have surrounding whitespace</param>
         /// <returns><see cref="IShape"/>, null if unknown / unsupported shape.</returns>
         /// <exception cref="ParseException">Thrown if there is an error in the <see cref="IShape"/> definition</exception>
-        public virtual IShape ParseIfSupported(string wktString)
+        /// <exception cref="ArgumentNullException"><paramref name="wktString"/> is <c>null</c>.</exception>
+        public virtual IShape? ParseIfSupported(string wktString)
         {
+            if (wktString is null)
+                throw new ArgumentNullException(nameof(wktString)); // spatial4n specific - use ArgumentNullException instead of NullReferenceException
+
             State state = NewState(wktString);
             state.NextIfWhitespace();//leading
             if (state.Eof)
@@ -113,7 +121,7 @@ namespace Spatial4n.Core.IO
             if (!char.IsLetter(state.rawString[state.offset]))
                 return null;
             string shapeType = state.NextWord();
-            IShape result = null;
+            IShape? result = null;
             try
             {
                 result = ParseShapeByType(state, shapeType);
@@ -137,8 +145,12 @@ namespace Spatial4n.Core.IO
         /// (internal) Creates a new State with the given String. It's only called by
         /// <see cref="ParseIfSupported(string)"/>. This is an extension point for subclassing.
         /// </summary>
+        /// <exception cref="ArgumentNullException"><paramref name="wktString"/> is <c>null</c>.</exception>
         protected internal virtual State NewState(string wktString)
         {
+            if (wktString is null)
+                throw new ArgumentNullException(nameof(wktString)); // spatial4n specific - use ArgumentNullException instead of NullReferenceException
+
             //NOTE: if we wanted to re-use old States to reduce object allocation, we might do that
             // here. But in the scheme of things, it doesn't seem worth the bother as it complicates the
             // thread-safety story of the API for too little of a gain.
@@ -164,8 +176,14 @@ namespace Spatial4n.Core.IO
         /// <param name="state"></param>
         /// <param name="shapeType">Non-Null string; could have mixed case. The first character is a letter.</param>
         /// <returns>The shape or null if not supported / unknown.</returns>
-        protected virtual IShape ParseShapeByType(State state, string shapeType)
+        /// <exception cref="ArgumentNullException"><paramref name="state"/> or <paramref name="shapeType"/> is <c>null</c>.</exception>
+        protected virtual IShape? ParseShapeByType(State state, string shapeType)
         {
+            if (state is null)
+                throw new ArgumentNullException(nameof(state)); // spatial4n specific - use ArgumentNullException instead of NullReferenceException
+            if (shapeType is null)
+                throw new ArgumentNullException(nameof(shapeType)); // spatial4n specific - use ArgumentNullException instead of NullReferenceException
+
             Debug.Assert(char.IsLetter(shapeType[0]), "Shape must start with letter: " + shapeType);
 
             if (shapeType.Equals("POINT", StringComparison.OrdinalIgnoreCase))
@@ -209,8 +227,12 @@ namespace Spatial4n.Core.IO
         /// </code>
         /// Whereas 'number' is the distance to buffer the shape by.
         /// </summary>
+        /// <exception cref="ArgumentNullException"><paramref name="state"/> is <c>null</c>.</exception>
         protected virtual IShape ParseBufferShape(State state)
         {
+            if (state is null)
+                throw new ArgumentNullException(nameof(state)); // spatial4n specific - use ArgumentNullException instead of NullReferenceException
+
             state.NextExpect('(');
             IShape shape = Shape(state);
             state.NextExpect(',');
@@ -234,9 +256,13 @@ namespace Spatial4n.Core.IO
         ///   '(' coordinate ')'
         /// </code>
         /// </summary>
+        /// <exception cref="ArgumentNullException"><paramref name="state"/> is <c>null</c>.</exception>
         /// <seealso cref="Point(State)"/>
         protected virtual IShape ParsePointShape(State state)
         {
+            if (state is null)
+                throw new ArgumentNullException(nameof(state)); // spatial4n specific - use ArgumentNullException instead of NullReferenceException
+
             if (state.NextIfEmptyAndSkipZM())
                 return m_ctx.MakePoint(double.NaN, double.NaN);
             state.NextExpect('(');
@@ -252,9 +278,13 @@ namespace Spatial4n.Core.IO
         /// </code>
         /// Furthermore, coordinate can optionally be wrapped in parenthesis.
         /// </summary>
+        /// <exception cref="ArgumentNullException"><paramref name="state"/> is <c>null</c>.</exception>
         /// <seealso cref="Point(State)"/>
         protected virtual IShape ParseMultiPointShape(State state)
         {
+            if (state is null)
+                throw new ArgumentNullException(nameof(state)); // spatial4n specific - use ArgumentNullException instead of NullReferenceException
+
             if (state.NextIfEmptyAndSkipZM())
                 return m_ctx.MakeCollection(new List<IShape>());
             IList<IShape> shapes = new List<IShape>();
@@ -281,8 +311,12 @@ namespace Spatial4n.Core.IO
         /// </code>
         /// </para>
         /// </summary>
+        /// <exception cref="ArgumentNullException"><paramref name="state"/> is <c>null</c>.</exception>
         protected virtual IShape ParseEnvelopeShape(State state)
         {
+            if (state is null)
+                throw new ArgumentNullException(nameof(state)); // spatial4n specific - use ArgumentNullException instead of NullReferenceException
+
             //FYI no dimension or EMPTY
             state.NextExpect('(');
             double x1 = state.NextDouble();
@@ -302,9 +336,13 @@ namespace Spatial4n.Core.IO
         ///   coordinateSequence
         /// </code>
         /// </summary>
+        /// <exception cref="ArgumentNullException"><paramref name="state"/> is <c>null</c>.</exception>
         /// <seealso cref="PointList(State)"/>
         protected virtual IShape ParseLineStringShape(State state)
         {
+            if (state is null)
+                throw new ArgumentNullException(nameof(state)); // spatial4n specific - use ArgumentNullException instead of NullReferenceException
+
             if (state.NextIfEmptyAndSkipZM())
                 return m_ctx.MakeLineString(new List<IPoint>());
             IList<IPoint> points = PointList(state);
@@ -317,9 +355,13 @@ namespace Spatial4n.Core.IO
         ///   '(' coordinateSequence (',' coordinateSequence )* ')'
         /// </code>
         /// </summary>
+        /// <exception cref="ArgumentNullException"><paramref name="state"/> is <c>null</c>.</exception>
         /// <seealso cref="ParseLineStringShape(State)"/>
         protected virtual IShape ParseMultiLineStringShape(State state)
         {
+            if (state is null)
+                throw new ArgumentNullException(nameof(state)); // spatial4n specific - use ArgumentNullException instead of NullReferenceException
+
             if (state.NextIfEmptyAndSkipZM())
                 return m_ctx.MakeCollection(new List<IShape>());
             IList<IShape> shapes = new List<IShape>();
@@ -338,8 +380,12 @@ namespace Spatial4n.Core.IO
         ///   '(' shape (',' shape )* ')'
         /// </code>
         /// </summary>
+        /// <exception cref="ArgumentNullException"><paramref name="state"/> is <c>null</c>.</exception>
         protected virtual IShape ParseGeometryCollectionShape(State state)
         {
+            if (state is null)
+                throw new ArgumentNullException(nameof(state)); // spatial4n specific - use ArgumentNullException instead of NullReferenceException
+
             if (state.NextIfEmptyAndSkipZM())
                 return m_ctx.MakeCollection(new List<IShape>());
             IList<IShape> shapes = new List<IShape>();
@@ -357,11 +403,15 @@ namespace Spatial4n.Core.IO
         /// calls <seealso cref="ParseShapeByType(State, string)"/>
         /// and throws an exception if the shape wasn't supported.
         /// </summary>
+        /// <exception cref="ArgumentNullException"><paramref name="state"/> is <c>null</c>.</exception>
         protected virtual IShape Shape(State state)
         {
+            if (state is null)
+                throw new ArgumentNullException(nameof(state)); // spatial4n specific - use ArgumentNullException instead of NullReferenceException
+
             string type = state.NextWord();
-            IShape shape = ParseShapeByType(state, type);
-            if (shape == null)
+            IShape? shape = ParseShapeByType(state, type);
+            if (shape is null)
                 throw new ParseException("Shape of type " + type + " is unknown", state.offset);
             return shape;
         }
@@ -372,9 +422,13 @@ namespace Spatial4n.Core.IO
         ///   '(' coordinate (',' coordinate )* ')'
         /// </code>
         /// </summary>
+        /// <exception cref="ArgumentNullException"><paramref name="state"/> is <c>null</c>.</exception>
         /// <seealso cref="Point(State)"/>
         protected virtual IList<IPoint> PointList(State state)
         {
+            if (state is null)
+                throw new ArgumentNullException(nameof(state)); // spatial4n specific - use ArgumentNullException instead of NullReferenceException
+
             IList<IPoint> sequence = new List<IPoint>();
             state.NextExpect('(');
             do
@@ -392,8 +446,12 @@ namespace Spatial4n.Core.IO
         ///   number number number*
         /// </code>
         /// </summary>
+        /// <exception cref="ArgumentNullException"><paramref name="state"/> is <c>null</c>.</exception>
         protected virtual IPoint Point(State state)
         {
+            if (state is null)
+                throw new ArgumentNullException(nameof(state)); // spatial4n specific - use ArgumentNullException instead of NullReferenceException
+
             double x = state.NextDouble();
             double y = state.NextDouble();
             state.SkipNextDoubles();
@@ -412,14 +470,18 @@ namespace Spatial4n.Core.IO
             /// <summary>Offset of the next char in <see cref="rawString"/> to be read. </summary>
             public int offset;
             /// <summary>Dimensionality specifier (e.g. 'Z', or 'M') following a shape type name.</summary>
-            public string dimension;
+            public string? dimension;
 
+            /// <summary>
+            /// Initializes a new State instance with the specified WktShapeParser and <paramref name="rawString"/>.
+            /// </summary>
+            /// <param name="outerInstance">The <see cref="WktShapeParser"/>.</param>
+            /// <param name="rawString">The raw string.</param>
+            /// <exception cref="ArgumentNullException"><paramref name="outerInstance"/> or <paramref name="rawString"/> is <c>null</c>.</exception>
             public State(WktShapeParser outerInstance, string rawString)
             {
-                if (outerInstance == null)
-                    throw new ArgumentNullException("outerInstance");
-                this.outerInstance = outerInstance;
-                this.rawString = rawString;
+                this.outerInstance = outerInstance ?? throw new ArgumentNullException(nameof(outerInstance));
+                this.rawString = rawString ?? throw new ArgumentNullException(nameof(rawString)); // spatial4n specific - use ArgumentNullException instead of NullReferenceException
             }
 
             public virtual SpatialContext Ctx

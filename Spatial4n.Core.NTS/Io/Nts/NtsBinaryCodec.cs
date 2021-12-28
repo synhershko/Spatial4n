@@ -64,7 +64,7 @@ namespace Spatial4n.Core.IO.Nts
             return type;
         }
 
-        protected override IShape ReadShapeByTypeIfSupported(BinaryReader dataInput, ShapeType type)
+        protected override IShape? ReadShapeByTypeIfSupported(BinaryReader dataInput, ShapeType type)
         {
             if (type != ShapeType.TYPE_GEOM)
                 return base.ReadShapeByTypeIfSupported(dataInput, type);

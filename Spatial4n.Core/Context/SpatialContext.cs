@@ -66,8 +66,8 @@ namespace Spatial4n.Core.Context
         { }
 
         private static SpatialContextFactory InitFromLegacyConstructor(bool geo,
-                                                                 IDistanceCalculator calculator,
-                                                                 IRectangle worldBounds)
+                                                                 IDistanceCalculator? calculator,
+                                                                 IRectangle? worldBounds)
         {
             SpatialContextFactory factory = new SpatialContextFactory();
             factory.geo = geo;
@@ -101,8 +101,8 @@ namespace Spatial4n.Core.Context
             }
 
             //TODO remove worldBounds from Spatial4j: see Issue #55
-            IRectangle bounds = factory.worldBounds;
-            if (bounds == null)
+            IRectangle? bounds = factory.worldBounds;
+            if (bounds is null)
             {
                 this.worldBounds = IsGeo
                         ? new Rectangle(-180, 180, -90, 90, this)
@@ -398,8 +398,8 @@ namespace Spatial4n.Core.Context
         [Obsolete]
         public virtual IShape ReadShape(string value)
         {
-            IShape s = LegacyShapeReadWriterFormat.ReadShapeOrNull(value, this);
-            if (s == null)
+            IShape? s = LegacyShapeReadWriterFormat.ReadShapeOrNull(value, this);
+            if (s is null)
             {
                 try
                 {

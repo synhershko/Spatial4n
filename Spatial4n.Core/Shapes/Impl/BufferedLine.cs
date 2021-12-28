@@ -154,10 +154,7 @@ namespace Spatial4n.Core.Shapes.Impl
                 Math.Min(bounds.MaxY, maxY));
         }
 
-        public virtual bool IsEmpty
-        {
-            get { return pA.IsEmpty; }
-        }
+        public virtual bool IsEmpty => pA.IsEmpty;
 
 
         public virtual IShape GetBuffered(double distance, SpatialContext ctx)
@@ -221,16 +218,10 @@ namespace Spatial4n.Core.Shapes.Impl
             return linePrimary.Contains(p) && linePerp.Contains(p);
         }
 
-        public virtual IRectangle BoundingBox
-        {
-            get { return bbox; }
-        }
+        public virtual IRectangle BoundingBox => bbox;
 
 
-        public virtual bool HasArea
-        {
-            get { return buf > 0; }
-        }
+        public virtual bool HasArea => buf > 0;
 
 
         public virtual double GetArea(SpatialContext? ctx)
@@ -239,41 +230,23 @@ namespace Spatial4n.Core.Shapes.Impl
         }
 
 
-        public virtual IPoint Center
-        {
-            get { return BoundingBox.Center; }
-        }
+        public virtual IPoint Center => BoundingBox.Center;
 
-        public virtual IPoint A
-        {
-            get { return pA; }
-        }
+        public virtual IPoint A => pA;
 
-        public virtual IPoint B
-        {
-            get { return pB; }
-        }
+        public virtual IPoint B => pB;
 
-        public virtual double Buf
-        {
-            get { return buf; }
-        }
+        public virtual double Buf => buf;
 
         /// <summary>
         /// INTERNAL
         /// </summary>
-        public virtual InfBufLine LinePrimary
-        {
-            get { return linePrimary; }
-        }
+        public virtual InfBufLine LinePrimary => linePrimary;
 
         /// <summary>
         /// INTERNAL
         /// </summary>
-        public virtual InfBufLine LinePerp
-        {
-            get { return linePerp; }
-        }
+        public virtual InfBufLine LinePerp => linePerp;
 
 
         public override string ToString()

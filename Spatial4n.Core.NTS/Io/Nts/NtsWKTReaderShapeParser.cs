@@ -129,21 +129,9 @@ namespace Spatial4n.Core.IO.Nts
                 outerInstance.m_ctx.VerifyY(y);
             }
 
-            public bool Done
-            {
-                get
-                {
-                    return false;
-                }
-            }
+            public bool Done => false;
 
-            public bool GeometryChanged
-            {
-                get
-                {
-                    return changed;
-                }
-            }
+            public bool GeometryChanged => changed;
         }
 
         protected virtual void CheckCoordinates(IGeometry geom)

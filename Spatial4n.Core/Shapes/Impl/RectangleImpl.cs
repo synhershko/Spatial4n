@@ -71,10 +71,7 @@ namespace Spatial4n.Core.Shapes.Impl
             Debug.Assert(minY <= maxY || double.IsNaN(minY), "minY, maxY: " + minY + ", " + maxY);
         }
 
-        public virtual bool IsEmpty
-        {
-            get { return double.IsNaN(minX); }
-        }
+        public virtual bool IsEmpty => double.IsNaN(minX);
 
         public virtual IShape GetBuffered(double distance, SpatialContext ctx)
         {
@@ -116,10 +113,7 @@ namespace Spatial4n.Core.Shapes.Impl
             }
         }
 
-        public virtual bool HasArea
-        {
-            get { return maxX != minX && maxY != minY; }
-        }
+        public virtual bool HasArea => maxX != minX && maxY != minY;
 
         public virtual double GetArea(SpatialContext? ctx)
         {
@@ -133,15 +127,9 @@ namespace Spatial4n.Core.Shapes.Impl
             }
         }
 
-        public virtual bool CrossesDateLine
-        {
-            get { return (minX > maxX); }
-        }
+        public virtual bool CrossesDateLine => (minX > maxX);
 
-        public virtual double Height
-        {
-            get { return maxY - minY; }
-        }
+        public virtual double Height => maxY - minY;
 
         public virtual double Width
         {
@@ -158,30 +146,15 @@ namespace Spatial4n.Core.Shapes.Impl
             }
         }
 
-        public virtual double MaxX
-        {
-            get { return maxX; }
-        }
+        public virtual double MaxX => maxX;
 
-        public virtual double MaxY
-        {
-            get { return maxY; }
-        }
+        public virtual double MaxY => maxY;
 
-        public virtual double MinX
-        {
-            get { return minX; }
-        }
+        public virtual double MinX => minX;
 
-        public virtual double MinY
-        {
-            get { return minY; }
-        }
+        public virtual double MinY => minY;
 
-        public virtual IRectangle BoundingBox
-        {
-            get { return this; }
-        }
+        public virtual IRectangle BoundingBox => this;
 
         public virtual SpatialRelation Relate(IShape other)
         {

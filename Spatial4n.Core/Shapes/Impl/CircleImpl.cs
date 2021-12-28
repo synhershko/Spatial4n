@@ -57,20 +57,11 @@ namespace Spatial4n.Core.Shapes.Impl
             this.enclosingBox = ctx.DistCalc.CalcBoxByDistFromPt(point, this.radiusDEG, ctx, enclosingBox);
         }
 
-        public virtual bool IsEmpty
-        {
-            get { return point.IsEmpty; }
-        }
+        public virtual bool IsEmpty => point.IsEmpty;
 
-        public virtual IPoint Center
-        {
-            get { return point; }
-        }
+        public virtual IPoint Center => point;
 
-        public virtual double Radius
-        {
-            get { return radiusDEG; }
-        }
+        public virtual double Radius => radiusDEG;
 
         public virtual double GetArea(SpatialContext? ctx)
         {
@@ -94,18 +85,12 @@ namespace Spatial4n.Core.Shapes.Impl
             return ctx.DistCalc.Distance(point, x, y) <= radiusDEG;
         }
 
-        public virtual bool HasArea
-        {
-            get { return radiusDEG > 0; }
-        }
+        public virtual bool HasArea => radiusDEG > 0;
 
         /// <summary>
         /// Note that the bounding box might contain a minX that is &gt; maxX, due to WGS84 dateline.
         /// </summary>
-        public virtual IRectangle BoundingBox
-        {
-            get { return enclosingBox; }
-        }
+        public virtual IRectangle BoundingBox => enclosingBox;
 
 
         public virtual SpatialRelation Relate(IShape other)
@@ -240,18 +225,12 @@ namespace Spatial4n.Core.Shapes.Impl
         /// <summary>
         /// The <c>Y</c> coordinate of where the circle axis intersect.
         /// </summary>
-        protected virtual double YAxis
-        {
-            get { return point.Y; }
-        }
+        protected virtual double YAxis => point.Y;
 
         /// <summary>
         /// The <c>X</c> coordinate of where the circle axis intersect.
         /// </summary>
-        protected virtual double XAxis
-        {
-            get { return point.X; }
-        }
+        protected virtual double XAxis => point.X;
 
         public virtual SpatialRelation Relate(ICircle circle)
         {

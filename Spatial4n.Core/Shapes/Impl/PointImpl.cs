@@ -39,10 +39,7 @@ namespace Spatial4n.Core.Shapes.Impl
             Reset(x, y);
         }
 
-        public virtual bool IsEmpty
-        {
-            get { return double.IsNaN(x); }
-        }
+        public virtual bool IsEmpty => double.IsNaN(x);
 
         public virtual void Reset(double x, double y)
         {
@@ -51,15 +48,9 @@ namespace Spatial4n.Core.Shapes.Impl
             this.y = y;
         }
 
-        public virtual double X
-        {
-            get { return x; }
-        }
+        public virtual double X => x;
 
-        public virtual double Y
-        {
-            get { return y; }
-        }
+        public virtual double Y => y;
 
         public virtual IRectangle BoundingBox
         {
@@ -71,10 +62,7 @@ namespace Spatial4n.Core.Shapes.Impl
             }
         }
 
-        public virtual IPoint Center
-        {
-            get { return this; }
-        }
+        public virtual IPoint Center => this;
 
         public virtual IShape GetBuffered(double distance, SpatialContext ctx)
         {
@@ -90,10 +78,7 @@ namespace Spatial4n.Core.Shapes.Impl
             return other.Relate(this).Transpose();
         }
 
-        public virtual bool HasArea
-        {
-            get { return false; }
-        }
+        public virtual bool HasArea => false;
 
         public virtual double GetArea(SpatialContext? ctx)
         {

@@ -91,33 +91,15 @@ namespace Spatial4n.Core.Shapes
             return ctx.MakeRectangle(xRange!.Min, xRange.Max, minY, maxY);
         }
 
-        public virtual IList<IShape> Shapes
-        {
-            get { return m_shapes; }
-        }
+        public virtual IList<IShape> Shapes => m_shapes;
 
-        public virtual IShape this[int index]
-        {
-            get
-            {
-                return m_shapes[index];
-            }
-        }
+        public virtual IShape this[int index] => m_shapes[index];
 
-        public virtual int Count
-        {
-            get { return m_shapes.Count; }
-        }
+        public virtual int Count => m_shapes.Count;
 
-        public virtual IRectangle BoundingBox
-        {
-            get { return m_bbox; }
-        }
+        public virtual IRectangle BoundingBox => m_bbox;
 
-        public virtual IPoint Center
-        {
-            get { return m_bbox.Center; }
-        }
+        public virtual IPoint Center => m_bbox.Center;
 
 
         public virtual bool HasArea
@@ -341,22 +323,13 @@ namespace Spatial4n.Core.Shapes
             return m_shapes.GetEnumerator();
         }
 
-        public bool IsReadOnly
-        {
-            get
-            {
-                return m_shapes.IsReadOnly;
-            }
-        }
+        public bool IsReadOnly => m_shapes.IsReadOnly;
 
         #endregion
 
         #region Added for .NET support of the IShape interface
 
-        public virtual bool IsEmpty
-        {
-            get { return !m_shapes.Any(); }
-        }
+        public virtual bool IsEmpty => !m_shapes.Any();
 
         #endregion
     }

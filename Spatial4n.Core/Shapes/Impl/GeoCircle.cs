@@ -95,10 +95,7 @@ namespace Spatial4n.Core.Shapes.Impl
             }
         }
 
-        protected override double YAxis
-		{
-			get { return horizAxisY; }
-		}
+        protected override double YAxis => horizAxisY;
 
         /// <summary>
         /// Called after bounding box is intersected.

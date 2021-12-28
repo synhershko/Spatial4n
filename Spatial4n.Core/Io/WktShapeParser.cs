@@ -74,10 +74,7 @@ namespace Spatial4n.Core.IO
             this.m_ctx = ctx;
         }
 
-        public virtual SpatialContext Ctx
-        {
-            get { return m_ctx; }
-        }
+        public virtual SpatialContext Ctx => m_ctx;
 
         /// <summary>
         /// Parses the wktString, returning the defined <see cref="IShape"/>.
@@ -484,15 +481,9 @@ namespace Spatial4n.Core.IO
                 this.rawString = rawString ?? throw new ArgumentNullException(nameof(rawString)); // spatial4n specific - use ArgumentNullException instead of NullReferenceException
             }
 
-            public virtual SpatialContext Ctx
-            {
-                get { return outerInstance.m_ctx; }
-            }
+            public virtual SpatialContext Ctx => outerInstance.m_ctx;
 
-            public virtual WktShapeParser Parser
-            {
-                get { return outerInstance; }
-            }
+            public virtual WktShapeParser Parser => outerInstance;
 
             /// <summary>
             /// Reads the word starting at the current character position. The word
@@ -627,10 +618,7 @@ namespace Spatial4n.Core.IO
             /// <summary>
             /// If the string is consumed, i.e. at end-of-file.
             /// </summary>
-            public bool Eof
-            {
-                get { return offset >= rawString.Length; }
-            }
+            public bool Eof => offset >= rawString.Length;
 
             /// <summary>
             /// If the current character is <paramref name="expected"/>, then offset is advanced after it and any

@@ -81,10 +81,7 @@ namespace Spatial4n.Core.Context.Nts
         /// doesn't care but it has a method related to this
         /// <see cref="Shapes.ShapeCollection.RelateContainsShortCircuits()"/>.
         /// </summary>
-        public virtual bool IsAllowMultiOverlap
-        {
-            get { return m_allowMultiOverlap; }
-        }
+        public virtual bool IsAllowMultiOverlap => m_allowMultiOverlap;
 
         ////      protected override ShapeReadWriter MakeShapeReadWriter()
         ////{
@@ -186,10 +183,7 @@ namespace Spatial4n.Core.Context.Nts
         }
 
         // Should {@link #makePoint(double, double)} return {@link NtsPoint}?
-        public virtual bool UseNtsPoint
-        {
-            get { return m_useNtsPoint; }
-        }
+        public virtual bool UseNtsPoint => m_useNtsPoint;
 
         public override IPoint MakePoint(double x, double y)
         {
@@ -203,15 +197,10 @@ namespace Spatial4n.Core.Context.Nts
         }
 
         // Should MakeLineString(IList{IPoint}) return NtsGeometry? 
-        public virtual bool UseNtsLineString
-        {
-            get
-            {
-                //BufferedLineString doesn't yet do dateline cross, and can't yet be relate()'ed with a
-                // NTS geometry
-                return m_useNtsLineString;
-            }
-        }
+        public virtual bool UseNtsLineString =>
+            //BufferedLineString doesn't yet do dateline cross, and can't yet be relate()'ed with a
+            // NTS geometry
+            m_useNtsLineString;
 
         public override IShape MakeLineString(IList<IPoint> points)
         {
@@ -263,10 +252,7 @@ namespace Spatial4n.Core.Context.Nts
             return MakeShape(geom, true/*dateline180Check*/, m_allowMultiOverlap);
         }
 
-        public virtual GeometryFactory GeometryFactory
-        {
-            get { return m_geometryFactory; }
-        }
+        public virtual GeometryFactory GeometryFactory => m_geometryFactory;
 
         public override string ToString()
         {

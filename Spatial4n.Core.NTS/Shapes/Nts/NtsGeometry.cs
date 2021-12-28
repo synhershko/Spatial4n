@@ -134,10 +134,7 @@ namespace Spatial4n.Core.Shapes.Nts
         }
 
 
-        public virtual bool IsEmpty
-        {
-            get { return geom.IsEmpty; }
-        }
+        public virtual bool IsEmpty => geom.IsEmpty;
 
         /// <summary>
         /// Given <paramref name="geoms"/> which has already been checked for being in world
@@ -182,10 +179,7 @@ namespace Spatial4n.Core.Shapes.Nts
             return this.ctx.MakeShape(geom.Buffer(distance), true, true);
         }
 
-        public virtual bool HasArea
-        {
-            get { return _hasArea; }
-        }
+        public virtual bool HasArea => _hasArea;
 
         public virtual double GetArea(SpatialContext? ctx)
         {
@@ -201,10 +195,7 @@ namespace Spatial4n.Core.Shapes.Nts
             //  estimate)
         }
 
-        public virtual IRectangle BoundingBox
-        {
-            get { return bbox; }
-        }
+        public virtual IRectangle BoundingBox => bbox;
 
         public virtual IPoint Center
         {
@@ -342,10 +333,7 @@ namespace Spatial4n.Core.Shapes.Nts
             return geom.EnvelopeInternal.GetHashCode();
         }
 
-        public virtual IGeometry Geometry
-        {
-            get { return geom; }
-        }
+        public virtual IGeometry Geometry => geom;
 
         private class S4nGeometryFilter : IGeometryFilter
         {
@@ -485,15 +473,9 @@ namespace Spatial4n.Core.Shapes.Nts
                 seq.SetOrdinate(i, Ordinate.X, seq.GetX(i) + _xShift);
             }
 
-            public bool Done
-            {
-                get { return false; }
-            }
+            public bool Done => false;
 
-            public bool GeometryChanged
-            {
-                get { return true; }
-            }
+            public bool GeometryChanged => true;
         };
 
         private static void ShiftGeomByX(IGeometry geom, int xShift)

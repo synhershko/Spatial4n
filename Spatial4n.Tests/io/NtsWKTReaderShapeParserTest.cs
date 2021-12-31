@@ -36,7 +36,7 @@ namespace Spatial4n.Core.IO
             NtsSpatialContextFactory factory = new NtsSpatialContextFactory();
             factory.datelineRule = DatelineRule.CcwRect;
             factory.wktShapeParserClass = typeof(NtsWKTReaderShapeParser);
-            ctx = factory.NewSpatialContext();
+            ctx = factory.CreateSpatialContext();
         }
 
         [Fact]

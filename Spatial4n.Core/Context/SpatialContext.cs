@@ -31,8 +31,8 @@ namespace Spatial4n.Core.Context
     /// <para>
     /// If you want a typical geodetic context, just reference <see cref="GEO"/>.  Otherwise,
     /// You should either create and configure a <see cref="SpatialContextFactory"/> and then call
-    /// <see cref="SpatialContextFactory.NewSpatialContext()"/>, OR, call
-    /// <see cref="SpatialContextFactory.MakeSpatialContext(IDictionary{string, string})"/>
+    /// <see cref="SpatialContextFactory.CreateSpatialContext()"/>, OR, call
+    /// <see cref="SpatialContextFactory.MakeSpatialContext(IDictionary{string, string}, System.Reflection.Assembly?)"/>
     /// to do this via configuration data.
     /// </para>
     /// Thread-safe &amp; immutable.
@@ -82,7 +82,7 @@ namespace Spatial4n.Core.Context
         { }
 
         /// <summary>
-        /// Called by <see cref="SpatialContextFactory.NewSpatialContext()"/>.
+        /// Called by <see cref="SpatialContextFactory.CreateSpatialContext()"/>.
         /// </summary>
         /// <param name="factory"></param>
         public SpatialContext(SpatialContextFactory factory)

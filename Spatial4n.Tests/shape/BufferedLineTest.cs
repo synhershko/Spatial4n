@@ -36,7 +36,7 @@ namespace Spatial4n.Core.Shape
         protected readonly Random random = new Random(RandomSeed.Seed());
 
         private readonly SpatialContext ctx = new SpatialContextFactory()
-        { geo = false, worldBounds = new Rectangle(-100, 100, -50, 50, null) }.NewSpatialContext();
+        { geo = false, worldBounds = new Rectangle(-100, 100, -50, 50, null) }.CreateSpatialContext();
 
         //      @Rule
         //public TestLog testLog = TestLog.instance;

@@ -61,7 +61,7 @@ namespace Spatial4n.Core.Context.Nts
         protected readonly bool m_useNtsLineString;
 
         /// <summary>
-        /// Called by <see cref="NtsSpatialContextFactory.NewSpatialContext()"/>.
+        /// Called by <see cref="NtsSpatialContextFactory.CreateSpatialContext()"/>.
         /// </summary>
         /// <param name="factory"></param>
         public NtsSpatialContext(NtsSpatialContextFactory factory)

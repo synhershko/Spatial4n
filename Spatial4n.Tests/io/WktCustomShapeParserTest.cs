@@ -49,7 +49,7 @@ namespace Spatial4n.Core.IO
         {
             SpatialContextFactory factory = new SpatialContextFactory();
             factory.wktShapeParserClass = typeof(MyWKTShapeParser);
-            return factory.NewSpatialContext();
+            return factory.CreateSpatialContext();
         }
 
         [Fact]

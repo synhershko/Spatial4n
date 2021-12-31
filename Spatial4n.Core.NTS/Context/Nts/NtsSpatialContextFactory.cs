@@ -24,11 +24,12 @@ using Spatial4n.Core.IO.Nts;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Reflection;
 
 namespace Spatial4n.Core.Context.Nts
 {
     /// <summary>
-    /// See <see cref="SpatialContextFactory.MakeSpatialContext(IDictionary{string, string})"/>.
+    /// See <see cref="SpatialContextFactory.MakeSpatialContext(IDictionary{string, string}, Assembly?)"/>.
     /// <para>
     /// The following keys are looked up in the args map, in addition to those in the
     /// superclass:
@@ -85,9 +86,9 @@ namespace Spatial4n.Core.Context.Nts
             base.binaryCodecClass = typeof(NtsBinaryCodec);
         }
 
-        protected override void Init(IDictionary<string, string> args)
+        protected override void Init(IDictionary<string, string> args, Assembly? assembly)
         {
-            base.Init(args);
+            base.Init(args, assembly);
 
             InitField("datelineRule");
             InitField("validationRule");
@@ -136,7 +137,7 @@ namespace Spatial4n.Core.Context.Nts
             }
         }
 
-        protected internal override SpatialContext NewSpatialContext()
+        public override SpatialContext CreateSpatialContext()
         {
             return new NtsSpatialContext(this);
         }

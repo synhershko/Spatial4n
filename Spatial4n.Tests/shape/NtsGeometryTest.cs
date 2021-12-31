@@ -244,7 +244,7 @@ namespace Spatial4n.Core.Shape
             NtsSpatialContextFactory factory = new NtsSpatialContextFactory();
             factory.normWrapLongitude = true;
 
-            NtsSpatialContext ctx = (NtsSpatialContext)factory.NewSpatialContext();
+            NtsSpatialContext ctx = (NtsSpatialContext)factory.CreateSpatialContext();
 
             IShape shape = ctx.ReadShapeFromWkt(wktStr);
             //System.out.println("Russia Area: "+shape.getArea(ctx));
@@ -258,7 +258,7 @@ namespace Spatial4n.Core.Shape
 
             NtsSpatialContextFactory factory = new NtsSpatialContextFactory();
             factory.normWrapLongitude = true;
-            NtsSpatialContext ctx = (NtsSpatialContext)factory.NewSpatialContext();
+            NtsSpatialContext ctx = (NtsSpatialContext)factory.CreateSpatialContext();
 
             IShape shape = ctx.ReadShapeFromWkt(wktStr);
 

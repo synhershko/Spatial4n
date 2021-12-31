@@ -56,7 +56,7 @@ namespace Spatial4n.Core.Shape
         public virtual void TestRectIntersect()
         {
             SpatialContext ctx = new SpatialContextFactory()
-            { geo = false, worldBounds = new Rectangle(-100, 100, -50, 50, null) }.NewSpatialContext();
+            { geo = false, worldBounds = new Rectangle(-100, 100, -50, 50, null) }.CreateSpatialContext();
 
             new ShapeCollectionRectIntersectionTestHelper(ctx).TestRelateWithRectangle();
         }

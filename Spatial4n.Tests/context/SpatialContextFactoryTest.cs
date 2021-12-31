@@ -31,7 +31,7 @@ namespace Spatial4n.Core.Context
     {
         public static string PROP = "SpatialContextFactory";
 
-        private static SpatialContext Call(params string[] argsStr)
+        private SpatialContext Call(params string[] argsStr)
         {
             var args = new Dictionary<string, string>();
             for (int i = 0; i < argsStr.Length; i += 2)
@@ -40,7 +40,7 @@ namespace Spatial4n.Core.Context
                 string val = argsStr[i + 1];
                 args.Add(key, val);
             }
-            return SpatialContextFactory.MakeSpatialContext(args);
+            return SpatialContextFactory.MakeSpatialContext(args, GetType().Assembly);
         }
 
         [Fact]
@@ -84,7 +84,7 @@ namespace Spatial4n.Core.Context
                 "geo", "true",
                 "normWrapLongitude", "true",
                 "precisionScale", "2.0",
-                "wktShapeParserClass", typeof(CustomWktShapeParser).AssemblyQualifiedName,
+                "wktShapeParserClass", typeof(CustomWktShapeParser).FullName, // spatial4n: This is in the current assembly, so we pass non-qualified name
                 "datelineRule", "ccwRect",
                 "validationRule", "repairConvexHull",
                 "autoIndex", "true");
@@ -103,7 +103,7 @@ namespace Spatial4n.Core.Context
                 "worldBounds", "ENVELOPE(-500,500,300,-300)",
                 "normWrapLongitude", "true",
                 "precisionScale", "2.0",
-                "wktShapeParserClass", typeof(CustomWktShapeParser).AssemblyQualifiedName,
+                "wktShapeParserClass", typeof(CustomWktShapeParser).FullName, // spatial4n: This is in the current assembly, so we pass non-qualified name
                 "datelineRule", "ccwRect",
                 "validationRule", "repairConvexHull",
                 "autoIndex", "true");
@@ -114,13 +114,13 @@ namespace Spatial4n.Core.Context
         [Fact]
         public void TestSystemPropertyLookup()
         {
-            var customInstance = Call("spatialContextFactory", typeof(DSCF).AssemblyQualifiedName);
+            var customInstance = Call("spatialContextFactory", typeof(DSCF).FullName); // spatial4n: This is in the current assembly, so we pass non-qualified name
             Assert.True(!customInstance.IsGeo);//DSCF returns this
         }
 
         public class DSCF : SpatialContextFactory
         {
-            protected internal override SpatialContext NewSpatialContext()
+            public override SpatialContext CreateSpatialContext()
             {
                 geo = false;
 #pragma warning disable 612, 618

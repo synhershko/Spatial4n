@@ -43,7 +43,7 @@ namespace Spatial4n.Core.IO
                 factory.precisionModel = new PrecisionModel(PrecisionModels.FloatingSingle);
 
                 yield return new object[] { NtsSpatialContext.GEO /*doubles*/ };
-                yield return new object[] { factory.NewSpatialContext() /*floats*/ };
+                yield return new object[] { factory.CreateSpatialContext() /*floats*/ };
             }
         }
 

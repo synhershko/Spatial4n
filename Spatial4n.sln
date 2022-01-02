@@ -29,6 +29,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "build", "build", "{FB359D70
 		build\dependencies.props = build\dependencies.props
 		build\nuget.props = build\nuget.props
 		version.json = version.json
+		build\version.ps1 = build\version.ps1
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "azure-templates", "azure-templates", "{E7201A50-30CD-4C4C-8E52-3C197E138140}"

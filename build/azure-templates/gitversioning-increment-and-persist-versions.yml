@@ -33,36 +33,36 @@ steps:
     EnsureNotNullOrEmpty('${{ parameters.buildNumberFileName }}', 'buildNumberFileName')
   displayName: 'Validate Template Parameters'
 
-- task: DotNetCoreCLI@2  
-  inputs:
-    command: custom
-    custom: tool
-    arguments: install nbgv --tool-path . --version 3.5.68-alpha --add-source https://api.nuget.org/v3/index.json --add-source https://pkgs.dev.azure.com/andrewarnott/OSS/_packaging/PublicCI/nuget/v3/index.json
-  displayName: Install NBGV tool (GitVersioning)
+#- task: DotNetCoreCLI@2  
+#  inputs:
+#    command: custom
+#    custom: tool
+#    arguments: install nbgv --tool-path . --version 3.5.68-alpha --add-source https://api.nuget.org/v3/index.json --add-source https://pkgs.dev.azure.com/andrewarnott/OSS/_packaging/PublicCI/nuget/v3/index.json
+#  displayName: Install NBGV tool (GitVersioning)
 
-- script: nbgv cloud --common-vars --all-vars
-  displayName: 'Set Version'
+#- script: nbgv cloud --common-vars --all-vars
+#  displayName: 'Set Version'
 
-- template: 'show-all-environment-variables.yml'
+#- template: 'show-all-environment-variables.yml'
 
 - pwsh: |
-    # 3 or 4 digit number for packageVersion or assemblyInfoVersion
-    $version = if ($env:NBGV_VERSIONREVISION -eq '-1') { "$env:NBGV_MAJORMINORVERSION.$env:NBGV_BUILDNUMBER" } else { $env:NBGV_VERSION }
-    if ([string]::IsNullOrEmpty('${{ parameters.packageVersion }}')) {
-        $packageVersionRaw = $env:NBGV_NUGETPACKAGEVERSION
-        $packageDashIndex = "$packageVersionRaw".IndexOf('-')
-        $packageVersion = if ($packageDashIndex -eq -1) { $version } else { $version + "$packageVersionRaw".Substring($packageDashIndex, "$packageVersionRaw".Length - $packageDashIndex) }
-    } else {
-        $packageVersion = '${{ parameters.packageVersion }}' # Allow overriding the entire value
-    }
-    if ([string]::IsNullOrEmpty('${{ parameters.informationalVersion }}')) {
-        $informationalVersion = $version + $env:NBGV_PRERELEASEVERSION
-    } else {
-        $informationalVersion = '${{ parameters.informationalVersion }}' + $env:NBGV_PRERELEASEVERSION
-    }
+    $versionScriptFile = "$(Build.SourcesDirectory)/build/version.ps1"
+    $versionInfo = @{}
 
-    $fileVersion = if ([string]::IsNullOrEmpty('${{ parameters.fileVersion }}')) { $env:NBGV_ASSEMBLYFILEVERSION } else { '${{ parameters.fileVersion }}' }
-    $assemblyVersion = if ([string]::IsNullOrEmpty('${{ parameters.assemblyVersion }}')) { $env:NBGV_ASSEMBLYVERSION } else { '${{ parameters.assemblyVersion }}' }
+    # Get the version info
+    $versionInfoString = Invoke-Expression -Command "$versionScriptFile -PackageVersion ""${{ parameters.packageVersion }}"" -AssemblyVersion ""${{ parameters.assemblyVersion }}"" -InformationalVersion ""${{ parameters.informataionalVersion }}"" -FileVersion ""${{ parameters.fileVersion }}"""
+    #Write-Host $versionInfoString
+
+    # parse the version numbers and put them into a hashtable
+    [string[]]$versionInfoSplit = $versionInfoString -split '\r?\n' # split $a into lines, whether it has CRLF or LF-only line endings
+    foreach ($line in $versionInfoSplit) {
+        [string[]]$kvp = $line -split '\:\s+?'
+        $versionInfo.Add($kvp[0], $($kvp[1]).Trim())
+    }
+    $informationalVersion = $versionInfo['InformationalVersion']
+    $fileVersion = $versionInfo['FileVersion']
+    $assemblyVersion = $versionInfo['AssemblyVersion']
+    $packageVersion = $versionInfo['PackageVersion']
 
     Write-Host "##vso[task.setvariable variable=CI_InformationalVersion;]$informationalVersion"
     Write-Host "##vso[task.setvariable variable=CI_FileVersion;]$fileVersion"
@@ -70,6 +70,32 @@ steps:
     Write-Host "##vso[task.setvariable variable=CI_PackageVersion;]$packageVersion"
     Write-Host "##vso[build.updatebuildnumber]$packageVersion"
   displayName: 'Write Output Parameters'
+
+#- pwsh: |
+#    # 3 or 4 digit number for packageVersion or assemblyInfoVersion
+#    $version = if ($env:NBGV_VERSIONREVISION -eq '-1') { "$env:NBGV_MAJORMINORVERSION.$env:NBGV_BUILDNUMBER" } else { $env:NBGV_VERSION }
+#    if ([string]::IsNullOrEmpty('${{ parameters.packageVersion }}')) {
+#        $packageVersionRaw = $env:NBGV_NUGETPACKAGEVERSION
+#        $packageDashIndex = "$packageVersionRaw".IndexOf('-')
+#        $packageVersion = if ($packageDashIndex -eq -1) { $version } else { $version + "$packageVersionRaw".Substring($packageDashIndex, "$packageVersionRaw".Length - $packageDashIndex) }
+#    } else {
+#        $packageVersion = '${{ parameters.packageVersion }}' # Allow overriding the entire value
+#    }
+#    if ([string]::IsNullOrEmpty('${{ parameters.informationalVersion }}')) {
+#        $informationalVersion = $version + $env:NBGV_PRERELEASEVERSION
+#    } else {
+#        $informationalVersion = '${{ parameters.informationalVersion }}' + $env:NBGV_PRERELEASEVERSION
+#    }
+
+#    $fileVersion = if ([string]::IsNullOrEmpty('${{ parameters.fileVersion }}')) { $env:NBGV_ASSEMBLYFILEVERSION } else { '${{ parameters.fileVersion }}' }
+#    $assemblyVersion = if ([string]::IsNullOrEmpty('${{ parameters.assemblyVersion }}')) { $env:NBGV_ASSEMBLYVERSION } else { '${{ parameters.assemblyVersion }}' }
+
+#    Write-Host "##vso[task.setvariable variable=CI_InformationalVersion;]$informationalVersion"
+#    Write-Host "##vso[task.setvariable variable=CI_FileVersion;]$fileVersion"
+#    Write-Host "##vso[task.setvariable variable=CI_AssemblyVersion;]$assemblyVersion"
+#    Write-Host "##vso[task.setvariable variable=CI_PackageVersion;]$packageVersion"
+#    Write-Host "##vso[build.updatebuildnumber]$packageVersion"
+#  displayName: 'Write Output Parameters'
 
 - template: 'show-all-environment-variables.yml'
 

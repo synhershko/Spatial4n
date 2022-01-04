@@ -24,6 +24,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "build", "build", "{FB359D70-1DCB-4817-8758-1DA9F6571B6F}"
 	ProjectSection(SolutionItems) = preProject
 		build\dependencies.props = build\dependencies.props
+		build\nuget.props = build\nuget.props
 	EndProjectSection
 EndProject
 Global

@@ -11,6 +11,10 @@
     <FrameworkPathOverride Condition="'$(TargetFramework)' == 'net35'">$(MSBuildProgramFiles32)\Reference Assemblies\Microsoft\Framework\.NETFramework\v3.5\Profile\Client</FrameworkPathOverride>
   </PropertyGroup>
 
+  <PropertyGroup Label="NuGet Settings">
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
   <PropertyGroup>
     <DefineConstants>$(DefineConstants);FEATURE_NTS</DefineConstants>
   </PropertyGroup>

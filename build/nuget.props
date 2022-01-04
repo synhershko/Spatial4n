@@ -1,0 +1,15 @@
+<Project>
+  <PropertyGroup Label="NuGet Package Properties">
+    <IsPackable>true</IsPackable>
+    <PackageTags>lucene lucene.net spatial geospatial geo spatial4j search</PackageTags>
+    <Authors>Itamar Syn-Hershko, Shad Storhaug</Authors>
+    <PackageProjectUrl>https://github.com/$(GitHubOrganization)/$(GitHubProject)/</PackageProjectUrl>
+    <!--<PackageIconUrl></PackageIconUrl>-->
+    <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
+    <ReleaseNotesUrl Condition=" '$(PackageVersion)' != '' ">https://github.com/$(GitHubOrganization)/$(GitHubProject)/releases/tag/$(PackageVersion)</ReleaseNotesUrl>
+    <PackageReleaseNotes Condition=" '$(ReleaseNotesUrl)' != '' ">$(ReleaseNotesUrl)</PackageReleaseNotes>
+  </PropertyGroup>
+  <ItemGroup>
+    <None Include="$(SolutionDir)LICENSE.txt" Pack="true" PackagePath="LICENSE.txt"/>
+  </ItemGroup>
+</Project>

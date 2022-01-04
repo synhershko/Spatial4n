@@ -24,6 +24,11 @@
       SolutionDir is only available when running in the IDE, so we patch to ensure it also works when using dotnet.exe -->
     <SolutionDir Condition=" '$(SolutionDir)' == '' ">$(MSBuildThisFileDirectory)../</SolutionDir>
   </PropertyGroup>
+
+  <PropertyGroup>
+    <GitHubOrganization>synhershko</GitHubOrganization>
+    <GitHubProject>spatial4n</GitHubProject>
+  </PropertyGroup>
   
   <PropertyGroup Label="Version Defaults">
     <!-- We are strong-named - never change this unless we increment major version. -->
@@ -35,12 +40,11 @@
          If we do port the changes from Spatial4j, then we should increment the first 3 segments to be the same as the ported version. -->
   </PropertyGroup>
   
-  <PropertyGroup Label="NuGet Package Properties">
-    <Authors>Itamar Syn-Hershko, Shad Storhaug</Authors>
-    <PackageProjectUrl>https://github.com/synhershko/spatial4n</PackageProjectUrl>
+  <PropertyGroup Label="NuGet Package Defaults">
     <IsPackable>false</IsPackable>
     <IncludeSymbols>true</IncludeSymbols>
-    <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
+    <!-- This is the new symbols format (the only one currently supported at NuGet.org) -->
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
   </PropertyGroup>
   
   <PropertyGroup Label="Copyright Info">

@@ -15,6 +15,11 @@ name: 'vNext$(rev:.r)' # Format for build number (will be overridden)
 # BuildPlatform: 'Any CPU'
 # RunTests: 'true' (Optional - set to 'false' to disable test jobs - useful for debugging. If not provided, tests will be run.)
 # RunX86Tests: 'false' (Optional - set to 'true' to enable x86 tests)
+#
+# PackageVersion: '' (Optional. Will be generated from nbgv if not provided. The version of the NuGet package.)
+# AssemblyVersion: '' (Optional. Will be generated from nbgv if not provided. The assembly version (affects binary compatibility). This should always be the same as the previous version unless a binary breaking change happens (i.e. porting a new version).)
+# FileVersion: '' (Optional. Will be generated from nbgv if not provided. The version that is visible on the assembly file.)
+# InformationalVersion: '' (Optional. Will be generated from nbgv if not provided. If provided, the git commit hash will be appended to the end of the value.)
 
 variables:
 - name: TestTargetFrameworks
@@ -46,8 +51,27 @@ stages:
       vmImage: 'windows-2019'
 
     steps:
+    - pwsh: |
+        $configuration = if ($env:BUILDCONFIGURATION) { $env:BUILDCONFIGURATION } else { "Release" }
+        Write-Host "##vso[task.setvariable variable=BuildConfiguration;]$configuration"
+        $platform = if ($env:BUILDPLATFORM) { $env:BUILDPLATFORM } else { "Any CPU" }
+        Write-Host "##vso[task.setvariable variable=BuildPlatform;]$platform"
+        $informationalVersion = if ($env:INFORMATIONALVERSION) { $env:INFORMATIONALVERSION } else { '' }
+        Write-Host "##vso[task.setvariable variable=InformationalVersion;]$informationalVersion"
+        $fileVersion = if ($env:FILEVERSION) { $env:FILEVERSION } else { '' }
+        Write-Host "##vso[task.setvariable variable=FileVersion;]$fileVersion"
+        $assemblyVersion = if ($env:ASSEMBLYVERSION) { $env:ASSEMBLYVERSION } else { '' }
+        Write-Host "##vso[task.setvariable variable=AssemblyVersion;]$assemblyVersion"
+        $packageVersion = if ($env:PACKAGEVERSION) { $env:PACKAGEVERSION } else { '' }
+        Write-Host "##vso[task.setvariable variable=PackageVersion;]$packageVersion"
+      displayName: 'Setup Default Variable Values'
+
     - template: 'build/azure-templates/gitversioning-increment-and-persist-versions.yml'
       parameters:
+        informationalVersion: '$(InformationalVersion)' # Input passed in from pipeline
+        fileVersion: '$(FileVersion)' # Input passed in from pipeline
+        assemblyVersion: '$(AssemblyVersion)' # Input passed in from pipeline
+        packageVersion: '$(PackageVersion)' # Input passed in from pipeline
         versionArtifactName: '$(VersionArtifactName)'
         packageVersionFileName: '$(PackageVersionFileName)'
         fileVersionFileName: '$(FileVersionFileName)'
@@ -57,10 +81,10 @@ stages:
       parameters:
         artifactFeedID: '$(ArtifactFeedID)'
         testTargetFrameworks: '$(TestTargetFrameworks)'
-        informationalVersion: '$(InformationalVersion)' # Output from gitversioning-increment-and-persist-versions.yml
-        fileVersion: '$(FileVersion)' # Output from gitversioning-increment-and-persist-versions.yml
-        assemblyVersion: '$(AssemblyVersion)' # Output from gitversioning-increment-and-persist-versions.yml
-        packageVersion: '$(PackageVersion)' # Output from gitversioning-increment-and-persist-versions.yml
+        informationalVersion: '$(CI_InformationalVersion)' # Output from gitversioning-increment-and-persist-versions.yml
+        fileVersion: '$(CI_FileVersion)' # Output from gitversioning-increment-and-persist-versions.yml
+        assemblyVersion: '$(CI_AssemblyVersion)' # Output from gitversioning-increment-and-persist-versions.yml
+        packageVersion: '$(CI_PackageVersion)' # Output from gitversioning-increment-and-persist-versions.yml
         buildSdkVersion: '$(BuildSDKVersion)'
         buildConfiguration: '$(BuildConfiguration)'
         buildPlatform: '$(BuildPlatform)'

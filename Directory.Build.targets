@@ -64,11 +64,20 @@
 
   <!-- Global PackageReferences -->
 
+  <!-- This is for testing only, we use SourceLink from any Azure DevOps git repo -->
+  <ItemGroup Condition=" '$(BUILD_REPOSITORY_PROVIDER)' == 'TfsGit' " Label="SourceLink Packages (experimental Azure Repos)">
+    <PackageReference Include="Microsoft.SourceLink.AzureRepos.Git" Version="$(MicrosoftSourceLinkAzureReposGitPackageReferenceVersion)" PrivateAssets="All"/>
+  </ItemGroup>
+
+  <ItemGroup Condition=" '$(BUILD_REPOSITORY_PROVIDER)' == 'GitHub' " Label="SourceLink Packages (main repo)">
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="$(MicrosoftSourceLinkGitHubPackageReferenceVersion)" PrivateAssets="All"/>
+  </ItemGroup>
+  
   <ItemGroup>
     <PackageReference Include="Nerdbank.GitVersioning">
       <Version>$(NerdBankGitVersioningPackageReferenceVersion)</Version>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
   </ItemGroup>
-
+  
 </Project>

@@ -67,4 +67,13 @@
     <CopyrightYearRange Condition=" '$(BeginCopyrightYear)' == '$(CurrentYear)' ">$(CurrentYear)</CopyrightYearRange>
     <Copyright>Copyright © $(CopyrightYearRange) spatial4j, Itamar Syn-Hershko, Shad Storhaug, and contributors</Copyright>
   </PropertyGroup>
+  <PropertyGroup Label="SourceLink Settings: https://github.com/dotnet/sourcelink/blob/main/README.md">
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(BUILD_REPOSITORY_PROVIDER)' == 'GitHub' Or '$(BUILD_REPOSITORY_PROVIDER)' == 'TfsGit' " Label="Deterministic builds: https://github.com/clairernovotny/DeterministicBuilds#readme">
+    <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
+  </PropertyGroup>
+
 </Project>

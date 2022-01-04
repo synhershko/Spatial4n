@@ -25,6 +25,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "build", "build", "{FB359D70
 	ProjectSection(SolutionItems) = preProject
 		build\dependencies.props = build\dependencies.props
 		build\nuget.props = build\nuget.props
+		version.json = version.json
 	EndProjectSection
 EndProject
 Global

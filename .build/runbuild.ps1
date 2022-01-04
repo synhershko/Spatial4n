@@ -5,14 +5,19 @@ properties {
 	[string]$source_directory = "$base_directory"
 	[string]$nuget_package_directory = "$release_directory\packagesource"
 	[string]$solutionFile = "$base_directory\Spatial4n.sln"
+	[string]$versionScriptFile = "$base_directory/build/version.ps1"
 
-	[string]$packageVersion   = "0.4.1"  
-	[string]$version          = "0.0.0"
-	[string]$configuration    = "Release"
-	[bool]$backupFiles        = $true
+	[string]$packageVersion       = ""  
+	[string]$assemblyVersion      = ""
+	[string]$informationalVersion = ""
+	[string]$fileVersion          = ""
+	[string]$configuration        = "Release"
+	[string]$platform             = "Any CPU"
+	[bool]$backupFiles            = $true
 }
 
 $backedUpFiles = New-Object System.Collections.ArrayList
+$versionInfo = @{}
 
 task default -depends Test
 
@@ -46,14 +51,31 @@ task InstallSDK -description "This task makes sure the correct SDK version is in
 
 task Init -depends InstallSDK -description "This tasks makes sure the build environment is correctly setup" {  
 
+	# Get the version info
+	$versionInfoString = Invoke-Expression -Command "$versionScriptFile -PackageVersion ""$packageVersion"" -AssemblyVersion ""$assemblyVersion"" -InformationalVersion ""$informationalVersion"" -FileVersion ""$fileVersion"""
+	Write-Host $versionInfoString
+
+    # parse the version numbers and put them into a hashtable
+    $versionInfoSplit = $versionInfoString -split '\r?\n' # split $a into lines, whether it has CRLF or LF-only line endings
+    foreach ($line in $versionInfoSplit) {
+        $kvp = $line -split '\:\s+?'
+        $versionInfo.Add($kvp[0], $($kvp[1]).Trim())
+    }
+	$localInformationalVersion = $versionInfo['InformationalVersion']
+	$localFileVersion = $versionInfo['FileVersion']
+	$localAssemblyVersion = $versionInfo['AssemblyVersion']
+	$localPackageVersion = $versionInfo['PackageVersion']
+
 	Write-Host "Base Directory: $base_directory"
 	Write-Host "Release Directory: $release_directory"
 	Write-Host "Source Directory: $source_directory"
 	Write-Host "Tools Directory: $tools_directory"
 	Write-Host "NuGet Package Directory: $nuget_package_directory"
 	Write-Host "Template Directory: $template_directory"
-	Write-Host "Version: $version"
-	Write-Host "Package Version: $packageVersion"
+	Write-Host "AssemblyVersion: $localAssemblyVersion"
+	Write-Host "Package Version: $localPackageVersion"
+	Write-Host "File Version: $localFileVersion"
+	Write-Host "InformationalVersion Version: $localInformationalVersion"
 	Write-Host "Configuration: $configuration"
 	
 	Ensure-Directory-Exists "$release_directory"
@@ -63,62 +85,36 @@ task Compile -depends Clean, Init -description "This task compiles the solution"
 
 	Write-Host "Compiling..." -ForegroundColor Green
 
-	pushd $base_directory
-	$projects = Get-ChildItem -Path "*.csproj" -Recurse
-	popd
+	$localInformationalVersion = $versionInfo['InformationalVersion']
+	$localFileVersion = $versionInfo['FileVersion']
+	$localAssemblyVersion = $versionInfo['AssemblyVersion']
 
 	Exec {
-		&dotnet msbuild $solutionFile /t:Restore
-	}
-
-	#If build runner is MyGet or version is not passed in, parse it from $packageVersion
-	if (($env:BuildRunner -ne $null -and $env:BuildRunner -eq "MyGet") -or $version -eq "0.0.0") {		
-		$version = $packageVersion
-		if ($version.Contains("-") -eq $true) {
-			$version = $version.SubString(0, $version.IndexOf("-"))
-		}
-		echo "Updated version to: $version"
-	}
-
-	$pv = $packageVersion
-	#check for presense of Git
-	& where.exe git.exe
-	if ($LASTEXITCODE -eq 0) {
-		$gitCommit = ((git rev-parse --verify --short=10 head) | Out-String).Trim()
-		$pv = "$packageVersion commit:[$gitCommit]"
-	}
-
-	Exec {
-		&dotnet msbuild $solutionFile /t:Build `
-			/p:Configuration=$configuration `
-			/p:FileVersion=$version `
-			/p:InformationalVersion=$pv
+		&dotnet build "$solutionFile" `
+			--configuration "$configuration" `
+			/p:Platform="$platform" `
+			/p:InformationalVersion="$localInformationalVersion" `
+			/p:FileVersion="$localFileVersion" `
+			/p:AssemblyVersion="$localAssemblyVersion" `
+			/p:TestAllTargetFrameworks=true `
+			/p:PortableDebugTypeOnly=true `
+			/p:SkipGitVersioning=true
 	}
 }
 
 task Pack -depends Compile -description "This task creates the NuGet packages" {
 	Ensure-Directory-Exists "$nuget_package_directory"
 
-	pushd $base_directory
-	$packages = Get-ChildItem -Path "*.csproj" -Recurse | ? { !$_.Directory.Name.Contains(".Test") }
-	popd
+	$localPackageVersion = $versionInfo['PackageVersion']
 
-	foreach ($package in $packages) {
-		Write-Host "Creating NuGet package for $package..." -ForegroundColor Magenta
-		Exec {
-			&dotnet pack $package --output "$nuget_package_directory" --configuration $configuration --no-build --include-source /p:PackageVersion=$packageVersion
-		}
-
-		$temp = New-TemporaryDirectory
-
-		# Create portable symbols (the only format that NuGet.org supports) for .NET Standard and .NET 4.0 only
-		Exec {
-			&dotnet pack $package --output "$temp" --configuration $configuration /p:PackageVersion=$packageVersion /p:SymbolPackageFormat=snupkg /p:PortableDebugTypeOnly=true
-		}
-
-		# Move the portable files to the $nuget_package_directory
-		Get-ChildItem -Path "$temp" -Include *.snupkg -Recurse | Copy-Item -Destination "$nuget_package_directory"
-		Remove-Item -LiteralPath "$temp" -Force -Recurse -ErrorAction SilentlyContinue
+	Exec {
+		&dotnet pack "$solutionFile" `
+			--configuration $configuration `
+			--output "$nuget_package_directory" `
+			--no-build `
+			--no-restore `
+			/p:PackageVersion="$localPackageVersion" `
+			/p:SkipGitVersioning=true
 	}
 }
 

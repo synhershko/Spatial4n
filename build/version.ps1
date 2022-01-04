@@ -4,11 +4,11 @@ Generates the PackgeVersion, AssemblyVersion, FileVersion, and InformationalVers
 based on configuration and/or provided parameters.
 
 .OUTPUTS
-Generates the output environment variables:
-CI_InformationalVersion
-CI_FileVersion
-CI_AssemblyVersion
-CI_PackageVersion
+Generates an array with the following lines in "Name: Value" format
+InformationalVersion
+FileVersion
+AssemblyVersion
+PackageVersion
 
 .PARAMETER InformationalVersion
 The informational version for the assembly.
@@ -28,66 +28,85 @@ The version of the NBGV tool that will be installed to generate the version info
 #>
 
 Param(
-    [string]$informationalVersion = ""
-    [string]$fileVersion = ""
-    [string]$assemblyVersion = ""
-    [string]$packageVersion = ""
-    [string]$nbgvToolVersion = "3.5.68-alpha"
+    [string]$informationalVersion = "",
+    [string]$fileVersion = "",
+    [string]$assemblyVersion = "",
+    [string]$packageVersion = "",
+    [string]$nbgvToolVersion = "3.5.68-alpha",
+    [bool]$useLegacyPackageVersion = $true
 )
 
-function Show-EnvironmentVariables() {
-    $environmentVars = Get-ChildItem -path env:* | sort Name
-    foreach($var in $environmentVars) {
-        $keyname = $var.Key
-        $keyvalue = $var.Value
-        Write-Output "${keyname}: $keyvalue"
+function Ensure-NonNegativeComponents([version]$version, [int]$fieldCount = 4) {
+    
+    [int]$maj = if ($fieldCount -ge 1) { [Math]::Max(0, $version.Major) } else { $version.Major }
+    [int]$min = if ($fieldCount -ge 2) { [Math]::Max(0, $version.Minor) } else { $version.Minor }
+    [int]$bld = if ($fieldCount -ge 3) { [Math]::Max(0, $version.Build) } else { $version.Build }
+    [int]$rev = if ($fieldCount -ge 4) { [Math]::Max(0, $version.Revision) } else { $version.Revision }
+
+    if ($rev -ge 0) {
+        return New-Object System.Version -ArgumentList @($maj, $min, $bld, $rev)
+    } else {
+        return New-Object System.Version -ArgumentList @($maj, $min, $bld)
     }
 }
 
 # Check prerequisites
-& where.exe dotnet.exe
+& where.exe dotnet.exe | Out-Null
 if ($LASTEXITCODE -ne 0) {
 	Write-Host "dotnet.exe was not found. Please install .NET 6 SDK."
 }
 
 $repoRoot = Split-Path $PSScriptRoot -Parent # Assumes this file is in the /build directory
 
-& dotnet install nbgv --tool-path $repoRoot --version $nbgvToolVersion
+#Write-Host "Repo Root: $repoRoot"
+
+& dotnet tool install nbgv --tool-path $repoRoot --version $nbgvToolVersion | Out-Null
 try {
-    & nbgv cloud --common-vars --all-vars
+    #Write-Host "Generating Version Numbers..."
 
-    Show-EnvironmentVariables
+    $versionInfo = @{}
+    $versionInfoString = & $repoRoot/nbgv get-version
 
+    # parse the version numbers and put them into a hashtable
+    $versionInfoSplit = $versionInfoString -split '\r?\n' # split $a into lines, whether it has CRLF or LF-only line endings
+    foreach ($line in $versionInfoSplit) {
+        $kvp = $line -split '\:\s+?'
+        $versionInfo.Add($kvp[0], $($kvp[1]).Trim())
+    }
+
+    
+    [version]$ver = [version]$versionInfo['Version']
     # 3 or 4 digit number for packageVersion or assemblyInfoVersion
-    $version = if ($env:NBGV_VERSIONREVISION -eq '-1') { "$env:NBGV_MAJORMINORVERSION.$env:NBGV_BUILDNUMBER" } else { $env:NBGV_VERSION }
-
+    $version = $(Ensure-NonNegativeComponents $ver).ToString()
+    
     # Get the NuGet package version if it wasn't passed in
-    if ([string]::IsNullOrEmpty($packageVersion)) {
-        $packageVersionRaw = $env:NBGV_NUGETPACKAGEVERSION
-        $packageDashIndex = "$packageVersionRaw".IndexOf('-')
-        $packageVersion = if ($packageDashIndex -eq -1) { $version } else { $version + "$packageVersionRaw".Substring($packageDashIndex, "$packageVersionRaw".Length - $packageDashIndex) }
+    if ([string]::IsNullOrWhiteSpace($packageVersion)) {
+        $packageVersion = $version
+        $nugetPackageVersion = $versionInfo['NuGetPackageVersion']
+
+        # Write-Host "NuGet Package Version: $nugetPackageVersion"
+        # Only matches if this is a pre-release version - take the extra dash out between the label and count
+        if ($nugetPackageVersion -match "(?<=(?:\d+)(?:\.\d+)(?:\.\d+)(?:\.\d+)?)(-[^\-]+)?-(.*)$") {
+            $label = $Matches[1]
+            $preReleaseVersion = if ($useLegacyPackageVersion) { $Matches[2] } else { "-" + $Matches[2] }
+            $packageVersion = $version + $label + $preReleaseVersion
+        }
     }
+    # Get the pre-release version (we need to chop off the commit hash, because it is added automatically in the build)
+    $assemblyInformationalVersion = $versionInfo['AssemblyInformationalVersion']
+    $preReleaseVersion = if ($assemblyInformationalVersion -match "(?<=(?:\d+)(?:\.\d+)(?:\.\d+)(?:\.\d+)?)(-[^\s]+)?") { $Matches[1] } else { '' }
 
-    $informationalVersion = $(if ([string]::IsNullOrEmpty($informationalVersion)) { $version } else { $informationalVersion }) + $env:NBGV_PRERELEASEVERSION
-    $fileVersion = if ([string]::IsNullOrEmpty($fileVersion)) { $env:NBGV_ASSEMBLYFILEVERSION } else { $fileVersion }
-    $assemblyVersion = if ([string]::IsNullOrEmpty($assemblyVersion)) { $env:NBGV_ASSEMBLYVERSION } else { $assemblyVersion }
+    $informationalVersion = $(if ([string]::IsNullOrEmpty($informationalVersion)) { $version } else { $informationalVersion }) + $preReleaseVersion
+    $fileVersion = if ([string]::IsNullOrEmpty($fileVersion)) { $version } else { $fileVersion }
+    $assemblyVersion = if ([string]::IsNullOrEmpty($assemblyVersion)) { $versionInfo['AssemblyVersion'] } else { $assemblyVersion }
+    
 
-    # Set the environment variables temporarily for this process
-    if ($env:TF_BUILD) {
-        Write-Host "##vso[task.setvariable variable=CI_InformationalVersion;]$informationalVersion"
-        Write-Host "##vso[task.setvariable variable=CI_FileVersion;]$fileVersion"
-        Write-Host "##vso[task.setvariable variable=CI_AssemblyVersion;]$assemblyVersion"
-        Write-Host "##vso[task.setvariable variable=CI_PackageVersion;]$packageVersion"
-        Write-Host "##vso[build.updatebuildnumber]$packageVersion"
-    } else {
-        $env:CI_InformationalVersion = $informationalVersion
-        $env:CI_FileVersion = $fileVersion
-        $env:CI_AssemblyVersion = $assemblyVersion
-        $env:CI_PackageVersion = $packageVersion
-    }
-
-    Show-EnvironmentVariables
+    # Output - needs to be parsed by caller
+    "InformationalVersion: $informationalVersion"
+    "FileVersion: $fileVersion"
+    "AssemblyVersion: $assemblyVersion"
+    "PackageVersion: $packageVersion"
 
 } finally {
-    & dotnet uninstall nbgv --tool-path $repoRoot
+    & dotnet tool uninstall nbgv --tool-path $repoRoot | Out-Null
 }

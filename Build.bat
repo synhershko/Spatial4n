@@ -13,7 +13,7 @@ GOTO endcommentblock
 ::                  as PackageVersion (excluding any pre-release tag).
 ::
 ::   -PackageVersion:<PackageVersion>
-::   -pv:<PackageVersion> - Nuget package version. Default is 1.0.0.
+::   -pv:<PackageVersion> - Nuget package version. Default is calculated using the nbgv tool based on version.json.
 ::
 ::   -Configuration:<Configuration>
 ::   -config:<Configuration> - MSBuild configuration for the build.
@@ -28,15 +28,15 @@ GOTO endcommentblock
 setlocal enabledelayedexpansion enableextensions
 
 REM Default values
-IF "%version%" == "" (
+REM IF "%version%" == "" (
 	REM If version is not supplied, our build script should parse it
 	REM from the %PackageVersion% variable. We determine this by checking
 	REM whether it is 0.0.0 (uninitialized).
-	set version=0.0.0
-)
-IF "%PackageVersion%" == "" (
-    set PackageVersion=1.0.0
-)
+REM	set version=0.0.0
+REM )
+REM IF "%PackageVersion%" == "" (
+REM    set PackageVersion=1.0.0
+REM )
 set configuration=Release
 IF NOT "%config%" == "" (
 	set configuration=%config%

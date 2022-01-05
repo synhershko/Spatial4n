@@ -23,4 +23,11 @@
 #   All options are case insensitive.
 #
 # -----------------------------------------------------------------------------------
+
+if ! command -v pwsh &> /dev/null
+then
+    echo "Powershell Core could not be found. Please install version 3 or higher."
+    exit
+fi
+
 pwsh -ExecutionPolicy bypass -Command "& './build.ps1'" "$@"

@@ -16,6 +16,7 @@ properties {
 	[string]$configuration        = "Release"
 	[string]$platform             = "Any CPU"
 	[bool]$backupFiles            = $true
+	[string]$minimumSdkVersion    = "6.0.100"
 
 	#test parameters
 	[string]$testPlatforms        = "x64"
@@ -31,30 +32,19 @@ task Clean -description "This task cleans up the build directory" {
 	Get-ChildItem $baseDirectory -Include *.bak -Recurse | foreach ($_) {Remove-Item $_.FullName}
 }
 
-task InstallSDK -description "This task makes sure the correct SDK version is installed" {
-	#& where.exe dotnet.exe
-	#$sdkVersion = ""
-
-	#if ($LASTEXITCODE -eq 0) {
-	#	$sdkVersion = ((& dotnet.exe --version) | Out-String).Trim()
-	#}
-	
-	#Write-Host "Current SDK version: $sdkVersion" -ForegroundColor Yellow
-	#if (([version]$sdkVersion) -lt ([version]"2.2.401")) {
-	#	Write-Host "Require SDK version 2.2.401, installing..." -ForegroundColor Red
-	#	#Install the correct version of the .NET SDK for this build
-	#    Invoke-Expression "$baseDirectory/.build/dotnet-install.ps1 -Version 2.2.401"
-	#}
-
-	## Safety check - this should never happen
-	#& where.exe dotnet.exe
-
-	#if ($LASTEXITCODE -ne 0) {
-	#	throw "Could not find dotnet CLI in PATH. Please install the .NET Core 2.0 SDK."
-	#}
+task CheckSDK -description "This task makes sure the correct SDK version is installed" {
+	# Check prerequisites
+	$sdkVersion = ((& dotnet --version) | Out-String).Trim()
+	if ($LASTEXITCODE -ne 0) {
+		throw "dotnet command was not found. Please install .NET $minimumSdkVersion or higher SDK and make sure it is in your PATH."
+	}
+	[version]$releaseVersion = if ($sdkVersion.Contains('-')) { "$sdkVersion".Substring(0, "$sdkVersion".IndexOf('-')) } else { $sdkVersion }
+	if ($releaseVersion -lt ([version]$minimumSdkVersion)) {
+		throw "Minimum .NET SDK $minimumSdkVersion required. Please install the required SDK before running the command."
+	}
 }
 
-task Init -depends InstallSDK -description "This tasks makes sure the build environment is correctly setup" {  
+task Init -depends CheckSDK -description "This tasks makes sure the build environment is correctly setup" {  
 
 	# Get the version info
 	$versionInfoString = Invoke-Expression -Command "$versionScriptFile -PackageVersion ""$packageVersion"" -AssemblyVersion ""$assemblyVersion"" -InformationalVersion ""$informationalVersion"" -FileVersion ""$fileVersion"""

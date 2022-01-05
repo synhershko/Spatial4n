@@ -33,7 +33,8 @@ Param(
     [string]$assemblyVersion = "",
     [string]$packageVersion = "",
     [string]$nbgvToolVersion = "3.5.68-alpha",
-    [bool]$useLegacyPackageVersion = $true
+    [bool]$useLegacyPackageVersion = $true,
+    [string]$minimumSdkVersion = "6.0.100"
 )
 
 function Ensure-NonNegativeComponents([version]$version, [int]$fieldCount = 4) {
@@ -51,9 +52,13 @@ function Ensure-NonNegativeComponents([version]$version, [int]$fieldCount = 4) {
 }
 
 # Check prerequisites
-& dotnet --version | Out-Null
+$sdkVersion = ((& dotnet --version) | Out-String).Trim()
 if ($LASTEXITCODE -ne 0) {
-	Write-Host "dotnet command was not found. Please install .NET 6 SDK."
+	throw "dotnet command was not found. Please install .NET $minimumSdkVersion or higher SDK and make sure it is in your PATH."
+}
+[version]$releaseVersion = if ($sdkVersion.Contains('-')) { "$sdkVersion".Substring(0, "$sdkVersion".IndexOf('-')) } else { $sdkVersion }
+if ($releaseVersion -lt ([version]$minimumSdkVersion)) {
+    throw "Minimum .NET SDK $minimumSdkVersion required. Please install the required SDK before running the command."
 }
 
 $repoRoot = Split-Path $PSScriptRoot -Parent # Assumes this file is in the /build directory

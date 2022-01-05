@@ -3,12 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.29123.88
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".build", ".build", "{6CB3CB17-7BB8-465A-AB42-37AD2F9093D8}"
-	ProjectSection(SolutionItems) = preProject
-		Build.bat = Build.bat
-		.build\runbuild.ps1 = .build\runbuild.ps1
-	EndProjectSection
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Spatial4n.Tests", "Spatial4n.Tests\Spatial4n.Tests.csproj", "{385FC6A2-E90E-4D13-B700-423489363E25}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Spatial4n.Core", "Spatial4n.Core\Spatial4n.Core.csproj", "{55165E3E-85ED-4718-8D1B-D4C6110E3552}"
@@ -26,8 +20,12 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "build", "build", "{FB359D70-1DCB-4817-8758-1DA9F6571B6F}"
 	ProjectSection(SolutionItems) = preProject
 		azure-pipelines.yml = azure-pipelines.yml
+		build.bat = build.bat
+		build.ps1 = build.ps1
+		build.sh = build.sh
 		build\dependencies.props = build\dependencies.props
 		build\nuget.props = build\nuget.props
+		build\runbuild.ps1 = build\runbuild.ps1
 		version.json = version.json
 		build\version.ps1 = build\version.ps1
 	EndProjectSection
@@ -43,6 +41,54 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "azure-templates", "azure-te
 		build\azure-templates\run-tests-on-os.yml = build\azure-templates\run-tests-on-os.yml
 		build\azure-templates\show-all-environment-variables.yml = build\azure-templates\show-all-environment-variables.yml
 		build\azure-templates\show-all-files.yml = build\azure-templates\show-all-files.yml
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "psake", "psake", "{4BFE738F-3D99-4408-85D4-E882737F9CEC}"
+	ProjectSection(SolutionItems) = preProject
+		build\psake\psake = build\psake\psake
+		build\psake\psake-config.ps1 = build\psake\psake-config.ps1
+		build\psake\psake.cmd = build\psake\psake.cmd
+		build\psake\psake.ps1 = build\psake\psake.ps1
+		build\psake\psake.psd1 = build\psake\psake.psd1
+		build\psake\psake.psm1 = build\psake\psake.psm1
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "public", "public", "{DB6B3C48-B1B1-4977-9FB0-333ED71E84E1}"
+	ProjectSection(SolutionItems) = preProject
+		build\psake\public\Assert.ps1 = build\psake\public\Assert.ps1
+		build\psake\public\BuildSetup.ps1 = build\psake\public\BuildSetup.ps1
+		build\psake\public\BuildTearDown.ps1 = build\psake\public\BuildTearDown.ps1
+		build\psake\public\Exec.ps1 = build\psake\public\Exec.ps1
+		build\psake\public\FormatTaskName.ps1 = build\psake\public\FormatTaskName.ps1
+		build\psake\public\Framework.ps1 = build\psake\public\Framework.ps1
+		build\psake\public\Get-PSakeScriptTasks.ps1 = build\psake\public\Get-PSakeScriptTasks.ps1
+		build\psake\public\Include.ps1 = build\psake\public\Include.ps1
+		build\psake\public\Invoke-psake.ps1 = build\psake\public\Invoke-psake.ps1
+		build\psake\public\Invoke-Task.ps1 = build\psake\public\Invoke-Task.ps1
+		build\psake\public\Properties.ps1 = build\psake\public\Properties.ps1
+		build\psake\public\Task.ps1 = build\psake\public\Task.ps1
+		build\psake\public\TaskSetup.ps1 = build\psake\public\TaskSetup.ps1
+		build\psake\public\TaskTearDown.ps1 = build\psake\public\TaskTearDown.ps1
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "private", "private", "{BC910C84-EF7C-4F69-AA76-47C0EC06D809}"
+	ProjectSection(SolutionItems) = preProject
+		build\psake\private\CleanupEnvironment.ps1 = build\psake\private\CleanupEnvironment.ps1
+		build\psake\private\ConfigureBuildEnvironment.ps1 = build\psake\private\ConfigureBuildEnvironment.ps1
+		build\psake\private\CreateConfigurationForNewContext.ps1 = build\psake\private\CreateConfigurationForNewContext.ps1
+		build\psake\private\ExecuteInBuildFileScope.ps1 = build\psake\private\ExecuteInBuildFileScope.ps1
+		build\psake\private\FormatErrorMessage.ps1 = build\psake\private\FormatErrorMessage.ps1
+		build\psake\private\Get-DefaultBuildFile.ps1 = build\psake\private\Get-DefaultBuildFile.ps1
+		build\psake\private\GetCurrentConfigurationOrDefault.ps1 = build\psake\private\GetCurrentConfigurationOrDefault.ps1
+		build\psake\private\GetTasksFromContext.ps1 = build\psake\private\GetTasksFromContext.ps1
+		build\psake\private\LoadConfiguration.ps1 = build\psake\private\LoadConfiguration.ps1
+		build\psake\private\LoadModules.ps1 = build\psake\private\LoadModules.ps1
+		build\psake\private\ResolveError.ps1 = build\psake\private\ResolveError.ps1
+		build\psake\private\SelectObjectWithDefault.ps1 = build\psake\private\SelectObjectWithDefault.ps1
+		build\psake\private\Test-ModuleVersion.ps1 = build\psake\private\Test-ModuleVersion.ps1
+		build\psake\private\WriteColoredOutput.ps1 = build\psake\private\WriteColoredOutput.ps1
+		build\psake\private\WriteDocumentation.ps1 = build\psake\private\WriteDocumentation.ps1
+		build\psake\private\WriteTaskTimeSummary.ps1 = build\psake\private\WriteTaskTimeSummary.ps1
 	EndProjectSection
 EndProject
 Global
@@ -83,6 +129,9 @@ Global
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{E7201A50-30CD-4C4C-8E52-3C197E138140} = {FB359D70-1DCB-4817-8758-1DA9F6571B6F}
+		{4BFE738F-3D99-4408-85D4-E882737F9CEC} = {FB359D70-1DCB-4817-8758-1DA9F6571B6F}
+		{DB6B3C48-B1B1-4977-9FB0-333ED71E84E1} = {4BFE738F-3D99-4408-85D4-E882737F9CEC}
+		{BC910C84-EF7C-4F69-AA76-47C0EC06D809} = {4BFE738F-3D99-4408-85D4-E882737F9CEC}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {98F91951-027C-4289-BC4C-14FF44D91078}

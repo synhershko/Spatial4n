@@ -32,26 +32,26 @@ task Clean -description "This task cleans up the build directory" {
 }
 
 task InstallSDK -description "This task makes sure the correct SDK version is installed" {
-	& where.exe dotnet.exe
-	$sdkVersion = ""
+	#& where.exe dotnet.exe
+	#$sdkVersion = ""
 
-	if ($LASTEXITCODE -eq 0) {
-		$sdkVersion = ((& dotnet.exe --version) | Out-String).Trim()
-	}
+	#if ($LASTEXITCODE -eq 0) {
+	#	$sdkVersion = ((& dotnet.exe --version) | Out-String).Trim()
+	#}
 	
-	Write-Host "Current SDK version: $sdkVersion" -ForegroundColor Yellow
-	if (([version]$sdkVersion) -lt ([version]"2.2.401")) {
-		Write-Host "Require SDK version 2.2.401, installing..." -ForegroundColor Red
-		#Install the correct version of the .NET SDK for this build
-	    Invoke-Expression "$baseDirectory/.build/dotnet-install.ps1 -Version 2.2.401"
-	}
+	#Write-Host "Current SDK version: $sdkVersion" -ForegroundColor Yellow
+	#if (([version]$sdkVersion) -lt ([version]"2.2.401")) {
+	#	Write-Host "Require SDK version 2.2.401, installing..." -ForegroundColor Red
+	#	#Install the correct version of the .NET SDK for this build
+	#    Invoke-Expression "$baseDirectory/.build/dotnet-install.ps1 -Version 2.2.401"
+	#}
 
-	# Safety check - this should never happen
-	& where.exe dotnet.exe
+	## Safety check - this should never happen
+	#& where.exe dotnet.exe
 
-	if ($LASTEXITCODE -ne 0) {
-		throw "Could not find dotnet CLI in PATH. Please install the .NET Core 2.0 SDK."
-	}
+	#if ($LASTEXITCODE -ne 0) {
+	#	throw "Could not find dotnet CLI in PATH. Please install the .NET Core 2.0 SDK."
+	#}
 }
 
 task Init -depends InstallSDK -description "This tasks makes sure the build environment is correctly setup" {  

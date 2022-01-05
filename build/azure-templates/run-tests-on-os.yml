@@ -68,7 +68,7 @@ steps:
         if ($IsWindows -eq $null) {
             $IsWindows = $env:OS.StartsWith('Win')
         }
-        if (!$IsWindows -and $framework.StartsWith('net4')) {
+        if (!$IsWindows -and ($framework.StartsWith('net4') -or $framework.StartsWith('net3'))) {
             return $false
         }
         return $true

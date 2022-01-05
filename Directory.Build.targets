@@ -61,6 +61,14 @@
       </AssemblyAttribute>
     </ItemGroup>
   </Target>
+  
+  <Target Name="PrintTargetFrameworks" Label="Prints the value for the $(TargetFrameworks) property or 'none' if no frameworks apply. Pass TestProjectsOnly=true to get results only if this is a test project.">
+    <PropertyGroup>
+      <OutputTargetFrameworks Condition=" '$(TestProjectsOnly)' != 'true' Or ('$(TestProjectsOnly)' == 'true' And '$(IsTestProject)' == 'true')">$(TargetFrameworks)</OutputTargetFrameworks>
+      <OutputTargetFrameworks Condition=" '$(OutputTargetFrameworks)' == '' ">none</OutputTargetFrameworks>
+    </PropertyGroup>
+    <Message Text="$(OutputTargetFrameworks)" Importance="high"/>
+  </Target>
 
   <!-- Global PackageReferences -->
   

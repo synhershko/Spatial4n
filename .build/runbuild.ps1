@@ -1,12 +1,12 @@
 properties {
     [string]$baseDirectory   = resolve-path "../."
-    [string]$releaseDirectory  = "$baseDirectory/release"
-    [string]$toolsDirectory  = "$baseDirectory/tools"
+    [string]$releaseDirectory  = "$baseDirectory/.release"
+    [string]$toolsDirectory  = "$baseDirectory/.tools"
     [string]$sourceDirectory = "$baseDirectory"
     [string]$nugetPackageDirectory = "$releaseDirectory/NuGetPackages"
     [string]$testResultsDirectory = "$releaseDirectory/TestResults"
     [string]$solutionFile = "$baseDirectory/Spatial4n.sln"
-    [string]$versionScriptFile = "$baseDirectory/build/version.ps1"
+    [string]$versionScriptFile = "$baseDirectory/.build/version.ps1"
     [string]$testResultsFileName = "TestResults.trx"
 
     [string]$packageVersion       = ""  

@@ -52,5 +52,5 @@ if (-not [string]::IsNullOrWhiteSpace($configuration)) {
 	$properties.configuration=$configuration
 }
 
-Import-Module "$PSScriptRoot/build/psake/psake.psm1"
-Invoke-Psake "$PSScriptRoot/build/runbuild.ps1" -task $task -properties $properties -parameters $parameters
+Import-Module "$PSScriptRoot/.build/psake/psake.psm1"
+Invoke-Psake "$PSScriptRoot/.build/runbuild.ps1" -task $task -properties $properties -parameters $parameters

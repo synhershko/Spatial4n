@@ -20,7 +20,7 @@
 -->
 <Project>
   
-  <Import Project="$(SolutionDir)build/dependencies.props" />
+  <Import Project="$(SolutionDir).build/dependencies.props" />
   
   <PropertyGroup Condition=" $(TargetFramework.StartsWith('netstandard')) Or $(TargetFramework.StartsWith('netcoreapp')) Or $(TargetFramework.StartsWith('net5.')) Or $(TargetFramework.StartsWith('net6.')) ">
 

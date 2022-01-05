@@ -46,7 +46,7 @@ steps:
 #- template: 'show-all-environment-variables.yml'
 
 - pwsh: |
-    $versionScriptFile = "$(Build.SourcesDirectory)/build/version.ps1"
+    $versionScriptFile = "$(Build.SourcesDirectory)/.build/version.ps1"
     $versionInfo = @{}
 
     # Get the version info

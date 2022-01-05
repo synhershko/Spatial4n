@@ -78,7 +78,7 @@ stages:
     #- template: 'show-all-files.yml' # Uncomment for debugging
     #- template: 'show-all-environment-variables.yml' # Uncomment for debugging
 
-    - template: 'build/azure-templates/gitversioning-increment-and-persist-versions.yml'
+    - template: '.build/azure-templates/gitversioning-increment-and-persist-versions.yml'
       parameters:
         informationalVersion: '$(InformationalVersion)' # Input passed in from pipeline
         fileVersion: '$(FileVersion)' # Input passed in from pipeline
@@ -89,7 +89,7 @@ stages:
         fileVersionFileName: '$(FileVersionFileName)'
         buildNumberFileName: '$(BuildNumberFileName)'
 
-    - template: 'build/azure-templates/build-pack-and-publish-libraries.yml'
+    - template: '.build/azure-templates/build-pack-and-publish-libraries.yml'
       parameters:
         artifactFeedID: '$(ArtifactFeedID)'
         testTargetFrameworks: '$(TestTargetFrameworks)'
@@ -127,7 +127,7 @@ stages:
     pool:
       vmImage: $(imageName)
     steps:
-    - template: 'build/azure-templates/run-tests-on-os.yml'
+    - template: '.build/azure-templates/run-tests-on-os.yml'
       parameters:
         osName: $(osName)
         testTargetFrameworks: 'net6.0'
@@ -155,7 +155,7 @@ stages:
     pool:
       vmImage: $(imageName)
     steps:
-    - template: 'build/azure-templates/run-tests-on-os.yml'
+    - template: '.build/azure-templates/run-tests-on-os.yml'
       parameters:
         osName: $(osName)
         testTargetFrameworks: 'net6.0'
@@ -183,7 +183,7 @@ stages:
     pool:
       vmImage: $(imageName)
     steps:
-    - template: 'build/azure-templates/run-tests-on-os.yml'
+    - template: '.build/azure-templates/run-tests-on-os.yml'
       parameters:
         osName: $(osName)
         testTargetFrameworks: 'net5.0'
@@ -211,7 +211,7 @@ stages:
     pool:
       vmImage: $(imageName)
     steps:
-    - template: 'build/azure-templates/run-tests-on-os.yml'
+    - template: '.build/azure-templates/run-tests-on-os.yml'
       parameters:
         osName: $(osName)
         testTargetFrameworks: 'net5.0'
@@ -239,7 +239,7 @@ stages:
     pool:
       vmImage: $(imageName)
     steps:
-    - template: 'build/azure-templates/run-tests-on-os.yml'
+    - template: '.build/azure-templates/run-tests-on-os.yml'
       parameters:
         osName: $(osName)
         testTargetFrameworks: 'netcoreapp3.1'
@@ -267,7 +267,7 @@ stages:
     pool:
       vmImage: $(imageName)
     steps:
-    - template: 'build/azure-templates/run-tests-on-os.yml'
+    - template: '.build/azure-templates/run-tests-on-os.yml'
       parameters:
         osName: $(osName)
         testTargetFrameworks: 'netcoreapp3.1'
@@ -281,7 +281,7 @@ stages:
     pool:
       vmImage: 'windows-2019'
     steps:
-    - template: 'build/azure-templates/run-tests-on-os.yml'
+    - template: '.build/azure-templates/run-tests-on-os.yml'
       parameters:
         osName: 'Windows'
         testTargetFrameworks: 'net40'
@@ -295,7 +295,7 @@ stages:
     pool:
       vmImage: 'windows-2019'
     steps:
-    - template: 'build/azure-templates/run-tests-on-os.yml'
+    - template: '.build/azure-templates/run-tests-on-os.yml'
       parameters:
         osName: 'Windows'
         testTargetFrameworks: 'net40'
@@ -309,7 +309,7 @@ stages:
     pool:
       vmImage: 'windows-2019'
     steps:
-    - template: 'build/azure-templates/run-tests-on-os.yml'
+    - template: '.build/azure-templates/run-tests-on-os.yml'
       parameters:
         osName: 'Windows'
         testTargetFrameworks: 'net35'
@@ -323,7 +323,7 @@ stages:
     pool:
       vmImage: 'windows-2019'
     steps:
-    - template: 'build/azure-templates/run-tests-on-os.yml'
+    - template: '.build/azure-templates/run-tests-on-os.yml'
       parameters:
         osName: 'Windows'
         testTargetFrameworks: 'net35'
@@ -340,7 +340,7 @@ stages:
       vmImage: 'windows-2019'
 
     steps:
-    - template: 'build/azure-templates/show-all-environment-variables.yml'
+    - template: '.build/azure-templates/show-all-environment-variables.yml'
 
     - task: DownloadBuildArtifacts@0
       displayName: 'Download Build Artifacts: $(VersionArtifactName)'
@@ -356,9 +356,9 @@ stages:
         Write-Host "##vso[build.updatebuildnumber]$version"
       displayName: 'Read PackageVersion from File to Build.BuildNumber'
 
-    - template: 'build/azure-templates/show-all-environment-variables.yml'
+    - template: '.build/azure-templates/show-all-environment-variables.yml'
 
-    - template: 'build/azure-templates/publish-nuget-packages.yml'
+    - template: '.build/azure-templates/publish-nuget-packages.yml'
       parameters:
         artifactFeedID: '$(ArtifactFeedID)'
         nugetArtifactName: '$(NuGetArtifactName)'

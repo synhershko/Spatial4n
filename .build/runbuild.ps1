@@ -24,7 +24,7 @@ properties {
 $backedUpFiles = New-Object System.Collections.ArrayList
 $versionInfo = @{}
 
-task default -depends Test
+task default -depends Pack
 
 task Clean -description "This task cleans up the build directory" {
 	Remove-Item $releaseDirectory -Force -Recurse -ErrorAction SilentlyContinue

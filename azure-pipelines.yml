@@ -66,6 +66,18 @@ stages:
         Write-Host "##vso[task.setvariable variable=PackageVersion;]$packageVersion"
       displayName: 'Setup Default Variable Values'
 
+    - task: UseDotNet@2
+      displayName: 'Use .NET sdk $(BuildSDKVersion)'
+      inputs:
+        packageType: 'sdk'
+        version: '$(BuildSDKVersion)'
+
+    # Fix errors with not being able to locate SDK: https://developercommunity.visualstudio.com/t/nuget-restore-fails-because-net-core-sdk-cannot-be/598541
+    - pwsh: dotnet new globaljson --sdk-version '$(BuildSDKVersion)'
+
+    #- template: 'show-all-files.yml' # Uncomment for debugging
+    #- template: 'show-all-environment-variables.yml' # Uncomment for debugging
+
     - template: 'build/azure-templates/gitversioning-increment-and-persist-versions.yml'
       parameters:
         informationalVersion: '$(InformationalVersion)' # Input passed in from pipeline
@@ -85,7 +97,6 @@ stages:
         fileVersion: '$(CI_FileVersion)' # Output from gitversioning-increment-and-persist-versions.yml
         assemblyVersion: '$(CI_AssemblyVersion)' # Output from gitversioning-increment-and-persist-versions.yml
         packageVersion: '$(CI_PackageVersion)' # Output from gitversioning-increment-and-persist-versions.yml
-        buildSdkVersion: '$(BuildSDKVersion)'
         buildConfiguration: '$(BuildConfiguration)'
         buildPlatform: '$(BuildPlatform)'
         nugetArtifactName: '$(NuGetArtifactName)'

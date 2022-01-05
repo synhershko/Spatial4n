@@ -54,11 +54,11 @@ function Ensure-NonNegativeComponents([version]$version, [int]$fieldCount = 4) {
 # Check prerequisites
 $sdkVersion = ((& dotnet --version) | Out-String).Trim()
 if ($LASTEXITCODE -ne 0) {
-	throw "dotnet command was not found. Please install .NET $minimumSdkVersion or higher SDK and make sure it is in your PATH."
+    throw "dotnet command was not found. Please install .NET $minimumSdkVersion or higher SDK and make sure it is in your PATH."
 }
-[version]$releaseVersion = if ($sdkVersion.Contains('-')) { "$sdkVersion".Substring(0, "$sdkVersion".IndexOf('-')) } else { $sdkVersion }
-if ($releaseVersion -lt ([version]$minimumSdkVersion)) {
-    throw "Minimum .NET SDK $minimumSdkVersion required. Please install the required SDK before running the command."
+$releaseVersion = if ($sdkVersion.Contains('-')) { "$sdkVersion".Substring(0, "$sdkVersion".IndexOf('-')) } else { $sdkVersion }
+if ([version]$releaseVersion -lt ([version]$minimumSdkVersion)) {
+    throw "Minimum .NET SDK $minimumSdkVersion required. Current SDK version is $releaseVersion. Please install the required SDK before running the command."
 }
 
 $repoRoot = Split-Path $PSScriptRoot -Parent # Assumes this file is in the /build directory

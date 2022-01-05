@@ -51,9 +51,9 @@ function Ensure-NonNegativeComponents([version]$version, [int]$fieldCount = 4) {
 }
 
 # Check prerequisites
-& where.exe dotnet.exe | Out-Null
+& dotnet --version | Out-Null
 if ($LASTEXITCODE -ne 0) {
-	Write-Host "dotnet.exe was not found. Please install .NET 6 SDK."
+	Write-Host "dotnet command was not found. Please install .NET 6 SDK."
 }
 
 $repoRoot = Split-Path $PSScriptRoot -Parent # Assumes this file is in the /build directory

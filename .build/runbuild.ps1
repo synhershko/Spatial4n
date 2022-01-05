@@ -1,11 +1,13 @@
 properties {
-	[string]$base_directory   = resolve-path "..\."
-	[string]$release_directory  = "$base_directory\.release"
-	[string]$tools_directory  = "$base_directory\.tools"
-	[string]$source_directory = "$base_directory"
-	[string]$nuget_package_directory = "$release_directory\packagesource"
-	[string]$solutionFile = "$base_directory\Spatial4n.sln"
-	[string]$versionScriptFile = "$base_directory/build/version.ps1"
+	[string]$baseDirectory   = resolve-path "../."
+	[string]$releaseDirectory  = "$baseDirectory/release"
+	[string]$toolsDirectory  = "$baseDirectory/tools"
+	[string]$sourceDirectory = "$baseDirectory"
+	[string]$nugetPackageDirectory = "$releaseDirectory/NuGetPackages"
+	[string]$testResultsDirectory = "$releaseDirectory/TestResults"
+	[string]$solutionFile = "$baseDirectory/Spatial4n.sln"
+	[string]$versionScriptFile = "$baseDirectory/build/version.ps1"
+	[string]$testResultsFileName = "TestResults.trx"
 
 	[string]$packageVersion       = ""  
 	[string]$assemblyVersion      = ""
@@ -14,6 +16,9 @@ properties {
 	[string]$configuration        = "Release"
 	[string]$platform             = "Any CPU"
 	[bool]$backupFiles            = $true
+
+	#test parameters
+	[string]$testPlatforms        = "x64"
 }
 
 $backedUpFiles = New-Object System.Collections.ArrayList
@@ -22,8 +27,8 @@ $versionInfo = @{}
 task default -depends Test
 
 task Clean -description "This task cleans up the build directory" {
-	Remove-Item $release_directory -Force -Recurse -ErrorAction SilentlyContinue
-	Get-ChildItem $base_directory -Include *.bak -Recurse | foreach ($_) {Remove-Item $_.FullName}
+	Remove-Item $releaseDirectory -Force -Recurse -ErrorAction SilentlyContinue
+	Get-ChildItem $baseDirectory -Include *.bak -Recurse | foreach ($_) {Remove-Item $_.FullName}
 }
 
 task InstallSDK -description "This task makes sure the correct SDK version is installed" {
@@ -38,7 +43,7 @@ task InstallSDK -description "This task makes sure the correct SDK version is in
 	if (([version]$sdkVersion) -lt ([version]"2.2.401")) {
 		Write-Host "Require SDK version 2.2.401, installing..." -ForegroundColor Red
 		#Install the correct version of the .NET SDK for this build
-	    Invoke-Expression "$base_directory/.build/dotnet-install.ps1 -Version 2.2.401"
+	    Invoke-Expression "$baseDirectory/.build/dotnet-install.ps1 -Version 2.2.401"
 	}
 
 	# Safety check - this should never happen
@@ -66,11 +71,11 @@ task Init -depends InstallSDK -description "This tasks makes sure the build envi
 	$localAssemblyVersion = $versionInfo['AssemblyVersion']
 	$localPackageVersion = $versionInfo['PackageVersion']
 
-	Write-Host "Base Directory: $base_directory"
-	Write-Host "Release Directory: $release_directory"
-	Write-Host "Source Directory: $source_directory"
-	Write-Host "Tools Directory: $tools_directory"
-	Write-Host "NuGet Package Directory: $nuget_package_directory"
+	Write-Host "Base Directory: $baseDirectory"
+	Write-Host "Release Directory: $releaseDirectory"
+	Write-Host "Source Directory: $sourceDirectory"
+	Write-Host "Tools Directory: $toolsDirectory"
+	Write-Host "NuGet Package Directory: $nugetPackageDirectory"
 	Write-Host "Template Directory: $template_directory"
 	Write-Host "AssemblyVersion: $localAssemblyVersion"
 	Write-Host "Package Version: $localPackageVersion"
@@ -78,12 +83,10 @@ task Init -depends InstallSDK -description "This tasks makes sure the build envi
 	Write-Host "InformationalVersion Version: $localInformationalVersion"
 	Write-Host "Configuration: $configuration"
 	
-	Ensure-Directory-Exists "$release_directory"
+	Ensure-Directory-Exists "$releaseDirectory"
 }
 
 task Compile -depends Clean, Init -description "This task compiles the solution" {
-
-	Write-Host "Compiling..." -ForegroundColor Green
 
 	$localInformationalVersion = $versionInfo['InformationalVersion']
 	$localFileVersion = $versionInfo['FileVersion']
@@ -103,14 +106,14 @@ task Compile -depends Clean, Init -description "This task compiles the solution"
 }
 
 task Pack -depends Compile -description "This task creates the NuGet packages" {
-	Ensure-Directory-Exists "$nuget_package_directory"
+	Ensure-Directory-Exists "$nugetPackageDirectory"
 
 	$localPackageVersion = $versionInfo['PackageVersion']
 
 	Exec {
 		&dotnet pack "$solutionFile" `
 			--configuration $configuration `
-			--output "$nuget_package_directory" `
+			--output "$nugetPackageDirectory" `
 			--no-build `
 			--no-restore `
 			/p:PackageVersion="$localPackageVersion" `
@@ -119,16 +122,50 @@ task Pack -depends Compile -description "This task creates the NuGet packages" {
 }
 
 task Test -depends Pack -description "This task runs the tests" {
-	$testProject = "$base_directory\Spatial4n.Tests\Spatial4n.Tests.csproj"
-	$xml = [xml](Get-Content $testProject)
-	$targetFrameworks = [string]$xml.Project.PropertyGroup.TargetFrameworks;
-	$frameworks = $targetFrameworks.Split(';', [StringSplitOptions]::RemoveEmptyEntries)
 
-	foreach ($framework in $frameworks) {
-		Write-Host "Running tests for framework: $framework" -ForegroundColor Green
+	pushd $baseDirectory
+    $testProjects = Get-ChildItem -Path "$sourceDirectory/**/*.csproj" -Recurse
+    popd
 
-		Exec {
-			&dotnet test $testProject --configuration $configuration --framework $framework.Trim() --no-build
+	$testProjects = $testProjects | Sort-Object -Property FullName
+	Ensure-Directory-Exists $testResultsDirectory
+
+	foreach ($testProject in $testProjects) {
+		$testName = $testProject.Directory.Name
+	
+		# Call the target to get the configured test frameworks for this project. We only read the first line because MSBuild adds extra output.
+		$frameworksString = $(dotnet build "$testProject" --verbosity minimal --nologo --no-restore /t:PrintTargetFrameworks /p:TestProjectsOnly=true)[0].Trim()
+	
+		#Write-Host "Test Framework String: $frameworksString"
+		if ($frameworksString -eq 'none') {
+			Write-Host "Skipping project '$testProject' because it is not marked with `<IsTestProject`>true`<`/IsTestProject`> and/or it contains no test frameworks for the current environment." -ForegroundColor DarkYellow
+			continue
+		}
+	
+		[string[]]$frameworks = $frameworksString -split '\s*;\s*'
+		foreach ($framework in $frameworks) {
+
+			$testPlatformArray = $testPlatforms -split '\s*[;,]\s*'
+			foreach ($testPlatform in $testPlatformArray) {
+
+				$testResultDirectory = "$testResultsDirectory/$framework/$testPlatform/$testName"
+				Ensure-Directory-Exists $testResultDirectory
+
+				Write-Host "Running tests for: $testName,$framework,$testPlatform" -ForegroundColor Green
+				&dotnet test "$testProject" `
+					--configuration $configuration `
+					--framework $framework `
+					--no-build `
+					--no-restore `
+					--blame-hang-timeout 10minutes `
+					--blame-hang-dump-type mini `
+					--results-directory "$testResultDirectory" `
+					--logger:"trx;LogFileName=$testResultsFileName" `
+					-- RunConfiguration.TargetPlatform=$testPlatform
+				#	--logger:"console;verbosity=normal"
+			}
+			Write-Host ""
+			Write-Host "See the .trx logs in $(Normalize-FileSystemSlashes "$testResultsDirectory/$framework") for more details." -ForegroundColor DarkCyan
 		}
 	}
 }
@@ -162,4 +199,9 @@ function New-TemporaryDirectory {
     $parent = [System.IO.Path]::GetTempPath()
     [string] $name = [System.Guid]::NewGuid()
     New-Item -ItemType Directory -Path (Join-Path $parent $name)
+}
+
+function Normalize-FileSystemSlashes([string]$path) {
+	$sep = [System.IO.Path]::DirectorySeparatorChar
+	return $($path -replace '/',$sep -replace '\\',$sep)
 }

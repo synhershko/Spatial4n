@@ -1,5 +1,14 @@
 # Parses and validates the command arguments and bootstraps the Psake build script with the cleaned values
 
+function Get-NextArg([string[]]$arguments, [int]$i, [string]$argName) {
+	$i++
+	if ($arguments.Length -gt $i -and -not $($arguments[$i]).StartsWith('-')) {
+		return $arguments[$i]
+	} else {
+		throw $("'$argName' requires a value to be passed as the next argument")
+	}
+}
+
 [string]$packageVersion = ''
 [string]$packageVersion = ''
 [string]$fileVersion = ''
@@ -8,19 +17,21 @@
 
 for ([int]$i = 0; $i -lt $args.Length; $i++) {
 	$arg = $args[$i]
-	$lowerdArg =  "$arg".ToLowerInvariant()
+	$loweredArg =  "$arg".ToLowerInvariant()
 	
-	if ($lowerdArg -eq '-t' -or $lowerdArg -eq '--test') {
+	if ($loweredArg -eq '-t' -or $loweredArg -eq '--test') {
 		$runTests = $true
-	}
-	if ($lowerdArg -eq '-pv' -or $lowerdArg -eq '--packageversion') {
-		$packageVersion = Get-NextArg($args, $i, $arg)
-	}
-	if ($lowerdArg -eq '-v' -or $lowerdArg -eq '--version') {
-		$fileVersion = Get-NextArg($args, $i, $arg)
-	}
-	if ($lowerdArg -eq '-config' -or $lowerdArg -eq '--configuration') {
-		$configuration = Get-NextArg($args, $i, $arg)
+	} elseif ($loweredArg -eq '-pv' -or $loweredArg -eq '--packageversion') {
+		$packageVersion = Get-NextArg $args $i $arg
+		$i++
+	} elseif ($loweredArg -eq '-v' -or $loweredArg -eq '--version') {
+		$fileVersion = Get-NextArg $args $i $arg
+		$i++
+	} elseif ($loweredArg -eq '-config' -or $loweredArg -eq '--configuration') {
+		$configuration = Get-NextArg $args $i $arg
+		$i++
+	} else {
+		throw $("Unrecognized argument: '$arg'")
 	}
 }
 
@@ -32,23 +43,14 @@ $parameters = @{}
 $properties = @{}
 
 if (-not [string]::IsNullOrWhiteSpace($packageVersion)) {
-	$properties.packageVersion='$packageVersion'
+	$properties.packageVersion=$packageVersion
 }
 if (-not [string]::IsNullOrWhiteSpace($fileVersion)) {
-	$properties.fileVersion='$fileVersion'
+	$properties.fileVersion=$fileVersion
 }
 if (-not [string]::IsNullOrWhiteSpace($configuration)) {
-	$properties.configuration='$configuration'
+	$properties.configuration=$configuration
 }
 
-Import-Module "$PSScriptRoot/.build/psake.psm1"
-Invoke-Psake "$PSScriptRoot/.build/runbuild.ps1" -task $task -properties $properties -parameters $parameters
-
-function Get-NextArg([string[]]$args, [int]$i, [string]$argName) {
-	$i = $i + 1
-	if ($args.Length - 1 -ge $i -and -not $args[$i].StartsWith('-')) {
-		return $args[$i]
-	} else {
-		throw "'$argName' requires a value to be passed as the next argument"
-	}
-}
+Import-Module "$PSScriptRoot/build/psake/psake.psm1"
+Invoke-Psake "$PSScriptRoot/build/runbuild.ps1" -task $task -properties $properties -parameters $parameters

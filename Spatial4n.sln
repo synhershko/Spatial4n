@@ -11,9 +11,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Spatial4n.Core.NTS", "Spati
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{71012F51-E7D3-4D12-A87C-B6B163643309}"
 	ProjectSection(SolutionItems) = preProject
+		build = build
 		build.bat = build.bat
 		build.ps1 = build.ps1
-		build = build
 		Directory.Build.props = Directory.Build.props
 		Directory.Build.targets = Directory.Build.targets
 		FUNDING.yml = FUNDING.yml
@@ -51,6 +51,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "psake", "psake", "{4BFE738F
 		.build\psake\psake.ps1 = .build\psake\psake.ps1
 		.build\psake\psake.psd1 = .build\psake\psake.psd1
 		.build\psake\psake.psm1 = .build\psake\psake.psm1
+		.build\psake\readme.md = .build\psake\readme.md
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "public", "public", "{DB6B3C48-B1B1-4977-9FB0-333ED71E84E1}"

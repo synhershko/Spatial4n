@@ -8,17 +8,17 @@ GOTO endcommentblock
 ::
 :: Available Options:
 ::
-::   --Version <Version>
-::   -v <Version> - Assembly version number. If not supplied, the version will be the same 
+::   --file-version <FileVersion>
+::   -fv <FileVersion> - File version number. If not supplied, the file version will be the same
 ::                  as PackageVersion (excluding any pre-release tag).
 ::
 ::   --PackageVersion <PackageVersion>
 ::   -pv <PackageVersion> - Nuget package version. Default is calculated using the nbgv tool based on version.json.
 ::
-::   --Configuration <Configuration>
+::   --configuration <Configuration>
 ::   -config <Configuration> - MSBuild configuration for the build.
 ::
-::   --Test
+::   --test
 ::   -t - Run the tests.
 ::
 ::   All options are case insensitive.

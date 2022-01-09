@@ -14,33 +14,45 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#if FEATURE_XUNIT_1X
+#if !FEATURE_XUNIT_1X
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using Xunit;
 using Xunit.Sdk;
 
 namespace Spatial4n.Core
 {
-	/// <summary>
-	/// Replacement for the <see cref="FactAttribute"/> that repeats. This can only be used with XUnit < 2.x.
-	/// </summary>
-	public class RepeatFactAttribute : FactAttribute
-	{
-		readonly int _count;
 
-		public RepeatFactAttribute(int count)
+    /// <summary>
+    /// Repeats a <see cref="TheoryAttribute"/>. Must accept a single <see cref="int"/> parameter named <c>iterationNumber</c>.
+    /// This only works on XUnit 2+.
+    /// </summary>
+    public class RepeatAttribute : DataAttribute
+    {
+		private readonly int count;
+
+		public RepeatAttribute(int count)
 		{
-			_count = count;
+			if (count < 1)
+			{
+				throw new ArgumentOutOfRangeException(
+					paramName: nameof(count),
+					message: "Repeat count must be greater than 0."
+					);
+			}
+			this.count = count;
 		}
 
-        protected override IEnumerable<ITestCommand> EnumerateTestCommands(
-            IMethodInfo method)
-        {
-            return base.EnumerateTestCommands(method)
-                .SelectMany(tc => Enumerable.Repeat(tc, _count));
-        }
+		public override IEnumerable<object[]> GetData(MethodInfo methodUnderTest)
+		{
+			foreach (var iterationNumber in Enumerable.Range(start: 1, count: this.count))
+			{
+				yield return new object[] { iterationNumber };
+			}
+		}
     }
 }
 #endif

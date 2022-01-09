@@ -19,11 +19,7 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <NoWarn>$(NoWarn);1701;1702;1705;xUnit2006</NoWarn>
-  </PropertyGroup>
-
-  <PropertyGroup Condition=" $(TargetFramework.StartsWith('netcore')) ">
-    <DefineConstants>$(DefineConstants);NETCOREAPP</DefineConstants>
+    <NoWarn>$(NoWarn);1701;1702;1705;xUnit2006;xUnit1026</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>

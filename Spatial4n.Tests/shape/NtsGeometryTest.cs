@@ -28,6 +28,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using Xunit;
+using Xunit.Extensions;
 
 namespace Spatial4n.Core.Shape
 {
@@ -156,9 +157,14 @@ namespace Spatial4n.Core.Shape
             Assert.True(POLY_SHAPE.BoundingBox.GetArea(ctx) > POLY_SHAPE.GetArea(ctx));
         }
 
-        //[Fact]
+#if FEATURE_XUNIT_1X
         [RepeatFact(100)]
         public virtual void TestPointAndRectIntersect()
+#else
+        [Repeat(100)]
+        [Theory]
+        public virtual void TestPointAndRectIntersect(int iterationNumber)
+#endif
         {
             IRectangle r = RandomRectangle(5);
 
@@ -267,11 +273,7 @@ namespace Spatial4n.Core.Shape
         private string ReadFirstLineFromRsrc(string wktRsrcPath)
         {
 
-#if !NETCOREAPP1_0
             var baseDirectory = AppDomain.CurrentDomain.BaseDirectory;
-#else
-            var baseDirectory = System.AppContext.BaseDirectory;
-#endif
             var projectPath = baseDirectory.Substring(0,
                 baseDirectory.LastIndexOf("Spatial4n.Tests", StringComparison.OrdinalIgnoreCase));
 

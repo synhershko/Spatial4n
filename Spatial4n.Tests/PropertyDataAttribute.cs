@@ -19,12 +19,8 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
-
-#if NETCOREAPP
 using Xunit.Sdk;
-#else
 using Xunit.Extensions;
-#endif
 
 namespace Spatial4n.Core
 {
@@ -67,19 +63,14 @@ namespace Spatial4n.Core
 		/// <param name="parameterTypes">The types of the parameters for the test method</param>
 		/// <returns>The theory data, in table form</returns>
 		[SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", MessageId = "0", Justification = "This is validated elsewhere.")]
-#if NETCOREAPP
-        public override IEnumerable<object[]> GetData(MethodInfo methodUnderTest)
+#if !FEATURE_XUNIT_1X
+		public override IEnumerable<object[]> GetData(MethodInfo methodUnderTest)
 #else
         public override IEnumerable<object[]> GetData(MethodInfo methodUnderTest, Type[] parameterTypes)
 #endif
         {
-#if NETCOREAPP1_0
-            // Spatial4n note: must always use PropertyType in .NET Core 1.0 if the data is in a subclass, since ReflectedType is not supported
-            Type type = PropertyType ?? methodUnderTest.DeclaringType;
-#else
+
             Type type = PropertyType ?? methodUnderTest.ReflectedType;
-            
-#endif
             PropertyInfo propInfo = type.GetProperty(propertyName, BindingFlags.Public | BindingFlags.Static | BindingFlags.FlattenHierarchy);
             if (propInfo == null)
 			{

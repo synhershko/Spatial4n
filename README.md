@@ -1,4 +1,4 @@
-Spatial4n
+Spatial4n - A GeoSpatial Library for .NET
 =========
 
 [![Nuget](https://img.shields.io/nuget/dt/Spatial4n.Core)](https://www.nuget.org/packages/Spatial4n.Core)
@@ -45,6 +45,10 @@ Spatial4n has a variety of shapes that operate in Euclidean-space -- i.e. a flat
 ## Documentation
 
 Currently, the best sources of documentation are the [Spatial4j javadocs](https://locationtech.github.io/spatial4j/apidocs/) and the [Spatial4j Getting Started section](https://github.com/locationtech/spatial4j#getting-started).
+
+## Building and Testing
+
+To build the project from source, see the [Building and Testing documentation](https://github.com/synhershko/Spatial4n/docs/building-and-testing).
 
 ## Saying Thanks
 

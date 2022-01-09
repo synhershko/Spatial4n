@@ -12,6 +12,7 @@ parameters:
   testResultsFileName: 'TestResults.trx' # The name of the file (not path) of the test results. Default 'TestResults.trx'.
   maximumParallelJobs: 8
   maximumAllowedFailures: 0
+  dotNetSdkVersion: '' # The .NET SDK version to install
 
 steps:
 - pwsh: |
@@ -29,7 +30,12 @@ steps:
     EnsureNotNullOrEmpty('${{ parameters.testBinaryFilesPattern }}', 'testBinaryFilesPattern')
     EnsureNotNullOrEmpty('${{ parameters.testResultsFileName }}', 'testResultsFileName')
     EnsureNotNullOrEmpty('${{ parameters.maximumParallelJobs }}', 'maximumParallelJobs')
+    EnsureNotNullOrEmpty('${{ parameters.dotNetSdkVersion }}', 'dotNetSdkVersion')
   displayName: 'Validate Template Parameters'
+
+- template: 'install-dotnet-sdk.yml'
+  parameters:
+    sdkVersion: '${{ parameters.dotNetSdkVersion }}'
 
 - task: UseDotNet@2
   displayName: 'Use .NET Core sdk 3.1.416'
@@ -42,11 +48,6 @@ steps:
   inputs:
     version: 5.0.404
   condition: and(succeeded(), contains('${{ parameters.testTargetFrameworks }}', 'net5.'))
-
-- task: UseDotNet@2
-  displayName: 'Use .NET sdk 6.0.101'
-  inputs:
-    version: 6.0.101
 
 - task: DownloadBuildArtifacts@0
   displayName: 'Download Build Artifacts: ${{ parameters.binaryArtifactName }}'

@@ -15,13 +15,13 @@ To build the source, clone or download and unzip the repository. From the reposi
 
 ##### Windows
 
-```
+```console
 > build [options]
 ```
 
 ##### Linux or macOS
 
-```
+```console
 ./build [options]
 ```
 
@@ -56,13 +56,13 @@ For example the following command creates a Release build with NuGet package wit
 
 ##### Windows
 
-```
+```console
 > build --configuration Release --test
 ```
 
 ##### Linux or macOS
 
-```
+```console
 ./build --configuration Release --test
 ```
 

@@ -2,7 +2,7 @@
 
 # The tasks can be easily re-generated (except for any special cases) using the following powershell script
 
-#$source_directory = "F:/Projects/Morfologik.Stemming" # Change to your repo location
+#$source_directory = "F:/Projects/Spatial4n" # Change to your repo location
 #
 #$testProjects = Get-ChildItem -Path "$source_directory/**/*.csproj" -Recurse | ? { $_.Directory.Name.Contains(".Tests") }
 #

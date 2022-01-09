@@ -48,7 +48,7 @@ Currently, the best sources of documentation are the [Spatial4j javadocs](https:
 
 ## Building and Testing
 
-To build the project from source, see the [Building and Testing documentation](https://github.com/synhershko/Spatial4n/docs/building-and-testing).
+To build the project from source, see the [Building and Testing documentation](https://github.com/synhershko/Spatial4n/docs/building-and-testing.md).
 
 ## Saying Thanks
 

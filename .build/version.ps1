@@ -25,6 +25,14 @@ The NuGet package version that will be displayed at NuGet.org.
 
 .PARAMETER NBGVToolVersion
 The version of the NBGV tool that will be installed to generate the version information.
+
+.PARAMETER UseLegacyPackageVersion
+If true, will not put a - between the pre-release label and the version height
+(i.e. -beta1234 rather than -beta-1234). The default value is $false.
+
+.PARAMETER MinimumSdkVersion
+The minimum .NET SDK version to require in order to process the command.
+The default value is '6.0.100'.
 #>
 
 Param(
@@ -33,16 +41,16 @@ Param(
     [string]$assemblyVersion = "",
     [string]$packageVersion = "",
     [string]$nbgvToolVersion = "3.5.73-alpha",
-    [bool]$useLegacyPackageVersion = $true,
+    [switch]$useLegacyPackageVersion = $false,
     [string]$minimumSdkVersion = "6.0.100"
 )
 
-function Ensure-NonNegativeComponents([version]$version, [int]$fieldCount = 4) {
+function Force-ThreeOrFourComponents([version]$version) {
     
-    [int]$maj = if ($fieldCount -ge 1) { [Math]::Max(0, $version.Major) } else { $version.Major }
-    [int]$min = if ($fieldCount -ge 2) { [Math]::Max(0, $version.Minor) } else { $version.Minor }
-    [int]$bld = if ($fieldCount -ge 3) { [Math]::Max(0, $version.Build) } else { $version.Build }
-    [int]$rev = if ($fieldCount -ge 4) { [Math]::Max(0, $version.Revision) } else { $version.Revision }
+    [int]$maj = [Math]::Max(0, $version.Major)
+    [int]$min = [Math]::Max(0, $version.Minor)
+    [int]$bld = [Math]::Max(0, $version.Build)
+    [int]$rev = $version.Revision
 
     if ($rev -ge 0) {
         return New-Object System.Version -ArgumentList @($maj, $min, $bld, $rev)
@@ -79,10 +87,9 @@ try {
         $versionInfo.Add($kvp[0], $($kvp[1]).Trim())
     }
 
-    
     [version]$ver = [version]$versionInfo['Version']
     # 3 or 4 digit number for packageVersion or assemblyInfoVersion
-    $version = $(Ensure-NonNegativeComponents $ver).ToString()
+    $version = $(Force-ThreeOrFourComponents $ver).ToString()
     
     # Get the NuGet package version if it wasn't passed in
     if ([string]::IsNullOrWhiteSpace($packageVersion)) {

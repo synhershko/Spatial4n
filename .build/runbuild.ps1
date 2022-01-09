@@ -68,6 +68,7 @@ task Init -depends CheckSDK -description "This tasks makes sure the build enviro
     Write-Host "Test Directory: $(Normalize-FileSystemSlashes "$testDirectory")"
     Write-Host "Tools Directory: $(Normalize-FileSystemSlashes "$toolsDirectory")"
     Write-Host "NuGet Package Directory: $(Normalize-FileSystemSlashes "$nugetPackageDirectory")"
+    Write-Host "Test Results Directory: $(Normalize-FileSystemSlashes "$testResultsDirectory")"
     Write-Host "AssemblyVersion: $localAssemblyVersion"
     Write-Host "Package Version: $localPackageVersion"
     Write-Host "File Version: $localFileVersion"
@@ -115,7 +116,7 @@ task Pack -depends Compile -description "This task creates the NuGet packages" {
 task Test -depends Pack -description "This task runs the tests" {
 
     pushd $baseDirectory
-    $testProjects = Get-ChildItem -Path "$sourceDirectory/**/*.csproj" -Recurse
+    $testProjects = Get-ChildItem -Path "$testDirectory/**/*.csproj" -Recurse
     popd
 
     $testProjects = $testProjects | Sort-Object -Property FullName

@@ -11,6 +11,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Spatial4n.Core.NTS", "Spati
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{71012F51-E7D3-4D12-A87C-B6B163643309}"
 	ProjectSection(SolutionItems) = preProject
+		.gitattributes = .gitattributes
+		.gitignore = .gitignore
 		build = build
 		build.bat = build.bat
 		build.ps1 = build.ps1
@@ -91,6 +93,12 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "private", "private", "{BC91
 		.build\psake\private\WriteColoredOutput.ps1 = .build\psake\private\WriteColoredOutput.ps1
 		.build\psake\private\WriteDocumentation.ps1 = .build\psake\private\WriteDocumentation.ps1
 		.build\psake\private\WriteTaskTimeSummary.ps1 = .build\psake\private\WriteTaskTimeSummary.ps1
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{15022E44-AB6B-46AB-B9C3-CFADD45E900A}"
+	ProjectSection(SolutionItems) = preProject
+		docs\building-and-testing.md = docs\building-and-testing.md
+		docs\make-release.md = docs\make-release.md
 	EndProjectSection
 EndProject
 Global

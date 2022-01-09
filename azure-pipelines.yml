@@ -11,8 +11,8 @@ name: 'vNext$(rev:.r)' # Format for build number (will be overridden)
 # DevOps Setup: Define the following pipeline level variables in Azure DevOps build pipeline
 #
 # ArtifactFeedID: (Optional - set to your Azure DevOps Artifact (NuGet) feed. If not provided, publish job will be skipped.)
-# BuildConfiguration: 'Release'
-# BuildPlatform: 'Any CPU'
+# BuildConfiguration: 'Release' (Optional - the solution build configuration to run.)
+# BuildPlatform: 'Any CPU' (Optional - the build platform to use when compiling assemblies.)
 # RunTests: 'true' (Optional - set to 'false' to disable test jobs - useful for debugging. If not provided, tests will be run.)
 # RunX86Tests: 'false' (Optional - set to 'true' to enable x86 tests)
 #
@@ -69,10 +69,7 @@ stages:
     - template: '.build/azure-templates/install-dotnet-sdk.yml'
       parameters:
         sdkVersion: '$(DotNetSDKVersion)'
-
-    #- template: 'show-all-files.yml' # Uncomment for debugging
-    #- template: 'show-all-environment-variables.yml' # Uncomment for debugging
-
+    
     - template: '.build/azure-templates/gitversioning-increment-and-persist-versions.yml'
       parameters:
         informationalVersion: '$(InformationalVersion)' # Input passed in from pipeline

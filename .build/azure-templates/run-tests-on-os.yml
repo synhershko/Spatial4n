@@ -144,7 +144,7 @@ steps:
 # Publish Test Results task or the (deprecated) TfsPublisher
 # our only other option is to make a task for every supported
 # platform and project and update it whenever a new platform 
-# is targeted or test project is created in Morfologik.
+# is targeted or test project is created in Spatial4n.
 
 - template: 'publish-test-results-for-test-projects.yml'
   parameters:

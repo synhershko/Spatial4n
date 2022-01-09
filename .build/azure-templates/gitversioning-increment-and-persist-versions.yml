@@ -38,7 +38,7 @@ steps:
     $versionInfo = @{}
 
     # Get the version info
-    $versionInfoString = Invoke-Expression -Command "$versionScriptFile -PackageVersion ""${{ parameters.packageVersion }}"" -AssemblyVersion ""${{ parameters.assemblyVersion }}"" -InformationalVersion ""${{ parameters.informataionalVersion }}"" -FileVersion ""${{ parameters.fileVersion }}"""
+    $versionInfoString = Invoke-Expression -Command "$versionScriptFile -PackageVersion ""${{ parameters.packageVersion }}"" -AssemblyVersion ""${{ parameters.assemblyVersion }}"" -InformationalVersion ""${{ parameters.informationalVersion }}"" -FileVersion ""${{ parameters.fileVersion }}"""
     #Write-Host $versionInfoString
 
     # parse the version numbers and put them into a hashtable

@@ -1,25 +1,26 @@
 properties {
-    [string]$baseDirectory   = resolve-path "../."
-    [string]$releaseDirectory  = "$baseDirectory/.release"
-    [string]$toolsDirectory  = "$baseDirectory/.tools"
-    [string]$sourceDirectory = "$baseDirectory"
-    [string]$nugetPackageDirectory = "$releaseDirectory/NuGetPackages"
-    [string]$testResultsDirectory = "$releaseDirectory/TestResults"
-    [string]$solutionFile = "$baseDirectory/Spatial4n.sln"
-    [string]$versionScriptFile = "$baseDirectory/.build/version.ps1"
-    [string]$testResultsFileName = "TestResults.trx"
+    [string]$baseDirectory         = resolve-path "../."
+    [string]$artifactsDirectory    = "$baseDirectory/_artifacts"
+    [string]$sourceDirectory       = "$baseDirectory"
+    [string]$testDirectory         = "$baseDirectory"
+    [string]$toolsDirectory        = "$baseDirectory/.tools"
+    [string]$nugetPackageDirectory = "$artifactsDirectory/NuGetPackages"
+    [string]$testResultsDirectory  = "$artifactsDirectory/TestResults"
+    [string]$solutionFile          = "$baseDirectory/Spatial4n.sln"
+    [string]$versionScriptFile     = "$baseDirectory/.build/version.ps1"
+    [string]$testResultsFileName   = "TestResults.trx"
 
-    [string]$packageVersion       = ""  
-    [string]$assemblyVersion      = ""
-    [string]$informationalVersion = ""
-    [string]$fileVersion          = ""
-    [string]$configuration        = "Release"
-    [string]$platform             = "Any CPU"
-    [bool]$backupFiles            = $true
-    [string]$minimumSdkVersion    = "6.0.100"
+    [string]$packageVersion        = ""  
+    [string]$assemblyVersion       = ""
+    [string]$informationalVersion  = ""
+    [string]$fileVersion           = ""
+    [string]$configuration         = "Release"
+    [string]$platform              = "Any CPU"
+    [bool]$backupFiles             = $true
+    [string]$minimumSdkVersion     = "6.0.100"
 
     #test parameters
-    [string]$testPlatforms        = "x64"
+    [string]$testPlatforms         = "x64"
 }
 
 $backedUpFiles = New-Object System.Collections.ArrayList
@@ -28,7 +29,7 @@ $versionInfo = @{}
 task default -depends Pack
 
 task Clean -description "This task cleans up the build directory" {
-    Remove-Item $releaseDirectory -Force -Recurse -ErrorAction SilentlyContinue
+    Remove-Item $artifactsDirectory -Force -Recurse -ErrorAction SilentlyContinue
     Get-ChildItem $baseDirectory -Include *.bak -Recurse | foreach ($_) {Remove-Item $_.FullName}
 }
 
@@ -61,19 +62,19 @@ task Init -depends CheckSDK -description "This tasks makes sure the build enviro
     $localAssemblyVersion = $versionInfo['AssemblyVersion']
     $localPackageVersion = $versionInfo['PackageVersion']
 
-    Write-Host "Base Directory: $baseDirectory"
-    Write-Host "Release Directory: $releaseDirectory"
-    Write-Host "Source Directory: $sourceDirectory"
-    Write-Host "Tools Directory: $toolsDirectory"
-    Write-Host "NuGet Package Directory: $nugetPackageDirectory"
-    Write-Host "Template Directory: $template_directory"
+    Write-Host "Base Directory: $(Normalize-FileSystemSlashes "$baseDirectory")"
+    Write-Host "Artifacts Directory: $(Normalize-FileSystemSlashes "$artifactsDirectory")"
+    Write-Host "Source Directory: $(Normalize-FileSystemSlashes "$sourceDirectory")"
+    Write-Host "Test Directory: $(Normalize-FileSystemSlashes "$testDirectory")"
+    Write-Host "Tools Directory: $(Normalize-FileSystemSlashes "$toolsDirectory")"
+    Write-Host "NuGet Package Directory: $(Normalize-FileSystemSlashes "$nugetPackageDirectory")"
     Write-Host "AssemblyVersion: $localAssemblyVersion"
     Write-Host "Package Version: $localPackageVersion"
     Write-Host "File Version: $localFileVersion"
     Write-Host "InformationalVersion Version: $localInformationalVersion"
     Write-Host "Configuration: $configuration"
     
-    Ensure-Directory-Exists "$releaseDirectory"
+    Ensure-Directory-Exists "$artifactsDirectory"
 }
 
 task Compile -depends Clean, Init -description "This task compiles the solution" {

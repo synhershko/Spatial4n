@@ -20,12 +20,6 @@ for ([int]$i = 0; $i -lt $args.Length; $i++) {
     
     if ($loweredArg -eq '-t' -or $loweredArg -eq '--test') {
         $runTests = $true
-    } elseif ($loweredArg -eq '-pv' -or $loweredArg -eq '--package-version' -or $loweredArg -eq '--packageversion') {
-        $packageVersion = Get-NextArg $args $i $arg
-        $i++
-    } elseif ($loweredArg -eq '-fv' -or $loweredArg -eq '--file-version' -or $loweredArg -eq '--fileversion') {
-        $fileVersion = Get-NextArg $args $i $arg
-        $i++
     } elseif ($loweredArg -eq '-config' -or $loweredArg -eq '--configuration') {
         $configuration = Get-NextArg $args $i $arg
         $i++

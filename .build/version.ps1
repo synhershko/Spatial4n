@@ -1,6 +1,6 @@
 <#
 .SYNOPSIS
-Generates the PackgeVersion, AssemblyVersion, FileVersion, and InformationalVersion
+Generates the PackageVersion, AssemblyVersion, FileVersion, and InformationalVersion
 based on configuration and/or provided parameters.
 
 .OUTPUTS
@@ -32,7 +32,7 @@ Param(
     [string]$fileVersion = "",
     [string]$assemblyVersion = "",
     [string]$packageVersion = "",
-    [string]$nbgvToolVersion = "3.5.68-alpha",
+    [string]$nbgvToolVersion = "3.5.73-alpha",
     [bool]$useLegacyPackageVersion = $true,
     [string]$minimumSdkVersion = "6.0.100"
 )
@@ -61,7 +61,7 @@ if ([version]$releaseVersion -lt ([version]$minimumSdkVersion)) {
     throw "Minimum .NET SDK $minimumSdkVersion required. Current SDK version is $releaseVersion. Please install the required SDK before running the command."
 }
 
-$repoRoot = Split-Path $PSScriptRoot -Parent # Assumes this file is in the /build directory
+$repoRoot = Split-Path $PSScriptRoot -Parent # Assumes this file is in the /.build directory
 
 #Write-Host "Repo Root: $repoRoot"
 

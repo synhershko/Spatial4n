@@ -25,11 +25,11 @@ namespace Spatial4n.Core.Distance
     /// A base class for a Distance Calculator that assumes a spherical earth model. 
     /// </summary>
     public abstract class GeodesicSphereDistCalc : AbstractDistanceCalculator
-	{
-		private readonly double radiusDEG = DistanceUtils.ToDegrees(1);//in degrees
+    {
+        private readonly double radiusDEG = DistanceUtils.ToDegrees(1);//in degrees
 
-		public override IPoint PointOnBearing(IPoint from, double distDEG, double bearingDEG, SpatialContext ctx, IPoint? reuse)
-		{
+        public override IPoint PointOnBearing(IPoint from, double distDEG, double bearingDEG, SpatialContext ctx, IPoint? reuse)
+        {
             if (distDEG == 0)
             {
                 if (reuse is null)
@@ -43,78 +43,78 @@ namespace Spatial4n.Core.Distance
                 DistanceUtils.ToRadians(bearingDEG), ctx, reuse);//output result is in radians
             result.Reset(DistanceUtils.ToDegrees(result.X), DistanceUtils.ToDegrees(result.Y));
             return result;
-		}
+        }
 
-		public override IRectangle CalcBoxByDistFromPt(IPoint from, double distDEG, SpatialContext ctx, IRectangle? reuse)
-		{
+        public override IRectangle CalcBoxByDistFromPt(IPoint from, double distDEG, SpatialContext ctx, IRectangle? reuse)
+        {
             return DistanceUtils.CalcBoxByDistFromPtDEG(from.Y, from.X, distDEG, ctx, reuse);
-		}
+        }
 
-		public override double CalcBoxByDistFromPt_yHorizAxisDEG(IPoint from, double distDEG, SpatialContext ctx)
-		{
-			return DistanceUtils.CalcBoxByDistFromPt_latHorizAxisDEG(from.Y, from.X, distDEG);
-		}
+        public override double CalcBoxByDistFromPt_yHorizAxisDEG(IPoint from, double distDEG, SpatialContext ctx)
+        {
+            return DistanceUtils.CalcBoxByDistFromPt_latHorizAxisDEG(from.Y, from.X, distDEG);
+        }
 
-		public override double Area(IRectangle rect)
-		{
-			//From http://mathforum.org/library/drmath/view/63767.html
-			double lat1 = DistanceUtils.ToRadians(rect.MinY);
-			double lat2 = DistanceUtils.ToRadians(rect.MaxY);
-			return Math.PI / 180 * radiusDEG * radiusDEG *
-					Math.Abs(Math.Sin(lat1) - Math.Sin(lat2)) *
-					rect.Width;
-		}
+        public override double Area(IRectangle rect)
+        {
+            //From http://mathforum.org/library/drmath/view/63767.html
+            double lat1 = DistanceUtils.ToRadians(rect.MinY);
+            double lat2 = DistanceUtils.ToRadians(rect.MaxY);
+            return Math.PI / 180 * radiusDEG * radiusDEG *
+                    Math.Abs(Math.Sin(lat1) - Math.Sin(lat2)) *
+                    rect.Width;
+        }
 
-		public override double Area(ICircle circle)
-		{
-			//formula is a simplified case of area(rect).
-			double lat = DistanceUtils.ToRadians(90 - circle.Radius);
-			return 2 * Math.PI * radiusDEG * radiusDEG * (1 - Math.Sin(lat));
-		}
+        public override double Area(ICircle circle)
+        {
+            //formula is a simplified case of area(rect).
+            double lat = DistanceUtils.ToRadians(90 - circle.Radius);
+            return 2 * Math.PI * radiusDEG * radiusDEG * (1 - Math.Sin(lat));
+        }
 
-		public override bool Equals(object o)
-		{
-			if (o == null) return false;
-			return GetType() == o.GetType();
-		}
+        public override bool Equals(object o)
+        {
+            if (o == null) return false;
+            return GetType() == o.GetType();
+        }
 
-		public override int GetHashCode()
-		{
-			return GetType().GetHashCode();
-		}
+        public override int GetHashCode()
+        {
+            return GetType().GetHashCode();
+        }
 
-		public override double Distance(IPoint @from, double toX, double toY)
-		{
-			return DistanceUtils.ToDegrees(DistanceLatLonRAD(DistanceUtils.ToRadians(from.Y),
-				DistanceUtils.ToRadians(from.X), DistanceUtils.ToRadians(toY), DistanceUtils.ToRadians(toX)));
-		}
+        public override double Distance(IPoint @from, double toX, double toY)
+        {
+            return DistanceUtils.ToDegrees(DistanceLatLonRAD(DistanceUtils.ToRadians(from.Y),
+                DistanceUtils.ToRadians(from.X), DistanceUtils.ToRadians(toY), DistanceUtils.ToRadians(toX)));
+        }
 
-		protected abstract double DistanceLatLonRAD(double lat1, double lon1, double lat2, double lon2);
+        protected abstract double DistanceLatLonRAD(double lat1, double lon1, double lat2, double lon2);
 
-		public class Haversine : GeodesicSphereDistCalc
-		{
+        public class Haversine : GeodesicSphereDistCalc
+        {
 
-			protected override double DistanceLatLonRAD(double lat1, double lon1, double lat2, double lon2)
-			{
-				return DistanceUtils.DistHaversineRAD(lat1, lon1, lat2, lon2);
-			}
-		}
+            protected override double DistanceLatLonRAD(double lat1, double lon1, double lat2, double lon2)
+            {
+                return DistanceUtils.DistHaversineRAD(lat1, lon1, lat2, lon2);
+            }
+        }
 
-		public class LawOfCosines : GeodesicSphereDistCalc
-		{
-			protected override double DistanceLatLonRAD(double lat1, double lon1, double lat2, double lon2)
-			{
-				return DistanceUtils.DistLawOfCosinesRAD(lat1, lon1, lat2, lon2);
-			}
+        public class LawOfCosines : GeodesicSphereDistCalc
+        {
+            protected override double DistanceLatLonRAD(double lat1, double lon1, double lat2, double lon2)
+            {
+                return DistanceUtils.DistLawOfCosinesRAD(lat1, lon1, lat2, lon2);
+            }
 
-		}
+        }
 
-		public class Vincenty : GeodesicSphereDistCalc
-		{
-			protected override double DistanceLatLonRAD(double lat1, double lon1, double lat2, double lon2)
-			{
-				return DistanceUtils.DistVincentyRAD(lat1, lon1, lat2, lon2);
-			}
-		}
-	}
+        public class Vincenty : GeodesicSphereDistCalc
+        {
+            protected override double DistanceLatLonRAD(double lat1, double lon1, double lat2, double lon2)
+            {
+                return DistanceUtils.DistVincentyRAD(lat1, lon1, lat2, lon2);
+            }
+        }
+    }
 }

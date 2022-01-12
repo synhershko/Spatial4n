@@ -36,45 +36,38 @@ namespace Spatial4n.Core.Util
     /// </summary>
     public static class GeohashUtils
     {
-        private static readonly char[] BASE_32 = {
+        private static readonly char[] Base32 = {
                                                      '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
                                                      'b', 'c', 'd', 'e', 'f', 'g', 'h', 'j', 'k', 'm',
                                                      'n', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x',
                                                      'y', 'z'
                                                  }; //note: this is sorted
 
-        private static readonly int[] BASE_32_IDX; //sparse array of indexes from '0' to 'z'
+        private static readonly int[] Base32Index = LoadBase32Index(); //sparse array of indexes from '0' to 'z'
 
+        private static int[] LoadBase32Index() // Spatial4n: Avoid static constructors
+        {
+            int[] result = new int[Base32[Base32.Length - 1] - Base32[0] + 1];
+            Debug.Assert(result.Length < 100);//reasonable length
+            for (int i = 0; i < result.Length; i++)
+            {
+                result[i] = -500;
+            }
+
+            for (int i = 0; i < Base32.Length; i++)
+            {
+                result[Base32[i] - Base32[0]] = i;
+            }
+
+            return result;
+        }
+
+        public const int MaxPrecision = 24; //DWS: I forget what level results in needless more precision but it's about this
+
+        [Obsolete("Use MaxPrecision instead. This const will be removed in 0.5.0."), System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
         public const int MAX_PRECISION = 24; //DWS: I forget what level results in needless more precision but it's about this
 
-        private static readonly int[] BITS = { 16, 8, 4, 2, 1 };
-
-        static GeohashUtils()
-        {
-            BASE_32_IDX = new int[BASE_32[BASE_32.Length - 1] - BASE_32[0] + 1];
-            Debug.Assert(BASE_32_IDX.Length < 100);//reasonable length
-            for (int i = 0; i < BASE_32_IDX.Length; i++)
-            {
-                BASE_32_IDX[i] = -500;
-            }
-
-            for (int i = 0; i < BASE_32.Length; i++)
-            {
-                BASE_32_IDX[BASE_32[i] - BASE_32[0]] = i;
-            }
-
-            hashLenToLatHeight = new double[MAX_PRECISION + 1];
-            hashLenToLonWidth = new double[MAX_PRECISION + 1];
-            hashLenToLatHeight[0] = 90 * 2;
-            hashLenToLonWidth[0] = 180 * 2;
-            bool even = false;
-            for (int i = 1; i <= MAX_PRECISION; i++)
-            {
-                hashLenToLatHeight[i] = hashLenToLatHeight[i - 1] / (even ? 8 : 4);
-                hashLenToLonWidth[i] = hashLenToLonWidth[i - 1] / (even ? 4 : 8);
-                even = !even;
-            }
-        }
+        private static readonly int[] Bits = { 16, 8, 4, 2, 1 };
 
         /// <summary>
         /// Encodes the given latitude and longitude into a geohash
@@ -105,13 +98,13 @@ namespace Spatial4n.Core.Util
 
             while (geohash.Length < precision)
             {
-                double mid = 0.0d;
+                double mid; // spatial4n: Remove unnecessary assignment
                 if (isEven)
                 {
                     mid = (lonInterval[0] + lonInterval[1]) / 2;
                     if (longitude > mid)
                     {
-                        ch |= BITS[bit];
+                        ch |= Bits[bit];
                         lonInterval[0] = mid;
                     }
                     else
@@ -124,7 +117,7 @@ namespace Spatial4n.Core.Util
                     mid = (latInterval[0] + latInterval[1]) / 2;
                     if (latitude > mid)
                     {
-                        ch |= BITS[bit];
+                        ch |= Bits[bit];
                         latInterval[0] = mid;
                     }
                     else
@@ -141,7 +134,7 @@ namespace Spatial4n.Core.Util
                 }
                 else
                 {
-                    geohash.Append(BASE_32[ch]);
+                    geohash.Append(Base32[ch]);
                     bit = 0;
                     ch = 0;
                 }
@@ -178,9 +171,9 @@ namespace Spatial4n.Core.Util
                 if (c >= 'A' && c <= 'Z')
                     c = Convert.ToChar(c - Convert.ToChar('A' - 'a'));
 
-                int cd = BASE_32_IDX[c - BASE_32[0]]; //TODO check successful?
+                int cd = Base32Index[c - Base32[0]]; //TODO check successful?
 
-                foreach (var mask in BITS)
+                foreach (var mask in Bits)
                 {
                     if (isEven)
                     {
@@ -213,10 +206,10 @@ namespace Spatial4n.Core.Util
         /// <summary>Array of geohashes 1 level below the baseGeohash. Sorted.</summary>
         public static string[] GetSubGeohashes(string baseGeohash)
         {
-            var hashes = new string[BASE_32.Length];
-            for (int i = 0; i < BASE_32.Length; i++)
+            var hashes = new string[Base32.Length];
+            for (int i = 0; i < Base32.Length; i++)
             {//note: already sorted
-                char c = BASE_32[i];
+                char c = Base32[i];
                 hashes[i] = baseGeohash + c;
             }
             return hashes;
@@ -233,18 +226,44 @@ namespace Spatial4n.Core.Util
         public static int LookupHashLenForWidthHeight(double lonErr, double latErr)
         {
             //loop through hash length arrays from beginning till we find one.
-            for (int len = 1; len < MAX_PRECISION; len++)
+            for (int len = 1; len < MaxPrecision; len++)
             {
                 double latHeight = hashLenToLatHeight[len];
                 double lonWidth = hashLenToLonWidth[len];
                 if (latHeight < latErr && lonWidth < lonErr)
                     return len;
             }
-            return MAX_PRECISION;
+            return MaxPrecision;
         }
 
         /** See the table at http://en.wikipedia.org/wiki/Geohash */
-        private static readonly double[] hashLenToLatHeight;
-        private static readonly double[] hashLenToLonWidth;
+        private static readonly double[] hashLenToLatHeight = LoadHashLenToLatHeight();
+        private static readonly double[] hashLenToLonWidth = LoadHashLenToLonWidth();
+
+        private static double[] LoadHashLenToLatHeight() // Spatial4n: Avoid static constructors
+        {
+            double[] result = new double[MaxPrecision + 1];
+            result[0] = 90 * 2;
+            bool even = false;
+            for (int i = 1; i <= MaxPrecision; i++)
+            {
+                result[i] = result[i - 1] / (even ? 8 : 4);
+                even = !even;
+            }
+            return result;
+        }
+
+        private static double[] LoadHashLenToLonWidth() // Spatial4n: Avoid static constructors
+        {
+            double[] result = new double[MaxPrecision + 1];
+            result[0] = 180 * 2;
+            bool even = false;
+            for (int i = 1; i <= MaxPrecision; i++)
+            {
+                result[i] = result[i - 1] / (even ? 4 : 8);
+                even = !even;
+            }
+            return result;
+        }
     }
 }

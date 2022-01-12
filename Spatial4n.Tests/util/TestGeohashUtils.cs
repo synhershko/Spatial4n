@@ -122,7 +122,7 @@ namespace Spatial4n.Core.Util
             Assert.Equal(3, GeohashUtils.LookupHashLenForWidthHeight(999, 5.5));
             Assert.Equal(3, GeohashUtils.LookupHashLenForWidthHeight(11.1, 999));
 
-            Assert.Equal(GeohashUtils.MAX_PRECISION, GeohashUtils.LookupHashLenForWidthHeight(10e-20, 10e-20));
+            Assert.Equal(GeohashUtils.MaxPrecision, GeohashUtils.LookupHashLenForWidthHeight(10e-20, 10e-20));
         }
     }
 }

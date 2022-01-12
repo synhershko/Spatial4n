@@ -121,15 +121,15 @@ namespace Spatial4n.Core.Shape
             NtsGeometry lineI = (NtsGeometry)ctx.ReadShapeFromWkt("LINESTRING(10 0, 20 0)");
 
             if (prepare) @base.Index();
-            AssertRelation(SpatialRelation.CONTAINS, @base, @base);//preferred result as there is no EQUALS
-            AssertRelation(SpatialRelation.INTERSECTS, @base, polyI);
-            AssertRelation(SpatialRelation.CONTAINS, @base, polyW);
-            AssertRelation(SpatialRelation.CONTAINS, @base, pointB);
-            AssertRelation(SpatialRelation.CONTAINS, @base, lineB);
-            AssertRelation(SpatialRelation.INTERSECTS, @base, lineI);
+            AssertRelation(SpatialRelation.Contains, @base, @base);//preferred result as there is no EQUALS
+            AssertRelation(SpatialRelation.Intersects, @base, polyI);
+            AssertRelation(SpatialRelation.Contains, @base, polyW);
+            AssertRelation(SpatialRelation.Contains, @base, pointB);
+            AssertRelation(SpatialRelation.Contains, @base, lineB);
+            AssertRelation(SpatialRelation.Intersects, @base, lineI);
             if (prepare) lineB.Index();
-            AssertRelation(SpatialRelation.CONTAINS, lineB, lineB);//line contains itself
-            AssertRelation(SpatialRelation.CONTAINS, lineB, pointB);
+            AssertRelation(SpatialRelation.Contains, lineB, lineB);//line contains itself
+            AssertRelation(SpatialRelation.Contains, lineB, pointB);
         }
 
         [Fact]
@@ -137,7 +137,7 @@ namespace Spatial4n.Core.Shape
         {
             IShape emptyGeom = ctx.ReadShapeFromWkt("POLYGON EMPTY");
             TestEmptiness(emptyGeom);
-            AssertRelation("EMPTY", SpatialRelation.DISJOINT, emptyGeom, POLY_SHAPE);
+            AssertRelation("EMPTY", SpatialRelation.Disjoint, emptyGeom, POLY_SHAPE);
         }
 
         [Fact]
@@ -197,8 +197,8 @@ namespace Spatial4n.Core.Shape
             IntersectionMatrix expectedM = POLY_SHAPE.Geometry.Relate(((NtsSpatialContext)ctx).GetGeometryFrom(shape));
             SpatialRelation expectedSR = NtsGeometry.IntersectionMatrixToSpatialRelation(expectedM);
             //NTS considers a point on a boundary INTERSECTS, not CONTAINS
-            if (expectedSR == SpatialRelation.INTERSECTS && shape is Core.Shapes.IPoint)
-                expectedSR = SpatialRelation.CONTAINS;
+            if (expectedSR == SpatialRelation.Intersects && shape is Core.Shapes.IPoint)
+                expectedSR = SpatialRelation.Contains;
             AssertRelation(null, expectedSR, POLY_SHAPE, shape);
 
             if (ctx.IsGeo)
@@ -239,7 +239,7 @@ namespace Spatial4n.Core.Shape
             // TODO Test contains: 64°12'44.82"N    61°29'5.20"E
             //  64.21245  61.48475
             // FAILS
-            //AssertRelation(null,SpatialRelation.CONTAINS, shape, ctx.makePoint(61.48, 64.21));
+            //AssertRelation(null,SpatialRelation.Contains, shape, ctx.makePoint(61.48, 64.21));
 
             NtsSpatialContextFactory factory = new NtsSpatialContextFactory();
             factory.normWrapLongitude = true;
@@ -262,9 +262,9 @@ namespace Spatial4n.Core.Shape
 
             IShape shape = ctx.ReadShapeFromWkt(wktStr);
 
-            AssertRelation(null, SpatialRelation.CONTAINS, shape,
+            AssertRelation(null, SpatialRelation.Contains, shape,
                     ctx.MakePoint(-179.99, -16.9));
-            AssertRelation(null, SpatialRelation.CONTAINS, shape,
+            AssertRelation(null, SpatialRelation.Contains, shape,
                     ctx.MakePoint(+179.99, -16.9));
             Assert.True(shape.BoundingBox.Width < 5);//smart bbox
             Console.WriteLine("Fiji Area: " + shape.GetArea(ctx));

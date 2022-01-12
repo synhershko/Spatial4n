@@ -74,14 +74,14 @@ namespace Spatial4n.Core.Shapes.Impl
                 CornerByQuadrant(r, cQuad, farthestP);
                 bool farthestContains = Contains(farthestP);
                 if (farthestContains)
-                    return SpatialRelation.CONTAINS;
-                return SpatialRelation.INTERSECTS;
+                    return SpatialRelation.Contains;
+                return SpatialRelation.Intersects;
             }
             else
             {// not nearestContains
                 if (Quadrant(nearestP) == cQuad)
-                    return SpatialRelation.DISJOINT;//out of buffer on same side as center
-                return SpatialRelation.INTERSECTS;//nearest & farthest points straddle the line
+                    return SpatialRelation.Disjoint;//out of buffer on same side as center
+                return SpatialRelation.Intersects;//nearest & farthest points straddle the line
             }
         }
 

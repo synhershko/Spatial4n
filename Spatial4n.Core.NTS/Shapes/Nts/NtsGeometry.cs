@@ -227,7 +227,7 @@ namespace Spatial4n.Core.Shapes.Nts
         public virtual SpatialRelation Relate(IPoint pt)
         {
             if (!BoundingBox.Relate(pt).Intersects())
-                return SpatialRelation.DISJOINT;
+                return SpatialRelation.Disjoint;
             IGeometry ptGeom;
             if (pt is NtsPoint)
                 ptGeom = ((NtsPoint)pt).Geometry;
@@ -239,7 +239,7 @@ namespace Spatial4n.Core.Shapes.Nts
         public virtual SpatialRelation Relate(IRectangle rectangle)
         {
             SpatialRelation bboxR = bbox.Relate(rectangle);
-            if (bboxR == SpatialRelation.WITHIN || bboxR == SpatialRelation.DISJOINT)
+            if (bboxR == SpatialRelation.Within || bboxR == SpatialRelation.Disjoint)
                 return bboxR;
             // FYI, the right answer could still be DISJOINT or WITHIN, but we don't know yet.
             return Relate(ctx.GetGeometryFrom(rectangle));
@@ -248,7 +248,7 @@ namespace Spatial4n.Core.Shapes.Nts
         public virtual SpatialRelation Relate(ICircle circle)
         {
             SpatialRelation bboxR = bbox.Relate(circle);
-            if (bboxR == SpatialRelation.WITHIN || bboxR == SpatialRelation.DISJOINT)
+            if (bboxR == SpatialRelation.Within || bboxR == SpatialRelation.Disjoint)
                 return bboxR;
 
             //Test each point to see how many of them are outside of the circle.
@@ -260,18 +260,18 @@ namespace Spatial4n.Core.Shapes.Nts
             {
                 i++;
                 SpatialRelation sect = circle.Relate(new Impl.Point(coord.X, coord.Y, ctx));
-                if (sect == SpatialRelation.DISJOINT)
+                if (sect == SpatialRelation.Disjoint)
                     outside++;
                 if (i != outside && outside != 0)//short circuit: partially outside, partially inside
-                    return SpatialRelation.INTERSECTS;
+                    return SpatialRelation.Intersects;
             }
             if (i == outside)
             {
-                return (Relate(circle.Center) == SpatialRelation.DISJOINT)
-                    ? SpatialRelation.DISJOINT : SpatialRelation.CONTAINS;
+                return (Relate(circle.Center) == SpatialRelation.Disjoint)
+                    ? SpatialRelation.Disjoint : SpatialRelation.Contains;
             }
             Debug.Assert(outside == 0);
-            return SpatialRelation.WITHIN;
+            return SpatialRelation.Within;
         }
 
         public virtual SpatialRelation Relate(NtsGeometry ntsGeometry)
@@ -286,18 +286,18 @@ namespace Spatial4n.Core.Shapes.Nts
             if (oGeom is GeoAPI.Geometries.IPoint) // TODO: This may not be the correct data type....
             {
                 if (preparedGeometry != null)
-                    return preparedGeometry.Disjoint(oGeom) ? SpatialRelation.DISJOINT : SpatialRelation.CONTAINS;
-                return geom.Disjoint(oGeom) ? SpatialRelation.DISJOINT : SpatialRelation.CONTAINS;
+                    return preparedGeometry.Disjoint(oGeom) ? SpatialRelation.Disjoint : SpatialRelation.Contains;
+                return geom.Disjoint(oGeom) ? SpatialRelation.Disjoint : SpatialRelation.Contains;
             }
             if (preparedGeometry == null)
                 return IntersectionMatrixToSpatialRelation(geom.Relate(oGeom));
             else if (preparedGeometry.Covers(oGeom))
-                return SpatialRelation.CONTAINS;
+                return SpatialRelation.Contains;
             else if (preparedGeometry.CoveredBy(oGeom))
-                return SpatialRelation.WITHIN;
+                return SpatialRelation.Within;
             else if (preparedGeometry.Intersects(oGeom))
-                return SpatialRelation.INTERSECTS;
-            return SpatialRelation.DISJOINT;
+                return SpatialRelation.Intersects;
+            return SpatialRelation.Disjoint;
         }
 
         public static SpatialRelation IntersectionMatrixToSpatialRelation(IntersectionMatrix matrix)
@@ -305,12 +305,12 @@ namespace Spatial4n.Core.Shapes.Nts
             //As indicated in SpatialRelation javadocs, Spatial4j CONTAINS & WITHIN are
             // OGC's COVERS & COVEREDBY
             if (matrix.IsCovers())
-                return SpatialRelation.CONTAINS;
+                return SpatialRelation.Contains;
             else if (matrix.IsCoveredBy())
-                return SpatialRelation.WITHIN;
+                return SpatialRelation.Within;
             else if (matrix.IsDisjoint())
-                return SpatialRelation.DISJOINT;
-            return SpatialRelation.INTERSECTS;
+                return SpatialRelation.Disjoint;
+            return SpatialRelation.Intersects;
         }
 
         public override string ToString()

@@ -72,9 +72,9 @@ namespace Spatial4n.Core.Shapes.Impl
         public virtual SpatialRelation Relate(IShape other)
         {
             if (IsEmpty || other.IsEmpty)
-                return SpatialRelation.DISJOINT;
+                return SpatialRelation.Disjoint;
             if (other is IPoint)
-                return this.Equals(other) ? SpatialRelation.INTERSECTS : SpatialRelation.DISJOINT;
+                return this.Equals(other) ? SpatialRelation.Intersects : SpatialRelation.Disjoint;
             return other.Relate(this).Transpose();
         }
 

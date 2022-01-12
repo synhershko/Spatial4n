@@ -98,7 +98,7 @@ namespace Spatial4n.Core.Shape
                 {
                     foreach (IRectangle shape in shapes)
                     {
-                        AssertRelation("bbox contains shape", SpatialRelation.CONTAINS, msBbox, shape);
+                        AssertRelation("bbox contains shape", SpatialRelation.Contains, msBbox, shape);
                     }
                 }
                 return shapeCollection;

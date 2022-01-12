@@ -67,7 +67,7 @@ namespace Spatial4n.Core.Distance
                 Assert.True(Dc().Distance(pCtr, pTgt) < d);
                 //since the pairwise distance is less than d, a bounding box from ctr with d should contain pTgt.
                 IRectangle r = Dc().CalcBoxByDistFromPt(pCtr, d, ctx, null);
-                Assert.Equal(SpatialRelation.CONTAINS, r.Relate(pTgt));
+                Assert.Equal(SpatialRelation.Contains, r.Relate(pTgt));
                 CheckBBox(pCtr, d);
             }
 

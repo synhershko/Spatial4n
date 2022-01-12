@@ -81,11 +81,11 @@ namespace Spatial4n.Core.Shape
 
             //test some relateXRange
             //    opposite +/- 180
-            Assert.Equal(SpatialRelation.INTERSECTS, ctx.MakeRectangle(170, 180, 0, 0).RelateXRange(-180, -170));
-            Assert.Equal(SpatialRelation.INTERSECTS, ctx.MakeRectangle(-90, -45, 0, 0).RelateXRange(-45, -135));
-            Assert.Equal(SpatialRelation.CONTAINS, ctx.WorldBounds.RelateXRange(-90, -135));
+            Assert.Equal(SpatialRelation.Intersects, ctx.MakeRectangle(170, 180, 0, 0).RelateXRange(-180, -170));
+            Assert.Equal(SpatialRelation.Intersects, ctx.MakeRectangle(-90, -45, 0, 0).RelateXRange(-45, -135));
+            Assert.Equal(SpatialRelation.Contains, ctx.WorldBounds.RelateXRange(-90, -135));
             //point on edge at dateline using opposite +/- 180
-            Assert.Equal(SpatialRelation.CONTAINS, ctx.MakeRectangle(170, 180, 0, 0).Relate(ctx.MakePoint(-180, 0)));
+            Assert.Equal(SpatialRelation.Contains, ctx.MakeRectangle(170, 180, 0, 0).Relate(ctx.MakePoint(-180, 0)));
 
             //test 180 becomes -180 for non-zero width rectangle
             Assert.Equal(ctx.MakeRectangle(-180, -170, 0, 0), ctx.MakeRectangle(180, -170, 0, 0));
@@ -118,7 +118,7 @@ namespace Spatial4n.Core.Shape
                 IRectangle r = RandomRectangle(1);
                 int buf = random.Next(0, 90 + 1);
                 IRectangle br = (IRectangle)r.GetBuffered(buf, ctx);
-                AssertRelation(null, SpatialRelation.CONTAINS, br, r);
+                AssertRelation(null, SpatialRelation.Contains, br, r);
                 if (r.Width + 2 * buf >= 360)
                     CustomAssert.EqualWithDelta(360, br.Width, 0.0);
                 else
@@ -166,50 +166,50 @@ namespace Spatial4n.Core.Shape
             //    assertEquals("dist != xy space", INTERSECTS, c.relate(r, ctx));//once failed here
             //}
 
-            AssertEquals("bad proportion logic", SpatialRelation.INTERSECTS, ctx.MakeCircle(64, -70, 18).Relate(ctx.MakeRectangle(46, 116, -86, -62)));
+            AssertEquals("bad proportion logic", SpatialRelation.Intersects, ctx.MakeCircle(64, -70, 18).Relate(ctx.MakeRectangle(46, 116, -86, -62)));
 
-            AssertEquals("Both touch pole", SpatialRelation.INTERSECTS, ctx.MakeCircle(-90, 30, 60).Relate(ctx.MakeRectangle(-24, -16, 14, 90)));
+            AssertEquals("Both touch pole", SpatialRelation.Intersects, ctx.MakeCircle(-90, 30, 60).Relate(ctx.MakeRectangle(-24, -16, 14, 90)));
 
-            AssertEquals("Spherical cap should contain enclosed band", SpatialRelation.CONTAINS,
+            AssertEquals("Spherical cap should contain enclosed band", SpatialRelation.Contains,
                 ctx.MakeCircle(0, -90, 30).Relate(ctx.MakeRectangle(-180, 180, -90, -80)));
 
-            AssertEquals("touches pole", SpatialRelation.INTERSECTS, ctx.MakeCircle(0, -88, 2).Relate(ctx.MakeRectangle(40, 60, -90, -86)));
+            AssertEquals("touches pole", SpatialRelation.Intersects, ctx.MakeCircle(0, -88, 2).Relate(ctx.MakeRectangle(40, 60, -90, -86)));
 
-            AssertEquals("wrong farthest opp corner", SpatialRelation.INTERSECTS, ctx.MakeCircle(92, 36, 46).Relate(ctx.MakeRectangle(134, 136, 32, 80)));
+            AssertEquals("wrong farthest opp corner", SpatialRelation.Intersects, ctx.MakeCircle(92, 36, 46).Relate(ctx.MakeRectangle(134, 136, 32, 80)));
 
-            AssertEquals("edge rounding issue 2", SpatialRelation.INTERSECTS, ctx.MakeCircle(84, -40, 136).Relate(ctx.MakeRectangle(-150, -80, 34, 84)));
+            AssertEquals("edge rounding issue 2", SpatialRelation.Intersects, ctx.MakeCircle(84, -40, 136).Relate(ctx.MakeRectangle(-150, -80, 34, 84)));
 
-            AssertEquals("edge rounding issue", SpatialRelation.CONTAINS, ctx.MakeCircle(0, 66, 156).Relate(ctx.MakePoint(0, -90)));
+            AssertEquals("edge rounding issue", SpatialRelation.Contains, ctx.MakeCircle(0, 66, 156).Relate(ctx.MakePoint(0, -90)));
 
-            AssertEquals("nudge back circle", SpatialRelation.CONTAINS, ctx.MakeCircle(-150, -90, 122).Relate(ctx.MakeRectangle(0, -132, 32, 32)));
+            AssertEquals("nudge back circle", SpatialRelation.Contains, ctx.MakeCircle(-150, -90, 122).Relate(ctx.MakeRectangle(0, -132, 32, 32)));
 
-            AssertEquals("wrong estimate", SpatialRelation.DISJOINT, ctx.MakeCircle(-166, 59, KmToDeg(5226.2)).Relate(ctx.MakeRectangle(36, 66, 23, 23)));
+            AssertEquals("wrong estimate", SpatialRelation.Disjoint, ctx.MakeCircle(-166, 59, KmToDeg(5226.2)).Relate(ctx.MakeRectangle(36, 66, 23, 23)));
 
-            AssertEquals("bad CONTAINS (dateline)", SpatialRelation.INTERSECTS, ctx.MakeCircle(56, -50, KmToDeg(12231.5)).Relate(ctx.MakeRectangle(108, 26, 39, 48)));
+            AssertEquals("bad CONTAINS (dateline)", SpatialRelation.Intersects, ctx.MakeCircle(56, -50, KmToDeg(12231.5)).Relate(ctx.MakeRectangle(108, 26, 39, 48)));
 
-            AssertEquals("bad CONTAINS (backwrap2)", SpatialRelation.INTERSECTS,
+            AssertEquals("bad CONTAINS (backwrap2)", SpatialRelation.Intersects,
                 ctx.MakeCircle(112, -3, 91).Relate(ctx.MakeRectangle(-163, 29, -38, 10)));
 
-            AssertEquals("bad CONTAINS (r x-wrap)", SpatialRelation.INTERSECTS,
+            AssertEquals("bad CONTAINS (r x-wrap)", SpatialRelation.Intersects,
                 ctx.MakeCircle(-139, 47, 80).Relate(ctx.MakeRectangle(-180, 180, -3, 12)));
 
-            AssertEquals("bad CONTAINS (pwrap)", SpatialRelation.INTERSECTS,
+            AssertEquals("bad CONTAINS (pwrap)", SpatialRelation.Intersects,
                 ctx.MakeCircle(-139, 47, 80).Relate(ctx.MakeRectangle(-180, 179, -3, 12)));
 
-            AssertEquals("no-dist 1", SpatialRelation.WITHIN,
+            AssertEquals("no-dist 1", SpatialRelation.Within,
                 ctx.MakeCircle(135, 21, 0).Relate(ctx.MakeRectangle(-103, -154, -47, 52)));
 
-            AssertEquals("bbox <= >= -90 bug", SpatialRelation.CONTAINS,
+            AssertEquals("bbox <= >= -90 bug", SpatialRelation.Contains,
                 ctx.MakeCircle(-64, -84, 124).Relate(ctx.MakeRectangle(-96, 96, -10, -10)));
 
             //The horizontal axis line of a geo circle doesn't necessarily pass through c's ctr.
-            AssertEquals("c's horiz axis doesn't pass through ctr", SpatialRelation.INTERSECTS,
+            AssertEquals("c's horiz axis doesn't pass through ctr", SpatialRelation.Intersects,
                 ctx.MakeCircle(71, -44, 40).Relate(ctx.MakeRectangle(15, 27, -62, -34)));
 
-            AssertEquals("pole boundary", SpatialRelation.INTERSECTS,
+            AssertEquals("pole boundary", SpatialRelation.Intersects,
                 ctx.MakeCircle(-100, -12, 102).Relate(ctx.MakeRectangle(143, 175, 4, 32)));
 
-            AssertEquals("full circle assert", SpatialRelation.CONTAINS,
+            AssertEquals("full circle assert", SpatialRelation.Contains,
                 ctx.MakeCircle(-64, 32, 180).Relate(ctx.MakeRectangle(47, 47, -14, 90)));
 
             //--Now proceed with systematic testing:

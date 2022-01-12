@@ -185,7 +185,7 @@ namespace Spatial4n.Core.Shapes.Impl
         public virtual SpatialRelation Relate(IShape other)
         {
             if (other is IPoint)
-                return Contains((IPoint)other) ? SpatialRelation.CONTAINS : SpatialRelation.DISJOINT;
+                return Contains((IPoint)other) ? SpatialRelation.Contains : SpatialRelation.Disjoint;
             if (other is IRectangle)
                 return Relate((IRectangle)other);
             throw new NotSupportedException();
@@ -195,21 +195,21 @@ namespace Spatial4n.Core.Shapes.Impl
         {
             //Check BBox for disjoint & within.
             SpatialRelation bboxR = bbox.Relate(r);
-            if (bboxR == SpatialRelation.DISJOINT || bboxR == SpatialRelation.WITHIN)
+            if (bboxR == SpatialRelation.Disjoint || bboxR == SpatialRelation.Within)
                 return bboxR;
             //Either CONTAINS, INTERSECTS, or DISJOINT
 
             IPoint scratch = new Point(0, 0, null);
             IPoint prC = r.Center;
             SpatialRelation result = linePrimary.Relate(r, prC, scratch);
-            if (result == SpatialRelation.DISJOINT)
-                return SpatialRelation.DISJOINT;
+            if (result == SpatialRelation.Disjoint)
+                return SpatialRelation.Disjoint;
             SpatialRelation resultOpp = linePerp.Relate(r, prC, scratch);
-            if (resultOpp == SpatialRelation.DISJOINT)
-                return SpatialRelation.DISJOINT;
+            if (resultOpp == SpatialRelation.Disjoint)
+                return SpatialRelation.Disjoint;
             if (result == resultOpp)//either CONTAINS or INTERSECTS
                 return result;
-            return SpatialRelation.INTERSECTS;
+            return SpatialRelation.Intersects;
         }
 
         public virtual bool Contains(IPoint p)

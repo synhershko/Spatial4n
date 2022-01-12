@@ -78,7 +78,7 @@ namespace Spatial4n.Core.Shape
             IPoint center = r.Center;
             msg += " ctr:" + center;
             //System.out.println(msg);
-            AssertRelation(msg, SpatialRelation.CONTAINS, r, center);
+            AssertRelation(msg, SpatialRelation.Contains, r, center);
 
             IDistanceCalculator dc = ctx.DistCalc;
             double dUR = dc.Distance(center, r.MaxX, r.MaxY);
@@ -113,10 +113,10 @@ namespace Spatial4n.Core.Shape
                         for (double right2 = left2; right2 <= right; right2 += INCR)
                         {
                             IRectangle r2 = MakeNormRect(left2, right2, -Y, Y);
-                            AssertRelation(null, SpatialRelation.CONTAINS, r, r2);
+                            AssertRelation(null, SpatialRelation.Contains, r, r2);
 
                             //test point contains
-                            AssertRelation(null, SpatialRelation.CONTAINS, r, r2.Center);
+                            AssertRelation(null, SpatialRelation.Contains, r, r2.Center);
                         }
                     }
 
@@ -124,13 +124,13 @@ namespace Spatial4n.Core.Shape
                     for (double left2 = right + INCR; left2 - left < 360; left2 += INCR)
                     {
                         //test point disjoint
-                        AssertRelation(null, SpatialRelation.DISJOINT, r, ctx.MakePoint(
+                        AssertRelation(null, SpatialRelation.Disjoint, r, ctx.MakePoint(
                             NormX(left2), random.Next(-90, 90)));
 
                         for (double right2 = left2; right2 - left < 360; right2 += INCR)
                         {
                             IRectangle r2 = MakeNormRect(left2, right2, -Y, Y);
-                            AssertRelation(null, SpatialRelation.DISJOINT, r, r2);
+                            AssertRelation(null, SpatialRelation.Disjoint, r, r2);
                         }
                     }
                     //test intersect
@@ -139,7 +139,7 @@ namespace Spatial4n.Core.Shape
                         for (double right2 = right + INCR; right2 - left < 360; right2 += INCR)
                         {
                             IRectangle r2 = MakeNormRect(left2, right2, -Y, Y);
-                            AssertRelation(null, SpatialRelation.INTERSECTS, r, r2);
+                            AssertRelation(null, SpatialRelation.Intersects, r, r2);
                         }
                     }
 
@@ -167,8 +167,8 @@ namespace Spatial4n.Core.Shape
                 AssertEqualsRatio(msg, bbox.Height, dist * 2);
                 AssertEqualsRatio(msg, bbox.Width, dist * 2);
             }
-            AssertRelation(msg, SpatialRelation.CONTAINS, c, c.Center);
-            AssertRelation(msg, SpatialRelation.CONTAINS, bbox, c);
+            AssertRelation(msg, SpatialRelation.Contains, c, c.Center);
+            AssertRelation(msg, SpatialRelation.Contains, bbox, c);
         }
 
         private class RectIntersectionAnonymousHelper : RectIntersectionTestHelper
@@ -247,10 +247,10 @@ namespace Spatial4n.Core.Shape
             Assert.True(emptyRect.IsEmpty);
             AssertEquals(emptyRect, emptyShape.BoundingBox);
             AssertEquals(emptyPt, emptyShape.Center);
-            AssertRelation("EMPTY", SpatialRelation.DISJOINT, emptyShape, emptyPt);
-            AssertRelation("EMPTY", SpatialRelation.DISJOINT, emptyShape, RandomPoint());
-            AssertRelation("EMPTY", SpatialRelation.DISJOINT, emptyShape, emptyRect);
-            AssertRelation("EMPTY", SpatialRelation.DISJOINT, emptyShape, RandomRectangle(10));
+            AssertRelation("EMPTY", SpatialRelation.Disjoint, emptyShape, emptyPt);
+            AssertRelation("EMPTY", SpatialRelation.Disjoint, emptyShape, RandomPoint());
+            AssertRelation("EMPTY", SpatialRelation.Disjoint, emptyShape, emptyRect);
+            AssertRelation("EMPTY", SpatialRelation.Disjoint, emptyShape, RandomRectangle(10));
             Assert.True(emptyShape.GetBuffered(random.Next(4 + 1), ctx).IsEmpty);
         }
     }

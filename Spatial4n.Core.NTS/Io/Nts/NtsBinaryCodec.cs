@@ -31,7 +31,7 @@ namespace Spatial4n.Core.IO.Nts
     public class NtsBinaryCodec : BinaryCodec
     {
         protected readonly bool useFloat;//instead of double
-        private const int wkbXDR = 0;
+        //private const int wkbXDR = 0; // Spatial4n: Unused
         public NtsBinaryCodec(NtsSpatialContext ctx, NtsSpatialContextFactory factory)
             : base(ctx, factory)
         {
@@ -59,21 +59,21 @@ namespace Spatial4n.Core.IO.Nts
             ShapeType type = base.TypeForShape(s);
             if (type == 0)
             {
-                type = ShapeType.TYPE_GEOM;//handles everything
+                type = ShapeType.Geometry;//handles everything
             }
             return type;
         }
 
         protected override IShape? ReadShapeByTypeIfSupported(BinaryReader dataInput, ShapeType type)
         {
-            if (type != ShapeType.TYPE_GEOM)
+            if (type != ShapeType.Geometry)
                 return base.ReadShapeByTypeIfSupported(dataInput, type);
             return ReadNtsGeom(dataInput);
         }
 
         protected override bool WriteShapeByTypeIfSupported(BinaryWriter dataOutput, IShape s, ShapeType type)
         {
-            if (type != ShapeType.TYPE_GEOM)
+            if (type != ShapeType.Geometry)
                 return base.WriteShapeByTypeIfSupported(dataOutput, s, type);
             WriteNtsGeom(dataOutput, s);
             return true;

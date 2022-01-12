@@ -329,7 +329,7 @@ namespace Spatial4n.Core.Shapes
 
         #region Added for .NET support of the IShape interface
 
-        public virtual bool IsEmpty => !m_shapes.Any();
+        public virtual bool IsEmpty => m_shapes.Count == 0;
 
         #endregion
     }

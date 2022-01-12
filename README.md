@@ -20,7 +20,7 @@ The main part of Spatial4n is its collection of shapes.  Shapes in Spatial4n hav
 * Compute its lat-lon bounding box.
 * Compute an area.  For some shapes its more of an estimate.
 * Compute if it contains a provided point.
-* Compute the relationship to a lat-lon rectangle. Relationships are: `CONTAINS`, `WITHIN`, `DISJOINT`, `INTERSECTS`.  Note that Spatial4n doesn't have a notion of "touching".
+* Compute the relationship to a lat-lon rectangle. Relationships are: `Contains`, `Within`, `Disjoint`, `Intersects`.  Note that Spatial4n doesn't have a notion of "touching".
 
 Spatial4n has a variety of shapes that operate in Euclidean-space -- i.e. a flat 2D plane.  Most shapes are augmented to support a wrap-around at `X` -180/+180 for compatibility with latitude & longitudes, which is effectively a cylindrical model.  But the real bonus is its circle (i.e. point-radius shape that can operate on a surface-of-a-sphere model.  See below for further info.  The term "geodetic" or "geodesic" or "geo" is used here as synonymous with that model but technically those words have a more broad meaning.
 

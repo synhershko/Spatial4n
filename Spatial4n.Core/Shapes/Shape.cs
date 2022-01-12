@@ -35,17 +35,17 @@ namespace Spatial4n.Core.Shapes
         /// <summary>
         /// Describe the relationship between the two objects.  For example
         /// <list type="bullet">
-        ///   <item>this is <see cref="SpatialRelation.WITHIN"/> other</item>
-        ///   <item>this <see cref="SpatialRelation.CONTAINS"/> other</item>
-        ///   <item>this is <see cref="SpatialRelation.DISJOINT"/> other</item>
-        ///   <item>this <see cref="SpatialRelation.INTERSECTS"/> other</item>
+        ///   <item>this is <see cref="SpatialRelation.Within"/> other</item>
+        ///   <item>this <see cref="SpatialRelation.Contains"/> other</item>
+        ///   <item>this is <see cref="SpatialRelation.Disjoint"/> other</item>
+        ///   <item>this <see cref="SpatialRelation.Intersects"/> other</item>
         /// </list>
-        /// Note that a <see cref="IShape"/> implementation may choose to return <see cref="SpatialRelation.INTERSECTS"/> when the
-        /// true answer is <see cref="SpatialRelation.WITHIN"/> or <see cref="SpatialRelation.CONTAINS"/> for performance reasons. If a shape does
+        /// Note that a <see cref="IShape"/> implementation may choose to return <see cref="SpatialRelation.Intersects"/> when the
+        /// true answer is <see cref="SpatialRelation.Within"/> or <see cref="SpatialRelation.Contains"/> for performance reasons. If a shape does
         /// this then it <i>must</i> document when it does.  Ideally the shape will not
         /// do this approximation in all circumstances, just sometimes.
         /// <p />
-        /// If the shapes are equal then the result is <see cref="SpatialRelation.CONTAINS"/> (preferred) or <see cref="SpatialRelation.WITHIN"/>.
+        /// If the shapes are equal then the result is <see cref="SpatialRelation.Contains"/> (preferred) or <see cref="SpatialRelation.Within"/>.
         /// </summary>
         SpatialRelation Relate(IShape other);
 
@@ -53,7 +53,7 @@ namespace Spatial4n.Core.Shapes
         /// Get the bounding box for this <see cref="IShape"/>. This means the shape is within the
         /// bounding box and that it touches each side of the rectangle.
         /// <p/>
-        /// Postcondition: <c>this.BoundingBox.Relate(this) == SpatialRelation.CONTAINS</c>
+        /// Postcondition: <c>this.BoundingBox.Relate(this) == SpatialRelation.Contains</c>
         /// </summary>
         IRectangle BoundingBox { get; }
 
@@ -77,7 +77,7 @@ namespace Spatial4n.Core.Shapes
         /// Returns the center point of this shape. This is usually the same as
         /// <c>BoundingBox.Center</c> but it doesn't have to be.
         /// <para/>
-        /// Postcondition: <c>this.Relate(this.Center) == SpatialContext.CONTAINS</c>
+        /// Postcondition: <c>this.Relate(this.Center) == SpatialContext.Contains</c>
         /// </summary>
         IPoint Center { get; }
 

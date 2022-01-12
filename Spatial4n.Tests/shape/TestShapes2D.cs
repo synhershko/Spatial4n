@@ -76,10 +76,10 @@ namespace Spatial4n.Core.Shape
             Assert.True(pt.Equals(center));
             //Assert.Equal(/*msg,*/ pt, center);
 
-            AssertRelation(msg, SpatialRelation.CONTAINS, pt, pt2);
-            AssertRelation(msg, SpatialRelation.DISJOINT, pt, ctx.MakePoint(0, 1));
-            AssertRelation(msg, SpatialRelation.DISJOINT, pt, ctx.MakePoint(1, 0));
-            AssertRelation(msg, SpatialRelation.DISJOINT, pt, ctx.MakePoint(1, 1));
+            AssertRelation(msg, SpatialRelation.Contains, pt, pt2);
+            AssertRelation(msg, SpatialRelation.Disjoint, pt, ctx.MakePoint(0, 1));
+            AssertRelation(msg, SpatialRelation.Disjoint, pt, ctx.MakePoint(1, 0));
+            AssertRelation(msg, SpatialRelation.Disjoint, pt, ctx.MakePoint(1, 1));
 
             pt.Reset(1, 2);
             Assert.Equal(ctx.MakePoint(1, 2), pt);
@@ -149,7 +149,7 @@ namespace Spatial4n.Core.Shape
             //INTERSECTION:
             //Start with some static tests that have shown to cause failures at some point:
             Assert.Equal( /*"getX not getY",*/
-                SpatialRelation.INTERSECTS,
+                SpatialRelation.Intersects,
                 ctx.MakeCircle(107, -81, 147).Relate(ctx.MakeRectangle(92, 121, -89, 74)));
 
             TestCircleIntersect();

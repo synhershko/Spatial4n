@@ -70,25 +70,25 @@ namespace Spatial4n.Core.Shape
                 {
                     switch (ic)
                     {
-                        case SpatialRelation.CONTAINS:
+                        case SpatialRelation.Contains:
                             i_C++;
                             for (int j = 0; j < AtLeast(10); j++)
                             {
                                 Core.Shapes.IPoint p = RandomPointIn(r);
-                                AssertRelation(null, SpatialRelation.CONTAINS, s, p);
+                                AssertRelation(null, SpatialRelation.Contains, s, p);
                             }
                             break;
 
-                        case SpatialRelation.WITHIN:
+                        case SpatialRelation.Within:
                             i_W++;
                             for (int j = 0; j < AtLeast(10); j++)
                             {
                                 Core.Shapes.IPoint p = RandomPointIn(s);
-                                AssertRelation(null, SpatialRelation.CONTAINS, r, p);
+                                AssertRelation(null, SpatialRelation.Contains, r, p);
                             }
                             break;
 
-                        case SpatialRelation.DISJOINT:
+                        case SpatialRelation.Disjoint:
                             if (!s.BoundingBox.Relate(r).Intersects())
                             {//bboxes are disjoint
                                 i_bboxD++;
@@ -102,11 +102,11 @@ namespace Spatial4n.Core.Shape
                             for (int j = 0; j < AtLeast(10); j++)
                             {
                                 Core.Shapes.IPoint p = RandomPointIn(r);
-                                AssertRelation(null, SpatialRelation.DISJOINT, s, p);
+                                AssertRelation(null, SpatialRelation.Disjoint, s, p);
                             }
                             break;
 
-                        case SpatialRelation.INTERSECTS:
+                        case SpatialRelation.Intersects:
                             i_I++;
                             SpatialRelation? pointR = null;//set once
                             IRectangle randomPointSpace = null;
@@ -123,7 +123,7 @@ namespace Spatial4n.Core.Shape
                                 {
                                     if (randomPointSpace == null)
                                     {
-                                        if (pointR == SpatialRelation.DISJOINT)
+                                        if (pointR == SpatialRelation.Disjoint)
                                         {
                                             randomPointSpace = IntersectRects(r, s.BoundingBox);
                                         }

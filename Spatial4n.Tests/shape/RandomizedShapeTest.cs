@@ -214,7 +214,7 @@ namespace Spatial4n.Core.Shape
             if (sect == expected)
                 return;
             msg = ((msg == null) ? "" : msg + "\r") + a + " intersect " + b;
-            if (expected == SpatialRelation.WITHIN || expected == SpatialRelation.CONTAINS)
+            if (expected == SpatialRelation.Within || expected == SpatialRelation.Contains)
             {
                 if (a.GetType().Equals(b.GetType())) // they are the same shape type
                     Assert.Equal(/*msg,*/ a, b);
@@ -328,7 +328,7 @@ namespace Spatial4n.Core.Shape
             double d = c.Radius * random.NextDouble();
             double angleDEG = 360 * random.NextDouble();
             IPoint p = ctx.DistCalc.PointOnBearing(c.Center, d, angleDEG, ctx, null);
-            Assert.Equal(SpatialRelation.CONTAINS, c.Relate(p));
+            Assert.Equal(SpatialRelation.Contains, c.Relate(p));
             return p;
         }
 
@@ -339,7 +339,7 @@ namespace Spatial4n.Core.Shape
             x = NormX(x);
             y = NormY(y);
             IPoint p = ctx.MakePoint(x, y);
-            Assert.Equal(SpatialRelation.CONTAINS, r.Relate(p));
+            Assert.Equal(SpatialRelation.Contains, r.Relate(p));
             return p;
         }
 

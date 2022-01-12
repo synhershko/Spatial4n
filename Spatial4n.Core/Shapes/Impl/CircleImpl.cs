@@ -97,7 +97,7 @@ namespace Spatial4n.Core.Shapes.Impl
         {
             //This shortcut was problematic in testing due to distinctions of CONTAINS/WITHIN for no-area shapes (lines, points).
             //    if (distance == 0) {
-            //      return point.relate(other,ctx).intersects() ? SpatialRelation.WITHIN : SpatialRelation.DISJOINT;
+            //      return point.relate(other,ctx).intersects() ? SpatialRelation.Within : SpatialRelation.Disjoint;
             //    }
 
             var other1 = other as IPoint;
@@ -121,7 +121,7 @@ namespace Spatial4n.Core.Shapes.Impl
 
         public virtual SpatialRelation Relate(IPoint point)
         {
-            return Contains(point.X, point.Y) ? SpatialRelation.CONTAINS : SpatialRelation.DISJOINT;
+            return Contains(point.X, point.Y) ? SpatialRelation.Contains : SpatialRelation.Disjoint;
         }
 
         public virtual SpatialRelation Relate(IRectangle r)
@@ -130,10 +130,10 @@ namespace Spatial4n.Core.Shapes.Impl
 
             //--We start by leveraging the fact we have a calculated bbox that is "cheaper" than use of DistanceCalculator.
             SpatialRelation bboxSect = enclosingBox.Relate(r);
-            if (bboxSect == SpatialRelation.DISJOINT || bboxSect == SpatialRelation.WITHIN)
+            if (bboxSect == SpatialRelation.Disjoint || bboxSect == SpatialRelation.Within)
                 return bboxSect;
-            if (bboxSect == SpatialRelation.CONTAINS && enclosingBox.Equals(r)) //nasty identity edge-case
-                return SpatialRelation.WITHIN;
+            if (bboxSect == SpatialRelation.Contains && enclosingBox.Equals(r)) //nasty identity edge-case
+                return SpatialRelation.Within;
             //bboxSect is INTERSECTS or CONTAINS
             //The result can be DISJOINT, CONTAINS, or INTERSECTS (not WITHIN)
 
@@ -143,9 +143,9 @@ namespace Spatial4n.Core.Shapes.Impl
         protected virtual SpatialRelation RelateRectanglePhase2(IRectangle r, SpatialRelation bboxSect)
         {
             /*
-			 !! DOES NOT WORK WITH GEO CROSSING DATELINE OR WORLD-WRAP.
-			 TODO upgrade to handle crossing dateline, but not world-wrap; use some x-shifting code from RectangleImpl.
-			 */
+             !! DOES NOT WORK WITH GEO CROSSING DATELINE OR WORLD-WRAP.
+             TODO upgrade to handle crossing dateline, but not world-wrap; use some x-shifting code from RectangleImpl.
+             */
 
             //At this point, the only thing we are certain of is that circle is *NOT* WITHIN r, since the bounding box of a
             // circle MUST be within r for the circle to be within r.
@@ -192,20 +192,20 @@ namespace Spatial4n.Core.Shapes.Impl
             if (xAxis != closestX && yAxis != closestY)
             {
                 if (!Contains(closestX, closestY))
-                    return SpatialRelation.DISJOINT;
+                    return SpatialRelation.Disjoint;
             } // else CAN'T be disjoint if spans axis because earlier bbox check ruled that out
 
             //Now, we know it's *NOT* DISJOINT and it's *NOT* WITHIN either.
             // Does circle CONTAINS r or simply intersect it?
 
             //If circle contains r, then its bbox MUST also CONTAIN r.
-            if (bboxSect != SpatialRelation.CONTAINS)
-                return SpatialRelation.INTERSECTS;
+            if (bboxSect != SpatialRelation.Contains)
+                return SpatialRelation.Intersects;
 
             //If the farthest point of r away from the center of the circle is contained, then all of r is
             // contained.
             if (!Contains(farthestX, farthestY))
-                return SpatialRelation.INTERSECTS;
+                return SpatialRelation.Intersects;
 
             //geodetic detection of farthest Y when rect crosses x axis can't be reliably determined, so
             // check other corner too, which might actually be farthest
@@ -215,11 +215,11 @@ namespace Spatial4n.Core.Shapes.Impl
                 {//r crosses north to south over x axis (confusing)
                     double otherY = (farthestY == r.MaxY ? r.MinY : r.MaxY);
                     if (!Contains(farthestX, otherY))
-                        return SpatialRelation.INTERSECTS;
+                        return SpatialRelation.Intersects;
                 }
             }
 
-            return SpatialRelation.CONTAINS;
+            return SpatialRelation.Contains;
         }
 
         /// <summary>
@@ -237,13 +237,13 @@ namespace Spatial4n.Core.Shapes.Impl
             double crossDist = ctx.DistCalc.Distance(point, circle.Center);
             double aDist = radiusDEG, bDist = circle.Radius;
             if (crossDist > aDist + bDist)
-                return SpatialRelation.DISJOINT;
+                return SpatialRelation.Disjoint;
             if (crossDist < aDist && crossDist + bDist <= aDist)
-                return SpatialRelation.CONTAINS;
+                return SpatialRelation.Contains;
             if (crossDist < bDist && crossDist + aDist <= bDist)
-                return SpatialRelation.WITHIN;
+                return SpatialRelation.Within;
 
-            return SpatialRelation.INTERSECTS;
+            return SpatialRelation.Intersects;
         }
 
         public override string ToString()

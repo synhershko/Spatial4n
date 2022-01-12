@@ -70,9 +70,9 @@ namespace Spatial4n.Core.Shapes.Nts
         {
             // ** NOTE ** the overall order of logic is kept consistent here with simple.PointImpl.
             if (IsEmpty || other.IsEmpty)
-                return SpatialRelation.DISJOINT;
+                return SpatialRelation.Disjoint;
             if (other is Spatial4n.Core.Shapes.IPoint)
-                return this.Equals(other) ? SpatialRelation.INTERSECTS : SpatialRelation.DISJOINT;
+                return this.Equals(other) ? SpatialRelation.Intersects : SpatialRelation.Disjoint;
             return other.Relate(this).Transpose();
         }
 

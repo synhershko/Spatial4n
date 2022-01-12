@@ -132,7 +132,7 @@ namespace Spatial4n.Core.Shapes
         public virtual SpatialRelation Relate(IShape other)
         {
             SpatialRelation bboxSect = m_bbox.Relate(other);
-            if (bboxSect == SpatialRelation.DISJOINT || bboxSect == SpatialRelation.WITHIN)
+            if (bboxSect == SpatialRelation.Disjoint || bboxSect == SpatialRelation.Within)
                 return bboxSect;
 
             bool containsWillShortCircuit = (other is IPoint) ||
@@ -152,20 +152,20 @@ namespace Spatial4n.Core.Shapes
                     sect = sect.Value.Combine(nextSect);
                 }
 
-                if (sect == SpatialRelation.INTERSECTS)
-                    return SpatialRelation.INTERSECTS;
+                if (sect == SpatialRelation.Intersects)
+                    return SpatialRelation.Intersects;
 
-                if (sect == SpatialRelation.CONTAINS && containsWillShortCircuit)
-                    return SpatialRelation.CONTAINS;
+                if (sect == SpatialRelation.Contains && containsWillShortCircuit)
+                    return SpatialRelation.Contains;
             }
             return sect.GetValueOrDefault(); // TODO: What to return if null??
         }
 
         /// <summary>
         /// Called by <see cref="Relate(IShape)"/> to determine whether to return early if it finds
-        /// <see cref="SpatialRelation.CONTAINS"/>, instead of checking the remaining shapes. It will do so without
+        /// <see cref="SpatialRelation.Contains"/>, instead of checking the remaining shapes. It will do so without
         /// calling this method if the "other" shape is a Point.  If a remaining shape
-        /// finds <see cref="SpatialRelation.INTERSECTS"/>, then <see cref="SpatialRelation.INTERSECTS"/> will be returned.  The only problem with
+        /// finds <see cref="SpatialRelation.Intersects"/>, then <see cref="SpatialRelation.Intersects"/> will be returned.  The only problem with
         /// this returning true is that if some of the shapes overlap, it's possible
         /// that the result of <see cref="Relate(IShape)"/> could be dependent on the order of the shapes,
         /// which could be unexpected / wrong depending on the application. The default

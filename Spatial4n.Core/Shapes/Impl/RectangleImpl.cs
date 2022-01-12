@@ -159,7 +159,7 @@ namespace Spatial4n.Core.Shapes.Impl
         public virtual SpatialRelation Relate(IShape other)
         {
             if (IsEmpty || other.IsEmpty)
-                return SpatialRelation.DISJOINT;
+                return SpatialRelation.Disjoint;
             var point = other as IPoint;
             if (point != null)
             {
@@ -176,7 +176,7 @@ namespace Spatial4n.Core.Shapes.Impl
         public virtual SpatialRelation Relate(IPoint point)
         {
             if (point.Y > MaxY || point.Y < MinY)
-                return SpatialRelation.DISJOINT;
+                return SpatialRelation.Disjoint;
             //  all the below logic is rather unfortunate but some dateline cases demand it
             double minX = this.minX;
             double maxX = this.maxX;
@@ -200,23 +200,23 @@ namespace Spatial4n.Core.Shapes.Impl
                 }
                 else
                 {
-                    return SpatialRelation.CONTAINS; //short-circuit
+                    return SpatialRelation.Contains; //short-circuit
                 }
             }
             if (pX < minX || pX > maxX)
-                return SpatialRelation.DISJOINT;
-            return SpatialRelation.CONTAINS;
+                return SpatialRelation.Disjoint;
+            return SpatialRelation.Contains;
         }
 
         public virtual SpatialRelation Relate(IRectangle rect)
         {
             SpatialRelation yIntersect = RelateYRange(rect.MinY, rect.MaxY);
-            if (yIntersect == SpatialRelation.DISJOINT)
-                return SpatialRelation.DISJOINT;
+            if (yIntersect == SpatialRelation.Disjoint)
+                return SpatialRelation.Disjoint;
 
             SpatialRelation xIntersect = RelateXRange(rect.MinX, rect.MaxX);
-            if (xIntersect == SpatialRelation.DISJOINT)
-                return SpatialRelation.DISJOINT;
+            if (xIntersect == SpatialRelation.Disjoint)
+                return SpatialRelation.Disjoint;
 
             if (xIntersect == yIntersect)//in agreement
                 return xIntersect;
@@ -227,7 +227,7 @@ namespace Spatial4n.Core.Shapes.Impl
             if (MinY == rect.MinY && MaxY == rect.MaxY)
                 return xIntersect;
 
-            return SpatialRelation.INTERSECTS;
+            return SpatialRelation.Intersects;
         }
 
         //TODO might this utility move to SpatialRelation ?
@@ -235,20 +235,20 @@ namespace Spatial4n.Core.Shapes.Impl
         {
             if (ext_min > int_max || ext_max < int_min)
             {
-                return SpatialRelation.DISJOINT;
+                return SpatialRelation.Disjoint;
             }
 
             if (ext_min >= int_min && ext_max <= int_max)
             {
-                return SpatialRelation.CONTAINS;
+                return SpatialRelation.Contains;
             }
 
             if (ext_min <= int_min && ext_max >= int_max)
             {
-                return SpatialRelation.WITHIN;
+                return SpatialRelation.Within;
             }
 
-            return SpatialRelation.INTERSECTS;
+            return SpatialRelation.Intersects;
         }
 
         public virtual SpatialRelation RelateYRange(double ext_minY, double ext_maxY)
@@ -266,7 +266,7 @@ namespace Spatial4n.Core.Shapes.Impl
                 //unwrap dateline, plus do world-wrap short circuit
                 double rawWidth = maxX - minX;
                 if (rawWidth == 360)
-                    return SpatialRelation.CONTAINS;
+                    return SpatialRelation.Contains;
                 if (rawWidth < 0)
                 {
                     maxX = minX + (rawWidth + 360);
@@ -274,7 +274,7 @@ namespace Spatial4n.Core.Shapes.Impl
 
                 double ext_rawWidth = ext_maxX - ext_minX;
                 if (ext_rawWidth == 360)
-                    return SpatialRelation.WITHIN;
+                    return SpatialRelation.Within;
                 if (ext_rawWidth < 0)
                 {
                     ext_maxX = ext_minX + (ext_rawWidth + 360);

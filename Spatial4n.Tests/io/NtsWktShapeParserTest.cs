@@ -204,7 +204,7 @@ namespace Spatial4n.Core.IO
             IShape cvxHull = ctx.ReadShapeFromWkt(wkt);
             Assert.True(cvxHull.GetArea(ctx) > 0);
 
-            Assert.Equal(SpatialRelation.CONTAINS, cvxHull.Relate(buffer0));
+            Assert.Equal(SpatialRelation.Contains, cvxHull.Relate(buffer0));
 
             factory = new NtsSpatialContextFactory();
             factory.validationRule = ValidationRule.None;

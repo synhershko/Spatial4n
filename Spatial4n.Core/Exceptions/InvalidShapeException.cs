@@ -28,7 +28,7 @@ namespace Spatial4n.Core.Exceptions
     /// parsing exceptions; that's usually <see cref="ParseException"/>.
     /// </summary>
 #if FEATURE_SERIALIZABLE
-	[Serializable]
+    [Serializable]
 #endif
     public class InvalidShapeException : RuntimeException
     {

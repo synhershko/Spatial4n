@@ -11,7 +11,7 @@ namespace Spatial4n.Core.Exceptions
     /// <see cref="Exception"/>.
     /// </summary>
 #if FEATURE_SERIALIZABLE
-	[Serializable]
+    [Serializable]
 #endif
     public class RuntimeException : Exception
     {

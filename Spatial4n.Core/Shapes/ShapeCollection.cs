@@ -31,7 +31,7 @@ namespace Spatial4n.Core.Shapes
     /// retained if an application requires it, although logically it's treated as an
     /// unordered Set, mostly.
     /// <para>
-    /// Ideally, <see cref="Relate(Shapes.IShape)"/> should return the same result no matter what
+    /// Ideally, <see cref="Relate(IShape)"/> should return the same result no matter what
     /// the shape order is, although the default implementation can be order
     /// dependent when the shapes overlap; see <see cref="RelateContainsShortCircuits()"/>.
     /// To improve performance slightly, the caller could order the shapes by
@@ -65,7 +65,7 @@ namespace Spatial4n.Core.Shapes
             this.m_bbox = ComputeBoundingBox(shapes, ctx);
         }
 
-        protected virtual IRectangle ComputeBoundingBox(ICollection<Shapes.IShape> shapes, SpatialContext ctx)
+        protected virtual IRectangle ComputeBoundingBox(ICollection<IShape> shapes, SpatialContext ctx)
         {
             if (!shapes.Any())
                 return ctx.MakeRectangle(double.NaN, double.NaN, double.NaN, double.NaN);
@@ -106,7 +106,7 @@ namespace Spatial4n.Core.Shapes
         {
             get
             {
-                foreach (Shapes.IShape geom in m_shapes)
+                foreach (IShape geom in m_shapes)
                 {
                     if (geom.HasArea)
                     {
@@ -120,8 +120,8 @@ namespace Spatial4n.Core.Shapes
 
         public virtual IShape GetBuffered(double distance, SpatialContext ctx)
         {
-            IList<Shapes.IShape> bufColl = new List<Shapes.IShape>(Count);
-            foreach (Shapes.IShape shape in m_shapes)
+            IList<IShape> bufColl = new List<IShape>(Count);
+            foreach (IShape shape in m_shapes)
             {
                 bufColl.Add(shape.GetBuffered(distance, ctx));
             }
@@ -138,7 +138,7 @@ namespace Spatial4n.Core.Shapes
             bool containsWillShortCircuit = (other is IPoint) ||
                 RelateContainsShortCircuits();
             SpatialRelation? sect = null;
-            foreach (Shapes.IShape shape in m_shapes)
+            foreach (IShape shape in m_shapes)
             {
                 SpatialRelation nextSect = shape.Relate(other);
 
@@ -208,7 +208,7 @@ namespace Spatial4n.Core.Shapes
         {
             double MAX_AREA = m_bbox.GetArea(ctx);
             double sum = 0;
-            foreach (Shapes.IShape geom in m_shapes)
+            foreach (IShape geom in m_shapes)
             {
                 sum += geom.GetArea(ctx);
                 if (sum >= MAX_AREA)
@@ -254,10 +254,11 @@ namespace Spatial4n.Core.Shapes
 
         private bool ValueEquals(ShapeCollection other)
         {
-            var iter = other.GetEnumerator();
+            using var iter = other.GetEnumerator();
             foreach (IShape value in this)
             {
-                iter.MoveNext();
+                if (!iter.MoveNext())
+                    return false;
                 if (!value.Equals(iter.Current))
                 {
                     return false;

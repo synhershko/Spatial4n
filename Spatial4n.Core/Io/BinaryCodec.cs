@@ -20,6 +20,7 @@ using Spatial4n.Core.Exceptions;
 using Spatial4n.Core.Shapes;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 
 namespace Spatial4n.Core.IO
@@ -35,12 +36,23 @@ namespace Spatial4n.Core.IO
     public class BinaryCodec
     {
         //type 0; reserved for unkonwn/generic; see readCollection
+        [SuppressMessage("Design", "CA1027:Mark enums with FlagsAttribute", Justification = "Not a flags enum")]
         protected enum ShapeType : byte
         {
+            Point = 1,
+            [Obsolete("Use Point instead. This const will be removed in 0.5.0."), System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
             TYPE_POINT = 1,
+            Rectangle = 2,
+            [Obsolete("Use Point instead. This const will be removed in 0.5.0."), System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
             TYPE_RECT = 2,
+            Circle = 3,
+            [Obsolete("Use Point instead. This const will be removed in 0.5.0."), System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
             TYPE_CIRCLE = 3,
+            Collection = 4,
+            [Obsolete("Use Point instead. This const will be removed in 0.5.0."), System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
             TYPE_COLL = 4,
+            Geometry = 5,
+            [Obsolete("Use Point instead. This const will be removed in 0.5.0."), System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
             TYPE_GEOM = 5
         }
 
@@ -49,7 +61,8 @@ namespace Spatial4n.Core.IO
 
         protected readonly SpatialContext ctx;
 
-        //This constructor is mandated by SpatialContextFactory
+
+        [SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "This constructor is mandated by SpatialContextFactory")]
         public BinaryCodec(SpatialContext ctx, SpatialContextFactory factory)
         {
             this.ctx = ctx;
@@ -75,10 +88,10 @@ namespace Spatial4n.Core.IO
         {
             switch (type)
             {
-                case ShapeType.TYPE_POINT: return ReadPoint(dataInput);
-                case ShapeType.TYPE_RECT: return ReadRect(dataInput);
-                case ShapeType.TYPE_CIRCLE: return ReadCircle(dataInput);
-                case ShapeType.TYPE_COLL: return ReadCollection(dataInput);
+                case ShapeType.Point: return ReadPoint(dataInput);
+                case ShapeType.Rectangle: return ReadRect(dataInput);
+                case ShapeType.Circle: return ReadCircle(dataInput);
+                case ShapeType.Collection: return ReadCollection(dataInput);
                 default: return null;
             }
         }
@@ -98,10 +111,10 @@ namespace Spatial4n.Core.IO
         {
             switch (type)
             {
-                case ShapeType.TYPE_POINT: WritePoint(dataOutput, (IPoint)s); break;
-                case ShapeType.TYPE_RECT: WriteRect(dataOutput, (IRectangle)s); break;
-                case ShapeType.TYPE_CIRCLE: WriteCircle(dataOutput, (ICircle)s); break;
-                case ShapeType.TYPE_COLL: WriteCollection(dataOutput, (ShapeCollection)s); break;
+                case ShapeType.Point: WritePoint(dataOutput, (IPoint)s); break;
+                case ShapeType.Rectangle: WriteRect(dataOutput, (IRectangle)s); break;
+                case ShapeType.Circle: WriteCircle(dataOutput, (ICircle)s); break;
+                case ShapeType.Collection: WriteCollection(dataOutput, (ShapeCollection)s); break;
                 default:
                     return false;
             }
@@ -112,19 +125,19 @@ namespace Spatial4n.Core.IO
         {
             if (s is IPoint)
             {
-                return ShapeType.TYPE_POINT;
+                return ShapeType.Point;
             }
             else if (s is IRectangle)
             {
-                return ShapeType.TYPE_RECT;
+                return ShapeType.Rectangle;
             }
             else if (s is ICircle)
             {
-                return ShapeType.TYPE_CIRCLE;
+                return ShapeType.Circle;
             }
             else if (s is ShapeCollection)
             {
-                return ShapeType.TYPE_COLL;
+                return ShapeType.Collection;
             }
             else
             {

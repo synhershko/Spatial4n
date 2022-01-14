@@ -49,11 +49,11 @@ namespace Spatial4n.Core.Distance
         {
             //See to verify: from http://www.movable-type.co.uk/scripts/latlong.html
             IPoint ctr = PLL(0, 100);
-            CustomAssert.EqualWithDelta(11100, Dc().Distance(ctr, PLL(10, 0)) * DistanceUtils.DEG_TO_KM, 3);
+            CustomAssert.EqualWithDelta(11100, Dc().Distance(ctr, PLL(10, 0)) * DistanceUtils.DegreesToKilometers, 3);
             double deg = Dc().Distance(ctr, PLL(10, -160));
-            CustomAssert.EqualWithDelta(11100, deg * DistanceUtils.DEG_TO_KM, 3);
+            CustomAssert.EqualWithDelta(11100, deg * DistanceUtils.DegreesToKilometers, 3);
 
-            CustomAssert.EqualWithDelta(314.40338, Dc().Distance(PLL(1, 2), PLL(3, 4)) * DistanceUtils.DEG_TO_KM, EPS);
+            CustomAssert.EqualWithDelta(314.40338, Dc().Distance(PLL(1, 2), PLL(3, 4)) * DistanceUtils.DegreesToKilometers, EPS);
         }
 
         [Fact]
@@ -61,7 +61,7 @@ namespace Spatial4n.Core.Distance
         {
             //first test regression
             {
-                double d = 6894.1 * DistanceUtils.KM_TO_DEG;
+                double d = 6894.1 * DistanceUtils.KilometersToDegrees;
                 IPoint pCtr = PLL(-20, 84);
                 IPoint pTgt = PLL(-42, 15);
                 Assert.True(Dc().Distance(pCtr, pTgt) < d);
@@ -74,17 +74,17 @@ namespace Spatial4n.Core.Distance
             CustomAssert.EqualWithDelta(/*"0 dist, horiz line",*/
                 -45, Dc().CalcBoxByDistFromPt_yHorizAxisDEG(ctx.MakePoint(-180, -45), 0, ctx), 0);
 
-            double MAXDIST = (double)180 * DistanceUtils.DEG_TO_KM;
+            double MAXDIST = (double)180 * DistanceUtils.DegreesToKilometers;
             CheckBBox(ctx.MakePoint(0, 0), MAXDIST);
             CheckBBox(ctx.MakePoint(0, 0), MAXDIST * 0.999999);
             CheckBBox(ctx.MakePoint(0, 0), 0);
             CheckBBox(ctx.MakePoint(0, 0), 0.000001);
             CheckBBox(ctx.MakePoint(0, 90), 0.000001);
             CheckBBox(ctx.MakePoint(-32.7, -5.42), 9829);
-            CheckBBox(ctx.MakePoint(0, 90 - 20), (double)20 * DistanceUtils.DEG_TO_KM);
+            CheckBBox(ctx.MakePoint(0, 90 - 20), (double)20 * DistanceUtils.DegreesToKilometers);
             {
                 double d = 0.010;//10m
-                CheckBBox(ctx.MakePoint(0, 90 - (d + 0.001) * DistanceUtils.KM_TO_DEG), d);
+                CheckBBox(ctx.MakePoint(0, 90 - (d + 0.001) * DistanceUtils.KilometersToDegrees), d);
             }
 
             for (int T = 0; T < 100; T++)
@@ -101,7 +101,7 @@ namespace Spatial4n.Core.Distance
         private void CheckBBox(IPoint ctr, double distKm)
         {
             string msg = "ctr: " + ctr + " distKm: " + distKm;
-            double dist = distKm * DistanceUtils.KM_TO_DEG;
+            double dist = distKm * DistanceUtils.KilometersToDegrees;
 
             IRectangle r = Dc().CalcBoxByDistFromPt(ctr, dist, ctx, null);
             double horizAxisLat = Dc().CalcBoxByDistFromPt_yHorizAxisDEG(ctr, dist, ctx);
@@ -112,25 +112,25 @@ namespace Spatial4n.Core.Distance
             if (r.Width >= 180)
             {
                 double deg = Dc().Distance(ctr, r.MinX, r.MaxY == 90 ? 90 : -90);
-                double calcDistKm = deg * DistanceUtils.DEG_TO_KM;
+                double calcDistKm = deg * DistanceUtils.DegreesToKilometers;
                 Assert.True(/*msg,*/ calcDistKm <= distKm + EPS);
                 //horizAxisLat is meaningless in this context
             }
             else
             {
                 IPoint tPt = FindClosestPointOnVertToPoint(r.MinX, r.MinY, r.MaxY, ctr);
-                double calcDistKm = Dc().Distance(ctr, tPt) * DistanceUtils.DEG_TO_KM;
+                double calcDistKm = Dc().Distance(ctr, tPt) * DistanceUtils.DegreesToKilometers;
                 CustomAssert.EqualWithDelta(/*msg,*/ distKm, calcDistKm, EPS);
                 CustomAssert.EqualWithDelta(/*msg,*/ tPt.Y, horizAxisLat, EPS);
             }
 
             //vertical
-            double topDistKm = Dc().Distance(ctr, ctr.X, r.MaxY) * DistanceUtils.DEG_TO_KM;
+            double topDistKm = Dc().Distance(ctr, ctr.X, r.MaxY) * DistanceUtils.DegreesToKilometers;
             if (r.MaxY == 90)
                 Assert.True(/*msg,*/ topDistKm <= distKm + EPS);
             else
                 CustomAssert.EqualWithDelta(msg, distKm, topDistKm, EPS);
-            double botDistKm = Dc().Distance(ctr, ctr.X, r.MinY) * DistanceUtils.DEG_TO_KM;
+            double botDistKm = Dc().Distance(ctr, ctr.X, r.MinY) * DistanceUtils.DegreesToKilometers;
             if (r.MinY == -90)
                 Assert.True(/*msg,*/ botDistKm <= distKm + EPS);
             else
@@ -198,7 +198,7 @@ namespace Spatial4n.Core.Distance
             //    assertEqualsRatio(dist, calcDist);
             //}
 
-            double maxDistKm = (double)180 * DistanceUtils.DEG_TO_KM;
+            double maxDistKm = (double)180 * DistanceUtils.DegreesToKilometers;
             for (int i = 0; i < 1000; i++)
             {
                 int dist = random.Next((int)maxDistKm);
@@ -219,8 +219,8 @@ namespace Spatial4n.Core.Distance
                 IPoint p2 = Dc().PointOnBearing(c, 0, angDEG, ctx, null);
                 Assert.Equal(c, p2);
 
-                p2 = Dc().PointOnBearing(c, distKm * DistanceUtils.KM_TO_DEG, angDEG, ctx, null);
-                double calcDistKm = Dc().Distance(c, p2) * DistanceUtils.DEG_TO_KM;
+                p2 = Dc().PointOnBearing(c, distKm * DistanceUtils.KilometersToDegrees, angDEG, ctx, null);
+                double calcDistKm = Dc().Distance(c, p2) * DistanceUtils.DegreesToKilometers;
                 AssertEqualsRatio(distKm, calcDistKm);
             }
         }
@@ -299,12 +299,12 @@ namespace Spatial4n.Core.Distance
         {
             AssertDistanceConversionImpl(0);
             AssertDistanceConversionImpl(500);
-            AssertDistanceConversionImpl(DistanceUtils.EARTH_MEAN_RADIUS_KM);
+            AssertDistanceConversionImpl(DistanceUtils.EarthMeanRadiusKilometers);
         }
 
         private void AssertDistanceConversionImpl(double dist)
         {
-            double radius = DistanceUtils.EARTH_MEAN_RADIUS_KM;
+            double radius = DistanceUtils.EarthMeanRadiusKilometers;
             //test back & forth conversion for both
             double distRAD = DistanceUtils.Dist2Radians(dist, radius);
             CustomAssert.EqualWithDelta(dist, DistanceUtils.Radians2Dist(distRAD, radius), EPS);
@@ -315,7 +315,7 @@ namespace Spatial4n.Core.Distance
             //test point on bearing
             CustomAssert.EqualWithDelta(
                 DistanceUtils.PointOnBearingRAD(0, 0, DistanceUtils.Dist2Radians(dist, radius),
-                    DistanceUtils.DEG_90_AS_RADS, ctx, new Point(0, 0, ctx)).X,
+                    DistanceUtils.Degrees90AsRadians, ctx, new Point(0, 0, ctx)).X,
                 distRAD, 10e-5);
         }
 
@@ -327,7 +327,7 @@ namespace Spatial4n.Core.Distance
         [Fact]
         public virtual void TestArea()
         {
-            double radius = DistanceUtils.EARTH_MEAN_RADIUS_KM * DistanceUtils.KM_TO_DEG;
+            double radius = DistanceUtils.EarthMeanRadiusKilometers * DistanceUtils.KilometersToDegrees;
             //surface of a sphere is 4 * pi * r^2
             double earthArea = 4 * Math.PI * radius * radius;
 

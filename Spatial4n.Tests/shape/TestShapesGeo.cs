@@ -58,12 +58,12 @@ namespace Spatial4n.Core.Shape
 
         private static double DegToKm(double deg)
         {
-            return DistanceUtils.Degrees2Dist(deg, DistanceUtils.EARTH_MEAN_RADIUS_KM);
+            return DistanceUtils.Degrees2Dist(deg, DistanceUtils.EarthMeanRadiusKilometers);
         }
 
         private static double KmToDeg(double km)
         {
-            return DistanceUtils.Dist2Degrees(km, DistanceUtils.EARTH_MEAN_RADIUS_KM);
+            return DistanceUtils.Dist2Degrees(km, DistanceUtils.EarthMeanRadiusKilometers);
         }
 
         [Theory]

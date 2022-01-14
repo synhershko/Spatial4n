@@ -272,7 +272,7 @@ namespace Spatial4n.Core.Shapes.Impl
 
         public override string ToString()
         {
-            double distKm = DistanceUtils.Degrees2Dist(radiusDEG, DistanceUtils.EARTH_MEAN_RADIUS_KM);
+            double distKm = DistanceUtils.Degrees2Dist(radiusDEG, DistanceUtils.EarthMeanRadiusKilometers);
             string dStr = string.Format("{0:0.0}\u00B0 {1:0.00}km", radiusDEG, distKm);
             return "Circle(" + point + ", d=" + dStr + ')';
         }

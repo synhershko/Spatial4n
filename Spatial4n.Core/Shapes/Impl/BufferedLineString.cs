@@ -68,7 +68,7 @@ namespace Spatial4n.Core.Shapes.Impl
             {
                 List<IShape> segments = new List<IShape>(points.Count - 1);
 
-                IPoint prevPoint = null;
+                IPoint? prevPoint = null;
                 foreach (IPoint point in points)
                 {
                     if (prevPoint != null)
@@ -85,34 +85,25 @@ namespace Spatial4n.Core.Shapes.Impl
                 }
                 if (!segments.Any())
                 {//TODO throw exception instead?
-                    segments.Add(new BufferedLine(prevPoint, prevPoint, buf, ctx));
+                    segments.Add(new BufferedLine(prevPoint!, prevPoint!, buf, ctx));
                 }
                 this.segments = ctx.MakeCollection(segments);
             }
         }
 
 
-        public virtual bool IsEmpty
-        {
-            get { return segments.IsEmpty; }
-        }
+        public virtual bool IsEmpty => segments.IsEmpty;
 
         public virtual IShape GetBuffered(double distance, SpatialContext ctx)
         {
             return ctx.MakeBufferedLineString(Points, buf + distance);
         }
 
-        public virtual ShapeCollection Segments
-        {
-            get { return segments; }
-        }
+        public virtual ShapeCollection Segments => segments;
 
-        public virtual double Buf
-        {
-            get { return buf; }
-        }
+        public virtual double Buf => buf;
 
-        public virtual double GetArea(SpatialContext ctx)
+        public virtual double GetArea(SpatialContext? ctx)
         {
             return segments.GetArea(ctx);
         }
@@ -122,22 +113,13 @@ namespace Spatial4n.Core.Shapes.Impl
             return segments.Relate(other);
         }
 
-        public virtual bool HasArea
-        {
-            get { return segments.HasArea; }
-        }
+        public virtual bool HasArea => segments.HasArea;
 
 
-        public virtual IPoint Center
-        {
-            get { return segments.Center; }
-        }
+        public virtual IPoint Center => segments.Center;
 
 
-        public virtual IRectangle BoundingBox
-        {
-            get { return segments.BoundingBox; }
-        }
+        public virtual IRectangle BoundingBox => segments.BoundingBox;
 
 
         public override string ToString()
@@ -172,10 +154,8 @@ namespace Spatial4n.Core.Shapes.Impl
 
                 foreach (var shape in shapes)
                 {
-                    if (!(shape is BufferedLine))
+                    if (!(shape is BufferedLine line))
                         continue;
-
-                    BufferedLine line = shape as BufferedLine;
 
                     points.Add(line.A);
                     points.Add(line.B);

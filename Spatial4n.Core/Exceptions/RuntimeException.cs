@@ -15,11 +15,11 @@ namespace Spatial4n.Core.Exceptions
 #endif
     public class RuntimeException : Exception
     {
-        public RuntimeException(string message)
+        public RuntimeException(string? message)
             : base(message)
         { }
 
-        public RuntimeException(string message, Exception innerException)
+        public RuntimeException(string? message, Exception? innerException)
             : base(message, innerException)
         { }
 

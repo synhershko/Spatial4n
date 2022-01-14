@@ -27,7 +27,7 @@ namespace Spatial4n.Core.Shapes.Impl
     /// </summary>
     public class GeoCircle : Circle
     {
-        private GeoCircle inverseCircle; //when distance reaches > 1/2 way around the world, cache the inverse.
+        private GeoCircle? inverseCircle; //when distance reaches > 1/2 way around the world, cache the inverse.
         private double horizAxisY; //see getYAxis
 
         public GeoCircle(IPoint p, double radiusDEG, SpatialContext ctx)
@@ -95,10 +95,7 @@ namespace Spatial4n.Core.Shapes.Impl
             }
         }
 
-        protected override double YAxis
-		{
-			get { return horizAxisY; }
-		}
+        protected override double YAxis => horizAxisY;
 
         /// <summary>
         /// Called after bounding box is intersected.

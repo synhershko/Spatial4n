@@ -51,39 +51,27 @@ namespace Spatial4n.Core.IO.Nts
         /// <summary>
         /// See <see cref="Nts.ValidationRule"/>
         /// </summary>
-        public virtual ValidationRule ValidationRule
-        {
-            get { return m_validationRule; }
-        }
+        public virtual ValidationRule ValidationRule => m_validationRule;
 
         /// <summary>
         /// NtsGeometry shapes are automatically validated when <see cref="ValidationRule"/> isn't
         /// <c>none</c>.
         /// </summary>
-        public virtual bool IsAutoValidate
-        {
-            get { return m_validationRule != Nts.ValidationRule.None; }
-        }
+        public virtual bool IsAutoValidate => m_validationRule != Nts.ValidationRule.None;
 
         /// <summary>
         /// If NtsGeometry shapes should be automatically prepared (i.e. optimized) when read via WKT.
         /// <see cref="NtsGeometry.Index()"/>
         /// </summary>
-        public virtual bool IsAutoIndex
-        {
-            get { return m_autoIndex; }
-        }
+        public virtual bool IsAutoIndex => m_autoIndex;
 
 
         /// <summary>
         /// See <see cref="Nts.DatelineRule"/>
         /// </summary>
-        public virtual DatelineRule DatelineRule
-        {
-            get { return m_datelineRule; }
-        }
+        public virtual DatelineRule DatelineRule => m_datelineRule;
 
-        protected override IShape ParseShapeByType(WktShapeParser.State state, string shapeType)
+        protected override IShape? ParseShapeByType(WktShapeParser.State state, string shapeType)
         {
             if (shapeType.Equals("POLYGON", StringComparison.OrdinalIgnoreCase))
             {
@@ -180,7 +168,7 @@ namespace Spatial4n.Core.IO.Nts
 
             ILinearRing shell = geometryFactory.CreateLinearRing(coordinateSequenceList[0]);
 
-            ILinearRing[] holes = null;
+            ILinearRing[]? holes = null;
             if (coordinateSequenceList.Count > 1)
             {
                 holes = new ILinearRing[coordinateSequenceList.Count - 1];

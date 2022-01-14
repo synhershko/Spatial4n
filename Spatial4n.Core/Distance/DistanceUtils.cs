@@ -181,7 +181,7 @@ namespace Spatial4n.Core.Distance
         /// <param name="ctx"></param>
         /// <param name="reuse">A preallocated object to hold the results.</param>
         /// <returns>The destination point, in radians.  First entry is latitude, second is longitude</returns>
-        public static IPoint PointOnBearingRAD(double startLat, double startLon, double distanceRAD, double bearingRAD, SpatialContext ctx, IPoint reuse)
+        public static IPoint PointOnBearingRAD(double startLat, double startLon, double distanceRAD, double bearingRAD, SpatialContext ctx, IPoint? reuse)
         {
             /*
                lat2 = asin(sin(lat1)*cos(d/R) + cos(lat1)*sin(d/R)*cos(θ))
@@ -233,7 +233,7 @@ namespace Spatial4n.Core.Distance
                 }
             }
 
-            if (reuse == null)
+            if (reuse is null)
             {
                 return ctx.MakePoint(lon2, lat2);
             }
@@ -280,7 +280,7 @@ namespace Spatial4n.Core.Distance
         /// and distance. <paramref name="reuse"/> is an optional argument to store the
         /// results to avoid object creation.
         /// </summary>
-        public static IRectangle CalcBoxByDistFromPtDEG(double lat, double lon, double distDEG, SpatialContext ctx, IRectangle reuse)
+        public static IRectangle CalcBoxByDistFromPtDEG(double lat, double lon, double distDEG, SpatialContext ctx, IRectangle? reuse)
         {
             //See http://janmatuschek.de/LatitudeLongitudeBoundingCoordinates Section 3.1, 3.2 and 3.3
             double minX;
@@ -334,7 +334,7 @@ namespace Spatial4n.Core.Distance
                     maxX = NormLonDEG(lon + lon_delta_deg);
                 }
             }
-            if (reuse == null)
+            if (reuse is null)
             {
                 return ctx.MakeRectangle(minX, maxX, minY, maxY);
             }

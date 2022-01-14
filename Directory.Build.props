@@ -19,22 +19,35 @@
 
 -->
 <Project>
-  <PropertyGroup Label="Version Defaults">
-    <!-- We are strong-named - never change this unless we increment major version. -->
-    <AssemblyVersion>0.4.1</AssemblyVersion>
-    <!-- Default for FileVersion, InformationalVersion, and PackageVersion if not passed in -->
-    <Version>0.4.1.0</Version>
-    <!-- IMPORTANT: Since this is a port, we are using the 4th (revision) number for patches.
-         For example, if we don't port the changes of Spatial4j, the version after 0.4.1 should be 0.4.1.1, not 0.4.2! 
-         If we do port the changes from Spatial4j, then we should increment the first 3 segments to be the same as the ported version. -->
+  <PropertyGroup>
+    <!-- According to the docs (https://docs.microsoft.com/en-us/cpp/build/reference/common-macros-for-build-commands-and-properties?view=vs-2019), the 
+      SolutionDir is only available when running in the IDE, so we patch to ensure it also works when using dotnet.exe -->
+    <SolutionDir Condition=" '$(SolutionDir)' == '' ">$(MSBuildThisFileDirectory)</SolutionDir>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <RepositoryRoot>$(MSBuildThisFileDirectory)</RepositoryRoot>
+    <LangVersion>8.0</LangVersion>
+    <GitHubOrganization>synhershko</GitHubOrganization>
+    <GitHubProject>spatial4n</GitHubProject>
   </PropertyGroup>
   
-  <PropertyGroup Label="NuGet Package Properties">
-    <Authors>Itamar Syn-Hershko, Shad Storhaug</Authors>
-    <PackageProjectUrl>https://github.com/synhershko/spatial4n</PackageProjectUrl>
+  <PropertyGroup Label="Assembly Signing">
+    <AssemblyOriginatorKeyFile>$(RepositoryRoot)Spatial4n.snk</AssemblyOriginatorKeyFile>
+    <PublicKey>00240000048000009400000006020000002400005253413100040000010001005dca02a2e396641a842d2acd4de6bf3db174844bdb3433033ba836afd645541ad94bf84e76f81eb644177ae2430e3cde2bc02411e97f76c6eca771acf561cecbdae333ec2448ffc546907862343938fe5458194350ac45938302bc077806e4b8603e9515b3a5e5df9047f4bc9b641c4fc2a7567eff3e9bc85036666ca4a66f9a</PublicKey>
+    <SignAssembly>true</SignAssembly>
+  </PropertyGroup>
+
+  <PropertyGroup Label="Assembly Publishing">
+    <IsPublishable>false</IsPublishable>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+  </PropertyGroup>
+  
+  <PropertyGroup Label="NuGet Package Defaults">
     <IsPackable>false</IsPackable>
     <IncludeSymbols>true</IncludeSymbols>
-    <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
+    <!-- This is the new symbols format (the only one currently supported at NuGet.org) -->
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
   </PropertyGroup>
   
   <PropertyGroup Label="Copyright Info">
@@ -43,6 +56,15 @@
     <BeginCopyrightYear>2012</BeginCopyrightYear>
     <CopyrightYearRange>$(BeginCopyrightYear) - $(CurrentYear)</CopyrightYearRange>
     <CopyrightYearRange Condition=" '$(BeginCopyrightYear)' == '$(CurrentYear)' ">$(CurrentYear)</CopyrightYearRange>
-    <Copyright>Copyright © $(CopyrightYearRange) spatial4j and Itamar Syn-Hershko</Copyright>
+    <Copyright>Copyright © $(CopyrightYearRange) spatial4j, Itamar Syn-Hershko, Shad Storhaug, and contributors</Copyright>
   </PropertyGroup>
+  <PropertyGroup Label="SourceLink Settings: https://github.com/dotnet/sourcelink/blob/main/README.md">
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(BUILD_REPOSITORY_PROVIDER)' == 'GitHub' Or '$(BUILD_REPOSITORY_PROVIDER)' == 'TfsGit' " Label="Deterministic builds: https://github.com/clairernovotny/DeterministicBuilds#readme">
+    <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
+  </PropertyGroup>
+
 </Project>

@@ -40,10 +40,10 @@ namespace Spatial4n.Core.Shape
                 IDistanceCalculator distCalcH = new GeodesicSphereDistCalc.Haversine();
                 IDistanceCalculator distCalcV = new GeodesicSphereDistCalc.Vincenty();
 
-                yield return new object[] { new SpatialContextFactory() { geo = true, distCalc = new RoundingDistCalc(distCalcH) }.NewSpatialContext() };
-                yield return new object[] { new SpatialContextFactory() { geo = true, distCalc = new RoundingDistCalc(distCalcV) }.NewSpatialContext() };
+                yield return new object[] { new SpatialContextFactory() { geo = true, distCalc = new RoundingDistCalc(distCalcH) }.CreateSpatialContext() };
+                yield return new object[] { new SpatialContextFactory() { geo = true, distCalc = new RoundingDistCalc(distCalcV) }.CreateSpatialContext() };
 #if FEATURE_NTS
-                yield return new object[] { new NtsSpatialContextFactory() { geo = true, distCalc = new RoundingDistCalc(distCalcH) }.NewSpatialContext() };
+                yield return new object[] { new NtsSpatialContextFactory() { geo = true, distCalc = new RoundingDistCalc(distCalcH) }.CreateSpatialContext() };
 #endif
             }
         }

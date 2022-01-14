@@ -26,23 +26,20 @@ namespace Spatial4n.Core.Shapes.Impl
     /// </summary>
     public class Point : IPoint
     {
-        private readonly SpatialContext ctx;
+        private readonly SpatialContext? ctx;
         private double x;
         private double y;
 
         /// <summary>
         /// A simple constructor without normalization / validation.
         /// </summary>
-        public Point(double x, double y, SpatialContext ctx)
+        public Point(double x, double y, SpatialContext? ctx)
         {
             this.ctx = ctx;
             Reset(x, y);
         }
 
-        public virtual bool IsEmpty
-        {
-            get { return double.IsNaN(x); }
-        }
+        public virtual bool IsEmpty => double.IsNaN(x);
 
         public virtual void Reset(double x, double y)
         {
@@ -51,25 +48,21 @@ namespace Spatial4n.Core.Shapes.Impl
             this.y = y;
         }
 
-        public virtual double X
-        {
-            get { return x; }
-        }
+        public virtual double X => x;
 
-        public virtual double Y
-        {
-            get { return y; }
-        }
+        public virtual double Y => y;
 
         public virtual IRectangle BoundingBox
         {
-            get { return ctx.MakeRectangle(this, this); }
+            get 
+            {
+                if (ctx is null)
+                    throw new InvalidOperationException("Must provide a SpatialContext in the constructor."); // spatial4n specific - use InvalidOperationException instead of NullReferenceException
+                return ctx.MakeRectangle(this, this); 
+            }
         }
 
-        public virtual IPoint Center
-        {
-            get { return this; }
-        }
+        public virtual IPoint Center => this;
 
         public virtual IShape GetBuffered(double distance, SpatialContext ctx)
         {
@@ -85,12 +78,9 @@ namespace Spatial4n.Core.Shapes.Impl
             return other.Relate(this).Transpose();
         }
 
-        public virtual bool HasArea
-        {
-            get { return false; }
-        }
+        public virtual bool HasArea => false;
 
-        public virtual double GetArea(SpatialContext ctx)
+        public virtual double GetArea(SpatialContext? ctx)
         {
             return 0;
         }
@@ -108,10 +98,10 @@ namespace Spatial4n.Core.Shapes.Impl
         /// <summary>
         /// All <see cref="IPoint"/> implementations should use this definition of <see cref="object.Equals(object)"/>.
         /// </summary>
-        public static bool Equals(IPoint thiz, Object o)
+        public static bool Equals(IPoint thiz, object o)
         {
             if (thiz == null)
-                throw new ArgumentNullException("thiz");
+                throw new ArgumentNullException(nameof(thiz));
 
             if (thiz == o) return true;
 
@@ -132,7 +122,7 @@ namespace Spatial4n.Core.Shapes.Impl
         public static int GetHashCode(IPoint thiz)
         {
             if (thiz == null)
-                throw new ArgumentNullException("thiz");
+                throw new ArgumentNullException(nameof(thiz));
 
             long temp = thiz.X != +0.0d ? BitConverter.DoubleToInt64Bits(thiz.X) : 0L;
             int result = (int)(temp ^ ((uint)temp >> 32));

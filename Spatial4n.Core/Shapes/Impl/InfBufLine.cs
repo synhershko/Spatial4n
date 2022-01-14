@@ -63,7 +63,7 @@ namespace Spatial4n.Core.Shapes.Impl
 
             int cQuad = Quadrant(prC);
 
-            IPoint nearestP = scratch;
+            IPoint? nearestP = scratch;
             CornerByQuadrant(r, oppositeQuad[cQuad], nearestP);
             bool nearestContains = Contains(nearestP);
 
@@ -154,28 +154,16 @@ namespace Spatial4n.Core.Shapes.Impl
             output.Reset(x, y);
         }
 
-        public virtual double Slope
-        {
-            get { return slope; }
-        }
+        public virtual double Slope => slope;
 
-        public virtual double Intercept
-        {
-            get { return intercept; }
-        }
+        public virtual double Intercept => intercept;
 
-        public virtual double Buf
-        {
-            get { return buf; }
-        }
+        public virtual double Buf => buf;
 
         /// <summary>
         /// <c>1 / Math.Sqrt(slope * slope + 1)</c>
         /// </summary>
-        public virtual double DistDenomInv
-        {
-            get { return distDenomInv; }
-        }
+        public virtual double DistDenomInv => distDenomInv;
 
 
         public override string ToString()

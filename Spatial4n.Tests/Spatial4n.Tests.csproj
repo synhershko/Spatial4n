@@ -1,53 +1,52 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>netcoreapp2.0;netcoreapp1.0;net40;net35</TargetFrameworks>
-    <PackageTargetFallback Condition=" '$(TargetFramework)' == 'netcoreapp1.0' ">$(PackageTargetFallback);dnxcore50</PackageTargetFallback>
+    <TargetFrameworks>net6.0;net5.0;netcoreapp3.1</TargetFrameworks>
+    <TargetFrameworks Condition="$([MSBuild]::IsOsPlatform('Windows'))">$(TargetFrameworks);net40;net35</TargetFrameworks>
 
-    <!-- For now, we can switch framework to test by manually editing this file -->
-    <!--<TargetFramework>net35</TargetFramework>-->
     <AssemblyName>Spatial4n.Tests</AssemblyName>
     <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
     <NoWarn>1591</NoWarn>
-    <GenerateAssemblyFileVersionAttribute>false</GenerateAssemblyFileVersionAttribute>
-    <DefineConstants>FEATURE_STRONG_NAME</DefineConstants>
-    <FrameworkPathOverride Condition="'$(TargetFramework)' == 'net35'">$(MSBuildProgramFiles32)\Reference Assemblies\Microsoft\Framework\.NETFramework\v3.5\Profile\Client</FrameworkPathOverride>
+  </PropertyGroup>
+
+  <PropertyGroup Label="NuGet Settings">
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <PropertyGroup Label="Assembly Publishing">
+    <IsPublishable>true</IsPublishable>
+  </PropertyGroup>
+
+  <PropertyGroup Label="Test Settings">
+    <IsTestProject>true</IsTestProject>
   </PropertyGroup>
 
   <PropertyGroup>
     <DefineConstants>$(DefineConstants);FEATURE_NTS</DefineConstants>
   </PropertyGroup>
-  
-  <PropertyGroup Condition="$(DefineConstants.Contains('FEATURE_STRONG_NAME'))">
-    <SignAssembly>True</SignAssembly>
-    <AssemblyOriginatorKeyFile>..\Spatial4n.snk</AssemblyOriginatorKeyFile>
-  </PropertyGroup>
 
   <PropertyGroup>
-    <NoWarn>$(NoWarn);1701;1702;1705;xUnit2006</NoWarn>
+    <NoWarn>$(NoWarn);1701;1702;1705;xUnit2006;xUnit1026</NoWarn>
   </PropertyGroup>
 
-  <PropertyGroup Condition=" $(TargetFramework.StartsWith('netcore')) ">
-    <DefineConstants>$(DefineConstants);NETCOREAPP</DefineConstants>
-  </PropertyGroup>
-  
-  <ItemGroup Condition="!$(TargetFramework.StartsWith('netcore'))">
-    <PackageReference Include="xunit" Version="1.9.2" />
-    <PackageReference Include="xunit.extensions" Version="1.9.2" />
-    <PackageReference Include="xunit.runner.visualstudio" Version="2.1.0" />
-  </ItemGroup>
-  
-  <ItemGroup Condition=" '$(TargetFramework)' == 'netcoreapp1.0' ">
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.0.0" />
-    <PackageReference Include="xunit" Version="2.2.0" />
-    <PackageReference Include="xunit.runner.visualstudio" Version="2.2.0" />
+  <ItemGroup>
+    <None Remove="resources\fiji.wkt.txt" />
+    <None Remove="resources\russia.wkt.txt" />
   </ItemGroup>
 
-  <ItemGroup Condition=" '$(TargetFramework)' == 'netcoreapp2.0' ">
-    <DotNetCliToolReference Include="dotnet-xunit" Version="2.3.0-beta4-build3742" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.0.0" />
-    <PackageReference Include="xunit" Version="2.3.0-beta4-build3742" />
-    <PackageReference Include="xunit.runner.visualstudio" Version="2.3.0-beta4-build3742" />
+  <ItemGroup>
+    <EmbeddedResource Include="resources\fiji.wkt.txt" />
+    <EmbeddedResource Include="resources\russia.wkt.txt" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="$(MicrosoftNETTestSdkPackageReferenceVersion)" />
+    <PackageReference Include="xunit" Version="$(XunitPackageReferenceVersion)" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="$(XunitRunnerVisualStudioPackageReferenceVersion)" />
+  </ItemGroup>
+  
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net35' Or '$(TargetFramework)' == 'net40' ">
+    <PackageReference Include="xunit.extensions" Version="$(XunitExtensionsPackageReferenceVersion)" />
   </ItemGroup>
 
   <ItemGroup>

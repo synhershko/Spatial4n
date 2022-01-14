@@ -64,7 +64,7 @@ namespace Spatial4n.Core.IO.Nts
             return type;
         }
 
-        protected override IShape ReadShapeByTypeIfSupported(BinaryReader dataInput, ShapeType type)
+        protected override IShape? ReadShapeByTypeIfSupported(BinaryReader dataInput, ShapeType type)
         {
             if (type != ShapeType.TYPE_GEOM)
                 return base.ReadShapeByTypeIfSupported(dataInput, type);
@@ -99,49 +99,19 @@ namespace Spatial4n.Core.IO.Nts
                 return dataInput.Read(buffer, offset, count);
             }
 
-            public override bool CanRead
-            {
-                get
-                {
-                    return dataInput.BaseStream.CanRead;
-                }
-            }
+            public override bool CanRead => dataInput.BaseStream.CanRead;
 
-            public override bool CanSeek
-            {
-                get
-                {
-                    return dataInput.BaseStream.CanSeek;
-                }
-            }
+            public override bool CanSeek => dataInput.BaseStream.CanSeek;
 
-            public override bool CanWrite
-            {
-                get
-                {
-                    return dataInput.BaseStream.CanWrite;
-                }
-            }
+            public override bool CanWrite => dataInput.BaseStream.CanWrite;
 
-            public override long Length
-            {
-                get
-                {
-                    return dataInput.BaseStream.Length;
-                }
-            }
+            public override long Length => dataInput.BaseStream.Length;
 
             public override long Position
             {
-                get
-                {
-                    return dataInput.BaseStream.Position;
-                }
+                get => dataInput.BaseStream.Position;
 
-                set
-                {
-                    dataInput.BaseStream.Position = value;
-                }
+                set => dataInput.BaseStream.Position = value;
             }
 
             public override void Flush()
@@ -203,49 +173,19 @@ namespace Spatial4n.Core.IO.Nts
                 dataOutput.BaseStream.Write(buffer, offset, count);
             }
 
-            public override bool CanRead
-            {
-                get
-                {
-                    return dataOutput.BaseStream.CanRead;
-                }
-            }
+            public override bool CanRead => dataOutput.BaseStream.CanRead;
 
-            public override bool CanSeek
-            {
-                get
-                {
-                    return dataOutput.BaseStream.CanSeek;
-                }
-            }
+            public override bool CanSeek => dataOutput.BaseStream.CanSeek;
 
-            public override bool CanWrite
-            {
-                get
-                {
-                    return dataOutput.BaseStream.CanWrite;
-                }
-            }
+            public override bool CanWrite => dataOutput.BaseStream.CanWrite;
 
-            public override long Length
-            {
-                get
-                {
-                    return dataOutput.BaseStream.Length;
-                }
-            }
+            public override long Length => dataOutput.BaseStream.Length;
 
             public override long Position
             {
-                get
-                {
-                    return dataOutput.BaseStream.Position;
-                }
+                get => dataOutput.BaseStream.Position;
 
-                set
-                {
-                    dataOutput.BaseStream.Position = value;
-                }
+                set => dataOutput.BaseStream.Position = value;
             }
 
             public override void Flush()

@@ -28,6 +28,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using Xunit;
+using Xunit.Extensions;
 
 namespace Spatial4n.Core.Shape
 {
@@ -156,9 +157,14 @@ namespace Spatial4n.Core.Shape
             Assert.True(POLY_SHAPE.BoundingBox.GetArea(ctx) > POLY_SHAPE.GetArea(ctx));
         }
 
-        //[Fact]
+#if FEATURE_XUNIT_1X
         [RepeatFact(100)]
         public virtual void TestPointAndRectIntersect()
+#else
+        [Repeat(100)]
+        [Theory]
+        public virtual void TestPointAndRectIntersect(int iterationNumber)
+#endif
         {
             IRectangle r = RandomRectangle(5);
 
@@ -238,7 +244,7 @@ namespace Spatial4n.Core.Shape
             NtsSpatialContextFactory factory = new NtsSpatialContextFactory();
             factory.normWrapLongitude = true;
 
-            NtsSpatialContext ctx = (NtsSpatialContext)factory.NewSpatialContext();
+            NtsSpatialContext ctx = (NtsSpatialContext)factory.CreateSpatialContext();
 
             IShape shape = ctx.ReadShapeFromWkt(wktStr);
             //System.out.println("Russia Area: "+shape.getArea(ctx));
@@ -252,7 +258,7 @@ namespace Spatial4n.Core.Shape
 
             NtsSpatialContextFactory factory = new NtsSpatialContextFactory();
             factory.normWrapLongitude = true;
-            NtsSpatialContext ctx = (NtsSpatialContext)factory.NewSpatialContext();
+            NtsSpatialContext ctx = (NtsSpatialContext)factory.CreateSpatialContext();
 
             IShape shape = ctx.ReadShapeFromWkt(wktStr);
 
@@ -266,22 +272,11 @@ namespace Spatial4n.Core.Shape
 
         private string ReadFirstLineFromRsrc(string wktRsrcPath)
         {
-
-#if !NETCOREAPP1_0
-            var baseDirectory = AppDomain.CurrentDomain.BaseDirectory;
-#else
-            var baseDirectory = System.AppContext.BaseDirectory;
-#endif
-            var projectPath = baseDirectory.Substring(0,
-                baseDirectory.LastIndexOf("Spatial4n.Tests", StringComparison.OrdinalIgnoreCase));
-
-            var fullPath = Path.Combine(projectPath, "Spatial4n.Tests");
-            fullPath = Path.Combine(fullPath, "resources");
-            fullPath = Path.Combine(fullPath, wktRsrcPath);
-
-            using (var stream = File.OpenText(fullPath))
+            using (var stream = this.GetType().Assembly.GetManifestResourceStream("Spatial4n.Tests.resources." + wktRsrcPath))
             {
-                return stream.ReadLine();
+                Assert.NotNull(stream);
+                using (var reader = new StreamReader(stream, System.Text.Encoding.UTF8))
+                    return reader.ReadLine();
             }
         }
     }

@@ -14,15 +14,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+#if FEATURE_XUNIT_1X
 
 using System.Collections.Generic;
 using System.Linq;
 using Xunit;
-using Xunit.Extensions;
 using Xunit.Sdk;
 
 namespace Spatial4n.Core
 {
+	/// <summary>
+	/// Replacement for the <see cref="FactAttribute"/> that repeats. This can only be used with XUnit < 2.x.
+	/// </summary>
 	public class RepeatFactAttribute : FactAttribute
 	{
 		readonly int _count;
@@ -32,33 +35,12 @@ namespace Spatial4n.Core
 			_count = count;
 		}
 
-#if !NETCOREAPP
-		protected override IEnumerable<ITestCommand> EnumerateTestCommands(
-			IMethodInfo method)
-		{
-			return base.EnumerateTestCommands(method)
-				.SelectMany(tc => Enumerable.Repeat(tc, _count));
-		}
-#endif
-    }
-
-    public class RepeatTheoryAttribute : TheoryAttribute
-	{
-		readonly int _count;
-
-		public RepeatTheoryAttribute(int count)
-		{
-			_count = count;
-		}
-
-#if !NETCOREAPP
-        // Spatial4n TODO: Work out how to make the test repeat in .NET Core
         protected override IEnumerable<ITestCommand> EnumerateTestCommands(
-			IMethodInfo method)
-		{
-			return base.EnumerateTestCommands(method)
-				.SelectMany(tc => Enumerable.Repeat(tc, _count));
-		}
-#endif
+            IMethodInfo method)
+        {
+            return base.EnumerateTestCommands(method)
+                .SelectMany(tc => Enumerable.Repeat(tc, _count));
+        }
     }
 }
+#endif

@@ -1,0 +1,168 @@
+# Downloads test binaries and executes tests using dotnet vstest,
+# runs the tests for each project on a background job in parallel,
+# then uploads the results to Azure DevOps pipelines
+
+parameters:
+  osName: 'Windows' # The name of the operating system for display purposes.
+  testTargetFrameworks: '' # A semicolon separated list of target frameworks indicating which frameworks tests will be run on. See: https://docs.microsoft.com/en-us/dotnet/standard/frameworks.
+  binaryArtifactName: 'testbinaries' # The name of the Azure DevOps build artifact where the test assemblies will be downloaded from. Default 'testbinaries'.
+  testResultsArtifactName: 'testresults' # The name of the Azure DevOps build artifact where the test results will be published. Default 'testresults'.
+  vsTestPlatform: 'x64' # Target platform architecture used for test execution. Valid values are x86, x64, and ARM.
+  testBinaryFilesPattern: '\.*\.Tests\.?\w*?.dll$' # The regex pattern (within $(System.DefaultWorkingDirectory)/**/<TargetFramework>) where to look for test .dll files, so they can be distinguished from other .dll file types.
+  testResultsFileName: 'TestResults.trx' # The name of the file (not path) of the test results. Default 'TestResults.trx'.
+  maximumParallelJobs: 8
+  maximumAllowedFailures: 0
+  dotNetSdkVersion: '' # The .NET SDK version to install
+
+steps:
+- pwsh: |
+    function EnsureNotNullOrEmpty([string]$param, [string]$nameOfParam) {
+        if ([string]::IsNullOrEmpty($param)) {
+            Write-Host "##vso[task.logissue type=error;]Missing template parameter \"$nameOfParam\""
+            Write-Host "##vso[task.complete result=Failed;]"
+        }
+    }
+    EnsureNotNullOrEmpty('${{ parameters.osName }}', 'osName')
+    EnsureNotNullOrEmpty('${{ parameters.testTargetFrameworks }}', 'testTargetFrameworks')
+    EnsureNotNullOrEmpty('${{ parameters.binaryArtifactName }}', 'binaryArtifactName')
+    EnsureNotNullOrEmpty('${{ parameters.testResultsArtifactName }}', 'testResultsArtifactName')
+    EnsureNotNullOrEmpty('${{ parameters.vsTestPlatform }}', 'vsTestPlatform')
+    EnsureNotNullOrEmpty('${{ parameters.testBinaryFilesPattern }}', 'testBinaryFilesPattern')
+    EnsureNotNullOrEmpty('${{ parameters.testResultsFileName }}', 'testResultsFileName')
+    EnsureNotNullOrEmpty('${{ parameters.maximumParallelJobs }}', 'maximumParallelJobs')
+    EnsureNotNullOrEmpty('${{ parameters.dotNetSdkVersion }}', 'dotNetSdkVersion')
+  displayName: 'Validate Template Parameters'
+
+- template: 'install-dotnet-sdk.yml'
+  parameters:
+    sdkVersion: '${{ parameters.dotNetSdkVersion }}'
+
+- task: UseDotNet@2
+  displayName: 'Use .NET Core sdk 3.1.416'
+  inputs:
+    version: 3.1.416
+  condition: and(succeeded(), contains('${{ parameters.testTargetFrameworks }}', 'netcoreapp3.'))
+
+- task: UseDotNet@2
+  displayName: 'Use .NET sdk 5.0.404'
+  inputs:
+    version: 5.0.404
+  condition: and(succeeded(), contains('${{ parameters.testTargetFrameworks }}', 'net5.'))
+
+- task: DownloadBuildArtifacts@0
+  displayName: 'Download Build Artifacts: ${{ parameters.binaryArtifactName }}'
+  inputs:
+    artifactName: ${{ parameters.binaryArtifactName }}
+    downloadPath: '$(System.DefaultWorkingDirectory)'
+
+- pwsh: |
+    $testTargetFrameworksString = '${{ parameters.testTargetFrameworks }}'
+    $testBinaryRootDirectory = "$(System.DefaultWorkingDirectory)"
+    $testResultsArtifactDirectory = "${{ format('$(Build.ArtifactStagingDirectory)/{0}',parameters.testResultsArtifactName) }}"
+    $testPlatform = '${{ parameters.vsTestPlatform }}'
+    $testOSName = '${{ parameters.osName }}'
+    $testBinaryFilesPattern = '${{ parameters.testBinaryFilesPattern }}'
+    $maximumParalellJobs = '${{ parameters.maximumParallelJobs }}'
+    $testTargetFrameworks = $testTargetFrameworksString.Split([char]',',[char]';')
+    
+    function IsSupportedFramework([string]$framework) {
+        if ($IsWindows -eq $null) {
+            $IsWindows = $env:OS.StartsWith('Win')
+        }
+        if (!$IsWindows -and ($framework.StartsWith('net4') -or $framework.StartsWith('net3'))) {
+            return $false
+        }
+        return $true
+    }
+    
+    function RunTests([string]$framework, [string]$fileRegexPattern) {
+        if (!(IsSupportedFramework($framework))) { continue }
+    
+        $testBinaries = Get-ChildItem -Path "$testBinaryRootDirectory" -File -Recurse | Where-Object {$_.FullName -match "$framework"} | Where-Object {$_.FullName -match "$fileRegexPattern"} | Select -ExpandProperty FullName
+        foreach ($testBinary in $testBinaries) {
+            $testName = [System.IO.Path]::GetFileNameWithoutExtension($testBinary)
+    
+            # Pause if we have queued too many parallel jobs
+            #$running = @(Get-Job | Where-Object { $_.State -eq 'Running' })
+            #if ($running.Count -ge $maximumParalellJobs) {
+            #    Write-Host ""
+            #    Write-Host "  Running tests in parallel on $($running.Count) projects." -ForegroundColor Cyan
+            #    Write-Host "  Next in queue is $projectName on $framework. This will take a bit, please wait..." -ForegroundColor Cyan
+            #    $running | Wait-Job -Any | Out-Null
+            #}
+              
+            $testResultDirectory = "$testResultsArtifactDirectory/$testOSName/$framework/$testPlatform/$testName"
+            if (!(Test-Path "$testResultDirectory")) {
+                New-Item "$testResultDirectory" -ItemType Directory -Force
+            }
+    
+            Write-Host "Testing '$testBinary' on framework '$framework' and outputting test results to '$testResultDirectory/${{ parameters.testResultsFileName }}'..."
+            dotnet test "$testBinary" --framework "$framework" --blame --no-build --no-restore --logger:"console;verbosity=normal" --logger:"trx;LogFileName=${{ parameters.testResultsFileName }}" --results-directory:"$testResultDirectory" --blame-hang-timeout 10minutes --blame-hang-dump-type mini -- RunConfiguration.TargetPlatform=$testPlatform
+    
+
+            $testExpression = "$testExpression -- RunConfiguration.TargetPlatform=$testPlatform"
+
+            #$scriptBlock = {
+            #    param([string]$testBinary, [string]$fwork, [string]$testPlatform, [string]$testResultDirectory)
+            #    dotnet test "$testBinary" --framework "$framework" --blame --no-build --no-restore --logger:"console;verbosity=normal" --logger:"trx;LogFileName=${{ parameters.testResultsFileName }}" --results-directory:"$testResultDirectory" --blame-hang-timeout 10minutes --blame-hang-dump-type mini -- RunConfiguration.TargetPlatform=$testPlatform > "$testResultDirectory/dotnet-vstest.log" 2> "$testResultDirectory/dotnet-vstest-error.log"
+            #}
+    
+            # Execute the jobs in parallel
+            #Start-Job $scriptBlock -ArgumentList $testBinary,$fwork,$testPlatform,$testResultDirectory
+        }
+    }
+    
+    foreach ($framework in $testTargetFrameworks) {
+        RunTests -Framework "$framework" -FileRegexPattern "$testBinaryFilesPattern"
+    }
+    
+    # Wait for it all to complete
+    #do {
+    #    $running = @(Get-Job | Where-Object { $_.State -eq 'Running' })
+    #    if ($running.Count -gt 0) {
+    #        Write-Host ""
+    #        Write-Host "  Almost finished, only $($running.Count) projects left..." -ForegroundColor Cyan
+    #        $running | Wait-Job -Any
+    #    }
+    #} until ($running.Count -eq 0)
+    
+    $global:LASTEXITCODE = 0 # Force the script to continue on error
+  displayName: 'dotnet test ${{ parameters.testTargetFrameworks }}'
+  ignoreLASTEXITCODE: true
+
+#- template: 'show-all-files.yml' # Uncomment for debugging
+
+- task: PublishBuildArtifacts@1
+  displayName: 'Publish Artifact: ${{ parameters.testResultsArtifactName }}'
+  inputs:
+    PathtoPublish: '$(Build.ArtifactStagingDirectory)/${{ parameters.testResultsArtifactName }}'
+    ArtifactName: '${{ parameters.testResultsArtifactName }}'
+  condition: succeededOrFailed()
+
+# Due to the fact that it is not possible to loop a task and
+# it would be a ton of work to make a replacement for the
+# Publish Test Results task or the (deprecated) TfsPublisher
+# our only other option is to make a task for every supported
+# platform and project and update it whenever a new platform 
+# is targeted or test project is created in Spatial4n.
+
+- template: 'publish-test-results-for-test-projects.yml'
+  parameters:
+    osName: '${{ parameters.osName }}'
+    framework: '${{ parameters.framework }}'
+    testPlatform: '${{ parameters.vsTestPlatform }}'
+
+- pwsh: |
+    $failed = $false
+    if ($env:HOSTCRASHED -eq 'true') {
+        Write-Host "##vso[task.logissue type=error;]Test host process(es) crashed:  $($env:CRASHEDRUNS)."
+        $failed = $true
+    }
+    $maximumAllowedFailures = '${{ parameters.maximumAllowedFailures }}'
+    if ([int]$env:TOTALFAILURES -gt [int]$maximumAllowedFailures) {
+        Write-Host "##vso[task.logissue type=error;]Test run failed due to too many failed tests. Maximum failures allowed: $maximumAllowedFailures, total failures: $($env:TOTALFAILURES)."
+        $failed = $true
+    }
+    if ($failed) {
+        Write-Host "##vso[task.complete result=Failed;]"
+    }

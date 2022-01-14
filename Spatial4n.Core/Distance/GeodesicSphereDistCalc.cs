@@ -28,11 +28,11 @@ namespace Spatial4n.Core.Distance
 	{
 		private readonly double radiusDEG = DistanceUtils.ToDegrees(1);//in degrees
 
-		public override IPoint PointOnBearing(IPoint @from, double distDEG, double bearingDEG, SpatialContext ctx, IPoint reuse)
+		public override IPoint PointOnBearing(IPoint from, double distDEG, double bearingDEG, SpatialContext ctx, IPoint? reuse)
 		{
             if (distDEG == 0)
             {
-                if (reuse == null)
+                if (reuse is null)
                     return from;
                 reuse.Reset(from.X, from.Y);
                 return reuse;
@@ -45,7 +45,7 @@ namespace Spatial4n.Core.Distance
             return result;
 		}
 
-		public override IRectangle CalcBoxByDistFromPt(IPoint from, double distDEG, SpatialContext ctx, IRectangle reuse)
+		public override IRectangle CalcBoxByDistFromPt(IPoint from, double distDEG, SpatialContext ctx, IRectangle? reuse)
 		{
             return DistanceUtils.CalcBoxByDistFromPtDEG(from.Y, from.X, distDEG, ctx, reuse);
 		}

@@ -49,15 +49,9 @@ namespace Spatial4n.Core.Shapes.Impl
             this.m_max = max;
         }
 
-        public virtual double Min
-        {
-            get { return m_min; }
-        }
+        public virtual double Min => m_min;
 
-        public virtual double Max
-        {
-            get { return m_max; }
-        }
+        public virtual double Max => m_max;
 
         public override bool Equals(object o)
         {
@@ -88,20 +82,14 @@ namespace Spatial4n.Core.Shapes.Impl
             return "Range{" + m_min + " TO " + m_max + '}';
         }
 
-        public virtual double Width
-        {
-            get { return m_max - m_min; }
-        }
+        public virtual double Width => m_max - m_min;
 
         public virtual bool Contains(double v)
         {
             return v >= m_min && v <= m_max;
         }
 
-        public virtual double Center
-        {
-            get { return m_min + Width / 2; }
-        }
+        public virtual double Center => m_min + Width / 2;
 
         public virtual Range ExpandTo(Range other)
         {
@@ -150,10 +138,7 @@ namespace Spatial4n.Core.Shapes.Impl
                 return v >= m_min || v <= m_max;// the OR is the distinction from non-dateline cross
             }
 
-            public virtual bool CrossesDateline
-            {
-                get { return m_min > m_max; }
-            }
+            public virtual bool CrossesDateline => m_min > m_max;
 
             public override double Center
             {

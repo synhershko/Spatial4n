@@ -49,7 +49,7 @@ namespace Spatial4n.Core.IO
         {
             SpatialContextFactory factory = new SpatialContextFactory();
             factory.wktShapeParserClass = typeof(MyWKTShapeParser);
-            return factory.NewSpatialContext();
+            return factory.CreateSpatialContext();
         }
 
         [Fact]
@@ -97,7 +97,7 @@ namespace Spatial4n.Core.IO
                 return new State(this, wkt);
             }
 
-            protected internal override IShape ParseShapeByType(State state, string shapeType)
+            protected override IShape ParseShapeByType(State state, string shapeType)
             {
                 IShape result = base.ParseShapeByType(state, shapeType);
                 if (result == null && shapeType.Contains("custom"))

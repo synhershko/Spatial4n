@@ -39,8 +39,8 @@ namespace Spatial4n.Core.Distance
 
         // spatial4n specific - need to implement abstract members here to satisfy the IDistanceCalculator contract
         public abstract double Distance(IPoint from, double toX, double toY);
-        public abstract IPoint PointOnBearing(IPoint from, double distDEG, double bearingDEG, SpatialContext ctx, IPoint reuse);
-        public abstract IRectangle CalcBoxByDistFromPt(IPoint from, double distDEG, SpatialContext ctx, IRectangle reuse);
+        public abstract IPoint PointOnBearing(IPoint from, double distDEG, double bearingDEG, SpatialContext ctx, IPoint? reuse);
+        public abstract IRectangle CalcBoxByDistFromPt(IPoint from, double distDEG, SpatialContext ctx, IRectangle? reuse);
         public abstract double CalcBoxByDistFromPt_yHorizAxisDEG(IPoint from, double distDEG, SpatialContext ctx);
         public abstract double Area(IRectangle rect);
         public abstract double Area(ICircle circle);

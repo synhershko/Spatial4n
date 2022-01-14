@@ -105,12 +105,16 @@ namespace Spatial4n.Core.IO
         /// <param name="str"></param>
         /// <param name="ctx"></param>
         /// <returns></returns>
-        public static IShape ReadShapeOrNull(string str, SpatialContext ctx)
+        /// <exception cref="InvalidShapeException"><paramref name="str"/> is <c>null</c> or empty, or is not a valid shape.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="ctx"/> is <c>null</c>.</exception>
+        public static IShape? ReadShapeOrNull(string str, SpatialContext ctx)
         {
-            if (str == null || str.Length == 0)
+            if (str is null || str.Length == 0)
             {
                 throw new InvalidShapeException(str);
             }
+            if (ctx is null)
+                throw new ArgumentNullException(nameof(ctx)); // spatial4n specific - use ArgumentNullException instead of NullReferenceException
 
             string[] tokens;
             int nextToken = 0;

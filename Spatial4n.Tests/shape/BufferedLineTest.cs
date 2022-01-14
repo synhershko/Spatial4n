@@ -22,6 +22,12 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using Xunit;
+using Xunit.Extensions;
+
+namespace Xunit.Extensions
+{
+
+}
 
 namespace Spatial4n.Core.Shape
 {
@@ -30,7 +36,7 @@ namespace Spatial4n.Core.Shape
         protected readonly Random random = new Random(RandomSeed.Seed());
 
         private readonly SpatialContext ctx = new SpatialContextFactory()
-        { geo = false, worldBounds = new Rectangle(-100, 100, -50, 50, null) }.NewSpatialContext();
+        { geo = false, worldBounds = new Rectangle(-100, 100, -50, 50, null) }.CreateSpatialContext();
 
         //      @Rule
         //public TestLog testLog = TestLog.instance;
@@ -100,9 +106,14 @@ namespace Spatial4n.Core.Shape
             Assert.False(line.Contains(ctx.MakePoint(10, 1 + 3 + 0.1)));
         }
 
-        //[Fact]
+#if FEATURE_XUNIT_1X
         [RepeatFact(15)]
         public virtual void Quadrants()
+#else
+        [Repeat(15)]
+        [Theory]
+        public virtual void Quadrants(int iterationNumber)
+#endif
         {
             //random line
             BufferedLine line = NewRandomLine();

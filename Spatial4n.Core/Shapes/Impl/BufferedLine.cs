@@ -47,8 +47,16 @@ namespace Spatial4n.Core.Shapes.Impl
         /// <param name="pB">end point</param>
         /// <param name="buf">the buffer distance in degrees</param>
         /// <param name="ctx"></param>
+        /// <exception cref="ArgumentNullException"><paramref name="pA"/>, <paramref name="pB"/>, or <paramref name="ctx"/> is <c>null</c>.</exception>
         public BufferedLine(IPoint pA, IPoint pB, double buf, SpatialContext ctx)
         {
+            if (pA is null)
+                throw new ArgumentNullException(nameof(pA)); // spatial4n specific - use ArgumentNullException instead of NullReferenceException
+            if (pB is null)
+                throw new ArgumentNullException(nameof(pB)); // spatial4n specific - use ArgumentNullException instead of NullReferenceException
+            if (ctx is null)
+                throw new ArgumentNullException(nameof(ctx)); // spatial4n specific - use ArgumentNullException instead of NullReferenceException
+
             Debug.Assert(buf >= 0);//TODO support buf=0 via another class ?
 
             // If true, buf should bump-out from the pA & pB, in effect
@@ -146,10 +154,7 @@ namespace Spatial4n.Core.Shapes.Impl
                 Math.Min(bounds.MaxY, maxY));
         }
 
-        public virtual bool IsEmpty
-        {
-            get { return pA.IsEmpty; }
-        }
+        public virtual bool IsEmpty => pA.IsEmpty;
 
 
         public virtual IShape GetBuffered(double distance, SpatialContext ctx)
@@ -213,59 +218,35 @@ namespace Spatial4n.Core.Shapes.Impl
             return linePrimary.Contains(p) && linePerp.Contains(p);
         }
 
-        public virtual IRectangle BoundingBox
-        {
-            get { return bbox; }
-        }
+        public virtual IRectangle BoundingBox => bbox;
 
 
-        public virtual bool HasArea
-        {
-            get { return buf > 0; }
-        }
+        public virtual bool HasArea => buf > 0;
 
 
-        public virtual double GetArea(SpatialContext ctx)
+        public virtual double GetArea(SpatialContext? ctx)
         {
             return linePrimary.Buf * linePerp.Buf * 4;
         }
 
 
-        public virtual IPoint Center
-        {
-            get { return BoundingBox.Center; }
-        }
+        public virtual IPoint Center => BoundingBox.Center;
 
-        public virtual IPoint A
-        {
-            get { return pA; }
-        }
+        public virtual IPoint A => pA;
 
-        public virtual IPoint B
-        {
-            get { return pB; }
-        }
+        public virtual IPoint B => pB;
 
-        public virtual double Buf
-        {
-            get { return buf; }
-        }
+        public virtual double Buf => buf;
 
         /// <summary>
         /// INTERNAL
         /// </summary>
-        public virtual InfBufLine LinePrimary
-        {
-            get { return linePrimary; }
-        }
+        public virtual InfBufLine LinePrimary => linePrimary;
 
         /// <summary>
         /// INTERNAL
         /// </summary>
-        public virtual InfBufLine LinePerp
-        {
-            get { return linePerp; }
-        }
+        public virtual InfBufLine LinePerp => linePerp;
 
 
         public override string ToString()

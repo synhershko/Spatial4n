@@ -31,8 +31,8 @@ namespace Spatial4n.Core.Context
     /// <para>
     /// If you want a typical geodetic context, just reference <see cref="GEO"/>.  Otherwise,
     /// You should either create and configure a <see cref="SpatialContextFactory"/> and then call
-    /// <see cref="SpatialContextFactory.NewSpatialContext()"/>, OR, call
-    /// <see cref="SpatialContextFactory.MakeSpatialContext(IDictionary{string, string})"/>
+    /// <see cref="SpatialContextFactory.CreateSpatialContext()"/>, OR, call
+    /// <see cref="SpatialContextFactory.MakeSpatialContext(IDictionary{string, string}, System.Reflection.Assembly?)"/>
     /// to do this via configuration data.
     /// </para>
     /// Thread-safe &amp; immutable.
@@ -66,8 +66,8 @@ namespace Spatial4n.Core.Context
         { }
 
         private static SpatialContextFactory InitFromLegacyConstructor(bool geo,
-                                                                 IDistanceCalculator calculator,
-                                                                 IRectangle worldBounds)
+                                                                 IDistanceCalculator? calculator,
+                                                                 IRectangle? worldBounds)
         {
             SpatialContextFactory factory = new SpatialContextFactory();
             factory.geo = geo;
@@ -82,7 +82,7 @@ namespace Spatial4n.Core.Context
         { }
 
         /// <summary>
-        /// Called by <see cref="SpatialContextFactory.NewSpatialContext()"/>.
+        /// Called by <see cref="SpatialContextFactory.CreateSpatialContext()"/>.
         /// </summary>
         /// <param name="factory"></param>
         public SpatialContext(SpatialContextFactory factory)
@@ -101,8 +101,8 @@ namespace Spatial4n.Core.Context
             }
 
             //TODO remove worldBounds from Spatial4j: see Issue #55
-            IRectangle bounds = factory.worldBounds;
-            if (bounds == null)
+            IRectangle? bounds = factory.worldBounds;
+            if (bounds is null)
             {
                 this.worldBounds = IsGeo
                         ? new Rectangle(-180, 180, -90, 90, this)
@@ -126,10 +126,7 @@ namespace Spatial4n.Core.Context
             this.binaryCodec = factory.MakeBinaryCodec(this);
         }
 
-        public virtual IDistanceCalculator DistCalc
-        {
-            get { return calculator; }
-        }
+        public virtual IDistanceCalculator DistCalc => calculator;
 
         /// <summary>
         /// Convenience that uses <see cref="DistCalc"/>
@@ -152,19 +149,13 @@ namespace Spatial4n.Core.Context
         /// Do *NOT* invoke <see cref="IRectangle.Reset(double, double, double, double)"/> on this return type.
         /// </summary>
         /// <returns></returns>
-		public virtual IRectangle WorldBounds
-        {
-            get { return worldBounds; }
-        }
+		public virtual IRectangle WorldBounds => worldBounds;
 
         /// <summary>
         /// If true then <see cref="NormX(double)"/> will wrap longitudes outside of the standard
         /// geodetic boundary into it. Example: 181 will become -179.
         /// </summary>
-        public virtual bool IsNormWrapLongitude
-        {
-            get { return normWrapLongitude; }
-        }
+        public virtual bool IsNormWrapLongitude => normWrapLongitude;
 
         /// <summary>
         /// Is the mathematical world model based on a sphere, or is it a flat plane? The word
@@ -172,10 +163,7 @@ namespace Spatial4n.Core.Context
         /// referred to as "Euclidean" or "cartesian".
         /// </summary>
         /// <returns></returns>
-        public virtual bool IsGeo
-        {
-            get { return geo; }
-        }
+        public virtual bool IsGeo => geo;
 
         /// <summary>
         /// Normalize the 'x' dimension. Might reduce precision or wrap it to be within the bounds. This
@@ -365,10 +353,7 @@ namespace Spatial4n.Core.Context
         /// The <see cref="IO.WktShapeParser"/> used by <see cref="ReadShapeFromWkt(string)"/>.
         /// </summary>
         /// <returns></returns>
-        public virtual WktShapeParser WktShapeParser
-        {
-            get { return wktShapeParser; }
-        }
+        public virtual WktShapeParser WktShapeParser => wktShapeParser;
 
         /// <summary>
         /// Reads a shape from the string formatted in WKT.
@@ -382,10 +367,7 @@ namespace Spatial4n.Core.Context
             return wktShapeParser.Parse(wkt);
         }
 
-        public virtual BinaryCodec BinaryCodec
-        {
-            get { return binaryCodec; }
-        }
+        public virtual BinaryCodec BinaryCodec => binaryCodec;
 
         /// <summary>
         /// Reads the shape from a String using the old/deprecated
@@ -398,8 +380,8 @@ namespace Spatial4n.Core.Context
         [Obsolete]
         public virtual IShape ReadShape(string value)
         {
-            IShape s = LegacyShapeReadWriterFormat.ReadShapeOrNull(value, this);
-            if (s == null)
+            IShape? s = LegacyShapeReadWriterFormat.ReadShapeOrNull(value, this);
+            if (s is null)
             {
                 try
                 {

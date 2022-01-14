@@ -106,7 +106,7 @@ namespace Spatial4n.Core.IO
         [Fact]
         public virtual void PolyToRectCcwRule()
         {
-            NtsSpatialContext ctx = (NtsSpatialContext)new NtsSpatialContextFactory() { datelineRule = DatelineRule.CcwRect }.NewSpatialContext();
+            NtsSpatialContext ctx = (NtsSpatialContext)new NtsSpatialContextFactory() { datelineRule = DatelineRule.CcwRect }.CreateSpatialContext();
             //counter-clockwise
             Assert.Equal(ctx.ReadShapeFromWkt("POLYGON((160 0, -170 0, -170 10, 160 10, 160 0))"),
         ctx.MakeRectangle(160, -170, 0, 10));
@@ -194,13 +194,13 @@ namespace Spatial4n.Core.IO
 
             NtsSpatialContextFactory factory = new NtsSpatialContextFactory();
             factory.validationRule = ValidationRule.RepairBuffer0;
-            NtsSpatialContext ctx = (NtsSpatialContext)factory.NewSpatialContext(); // TODO: Can we remove this cast?
+            NtsSpatialContext ctx = (NtsSpatialContext)factory.CreateSpatialContext(); // TODO: Can we remove this cast?
             IShape buffer0 = ctx.ReadShapeFromWkt(wkt);
             Assert.True(buffer0.GetArea(ctx) > 0);
 
             factory = new NtsSpatialContextFactory();
             factory.validationRule = ValidationRule.RepairConvexHull;
-            ctx = (NtsSpatialContext)factory.NewSpatialContext();
+            ctx = (NtsSpatialContext)factory.CreateSpatialContext();
             IShape cvxHull = ctx.ReadShapeFromWkt(wkt);
             Assert.True(cvxHull.GetArea(ctx) > 0);
 
@@ -208,7 +208,7 @@ namespace Spatial4n.Core.IO
 
             factory = new NtsSpatialContextFactory();
             factory.validationRule = ValidationRule.None;
-            ctx = (NtsSpatialContext)factory.NewSpatialContext();
+            ctx = (NtsSpatialContext)factory.CreateSpatialContext();
             ctx.ReadShapeFromWkt(wkt);//doesn't throw
         }
     }

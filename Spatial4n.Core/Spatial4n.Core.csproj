@@ -1,56 +1,25 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
+  <Import Project="$(SolutionDir).build/nuget.props" />
+  
   <PropertyGroup>
-    <TargetFrameworks>netstandard2.0;netstandard1.3;net40;net35</TargetFrameworks>
-    <PackageTargetFallback Condition=" '$(TargetFramework)' == 'netstandard1.3' ">$(PackageTargetFallback);dnxcore50</PackageTargetFallback>
+    <TargetFrameworks>netstandard2.0;net40;net35</TargetFrameworks>
 
     <AssemblyTitle>Spatial4n.Core</AssemblyTitle>
     <Description>A Geospatial Library for .NET - a .NET port of spatial4j</Description>
-    <PackageTags>Lucene Lucene.net spatial geospatial geo spatial4j search</PackageTags>
-    <IsPackable>true</IsPackable>
     <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\$(AssemblyName).xml</DocumentationFile>
     <NoWarn>1591</NoWarn>
-    <GenerateAssemblyFileVersionAttribute>false</GenerateAssemblyFileVersionAttribute>
-    <DefineConstants>FEATURE_STRONG_NAME</DefineConstants>
-    <FrameworkPathOverride Condition="'$(TargetFramework)' == 'net35'">$(MSBuildProgramFiles32)\Reference Assemblies\Microsoft\Framework\.NETFramework\v3.5\Profile\Client</FrameworkPathOverride>
+    <Nullable>enable</Nullable>
   </PropertyGroup>
 
-  <ItemGroup>
-    <None Include="..\LICENSE.txt" Pack="true" PackagePath="$(PackageLicenseFile)"/>
-  </ItemGroup>
-
-  <PropertyGroup Condition="$(DefineConstants.Contains('FEATURE_STRONG_NAME'))">
-    <SignAssembly>True</SignAssembly>
-    <AssemblyOriginatorKeyFile>..\Spatial4n.snk</AssemblyOriginatorKeyFile>
-  </PropertyGroup>
 
   <PropertyGroup>
     <NoWarn>$(NoWarn);1701;1702;1705</NoWarn>
   </PropertyGroup>
-  
-  <ItemGroup Condition="'$(TargetFramework)' == 'netstandard1.3'">
-    <PackageReference Include="System.Reflection" Version="4.3.0" />
-    <PackageReference Include="System.Reflection.TypeExtensions" Version="4.3.0" />
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="Spatial4n.Core.NTS" />
+    <InternalsVisibleTo Include="Spatial4n.Tests" />
   </ItemGroup>
-
-  <PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' ">
-    <DefineConstants>$(DefineConstants);NETSTANDARD;FEATURE_SERIALIZABLE</DefineConstants>
-    <DebugType>portable</DebugType>
-  </PropertyGroup>
-
-  <PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard1.3' ">
-    <DefineConstants>$(DefineConstants);NETSTANDARD</DefineConstants>
-    <DebugType>portable</DebugType>
-  </PropertyGroup>
-
-  <PropertyGroup Condition=" '$(TargetFramework)' == 'net40' ">
-    <DefineConstants>$(DefineConstants);FEATURE_SERIALIZABLE</DefineConstants>
-    <DebugType>full</DebugType>
-  </PropertyGroup>
-
-  <PropertyGroup Condition=" '$(TargetFramework)' == 'net35' ">
-    <DefineConstants>$(DefineConstants);FEATURE_SERIALIZABLE</DefineConstants>
-    <DebugType>full</DebugType>
-  </PropertyGroup>
   
 </Project>

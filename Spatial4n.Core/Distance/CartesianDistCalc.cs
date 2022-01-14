@@ -67,7 +67,7 @@ namespace Spatial4n.Core.Distance
             return deltaX * deltaX + deltaY * deltaY <= distance * distance;
         }
 
-        public override IPoint PointOnBearing(IPoint from, double distDEG, double bearingDEG, SpatialContext ctx, IPoint reuse)
+        public override IPoint PointOnBearing(IPoint from, double distDEG, double bearingDEG, SpatialContext ctx, IPoint? reuse)
         {
             if (distDEG == 0)
             {
@@ -79,7 +79,7 @@ namespace Spatial4n.Core.Distance
             double bearingRAD = DistanceUtils.ToRadians(bearingDEG);
             double x = from.X + Math.Sin(bearingRAD) * distDEG;
             double y = from.Y + Math.Cos(bearingRAD) * distDEG;
-            if (reuse == null)
+            if (reuse is null)
             {
                 return ctx.MakePoint(x, y);
             }
@@ -90,13 +90,13 @@ namespace Spatial4n.Core.Distance
             }
         }
 
-        public override IRectangle CalcBoxByDistFromPt(IPoint from, double distDEG, SpatialContext ctx, IRectangle reuse)
+        public override IRectangle CalcBoxByDistFromPt(IPoint from, double distDEG, SpatialContext ctx, IRectangle? reuse)
         {
             double minX = from.X - distDEG;
             double maxX = from.X + distDEG;
             double minY = from.Y - distDEG;
             double maxY = from.Y + distDEG;
-            if (reuse == null)
+            if (reuse is null)
             {
                 return ctx.MakeRectangle(minX, maxX, minY, maxY);
             }

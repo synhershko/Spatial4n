@@ -19,6 +19,7 @@
 using GeoAPI.Geometries;
 using Spatial4n.Core.Context;
 using Spatial4n.Core.Shapes.Impl;
+using System;
 using System.Diagnostics;
 
 namespace Spatial4n.Core.Shapes.Nts
@@ -42,38 +43,26 @@ namespace Spatial4n.Core.Shapes.Nts
             this.empty = pointGeom.IsEmpty;
         }
 
-        public virtual GeoAPI.Geometries.IPoint Geometry
-        {
-            get { return pointGeom; }
-        }
+        public virtual GeoAPI.Geometries.IPoint Geometry => pointGeom;
 
-        public virtual bool IsEmpty
-        {
-            get { return empty; }
-        }
+        public virtual bool IsEmpty => empty;
 
-        public virtual Spatial4n.Core.Shapes.IPoint Center
-        {
-            get { return this; }
-        }
+        public virtual Spatial4n.Core.Shapes.IPoint Center => this;
 
-        public virtual bool HasArea
-        {
-            get { return false; }
-        }
+        public virtual bool HasArea => false;
 
-        public virtual double GetArea(SpatialContext ctx)
+        public virtual double GetArea(SpatialContext? ctx)
         {
             return 0;
         }
 
-        public virtual IRectangle BoundingBox
-        {
-            get { return ctx.MakeRectangle(this, this); }
-        }
+        public virtual IRectangle BoundingBox => ctx.MakeRectangle(this, this);
 
         public virtual IShape GetBuffered(double distance, SpatialContext ctx)
         {
+            if (ctx is null)
+                throw new ArgumentNullException(nameof(ctx)); // spatial4n specific - use ArgumentNullException instead of NullReferenceException
+
             return ctx.MakeCircle(this, distance);
         }
 
@@ -87,15 +76,9 @@ namespace Spatial4n.Core.Shapes.Nts
             return other.Relate(this).Transpose();
         }
 
-        public virtual double X
-        {
-            get { return IsEmpty ? double.NaN : pointGeom.X; }
-        }
+        public virtual double X => IsEmpty ? double.NaN : pointGeom.X;
 
-        public virtual double Y
-        {
-            get { return IsEmpty ? double.NaN : pointGeom.Y; }
-        }
+        public virtual double Y => IsEmpty ? double.NaN : pointGeom.Y;
 
         public virtual void Reset(double x, double y)
         {

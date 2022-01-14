@@ -18,11 +18,10 @@
 using Spatial4n.Core.Context;
 using Spatial4n.Core.Distance;
 using Spatial4n.Core.Shapes;
-using Spatial4n.Core.Shapes.Impl;
 using System;
 using System.Diagnostics;
-using System.Reflection;
 using Xunit;
+using Range = Spatial4n.Core.Shapes.Impl.Range;
 
 namespace Spatial4n.Core.Shape
 {
@@ -67,7 +66,7 @@ namespace Spatial4n.Core.Shape
             {
                 try
                 {
-                    clazz.GetTypeInfo().GetMethod("Equals");
+                    clazz.GetMethod("Equals");
                 }
 #pragma warning disable 168
                 catch (Exception e)
@@ -77,7 +76,7 @@ namespace Spatial4n.Core.Shape
                 }
                 try
                 {
-                    clazz.GetTypeInfo().GetMethod("GetHashCode");
+                    clazz.GetMethod("GetHashCode");
                 }
 #pragma warning disable 168
                 catch (Exception e)

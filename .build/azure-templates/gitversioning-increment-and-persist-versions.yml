@@ -1,0 +1,76 @@
+# Runs GitVersioning (nbgv),
+# persists the current NBGV_NuGetPackageVersion, NBGV_AssemblyFileVersion, and BUILD_BuildNumber to a file and uploads it as a build artifact.
+
+# Output parameters:
+# - $(CI_InformationalVersion)
+# - $(CI_FileVersion)
+# - $(CI_AssemblyVersion)
+# - $(CI_PackageVersion)
+
+# Also, need to create a version.json configuration file. See: https://github.com/AArnott/Nerdbank.GitVersioning#installation-and-configuration
+
+parameters:
+  informationalVersion: '' # Optional. Will be generated from nbgv if not provided. If provided, the git commit hash will be appended to the end of the value.
+  fileVersion: '' # Optional. Will be generated from nbgv if not provided. The version that is visible on the assembly file.
+  assemblyVersion: '' # Optional. Will be generated from nbgv if not provided. The assembly version (affects binary compatibility). This should always be the same as the previous version unless a binary breaking change happens (i.e. porting a new version).
+  packageVersion: '' # Optional. Will be generated from nbgv if not provided. The version of the NuGet package.
+  versionArtifactName: 'version' # The name of the artifact where the version assets (version text files) can be downloaded
+  packageVersionFileName: 'packageVersion.txt' # The name of the file where the PackageVersion will be stored in the versionArtifact for use in later build jobs
+  fileVersionFileName: 'fileVersion.txt' # The name of the file where the FileVersion will be stored in the versionArtifact for use in later build jobs
+  buildNumberFileName: 'buildNumber.txt' # The name of the file where the Build.BuildNumber will be stored in the versionArtifact for use in later build jobs
+
+steps:
+- pwsh: |
+    function EnsureNotNullOrEmpty([string]$param, [string]$nameOfParam) {
+        if ([string]::IsNullOrEmpty($param)) {
+            Write-Host "##vso[task.logissue type=error;]Missing template parameter \"$nameOfParam\""
+            Write-Host "##vso[task.complete result=Failed;]"
+        }
+    }
+    EnsureNotNullOrEmpty('${{ parameters.versionArtifactName }}', 'versionArtifactName')
+    EnsureNotNullOrEmpty('${{ parameters.packageVersionFileName }}', 'packageVersionFileName')
+    EnsureNotNullOrEmpty('${{ parameters.fileVersionFileName }}', 'fileVersionFileName')
+    EnsureNotNullOrEmpty('${{ parameters.buildNumberFileName }}', 'buildNumberFileName')
+  displayName: 'Validate Template Parameters'
+
+- pwsh: |
+    $versionScriptFile = "$(Build.SourcesDirectory)/.build/version.ps1"
+    $versionInfo = @{}
+
+    # Get the version info
+    $versionInfoString = Invoke-Expression -Command "$versionScriptFile -PackageVersion ""${{ parameters.packageVersion }}"" -AssemblyVersion ""${{ parameters.assemblyVersion }}"" -InformationalVersion ""${{ parameters.informationalVersion }}"" -FileVersion ""${{ parameters.fileVersion }}"""
+    #Write-Host $versionInfoString
+
+    # parse the version numbers and put them into a hashtable
+    [string[]]$versionInfoSplit = $versionInfoString -split '\r?\n' # split $a into lines, whether it has CRLF or LF-only line endings
+    foreach ($line in $versionInfoSplit) {
+        [string[]]$kvp = $line -split '\:\s+?'
+        $versionInfo.Add($kvp[0], $($kvp[1]).Trim())
+    }
+    $informationalVersion = $versionInfo['InformationalVersion']
+    $fileVersion = $versionInfo['FileVersion']
+    $assemblyVersion = $versionInfo['AssemblyVersion']
+    $packageVersion = $versionInfo['PackageVersion']
+
+    Write-Host "##vso[task.setvariable variable=CI_InformationalVersion;]$informationalVersion"
+    Write-Host "##vso[task.setvariable variable=CI_FileVersion;]$fileVersion"
+    Write-Host "##vso[task.setvariable variable=CI_AssemblyVersion;]$assemblyVersion"
+    Write-Host "##vso[task.setvariable variable=CI_PackageVersion;]$packageVersion"
+    Write-Host "##vso[build.updatebuildnumber]$packageVersion"
+  displayName: 'Write Output Parameters'
+
+- template: 'show-all-environment-variables.yml'
+
+- pwsh: |
+    $dir = '$(Build.ArtifactStagingDirectory)/${{ parameters.versionArtifactName }}'
+    if (!(Test-Path $dir)) { New-Item -ItemType Directory -Path "$dir" -Force }
+    '$(CI_PackageVersion)' | Out-File -FilePath "$dir/${{ parameters.packageVersionFileName }}" -Force
+    '$(CI_FileVersion)' | Out-File -FilePath "$dir/${{ parameters.fileVersionFileName }}" -Force
+    '$(Build.BuildNumber)' | Out-File -FilePath "$dir/${{ parameters.buildNumberFileName }}" -Force
+  displayName: 'Write Versions to Files'
+
+- task: PublishBuildArtifacts@1
+  displayName: 'Publish Artifact: $(VersionArtifactName)'
+  inputs:
+    PathtoPublish: '$(Build.ArtifactStagingDirectory)/$(VersionArtifactName)'
+    ArtifactName: '$(VersionArtifactName)'

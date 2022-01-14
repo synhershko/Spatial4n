@@ -52,7 +52,7 @@ function Force-ThreeOrFourComponents([version]$version) {
     [int]$bld = [Math]::Max(0, $version.Build)
     [int]$rev = $version.Revision
 
-    if ($rev -ge 0) {
+    if ($rev -gt 0) {
         return New-Object System.Version -ArgumentList @($maj, $min, $bld, $rev)
     } else {
         return New-Object System.Version -ArgumentList @($maj, $min, $bld)

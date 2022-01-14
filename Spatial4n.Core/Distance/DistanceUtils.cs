@@ -33,44 +33,82 @@ namespace Spatial4n.Core.Distance
     public static class DistanceUtils
     {
         //pre-compute some angles that are commonly used
-        [Obsolete]
-        public static readonly double DEG_45_AS_RADS = Math.PI / 4;
-#pragma warning disable 612, 618
-        [Obsolete]
-        public static readonly double SIN_45_AS_RADS = Math.Sin(DEG_45_AS_RADS);
-#pragma warning restore 612, 618
+        //[Obsolete]
+        //public const double Degrees45AsRadians = Math.PI / 4;
+        //[Obsolete]
+        //public static readonly double Sine45AsRadians = Math.Sin(Degrees45AsRadians);
 
-        public static readonly double DEG_90_AS_RADS = Math.PI / 2;
-        public static readonly double DEG_180_AS_RADS = Math.PI;
+        public const double Degrees90AsRadians = Math.PI / 2;
+        public const double Degrees180AsRadians = Math.PI;
 
-#pragma warning disable 612, 618
-        [Obsolete]
-        public static readonly double DEG_225_AS_RADS = 5 * DEG_45_AS_RADS;
-#pragma warning restore 612, 618
-        [Obsolete]
-        public static readonly double DEG_270_AS_RADS = 3 * DEG_90_AS_RADS;
+        //[Obsolete]
+        //public const double Degrees225AsRadians = 5 * Degrees45AsRadians;
+        //[Obsolete]
+        //public const double Degrees270AsRadians = 3 * Degrees90AsRadians;
 
-        public static readonly double DEGREES_TO_RADIANS = Math.PI / 180;
-        public static readonly double RADIANS_TO_DEGREES = 1 / DEGREES_TO_RADIANS;
+        public const double DegreesToRadians = Math.PI / 180;
+        public const double RadiansToDegrees = 1 / DegreesToRadians;
 
-        public static readonly double KM_TO_MILES = 0.621371192;
-        public static readonly double MILES_TO_KM = 1 / KM_TO_MILES;//1.609
+        public const double KilometersToMiles = 0.621371192;
+        public const double MilesToKilometers = 1 / KilometersToMiles;//1.609
 
         /// <summary>
         /// The International Union of Geodesy and Geophysics says the Earth's mean radius in KM is:
         ///
         /// [1] http://en.wikipedia.org/wiki/Earth_radius
         /// </summary>
-        public static readonly double EARTH_MEAN_RADIUS_KM = 6371.0087714;
-        public static readonly double EARTH_EQUATORIAL_RADIUS_KM = 6378.1370;
+        public const double EarthMeanRadiusKilometers = 6371.0087714;
+        public const double EarthEquatorialRadiusKilometers = 6378.1370;
 
         /// <summary>
-        /// Equivalent to Degrees2Dist(1, EARTH_MEAN_RADIUS_KM)
+        /// Equivalent to Degrees2Dist(1, EarthMeanRadiusKilometers)
         /// </summary>
+        public const double DegreesToKilometers = DegreesToRadians * EarthMeanRadiusKilometers;
+        public const double KilometersToDegrees = 1 / DegreesToKilometers;
+
+        public const double EarthMeanRadiusMiles = EarthMeanRadiusKilometers * KilometersToMiles;
+        public const double EarthEquatorialRadiusMiles = EarthEquatorialRadiusKilometers * KilometersToMiles;
+
+
+        //pre-compute some angles that are commonly used
+        [Obsolete, System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
+        public static readonly double DEG_45_AS_RADS = Math.PI / 4;
+        [Obsolete, System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
+        public static readonly double SIN_45_AS_RADS = Math.Sin(DEG_45_AS_RADS);
+
+        [Obsolete("Use None instead. This const will be removed in 0.5.0."), System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
+        public static readonly double DEG_90_AS_RADS = Math.PI / 2;
+        [Obsolete("Use None instead. This const will be removed in 0.5.0."), System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
+        public static readonly double DEG_180_AS_RADS = Math.PI;
+
+        [Obsolete, System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
+        public static readonly double DEG_225_AS_RADS = 5 * DEG_45_AS_RADS;
+        [Obsolete, System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
+        public static readonly double DEG_270_AS_RADS = 3 * DEG_90_AS_RADS;
+
+        [Obsolete("Use DegreesToRadians instead. This const will be removed in 0.5.0."), System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
+        public static readonly double DEGREES_TO_RADIANS = Math.PI / 180;
+        [Obsolete("Use RadiansToDegrees instead. This const will be removed in 0.5.0."), System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
+        public static readonly double RADIANS_TO_DEGREES = 1 / DEGREES_TO_RADIANS;
+
+        [Obsolete("Use KilometersToMiles instead. This const will be removed in 0.5.0."), System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
+        public static readonly double KM_TO_MILES = 0.621371192;
+        [Obsolete("Use MilesToKilometers instead. This const will be removed in 0.5.0."), System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
+        public static readonly double MILES_TO_KM = 1 / KM_TO_MILES;//1.609
+
+        [Obsolete("Use EarthMeanRadiusKilometers instead. This const will be removed in 0.5.0."), System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
+        public static readonly double EARTH_MEAN_RADIUS_KM = 6371.0087714;
+        [Obsolete("Use EarthEquatorialRadiusKilometers instead. This const will be removed in 0.5.0."), System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
+        public static readonly double EARTH_EQUATORIAL_RADIUS_KM = 6378.1370;
+
+        [Obsolete("Use DegreesToKilometers instead. This const will be removed in 0.5.0."), System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
         public static readonly double DEG_TO_KM = DEGREES_TO_RADIANS * EARTH_MEAN_RADIUS_KM;
+        [Obsolete("Use KilometersToDegrees instead. This const will be removed in 0.5.0."), System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
         public static readonly double KM_TO_DEG = 1 / DEG_TO_KM;
 
+        [Obsolete("Use EarthMeanRadiusMiles instead. This const will be removed in 0.5.0."), System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
         public static readonly double EARTH_MEAN_RADIUS_MI = EARTH_MEAN_RADIUS_KM * KM_TO_MILES;
+        [Obsolete("Use EarthEquatorialRadiusMiles instead. This const will be removed in 0.5.0."), System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
         public static readonly double EARTH_EQUATORIAL_RADIUS_MI = EARTH_EQUATORIAL_RADIUS_KM * KM_TO_MILES;
 
         /// <summary>
@@ -81,7 +119,7 @@ namespace Spatial4n.Core.Distance
         /// <param name="power">The power (2 for cartesian distance, 1 for manhattan, etc.)</param>
         /// <returns>The length. See http://en.wikipedia.org/wiki/Lp_space </returns>
         /// <seealso cref="VectorDistance(double[], double[], double, double)"/>
-        [Obsolete]
+        [Obsolete, System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
         public static double VectorDistance(double[] vec1, double[] vec2, double power)
         {
             //only calc oneOverPower if it's needed
@@ -98,7 +136,7 @@ namespace Spatial4n.Core.Distance
         /// <param name="oneOverPower">If you've precalculated <paramref name="oneOverPower"/> and cached it, 
         /// use this method to save one division operation over <seealso cref="VectorDistance(double[], double[], double)"/>.</param>
         /// <returns>The length.</returns>
-        [Obsolete]
+        [Obsolete, System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
         public static double VectorDistance(double[] vec1, double[] vec2, double power, double oneOverPower)
         {
             double result = 0;
@@ -149,7 +187,7 @@ namespace Spatial4n.Core.Distance
         /// <param name="distance">The distance from the center to the corner</param>
         /// <param name="upperRight">If true, return the coords for the upper right corner, else return the lower left.</param>
         /// <returns>The point, either the upperLeft or the lower right</returns>
-        [Obsolete]
+        [Obsolete, System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
         public static double[] VectorBoxCorner(double[] center, double[] result, double distance, bool upperRight)
         {
             if (result == null || result.Length != center.Length)
@@ -198,38 +236,38 @@ namespace Spatial4n.Core.Distance
                 cosAngDist - sinStartLat * sinLat2);
 
             // normalize lon first
-            if (lon2 > DEG_180_AS_RADS)
+            if (lon2 > Degrees180AsRadians)
             {
-                lon2 = -1.0 * (DEG_180_AS_RADS - (lon2 - DEG_180_AS_RADS));
+                lon2 = -1.0 * (Degrees180AsRadians - (lon2 - Degrees180AsRadians));
             }
-            else if (lon2 < -DEG_180_AS_RADS)
+            else if (lon2 < -Degrees180AsRadians)
             {
-                lon2 = (lon2 + DEG_180_AS_RADS) + DEG_180_AS_RADS;
+                lon2 = (lon2 + Degrees180AsRadians) + Degrees180AsRadians;
             }
 
             // normalize lat - could flip poles
-            if (lat2 > DEG_90_AS_RADS)
+            if (lat2 > Degrees90AsRadians)
             {
-                lat2 = DEG_90_AS_RADS - (lat2 - DEG_90_AS_RADS);
+                lat2 = Degrees90AsRadians - (lat2 - Degrees90AsRadians);
                 if (lon2 < 0)
                 {
-                    lon2 = lon2 + DEG_180_AS_RADS;
+                    lon2 = lon2 + Degrees180AsRadians;
                 }
                 else
                 {
-                    lon2 = lon2 - DEG_180_AS_RADS;
+                    lon2 = lon2 - Degrees180AsRadians;
                 }
             }
-            else if (lat2 < -DEG_90_AS_RADS)
+            else if (lat2 < -Degrees90AsRadians)
             {
-                lat2 = -DEG_90_AS_RADS - (lat2 + DEG_90_AS_RADS);
+                lat2 = -Degrees90AsRadians - (lat2 + Degrees90AsRadians);
                 if (lon2 < 0)
                 {
-                    lon2 = lon2 + DEG_180_AS_RADS;
+                    lon2 = lon2 + Degrees180AsRadians;
                 }
                 else
                 {
-                    lon2 = lon2 - DEG_180_AS_RADS;
+                    lon2 = lon2 - Degrees180AsRadians;
                 }
             }
 
@@ -501,8 +539,8 @@ namespace Spatial4n.Core.Distance
             // crossing 180 since cos(x) = cos(-x)
             double dLon = lon2 - lon1;
 
-            double a = DEG_90_AS_RADS - lat1;
-            double c = DEG_90_AS_RADS - lat2;
+            double a = Degrees90AsRadians - lat1;
+            double c = Degrees90AsRadians - lat2;
             double cosB = (Math.Cos(a) * Math.Cos(c))
                 + (Math.Sin(a) * Math.Sin(c) * Math.Cos(dLon));
 
@@ -587,7 +625,7 @@ namespace Spatial4n.Core.Distance
         /// </summary>
         public static double ToRadians(double degrees)
         {
-            return degrees * DEGREES_TO_RADIANS;
+            return degrees * DegreesToRadians;
         }
 
         /// <summary>
@@ -596,7 +634,7 @@ namespace Spatial4n.Core.Distance
         /// </summary>
         public static double ToDegrees(double radians)
         {
-            return radians * RADIANS_TO_DEGREES;
+            return radians * RadiansToDegrees;
         }
     }
 }

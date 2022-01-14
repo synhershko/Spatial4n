@@ -479,7 +479,7 @@ namespace Spatial4n.Core.Distance
         /// <param name="vec1">The first point</param>
         /// <param name="vec2">The second point</param>
         /// <returns>The squared cartesian distance</returns>
-        [Obsolete]
+        [Obsolete, System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
         public static double DistSquaredCartesian(double[] vec1, double[] vec2)
         {
             double result = 0;

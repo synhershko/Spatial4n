@@ -20,7 +20,6 @@ using Spatial4n.Core.Shapes.Impl;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 
 namespace Spatial4n.Core.Shapes
@@ -67,7 +66,7 @@ namespace Spatial4n.Core.Shapes
 
         protected virtual IRectangle ComputeBoundingBox(ICollection<IShape> shapes, SpatialContext ctx)
         {
-            if (!shapes.Any())
+            if (shapes.Count == 0)
                 return ctx.MakeRectangle(double.NaN, double.NaN, double.NaN, double.NaN);
             Range? xRange = null;
             double minY = double.PositiveInfinity;

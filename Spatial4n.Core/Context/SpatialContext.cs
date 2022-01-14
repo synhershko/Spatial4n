@@ -60,7 +60,7 @@ namespace Spatial4n.Core.Context
         /// <param name="geo">Establishes geo vs cartesian / Euclidean.</param>
         /// <param name="calculator">Optional; defaults to Haversine or cartesian depending on units.</param>
         /// <param name="worldBounds">Optional; defaults to GEO_WORLDBOUNDS or MAX_WORLDBOUNDS depending on units.</param> 
-        [Obsolete]
+        [Obsolete, System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
         public SpatialContext(bool geo, IDistanceCalculator calculator, IRectangle worldBounds)
             : this(InitFromLegacyConstructor(geo, calculator, worldBounds))
         { }
@@ -76,7 +76,7 @@ namespace Spatial4n.Core.Context
             return factory;
         }
 
-        [Obsolete]
+        [Obsolete, System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
         public SpatialContext(bool geo)
             : this(InitFromLegacyConstructor(geo, null, null))
         { }
@@ -377,7 +377,7 @@ namespace Spatial4n.Core.Context
         /// </summary>
         /// <param name="value">non-null</param>
         /// <returns>non-null</returns>
-        [Obsolete]
+        [Obsolete, System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
         public virtual IShape ReadShape(string value)
         {
             IShape? s = LegacyShapeReadWriterFormat.ReadShapeOrNull(value, this);
@@ -407,7 +407,7 @@ namespace Spatial4n.Core.Context
         /// </summary>
         /// <param name="shape">non-null</param>
         /// <returns>non-null</returns>
-        [Obsolete]
+        [Obsolete, System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
         public virtual string ToString(IShape shape)
         {
             return LegacyShapeReadWriterFormat.WriteShape(shape);

@@ -29,7 +29,7 @@ namespace Spatial4n.Core.IO
     /// Lucene, LUCENE-773</a>, which in turn came from "LocalLucene".
     /// </para>
     /// </summary>
-    [Obsolete("Not useful; see https://github.com/spatial4j/spatial4j/issues/19")]
+    [Obsolete("Not useful; see https://github.com/spatial4j/spatial4j/issues/19"), System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
     public static class ParseUtils
     {
         /// <summary>

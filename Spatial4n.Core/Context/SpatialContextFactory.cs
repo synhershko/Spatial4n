@@ -234,7 +234,7 @@ namespace Spatial4n.Core.Context
 #pragma warning restore 612, 618
         }
 
-        [Obsolete("Use CreateSpatialContext() instead.")]
+        [Obsolete("Use CreateSpatialContext() instead."), System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
         protected internal virtual SpatialContext NewSpatialContext()
         {
             return CreateSpatialContext();

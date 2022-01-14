@@ -18,7 +18,6 @@
 using Spatial4n.Core.Context;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 
 namespace Spatial4n.Core.Shapes.Impl
@@ -60,7 +59,7 @@ namespace Spatial4n.Core.Shapes.Impl
         {
             this.buf = buf;
 
-            if (!points.Any())
+            if (points.Count == 0)
             {
                 this.segments = ctx.MakeCollection(new List<IShape>());
             }
@@ -83,7 +82,7 @@ namespace Spatial4n.Core.Shapes.Impl
                     }
                     prevPoint = point;
                 }
-                if (!segments.Any())
+                if (segments.Count == 0)
                 {//TODO throw exception instead?
                     segments.Add(new BufferedLine(prevPoint!, prevPoint!, buf, ctx));
                 }
@@ -147,7 +146,7 @@ namespace Spatial4n.Core.Shapes.Impl
         {
             get
             {
-                if (!segments.Any())
+                if (segments.Count == 0)
                     return new List<IPoint>();
                 IList<IShape> shapes = segments.Shapes;
                 IList<IPoint> points = new List<IPoint>(); ;

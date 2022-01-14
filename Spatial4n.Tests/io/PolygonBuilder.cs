@@ -93,7 +93,7 @@ namespace Spatial4n.Core.IO
         public virtual IPolygon ToPolygon()
         {
             ILinearRing ring = ctx.GeometryFactory.CreateLinearRing(points.ToArray(/*new Coordinate[points.Count]*/));
-            ILinearRing[] holes = !this.holes.Any() ? null : this.holes.ToArray(/*new LinearRing[this.holes.Count]*/);
+            ILinearRing[] holes = this.holes.Count == 0 ? null : this.holes.ToArray(/*new LinearRing[this.holes.Count]*/);
             return ctx.GeometryFactory.CreatePolygon(ring, holes);
         }
 
